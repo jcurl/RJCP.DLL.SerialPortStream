@@ -503,25 +503,29 @@ namespace RJCP.IO.Ports
 
             ManagementObjectCollection objects;
             // Look for standard serial ports
-            objects = new ManagementObjectSearcher("select * from Win32_SerialPort").Get();
-            using (ManagementObjectCollection.ManagementObjectEnumerator enumerator = objects.GetEnumerator()) {
-                while (enumerator.MoveNext()) {
-                    ManagementObject current = (ManagementObject)enumerator.Current;
-                    string k = current["DeviceID"].ToString();
-                    if (!list.ContainsKey(k)) {
-                        list.Add(k, new PortDescription(k, current["Name"].ToString()));
+            using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_SerialPort")) {
+                objects = q.Get();
+                using (ManagementObjectCollection.ManagementObjectEnumerator enumerator = objects.GetEnumerator()) {
+                    while (enumerator.MoveNext()) {
+                        ManagementObject current = (ManagementObject)enumerator.Current;
+                        string k = current["DeviceID"].ToString();
+                        if (!list.ContainsKey(k)) {
+                            list.Add(k, new PortDescription(k, current["Name"].ToString()));
+                        }
                     }
                 }
             }
 
             // Look for any modems that are attached to COM ports that aren't listed above
-            objects = new ManagementObjectSearcher("select * from Win32_POTSModem").Get();
-            using (ManagementObjectCollection.ManagementObjectEnumerator enumerator = objects.GetEnumerator()) {
-                while (enumerator.MoveNext()) {
-                    ManagementObject current = (ManagementObject)enumerator.Current;
-                    string k = current["AttachedTo"].ToString();
-                    if (!list.ContainsKey(k)) {
-                        list.Add(k, new PortDescription(k, current["Name"].ToString()));
+            using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_POTSModem")) {
+                objects = q.Get();
+                using (ManagementObjectCollection.ManagementObjectEnumerator enumerator = objects.GetEnumerator()) {
+                    while (enumerator.MoveNext()) {
+                        ManagementObject current = (ManagementObject)enumerator.Current;
+                        string k = current["AttachedTo"].ToString();
+                        if (!list.ContainsKey(k)) {
+                            list.Add(k, new PortDescription(k, current["Name"].ToString()));
+                        }
                     }
                 }
             }
@@ -2029,6 +2033,7 @@ namespace RJCP.IO.Ports
 
             lock (m_EventCheck) {
                 // Check if there is an event to process.
+                if (m_Disposed) return;
                 if ((m_CommEvent == 0) && m_CommErrorEvent == 0) return;
                 m_EventProcessing.Set();
             }
@@ -2049,7 +2054,8 @@ namespace RJCP.IO.Ports
             NativeSerialPort.Native.SerialEventMask commEvent;
             NativeSerialPort.Native.ComStatErrors commErrorEvent;
 
-            while (true) {
+            bool handleEvent = true;
+            while (handleEvent) {
                 // Received Data
                 lock (m_EventCheck) {
                     commEvent = m_CommEvent;
@@ -2057,8 +2063,10 @@ namespace RJCP.IO.Ports
                         NativeSerialPort.Native.SerialEventMask.EV_RXFLAG);
                 }
                 if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RXFLAG) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Eof));
                 } else if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RXCHAR) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     if (m_SerialPort.SerialPortIo.BytesToRead >= m_RxThreshold) {
                         OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Chars));
                     }
@@ -2072,16 +2080,26 @@ namespace RJCP.IO.Ports
                         NativeSerialPort.Native.SerialEventMask.EV_DSR |
                         NativeSerialPort.Native.SerialEventMask.EV_BREAK);
                 }
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_CTS) != 0)
+                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_CTS) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RING) != 0)
+                }
+                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RING) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Ring));
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RLSD) != 0)
+                }
+                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RLSD) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_DSR) != 0)
+                }
+                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_DSR) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_BREAK) != 0)
+                }
+                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_BREAK) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Break));
+                }
 
                 // Error States
                 lock (m_EventCheck) {
@@ -2089,24 +2107,36 @@ namespace RJCP.IO.Ports
                     m_CommErrorEvent = 0;
                 }
 
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_TXFULL) != 0)
+                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_TXFULL) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.TXFull));
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_FRAME) != 0)
+                }
+                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_FRAME) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Frame));
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_RXPARITY) != 0)
+                }
+                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_RXPARITY) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXParity));
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_OVERRUN) != 0)
+                }
+                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_OVERRUN) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Overrun));
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_RXOVER) != 0)
+                }
+                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_RXOVER) != 0) {
+                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXOver));
+                }
 
                 lock (m_EventCheck) {
                     if (m_CommErrorEvent == 0 && m_CommEvent == 0) {
-                        m_EventProcessing.Reset();
-                        return;
+                        handleEvent = false;
+                        break;
                     }
                 }
             }
+
+            m_EventProcessing.Reset();
         }
 
         private void OnDataReceived(SerialDataReceivedEventArgs args)
@@ -2137,19 +2167,6 @@ namespace RJCP.IO.Ports
             m_SerialPort.Close();
         }
 
-        /// <summary>
-        /// Dispose this object, release all unmanaged and managed resources. Close all active threads.
-        /// </summary>
-        /// <remarks>
-        /// After disposing this object via this method, it is no longer usable. All methods and
-        /// properties will raise an exception.
-        /// </remarks>
-        public new void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         private bool m_Disposed = false;
 
         /// <summary>
@@ -2161,8 +2178,13 @@ namespace RJCP.IO.Ports
         {
             if (!IsDisposed) {
                 if (disposing) {
+                    // Wait for events to finish before we dispose
+                    lock (m_EventCheck) { m_Disposed = true; }
+                    m_EventProcessing.WaitOne();
+
                     m_Trace.Close();
                     if (m_SerialPort != null) Close();
+                    m_EventProcessing.Dispose();
                 }
                 base.Dispose(disposing);
             }

@@ -631,6 +631,7 @@ namespace RJCP.IO.Ports
                 /// <param name="offset">Offset into buffer</param>
                 /// <param name="count">Number of characters to write</param>
                 /// <param name="decoder">The decoder to use</param>
+                /// <param name="bytesUsed">Number of bytes consumed by the internal read buffer</param>
                 /// <returns>Number of characters copied into the buffer</returns>
                 public int Read(char[] buffer, int offset, int count, Decoder decoder, out int bytesUsed)
                 {
@@ -1115,20 +1116,22 @@ namespace RJCP.IO.Ports
                                 running = false;
                             } else if (whandles[ev] == m_SerialCommEvent) {
                                 result = Native.GetOverlappedResult(m_ComPortHandle, ref serialCommOverlapped, out bytes, false);
+                                int e = Marshal.GetLastWin32Error();
                                 if (result) {
                                     ProcessWaitCommEvent(commEventMask);
                                 } else {
                                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, m_DebugId,
-                                        "SerialThread: Overlapped WaitCommEvent() error {0}", Marshal.GetLastWin32Error());
+                                        "SerialThread: Overlapped WaitCommEvent() error {0}", e);
                                 }
                                 serialCommPending = false;
                             } else if (whandles[ev] == m_ReadEvent) {
                                 result = Native.GetOverlappedResult(m_ComPortHandle, ref readOverlapped, out bytes, false);
+                                int e = Marshal.GetLastWin32Error();
                                 if (result) {
                                     ProcessReadEvent(bytes);
                                 } else {
                                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, m_DebugId,
-                                        "SerialThread: Overlapped ReadFile() error {0}", Marshal.GetLastWin32Error());
+                                        "SerialThread: Overlapped ReadFile() error {0}", e);
                                 }
                                 readPending = false;
                             } else if (whandles[ev] == m_ReadBufferNotFullEvent) {
@@ -1136,11 +1139,12 @@ namespace RJCP.IO.Ports
                                 // should read or not.
                             } else if (whandles[ev] == m_WriteEvent) {
                                 result = Native.GetOverlappedResult(m_ComPortHandle, ref writeOverlapped, out bytes, false);
+                                int e = Marshal.GetLastWin32Error();
                                 if (result) {
                                     ProcessWriteEvent(bytes);
                                 } else {
                                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, m_DebugId,
-                                        "SerialThread: Overlapped WriteFile() error {0}", Marshal.GetLastWin32Error());
+                                        "SerialThread: Overlapped WriteFile() error {0}", e);
                                 }
                                 writePending = false;
                             } else if (whandles[ev] == m_WriteBufferNotEmptyEvent) {
@@ -1183,10 +1187,10 @@ namespace RJCP.IO.Ports
                 private bool DoWaitCommEvent(out Native.SerialEventMask mask, ref NativeOverlapped overlap)
                 {
                     bool result = Native.WaitCommEvent(m_ComPortHandle, out mask, ref overlap);
+                    int e = Marshal.GetLastWin32Error();
                     if (result) {
                         ProcessWaitCommEvent(mask);
                     } else {
-                        int e = Marshal.GetLastWin32Error();
                         if (e != WinError.ERROR_IO_PENDING) {
                             m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, m_DebugId, "SerialThread: DoWaitCommEvent: Result: {0}", e);
                             //throw new IOException("WaitCommEvent error", e);
@@ -1232,6 +1236,7 @@ namespace RJCP.IO.Ports
                     if ((mask & (Native.SerialEventMask.EV_RXCHAR | Native.SerialEventMask.EV_ERR)) != 0) {
                         Native.ComStatErrors comErr;
                         bool result = Native.ClearCommError(m_ComPortHandle, out comErr, IntPtr.Zero);
+                        int e = Marshal.GetLastWin32Error();
                         if (result) {
                             comErr = (Native.ComStatErrors)((int)comErr & 0x10F);
                             if (comErr != 0) {
@@ -1239,7 +1244,7 @@ namespace RJCP.IO.Ports
                             }
                         } else {
                             m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, 
-                                "SerialThread: ClearCommError: WINERROR {0}", Marshal.GetLastWin32Error());
+                                "SerialThread: ClearCommError: WINERROR {0}", e);
                         }
                     }
                 }
@@ -1280,6 +1285,7 @@ namespace RJCP.IO.Ports
 
                     uint bufRead;
                     bool result = Native.ReadFile(m_ComPortHandle, bufPtr, bufLen, out bufRead, ref overlap);
+                    int e = Marshal.GetLastWin32Error();
                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, 
                         "SerialThread: DoReadEvent: ReadFile({0}, {1}, {2}) == {3}", 
                         m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
@@ -1290,7 +1296,6 @@ namespace RJCP.IO.Ports
                         // asynchronous I/O operation and return the number of bytes copied in bufRead. 
                         ProcessReadEvent(bufRead);
                     } else {
-                        int e = Marshal.GetLastWin32Error();
                         if (e != WinError.ERROR_IO_PENDING) {
                             m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, m_DebugId, "SerialThread: DoReadEvent: ReadFile() error {0}", e);
                             //throw new IOException("ReadFile error", e);
@@ -1360,13 +1365,13 @@ namespace RJCP.IO.Ports
                     uint bufWrite;
                     m_TxBufferEmpty.Reset();
                     bool result = Native.WriteFile(m_ComPortHandle, bufPtr, bufLen, out bufWrite, ref overlap);
+                    int e = Marshal.GetLastWin32Error();
                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId,
                         "SerialThread: DoWriteEvent: WriteFile({0}, {1}, {2}, ...) == {3}",
                         m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
                     if (result) {
                         ProcessWriteEvent(bufWrite);
                     } else {
-                        int e = Marshal.GetLastWin32Error();
                         if (e != WinError.ERROR_IO_PENDING) {
                             m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, m_DebugId, "SerialThread: DoWriteEvent: WriteFile() error {0}", e);
                             //throw new IOException("WriteFile error", e);
@@ -1422,6 +1427,8 @@ namespace RJCP.IO.Ports
                         m_WriteBufferNotEmptyEvent.Dispose();
                         m_ReadBufferNotEmptyEvent.Dispose();
                         m_WriteBufferNotFullEvent.Dispose();
+                        m_ReadBufferEvent.Dispose();
+                        m_TxBufferEmpty.Dispose();
                     }
                 }
 
