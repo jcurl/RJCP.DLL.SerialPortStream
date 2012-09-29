@@ -150,24 +150,24 @@ namespace RJCP.IO.Ports
                 if (string.IsNullOrWhiteSpace(m_Port)) throw new InvalidOperationException("Port must first be set");
                 if (IsOpen) throw new InvalidOperationException("Serial Port currently open");
 
-                m_ComPortHandle = Native.CreateFile(@"\\.\" + m_Port, 
-                    Native.FileAccess.GENERIC_READ | Native.FileAccess.GENERIC_WRITE,
-                    Native.FileShare.FILE_SHARE_NONE, 
-                    IntPtr.Zero, 
-                    Native.CreationDisposition.OPEN_EXISTING,
-                    Native.FileAttributes.FILE_FLAG_OVERLAPPED,
+                m_ComPortHandle = UnsafeNativeMethods.CreateFile(@"\\.\" + m_Port,
+                    NativeMethods.FileAccess.GENERIC_READ | NativeMethods.FileAccess.GENERIC_WRITE,
+                    NativeMethods.FileShare.FILE_SHARE_NONE, 
+                    IntPtr.Zero,
+                    NativeMethods.CreationDisposition.OPEN_EXISTING,
+                    NativeMethods.FileAttributes.FILE_FLAG_OVERLAPPED,
                     IntPtr.Zero);
                 if (m_ComPortHandle.IsInvalid) WinIOError();
 
-                Native.FileType t = Native.GetFileType(m_ComPortHandle);
-                if (t != Native.FileType.FILE_TYPE_CHAR && t != Native.FileType.FILE_TYPE_UNKNOWN) {
+                NativeMethods.FileType t = UnsafeNativeMethods.GetFileType(m_ComPortHandle);
+                if (t != NativeMethods.FileType.FILE_TYPE_CHAR && t != NativeMethods.FileType.FILE_TYPE_UNKNOWN) {
                     m_ComPortHandle.Close();
                     m_ComPortHandle = null;
                     throw new IOException("Wrong Filetype: " + m_Port);
                 }
 
                 // Set the default parameters
-                Native.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
+                UnsafeNativeMethods.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
                 
                 m_CommState = new CommState(m_ComPortHandle, m_CommState);
                 m_CommProperties = new CommProperties(m_ComPortHandle);

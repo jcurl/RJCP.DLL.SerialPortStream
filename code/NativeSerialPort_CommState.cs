@@ -20,7 +20,7 @@ namespace RJCP.IO.Ports
             public sealed class CommState
             {
                 private SafeFileHandle m_ComPortHandle = null;
-                private Native.DCB m_Dcb = new Native.DCB();
+                private NativeMethods.DCB m_Dcb = new NativeMethods.DCB();
 
                 /// <summary>
                 /// Default constructor for a DCB
@@ -76,7 +76,7 @@ namespace RJCP.IO.Ports
                 /// <exception cref="IOException">The DCB could not be obtained</exception>
                 public void GetCommState()
                 {
-                    if (!Native.GetCommState(m_ComPortHandle, ref m_Dcb)) {
+                    if (!UnsafeNativeMethods.GetCommState(m_ComPortHandle, ref m_Dcb)) {
                         throw new IOException("Unable to get serial port state", Marshal.GetLastWin32Error());
                     }
                 }
@@ -95,15 +95,15 @@ namespace RJCP.IO.Ports
                 /// combination of data in the DCB.</exception>
                 public void SetCommState()
                 {
-                    if (!Native.SetCommState(m_ComPortHandle, ref m_Dcb)) {
+                    if (!UnsafeNativeMethods.SetCommState(m_ComPortHandle, ref m_Dcb)) {
                         throw new IOException("Unable to set the serial port state", Marshal.GetLastWin32Error());
                     }
                 }
 
                 public bool Binary
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.Binary) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.Binary)) | (value ? Native.DcbFlags.Binary : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.Binary) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.Binary)) | (value ? NativeMethods.DcbFlags.Binary : 0); }
                 }
 
                 public int BaudRate
@@ -114,54 +114,54 @@ namespace RJCP.IO.Ports
 
                 public bool ParityEnable
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.Parity) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.Parity)) | (value ? Native.DcbFlags.Parity : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.Parity) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.Parity)) | (value ? NativeMethods.DcbFlags.Parity : 0); }
                 }
 
                 public bool OutCtsFlow
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.OutxCtsFlow) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.OutxCtsFlow)) | (value ? Native.DcbFlags.OutxCtsFlow : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.OutxCtsFlow) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.OutxCtsFlow)) | (value ? NativeMethods.DcbFlags.OutxCtsFlow : 0); }
                 }
 
                 public bool OutDsrFlow
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.OutxDsrFlow) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.OutxDsrFlow)) | (value ? Native.DcbFlags.OutxDsrFlow : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.OutxDsrFlow) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.OutxDsrFlow)) | (value ? NativeMethods.DcbFlags.OutxDsrFlow : 0); }
                 }
 
                 public DtrControl DtrControl
                 {
                     get
                     {
-                        int dtrc = (int)(m_Dcb.Flags & Native.DcbFlags.DtrControlMask);
+                        int dtrc = (int)(m_Dcb.Flags & NativeMethods.DcbFlags.DtrControlMask);
                         return (DtrControl)(dtrc >> 4);
                     }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.DtrControlMask)) | (Native.DcbFlags)(((int)value) << 4); }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.DtrControlMask)) | (NativeMethods.DcbFlags)(((int)value) << 4); }
                 }
 
                 public bool DsrSensitivity
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.DsrSensitivity) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.DsrSensitivity)) | (value ? Native.DcbFlags.DsrSensitivity : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.DsrSensitivity) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.DsrSensitivity)) | (value ? NativeMethods.DcbFlags.DsrSensitivity : 0); }
                 }
 
                 public bool TxContinueOnXoff
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.TxContinueOnXoff) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.TxContinueOnXoff)) | (value ? Native.DcbFlags.TxContinueOnXoff : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.TxContinueOnXoff) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.TxContinueOnXoff)) | (value ? NativeMethods.DcbFlags.TxContinueOnXoff : 0); }
                 }
 
                 public bool OutX
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.OutX) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.OutX)) | (value ? Native.DcbFlags.OutX : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.OutX) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.OutX)) | (value ? NativeMethods.DcbFlags.OutX : 0); }
                 }
 
                 public bool InX
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.InX) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.InX)) | (value ? Native.DcbFlags.InX : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.InX) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.InX)) | (value ? NativeMethods.DcbFlags.InX : 0); }
                 }
 
                 public byte XOnChar
@@ -178,8 +178,8 @@ namespace RJCP.IO.Ports
 
                 public bool ErrorCharEnabled
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.ErrorChar) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.ErrorChar)) | (value ? Native.DcbFlags.ErrorChar : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.ErrorChar) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.ErrorChar)) | (value ? NativeMethods.DcbFlags.ErrorChar : 0); }
                 }
 
                 public byte ErrorChar
@@ -202,24 +202,24 @@ namespace RJCP.IO.Ports
 
                 public bool Null
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.Null) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.Null)) | (value ? Native.DcbFlags.Null : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.Null) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.Null)) | (value ? NativeMethods.DcbFlags.Null : 0); }
                 }
 
                 public RtsControl RtsControl
                 {
                     get
                     {
-                        int dtrc = (int)(m_Dcb.Flags & Native.DcbFlags.RtsControlMask);
+                        int dtrc = (int)(m_Dcb.Flags & NativeMethods.DcbFlags.RtsControlMask);
                         return (RtsControl)(dtrc >> 12);
                     }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.RtsControlMask)) | (Native.DcbFlags)(((int)value) << 12); }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.RtsControlMask)) | (NativeMethods.DcbFlags)(((int)value) << 12); }
                 }
 
                 public bool AbortOnError
                 {
-                    get { return (m_Dcb.Flags & Native.DcbFlags.AbortOnError) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~Native.DcbFlags.AbortOnError)) | (value ? Native.DcbFlags.AbortOnError : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.AbortOnError) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.AbortOnError)) | (value ? NativeMethods.DcbFlags.AbortOnError : 0); }
                 }
 
                 public int XonLim

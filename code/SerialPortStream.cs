@@ -728,7 +728,7 @@ namespace RJCP.IO.Ports
                 if (btr < m_RxThreshold && btr > value) {
                     m_RxThreshold = value;
                     SerialPortIo_CommEvent(this,
-                        new NativeSerialPort.CommOverlappedIo.CommEventArgs(NativeSerialPort.Native.SerialEventMask.EV_RXCHAR));
+                        new NativeSerialPort.CommOverlappedIo.CommEventArgs(NativeMethods.SerialEventMask.EV_RXCHAR));
                 } else {
                     m_RxThreshold = value;
                 }
@@ -1992,9 +1992,9 @@ namespace RJCP.IO.Ports
 
         private ManualResetEvent m_EventProcessing = new ManualResetEvent(false);
 
-        private NativeSerialPort.Native.SerialEventMask m_CommEvent = 0;
+        private NativeMethods.SerialEventMask m_CommEvent = 0;
 
-        private NativeSerialPort.Native.ComStatErrors m_CommErrorEvent = 0;
+        private NativeMethods.ComStatErrors m_CommErrorEvent = 0;
 
         private void SerialPortIo_CommEvent(object sender, NativeSerialPort.CommOverlappedIo.CommEventArgs e)
         {
@@ -2051,21 +2051,21 @@ namespace RJCP.IO.Ports
         /// <param name="state">Not used</param>
         private void HandleEvent(object state)
         {
-            NativeSerialPort.Native.SerialEventMask commEvent;
-            NativeSerialPort.Native.ComStatErrors commErrorEvent;
+            NativeMethods.SerialEventMask commEvent;
+            NativeMethods.ComStatErrors commErrorEvent;
 
             bool handleEvent = true;
             while (handleEvent) {
                 // Received Data
                 lock (m_EventCheck) {
                     commEvent = m_CommEvent;
-                    m_CommEvent &= ~(NativeSerialPort.Native.SerialEventMask.EV_RXCHAR |
-                        NativeSerialPort.Native.SerialEventMask.EV_RXFLAG);
+                    m_CommEvent &= ~(NativeMethods.SerialEventMask.EV_RXCHAR |
+                        NativeMethods.SerialEventMask.EV_RXFLAG);
                 }
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RXFLAG) != 0) {
+                if ((commEvent & NativeMethods.SerialEventMask.EV_RXFLAG) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Eof));
-                } else if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RXCHAR) != 0) {
+                } else if ((commEvent & NativeMethods.SerialEventMask.EV_RXCHAR) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     if (m_SerialPort.SerialPortIo.BytesToRead >= m_RxThreshold) {
                         OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Chars));
@@ -2074,29 +2074,29 @@ namespace RJCP.IO.Ports
 
                 // Modem Pin States
                 lock (m_EventCheck) {
-                    m_CommEvent &= ~(NativeSerialPort.Native.SerialEventMask.EV_CTS |
-                        NativeSerialPort.Native.SerialEventMask.EV_RING |
-                        NativeSerialPort.Native.SerialEventMask.EV_RLSD |
-                        NativeSerialPort.Native.SerialEventMask.EV_DSR |
-                        NativeSerialPort.Native.SerialEventMask.EV_BREAK);
+                    m_CommEvent &= ~(NativeMethods.SerialEventMask.EV_CTS |
+                        NativeMethods.SerialEventMask.EV_RING |
+                        NativeMethods.SerialEventMask.EV_RLSD |
+                        NativeMethods.SerialEventMask.EV_DSR |
+                        NativeMethods.SerialEventMask.EV_BREAK);
                 }
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_CTS) != 0) {
+                if ((commEvent & NativeMethods.SerialEventMask.EV_CTS) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
                 }
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RING) != 0) {
+                if ((commEvent & NativeMethods.SerialEventMask.EV_RING) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Ring));
                 }
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_RLSD) != 0) {
+                if ((commEvent & NativeMethods.SerialEventMask.EV_RLSD) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
                 }
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_DSR) != 0) {
+                if ((commEvent & NativeMethods.SerialEventMask.EV_DSR) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
                 }
-                if ((commEvent & NativeSerialPort.Native.SerialEventMask.EV_BREAK) != 0) {
+                if ((commEvent & NativeMethods.SerialEventMask.EV_BREAK) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Break));
                 }
@@ -2107,23 +2107,23 @@ namespace RJCP.IO.Ports
                     m_CommErrorEvent = 0;
                 }
 
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_TXFULL) != 0) {
+                if ((commErrorEvent & NativeMethods.ComStatErrors.CE_TXFULL) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.TXFull));
                 }
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_FRAME) != 0) {
+                if ((commErrorEvent & NativeMethods.ComStatErrors.CE_FRAME) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Frame));
                 }
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_RXPARITY) != 0) {
+                if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXPARITY) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXParity));
                 }
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_OVERRUN) != 0) {
+                if ((commErrorEvent & NativeMethods.ComStatErrors.CE_OVERRUN) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Overrun));
                 }
-                if ((commErrorEvent & NativeSerialPort.Native.ComStatErrors.CE_RXOVER) != 0) {
+                if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXOVER) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXOver));
                 }
