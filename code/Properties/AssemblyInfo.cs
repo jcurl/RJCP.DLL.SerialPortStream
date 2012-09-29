@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SerialPortStream")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Serial Port abstraction DLL")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("RJCP")]
 [assembly: AssemblyProduct("SerialPortStream")]
 [assembly: AssemblyCopyright("Copyright © Jason Curl 2012")]
 [assembly: AssemblyTrademark("")]

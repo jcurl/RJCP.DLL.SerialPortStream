@@ -16,7 +16,7 @@ namespace RJCP.Datastructures
     /// </remarks>
     /// <typeparam name="T">Type to use for the array</typeparam>
     [DebuggerDisplay("Start = {Start}; Length = {Length}; Free = {Free}")]
-    public class CircularBuffer<T>
+    internal class CircularBuffer<T>
     {
         /// <summary>
         /// Circular buffer itself. Exposed by property "Array"
@@ -542,7 +542,7 @@ namespace RJCP.Datastructures
     /// <summary>
     /// A set of useful extensions to the CircularBuffer for specific data types
     /// </summary>
-    public static class CircularBufferExtensions
+    internal static class CircularBufferExtensions
     {
         /// <summary>
         /// Convert the contents of the circular buffer into a string
