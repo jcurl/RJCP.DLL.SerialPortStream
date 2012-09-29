@@ -29,7 +29,7 @@ namespace RJCP.Datastructures
     /// then take into account the current time and reduce the timeout so that
     /// the operation ends as expected</para>
     /// </remarks>
-    public sealed class TimerExpiry
+    internal sealed class TimerExpiry
     {
         private Stopwatch m_StopWatch = new Stopwatch();
         private int m_Milliseconds;
