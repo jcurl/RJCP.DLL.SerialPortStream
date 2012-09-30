@@ -73,7 +73,6 @@ namespace RJCP.IO.Ports
                         throw new IOException("Unable to set RTS state explicitly", Marshal.GetLastWin32Error());
                     }
                 }
-
             }
         }
     }
