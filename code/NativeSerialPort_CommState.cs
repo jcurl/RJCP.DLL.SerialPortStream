@@ -19,7 +19,7 @@ namespace RJCP.IO.Ports
             /// </summary>
             public sealed class CommState
             {
-                private SafeFileHandle m_ComPortHandle = null;
+                private SafeFileHandle m_ComPortHandle;
                 private NativeMethods.DCB m_Dcb = new NativeMethods.DCB();
 
                 /// <summary>
@@ -146,10 +146,10 @@ namespace RJCP.IO.Ports
                     set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.DsrSensitivity)) | (value ? NativeMethods.DcbFlags.DsrSensitivity : 0); }
                 }
 
-                public bool TxContinueOnXoff
+                public bool TxContinueOnXOff
                 {
-                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.TxContinueOnXoff) != 0; }
-                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.TxContinueOnXoff)) | (value ? NativeMethods.DcbFlags.TxContinueOnXoff : 0); }
+                    get { return (m_Dcb.Flags & NativeMethods.DcbFlags.TxContinueOnXOff) != 0; }
+                    set { m_Dcb.Flags = (m_Dcb.Flags & (~NativeMethods.DcbFlags.TxContinueOnXOff)) | (value ? NativeMethods.DcbFlags.TxContinueOnXOff : 0); }
                 }
 
                 public bool OutX

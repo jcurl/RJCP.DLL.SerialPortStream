@@ -18,6 +18,34 @@ using RJCP.Datastructures;
 namespace RJCP.IO.Ports
 {
     /// <summary>
+    /// A class containing information about a serial port
+    /// </summary>
+    public class PortDescription
+    {
+        /// <summary>
+        /// The name of the port
+        /// </summary>
+        public string Port { get; set; }
+
+        /// <summary>
+        /// Description about the serial port
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="port">The name of the port</param>
+        /// <param name="description">Description about the serial port</param>
+        public PortDescription(string port, string description)
+        {
+            Port = port;
+            Description = description;
+        }
+    }
+
+
+    /// <summary>
     /// The SerialPortStream is a stream class to communicate with serial port based devices
     /// </summary>
     /// <remarks>
@@ -30,7 +58,7 @@ namespace RJCP.IO.Ports
     /// </remarks>
     public partial class SerialPortStream : Stream
     {
-        private NativeSerialPort m_SerialPort = null;
+        private NativeSerialPort m_SerialPort;
 
         private byte m_ParityReplace;
         private bool m_BreakState;
@@ -55,12 +83,14 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// If the last byte has consumed byte data but not yet generated a character
         /// </summary>
-        private bool m_ReadIncomplete = false;
+        // CA1805: false is the default value
+        private bool m_ReadIncomplete;
 
         /// <summary>
         /// Cached offset in the byte buffer which corresponds to the next character
         /// </summary>
-        private int m_ReadOffset = 0;
+        // CA1805: 0 is the default value
+        private int m_ReadOffset;
 
         /// <summary>
         /// If ReadTo is reading more data than we have in m_Read.
@@ -74,12 +104,14 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// First character in the byte buffer in case of a read overflow
         /// </summary>
-        private char m_ReadOverflowChar = '\0';
+        // CA1805: '\0' is the default value
+        private char m_ReadOverflowChar;
 
         /// <summary>
         /// Last string sought for
         /// </summary>
-        private string m_ReadToString = null;
+        // CA1805: Null is the default value
+        private string m_ReadToString;
         #endregion
 
         #region Public constants
@@ -224,7 +256,7 @@ namespace RJCP.IO.Ports
                     Parity = Ports.Parity.None;
                     StopBits = Ports.StopBits.One;
                     Handshake = Ports.Handshake.None;
-                    TxContinueOnXoff = false;
+                    TxContinueOnXOff = false;
                     DiscardNull = false;
                     XOnLimit = 2048;
                     XOffLimit = 512;
@@ -453,33 +485,6 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// A class containing information about a serial port
-        /// </summary>
-        public class PortDescription
-        {
-            /// <summary>
-            /// The name of the port
-            /// </summary>
-            public string Port {get; set; }
-
-            /// <summary>
-            /// Description about the serial port
-            /// </summary>
-            public string Description { get; set; }
-
-            /// <summary>
-            /// Constructor
-            /// </summary>
-            /// <param name="port">The name of the port</param>
-            /// <param name="description">Description about the serial port</param>
-            public PortDescription(string port, string description)
-            {
-                Port = port;
-                Description = description;
-            }
-        }
-
-        /// <summary>
         /// Gets an array of serial port names and descriptions for the current computer
         /// </summary>
         /// <remarks>
@@ -542,7 +547,7 @@ namespace RJCP.IO.Ports
 
         #region Reading and Writing Configuration
         private Encoding m_Encoding = Encoding.GetEncoding("UTF-8");
-        private Decoder m_Decoder = null;
+        private Decoder m_Decoder;
 
         /// <summary>
         /// Gets or sets the byte encoding for pre- and post-transmission conversion of text.
@@ -719,9 +724,9 @@ namespace RJCP.IO.Ports
             get { return m_RxThreshold; }
             set
             {
-                if (value <= 0) throw new ArgumentOutOfRangeException("ReceivedBytesThreshold", "Must be a positive value (1 or greater)");
+                if (value <= 0) throw new ArgumentOutOfRangeException("value", "Must be a positive value (1 or greater)");
                 if (value > m_SerialPort.SerialPortIo.ReadBufferSize)
-                    throw new ArgumentOutOfRangeException("ReceivedBytesThreshold", "Must be less or equal to the ReadBufferSize");
+                    throw new ArgumentOutOfRangeException("value", "Must be less or equal to the ReadBufferSize");
                 
                 // Only raise an event if we think that we wouldn't have received an event otherwise
                 int btr = m_SerialPort.SerialPortIo.BytesToRead;
@@ -1608,7 +1613,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
                 if (!Enum.IsDefined(typeof(StopBits), value)) 
-                    throw new ArgumentOutOfRangeException("Unknown setting for StopBits", "value");
+                    throw new ArgumentOutOfRangeException("value", "Unknown setting for StopBits");
 
                 m_SerialPort.SerialPortCommState.StopBits = value;
                 if (IsOpen) m_SerialPort.SerialPortCommState.SetCommState();
@@ -1636,7 +1641,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
                 if (!Enum.IsDefined(typeof(Ports.Parity), value))
-                    throw new ArgumentOutOfRangeException("Unknown setting for Parity", "value");
+                    throw new ArgumentOutOfRangeException("value", "Unknown setting for Parity");
 
                 Ports.Parity parity = m_SerialPort.SerialPortCommState.Parity;
                 bool parityEnabled = m_SerialPort.SerialPortCommState.ParityEnable;
@@ -1816,25 +1821,25 @@ namespace RJCP.IO.Ports
             get
             {
                 Handshake handshake = Ports.Handshake.None;
-                if (m_SerialPort.SerialPortCommState.RtsControl == NativeSerialPort.RtsControl.Handshake) handshake |= Ports.Handshake.RTS;
-                if (m_SerialPort.SerialPortCommState.DtrControl == NativeSerialPort.DtrControl.Handshake) handshake |= Ports.Handshake.DTR;
-                if (m_SerialPort.SerialPortCommState.InX) handshake |= Ports.Handshake.XON;
+                if (m_SerialPort.SerialPortCommState.RtsControl == NativeSerialPort.RtsControl.Handshake) handshake |= Ports.Handshake.Rts;
+                if (m_SerialPort.SerialPortCommState.DtrControl == NativeSerialPort.DtrControl.Handshake) handshake |= Ports.Handshake.Dtr;
+                if (m_SerialPort.SerialPortCommState.InX) handshake |= Ports.Handshake.XOn;
                 return handshake;
             }
             set
             {
-                bool rts = (value & Ports.Handshake.RTS) != 0;
+                bool rts = (value & Ports.Handshake.Rts) != 0;
                 m_SerialPort.SerialPortCommState.OutCtsFlow = rts;
                 m_SerialPort.SerialPortCommState.RtsControl = rts ? NativeSerialPort.RtsControl.Handshake : NativeSerialPort.RtsControl.Enable;
                 if (IsOpen && !rts) m_SerialPort.SerialPortModemStatus.SetRts(true);
 
-                bool dtr = (value & Ports.Handshake.DTR) != 0;
+                bool dtr = (value & Ports.Handshake.Dtr) != 0;
                 m_SerialPort.SerialPortCommState.OutDsrFlow = dtr;
                 m_SerialPort.SerialPortCommState.DsrSensitivity = dtr;
                 m_SerialPort.SerialPortCommState.DtrControl = dtr ? NativeSerialPort.DtrControl.Handshake : NativeSerialPort.DtrControl.Enable;
                 if (IsOpen && !dtr) m_SerialPort.SerialPortModemStatus.SetDtr(true);
 
-                bool xon = (value & Ports.Handshake.XON) != 0;
+                bool xon = (value & Ports.Handshake.XOn) != 0;
                 m_SerialPort.SerialPortCommState.InX = xon;
                 m_SerialPort.SerialPortCommState.OutX = xon;
 
@@ -1896,12 +1901,12 @@ namespace RJCP.IO.Ports
         /// The TxContinueOnXoff member should be set to FALSE when communicating with
         /// a DCE device that resumes sending after any character arrives.</para>
         /// </remarks>
-        public bool TxContinueOnXoff
+        public bool TxContinueOnXOff
         {
-            get { return m_SerialPort.SerialPortCommState.TxContinueOnXoff; }
+            get { return m_SerialPort.SerialPortCommState.TxContinueOnXOff; }
             set
             {
-                m_SerialPort.SerialPortCommState.TxContinueOnXoff = value;
+                m_SerialPort.SerialPortCommState.TxContinueOnXOff = value;
                 if (IsOpen) m_SerialPort.SerialPortCommState.SetCommState();
             }
         }
@@ -2167,7 +2172,7 @@ namespace RJCP.IO.Ports
             m_SerialPort.Close();
         }
 
-        private bool m_Disposed = false;
+        private bool m_Disposed;
 
         /// <summary>
         /// Cleanup all resources managed by this object

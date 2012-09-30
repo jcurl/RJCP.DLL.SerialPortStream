@@ -28,17 +28,17 @@ namespace RJCP.IO.Ports
                 /// <summary>
                 /// Handle to the already opened Com Port
                 /// </summary>
-                private SafeFileHandle m_ComPortHandle = null;
+                private SafeFileHandle m_ComPortHandle;
 
                 /// <summary>
                 /// The OverlappedIoThread
                 /// </summary>
-                private Thread m_Thread = null;
+                private Thread m_Thread;
 
                 /// <summary>
                 /// Read and Write buffers that are pinned
                 /// </summary>
-                private OverlappedIoState m_Buffers = null;
+                private OverlappedIoState m_Buffers;
 
                 /// <summary>
                 /// Object to use for locking during concurrent access to the read buffer
@@ -129,7 +129,8 @@ namespace RJCP.IO.Ports
                 /// The WaitCommEvent() method indicates if a byte has been received (EV_RXCHAR). This
                 /// is cleared when the read operation is finished.
                 /// </remarks>
-                private bool m_ReadByteAvailable = false;
+                // CA1805: false is the default value
+                private bool m_ReadByteAvailable;
 
                 /// <summary>
                 /// Basic state machine managing the EOF byte

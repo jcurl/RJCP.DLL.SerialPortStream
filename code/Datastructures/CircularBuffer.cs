@@ -342,7 +342,8 @@ namespace RJCP.Datastructures
         public int Append(T[] array, int offset, int count)
         {
             if (array == null) throw new ArgumentNullException("array");
-            if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException("Offset/Count must be positive");
+            if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Offset must be positive");
+            if (count < 0) throw new ArgumentOutOfRangeException("count", "Count must be positive");
             if (offset + count > array.Length) throw new ArgumentException("Parameters exceed array boundary");
             if (m_Count == Capacity) return 0;
             if (count == 0) return 0;
@@ -413,7 +414,8 @@ namespace RJCP.Datastructures
         public int Append(CircularBuffer<T> buffer, int offset, int count)
         {
             if (buffer == null) throw new ArgumentNullException("buffer");
-            if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException("Offset/Count must be positive");
+            if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Offset must be positive");
+            if (count < 0) throw new ArgumentOutOfRangeException("count", "Count must be positive");
             if (offset + count > buffer.Length) throw new ArgumentException("Parameters exceed buffer boundary");
             if (m_Count == Capacity) return 0;
             if (count == 0) return 0;
@@ -522,7 +524,8 @@ namespace RJCP.Datastructures
         {
             if (array == null) throw new ArgumentNullException("array");
             if (count == 0) return 0;
-            if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException("offset / count", "Offset and Count must be positive");
+            if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Offset must be positive");
+            if (count < 0) throw new ArgumentOutOfRangeException("count", "Count must be positive");
             if (array.Length < offset + count) throw new ArgumentException("Offset and count exceed boundary length");
 
             int length = Math.Min(count, Length);

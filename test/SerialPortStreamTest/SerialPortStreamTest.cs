@@ -208,7 +208,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             Dictionary<string, bool> ports1 = new Dictionary<string, bool>();
             Dictionary<string, bool> ports2 = new Dictionary<string, bool>();
 
-            foreach (SerialPortStream.PortDescription desc in SerialPortStream.GetPortDescriptions()) {
+            foreach (PortDescription desc in SerialPortStream.GetPortDescriptions()) {
                 Trace.WriteLine("GetPortDescriptions: " + desc.Port + "; Description: " + desc.Description);
                 ports1.Add(desc.Port, false);
                 ports2.Add(desc.Port, false);

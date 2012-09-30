@@ -72,37 +72,37 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Software handshaking
         /// </summary>
-        XON = 1,
+        XOn = 1,
 
         /// <summary>
         /// Hardware handshaking (RTS/CTS)
         /// </summary>
-        RTS = 2,
+        Rts = 2,
 
         /// <summary>
         /// Hardware handshaking (DTR/DSR) (uncommon)
         /// </summary>
-        DTR = 4,
+        Dtr = 4,
 
         /// <summary>
         /// RTS and Software handshaking
         /// </summary>
-        RTS_XON = RTS | XON,
+        RtsXOn = Rts | XOn,
 
         /// <summary>
         /// DTR and Software handshaking (uncommon)
         /// </summary>
-        DTR_XON = DTR | XON,
+        DtrXOn = Dtr | XOn,
 
         /// <summary>
         /// Hardware handshaking with RTS/CTS and DTR/DSR (uncommon)
         /// </summary>
-        DTR_RTS = DTR | RTS,
+        DtrRts = Dtr | Rts,
 
         /// <summary>
         /// Hardware handshaking with RTS/CTS and DTR/DSR and Software handshaking (uncommon)
         /// </summary>
-        DTR_RTS_XON = DTR | RTS | XON
+        DtrRtsXOn = Dtr | Rts | XOn
     }
 
     #region Events
@@ -111,6 +111,11 @@ namespace RJCP.IO.Ports
     /// </summary>
     public enum SerialData
     {
+        /// <summary>
+        /// Indicates no data received
+        /// </summary>
+        NoData = 0,
+
         /// <summary>
         /// At least a single byte has been received
         /// </summary>
@@ -160,6 +165,11 @@ namespace RJCP.IO.Ports
     // Values are obtained from ClearCommErrors() Win32API
     public enum SerialError
     {
+        /// <summary>
+        /// Indicates no error
+        /// </summary>
+        NoError = 0,
+
         /// <summary>
         /// Driver buffer has reached 80% full
         /// </summary>
@@ -223,6 +233,11 @@ namespace RJCP.IO.Ports
     /// </summary>
     public enum SerialPinChange
     {
+        /// <summary>
+        /// Indicates no pin change detected
+        /// </summary>
+        NoChange = 0,
+
         /// <summary>
         /// Clear To Send signal has changed
         /// </summary>
