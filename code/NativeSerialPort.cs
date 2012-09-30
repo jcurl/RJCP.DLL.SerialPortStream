@@ -15,12 +15,12 @@ namespace RJCP.IO.Ports
     {
         private sealed partial class NativeSerialPort : IDisposable
         {
-            private string m_Port = null;
-            private SafeFileHandle m_ComPortHandle = null;
-            private CommState m_CommState = null;
-            private CommProperties m_CommProperties = null;
-            private CommModemStatus m_CommModem = null;
-            private CommOverlappedIo m_CommIo = null;
+            private string m_Port;
+            private SafeFileHandle m_ComPortHandle;
+            private CommState m_CommState;
+            private CommProperties m_CommProperties;
+            private CommModemStatus m_CommModem;
+            private CommOverlappedIo m_CommIo;
 
             /// <summary>
             /// Type of DTR (Data Terminal Ready) control to use
@@ -255,7 +255,8 @@ namespace RJCP.IO.Ports
                 }
             }
 
-            private bool m_IsDisposed = false;
+            // CA1805: false is the default value
+            private bool m_IsDisposed;
 
             /// <summary>
             /// Indicate if the NativeSerialPort object is disposed

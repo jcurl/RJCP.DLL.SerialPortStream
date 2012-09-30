@@ -54,7 +54,7 @@ namespace RJCP.IO.Ports
                 public bool IsRtsCtsSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_RTSCTS]; } }
                 public bool IsRlsdSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_RLSD]; } }
                 public bool IsParityCheckSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_PARITY_CHECK]; } }
-                public bool IsXonXoffSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_XONXOFF]; } }
+                public bool IsXOnXOffSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_XONXOFF]; } }
                 public bool IsXCharSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_SETXCHAR]; } }
                 public bool IsTotalTimeoutsSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_TOTALTIMEOUTS]; } }
                 public bool IsIntervalTimeoutsSupported { get { return m_CommProp.dwProvCapabilities[(int)NativeMethods.ProvCapabilities.PCF_INTTIMEOUTS]; } }

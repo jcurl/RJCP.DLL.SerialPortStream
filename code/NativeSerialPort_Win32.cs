@@ -22,7 +22,7 @@ namespace RJCP.IO.Ports
             DtrControlEnable = 0x0010,
             DtrControlHandshake = 0x0020,
             DsrSensitivity = 0x0040,
-            TxContinueOnXoff = 0x0080,
+            TxContinueOnXOff = 0x0080,
             OutX = 0x0100,
             InX = 0x0200,
             ErrorChar = 0x0400,
@@ -1417,7 +1417,8 @@ namespace RJCP.IO.Ports
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetOverlappedResult(SafeFileHandle hFile,
            [In] ref System.Threading.NativeOverlapped lpOverlapped,
-           out uint lpNumberOfBytesTransferred, bool bWait);
+           out uint lpNumberOfBytesTransferred,
+           [MarshalAs(UnmanagedType.Bool)] bool bWait);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
