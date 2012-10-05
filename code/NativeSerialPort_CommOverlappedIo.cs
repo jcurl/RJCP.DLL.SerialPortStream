@@ -1,6 +1,9 @@
 ﻿// $URL$
 // $Id$
 
+// Copyright © Jason Curl 2012
+// See http://serialportstream.codeplex.com for license details (MS-PL License)
+
 //#define STRESSTEST
 #define PL2303_WORKAROUNDS
 

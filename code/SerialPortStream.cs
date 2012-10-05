@@ -1,6 +1,9 @@
 ﻿// $URL$
 // $Id$
 
+// Copyright © Jason Curl 2012
+// See http://serialportstream.codeplex.com for license details (MS-PL License)
+
 // Enable the following define to enable behaviour in the number of bytes similar to the MS
 // implementation. It's recommended not to do this, as it's not consistent with the rest of
 // this implementation.

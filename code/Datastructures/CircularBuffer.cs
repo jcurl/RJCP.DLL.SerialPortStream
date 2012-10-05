@@ -1,5 +1,9 @@
 ﻿// $URL$
 // $Id$
+
+// Copyright © Jason Curl 2012.
+// See http://serialportstream.codeplex.com for license details (MS-PL License)
+
 using System;
 using System.Text;
 using System.Diagnostics;
