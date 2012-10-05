@@ -648,6 +648,12 @@ namespace RJCP.IO.Ports
         }
         #endregion
 
+        /// <summary>
+        /// Gets a value that determines whether the current stream can time out.
+        /// </summary>
+        /// <returns>A value that determines whether the current stream can time out.</returns>
+        public override bool CanTimeout { get { return true; } }
+
         #region Reading
         /// <summary>
         /// Check if this stream supports reading.
@@ -2202,6 +2208,46 @@ namespace RJCP.IO.Ports
         public bool IsDisposed
         {
             get { return m_Disposed; }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            if (!string.IsNullOrWhiteSpace(PortName)) {
+                char p;
+                switch (Parity) {
+                case Ports.Parity.Even: p = 'E'; break;
+                case Ports.Parity.Mark: p = 'M'; break;
+                case Ports.Parity.None: p = 'N'; break;
+                case Ports.Parity.Odd: p = 'O'; break;
+                case Ports.Parity.Space: p = 'S'; break;
+                default: p = '?'; break;
+                }
+
+                string s;
+                switch (StopBits) {
+                case Ports.StopBits.One: s = "1"; break;
+                case Ports.StopBits.One5: s = "1.5"; break;
+                case Ports.StopBits.Two: s = "2"; break;
+                default: s = "?"; break;
+                }
+
+                return string.Format("{0}:{1},{2},{3},{4},to={5},xon={6},odsr={7},octs={8},dtr={9},rts={10},idsr={11}",
+                    PortName, BaudRate, p, DataBits, s, TxContinueOnXOff ? "on" : "off",
+                    (Handshake & Handshake.XOn) != 0 ? "on" : "off",
+                    (Handshake & Handshake.Dtr) != 0 ? "on" : "off",
+                    (Handshake & Handshake.Rts) != 0 ? "on" : "off",
+                    (Handshake & Handshake.Dtr) != 0 ? "hs" : (DtrEnable ? "on" : "off"),
+                    (Handshake & Handshake.Rts) != 0 ? "hs" : (RtsEnable ? "on" : "off"),
+                    (Handshake & Handshake.Dtr) != 0 ? "on" : "off");
+            } else {
+                return "SerialPortStream: Invalid configuration";
+            }
         }
     }
 }
