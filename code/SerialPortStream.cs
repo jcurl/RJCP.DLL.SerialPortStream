@@ -607,7 +607,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
                 if (value == null) throw new ArgumentNullException("value", "Newline string may not be null");
-                if (value.Equals("")) throw new ArgumentException("value", "Newline may not be empty");
+                if (value.Equals("")) throw new ArgumentException("Newline may not be empty", "value");
                 m_NewLine = value;
             }
         }
