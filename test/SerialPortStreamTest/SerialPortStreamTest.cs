@@ -137,6 +137,28 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        public void SerialPortStream_NewLine()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                bool exception = false;
+                try {
+                    src.NewLine = "";
+                } catch (System.ArgumentException) {
+                    exception = true;
+                }
+                Assert.IsTrue(exception, "Expected exception when setting newline to empty string");
+
+                exception = false;
+                try {
+                    src.NewLine = null;
+                } catch (System.ArgumentNullException) {
+                    exception = true;
+                }
+                Assert.IsTrue(exception, "Expected exception when setting newline to empty string");
+            }
+        }
+
+        [TestMethod]
         public void SerialPortStream_SendReceive()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))

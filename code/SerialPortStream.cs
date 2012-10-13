@@ -606,11 +606,9 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-                if (value != null) {
-                    m_NewLine = value;
-                } else {
-                    throw new ArgumentNullException("value", "Newline string may not be null");
-                }
+                if (value == null) throw new ArgumentNullException("value", "Newline string may not be null");
+                if (value.Equals("")) throw new ArgumentException("value", "Newline may not be empty");
+                m_NewLine = value;
             }
         }
         #endregion
@@ -2193,8 +2191,14 @@ namespace RJCP.IO.Ports
             if (!IsDisposed) {
                 if (disposing) {
                     // Wait for events to finish before we dispose
-                    lock (m_EventCheck) { m_Disposed = true; }
-                    m_EventProcessing.WaitOne();
+                    bool eventRunning = false;
+                    lock (m_EventCheck) {
+                        if (m_EventProcessing.WaitOne(0)) {
+                            m_Disposed = true;
+                            eventRunning = true;
+                        }
+                    }
+                    if (eventRunning) m_EventProcessing.WaitOne();
 
                     m_Trace.Close();
                     if (m_SerialPort != null) Close();
