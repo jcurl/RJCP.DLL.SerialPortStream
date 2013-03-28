@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012.
+// Copyright © Jason Curl 2012-2013.
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 using System;
@@ -556,6 +556,9 @@ namespace RJCP.Datastructures
         /// </summary>
         /// <param name="buff">The circular buffer based on char</param>
         /// <returns>A string</returns>
+        /// <remarks>
+        /// This method will not consume the data in the CircularBuffer&lt;char&gt;.
+        /// </remarks>
         public static string GetString(this CircularBuffer<char> buff)
         {
             if (buff == null) return null;
@@ -568,6 +571,9 @@ namespace RJCP.Datastructures
         /// <param name="buff">The circular buffer based on char</param>
         /// <param name="length">Number of characters to convert to a string</param>
         /// <returns>A string</returns>
+        /// <remarks>
+        /// This method will not consume the data in the CircularBuffer&lt;char&gt;.
+        /// </remarks>
         public static string GetString(this CircularBuffer<char> buff, int length)
         {
             if (buff == null) return null;
@@ -590,6 +596,9 @@ namespace RJCP.Datastructures
         /// <param name="offset">The offset into the circular buffer</param>
         /// <param name="length">Number of characters to convert to a string</param>
         /// <returns>A string</returns>
+        /// <remarks>
+        /// This method will not consume the data in the CircularBuffer&lt;char&gt;.
+        /// </remarks>
         public static string GetString(this CircularBuffer<char> buff, int offset, int length)
         {
             if (buff == null) return null;
@@ -624,57 +633,73 @@ namespace RJCP.Datastructures
         /// <param name="completed">When this method returns, contains true if all the characters
         /// specified by byteCount were converted; otherwise, false. This parameter is
         /// passed uninitialized.</param>
+        /// <exception cref="System.ArgumentException">The output buffer is too small to contain any of the
+        /// converted input</exception>
+        /// <remarks>
+        /// This method should behave the same as the decoder for an array of bytes of equal size.
+        /// <para>The <i>completed</i> output parameter indicates whether all the data in the input buffer 
+        /// was converted and stored in the output buffer. This parameter is set to <b>false</b> if the 
+        /// number of bytes specified by the <i>bytes.Length</i> parameter cannot be converted without 
+        /// exceeding the number of characters specified by the charCount parameter.</para>
+        /// <para>The completed parameter can also be set to false, even though the all bytes were consumed.
+        /// This situation occurs if there is still data in the Decoder object that has not been stored
+        /// in the bytes buffer.</para>
+        /// <para>There are a few noted deviations from using the Decoder on an array of bytes, instead
+        /// of a Circular Buffer</para>
+        /// <list type="bullet">
+        /// <item>When converting a sequence of bytes to multiple chars, if those sequences result in
+        /// the minimum number of characters being written as 2 or more characters, slight discrepancies
+        /// occur. A UTF8 decoder would convert the sequence F3 A0 82 84 to the two characters DB40 DC84.
+        /// The UTF8 decoder would not consume any of the 4 bytes if all 4 bytes are immediately
+        /// available to a single call to the Decoder.Convert() function and instead raise an exception.
+        /// This Convert() function may consume some of these bytes and indicate success, if the byte
+        /// sequence wraps over from the end of the array to the beginning of the array. The number of
+        /// bytes consumed (bytesUsed) is correct and characters produced (charsUsed) is also correct.
+        /// There is no error found according to the MS documentation. The next call will result in
+        /// an exception instead. So this function may: consume more bytes than expected (but with the
+        /// correct results); and may not raise an exception immediately if those bytes were consumed.</item>
+        /// </list>
+        /// </remarks>
         public static void Convert(this Decoder decoder, CircularBuffer<byte> bytes, char[] chars, int charIndex, int charCount, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
         {
-            int bu;
-            int cu;
-
             if (bytes == null) throw new ArgumentNullException("bytes", "Circular buffer bytes may not be null");
             if (chars == null) throw new ArgumentNullException("chars", "Array chars may not be null");
             if (charIndex < 0) throw new ArgumentOutOfRangeException("charIndex", "Negative offset provided");
             if (charCount < 0) throw new ArgumentOutOfRangeException("charCount", "Negative count provided");
             if (chars.Length - charIndex < charCount) throw new ArgumentException("charIndex and charCount exceed char buffer boundaries");
 
-            completed = true;
             bytesUsed = 0;
             charsUsed = 0;
+            bool oflush = false;
 
-            if (bytes.ReadLength == 0) return;
-            if (charCount == 0) {
-                completed = false;
-                return;
-            }
+            do {
+                int bu;
+                int cu;
+                if (bytes.ReadLength == bytes.Length) oflush = flush;
+                try {
+                    decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
+                        chars, charIndex, charCount,
+                        oflush, out bu, out cu, out completed);
+                } catch (System.ArgumentException e) {
+                    if (!e.ParamName.Equals("chars")) throw;
 
-            while (bytes.ReadLength > 0 && charCount > 0) {
-                decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength, 
-                    chars, charIndex, charCount, 
-                    false, out bu, out cu, out completed);
+                    // NOTE: While a decoder may not consume anything, using the CircularBuffer
+                    // extension may, if the bytes need to be passed to the decoder twice. This is
+                    // because we can't know what bytes may cause the error. The same kind of behaviour
+                    // would occur if you feed one byte at a time to the decoder yourself. It will
+                    // be passed twice if the byte sequence is split between the end and the start
+                    // of the circular queue.
+
+                    if (bytesUsed == 0) throw;
+                    completed = false;
+                    return;
+                }
                 bytes.Consume(bu);
                 bytesUsed += bu;
                 charCount -= cu;
                 charsUsed += cu;
                 charIndex += cu;
-                if (!completed) return;
-            }
-
-            if (flush) {
-                // We don't use 'flush' in the loop above, as we really can't tell when the conversion
-                // should be complete (without having to precalculate the number of bytes we need). So
-                // if we have space in the output buffer, we do a last conversion (bytes.ReadLength
-                // should be zero here).
-                if (charCount > 0) {
-                    decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
-                        chars, charIndex, charCount,
-                        true, out bu, out cu, out completed);
-                    bytes.Consume(bu);
-                    bytesUsed += bu;
-                    charCount -= cu;
-                    charsUsed += cu;
-                    charIndex += cu;
-                } else {
-                    completed = false;
-                }
-            }
+            } while (bytes.ReadLength > 0 && charCount > 0);
         }
 
         /// <summary>
@@ -692,54 +717,59 @@ namespace RJCP.Datastructures
         /// <param name="completed">When this method returns, contains true if all the characters
         /// specified by byteCount were converted; otherwise, false. This parameter is
         /// passed uninitialized.</param>
+        /// <exception cref="System.ArgumentException">The output buffer is too small to contain any of the
+        /// converted input</exception>
         public static void Convert(this Decoder decoder, CircularBuffer<byte> bytes, CircularBuffer<char> chars, int charCount, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
         {
-            int bu;
-            int cu;
-
             if (bytes == null) throw new ArgumentNullException("bytes", "Circular buffer bytes may not be null");
             if (chars == null) throw new ArgumentNullException("chars", "Circular buffer chars may not be null");
 
-            completed = true;
+            charCount = Math.Min(chars.Free, charCount);
             bytesUsed = 0;
             charsUsed = 0;
+            bool oflush = false;
 
-            if (bytes.ReadLength == 0) return;
-            if (charCount == 0) {
-                completed = false;
-                return;
-            }
+            do {
+                int bu;
+                int cu;
+                if (bytes.ReadLength == bytes.Length) oflush = flush;
+                try {
+                    decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
+                        chars.Array, chars.End, Math.Min(chars.WriteLength, charCount),
+                        oflush, out bu, out cu, out completed);
+                    bytes.Consume(bu);
+                    chars.Produce(cu);
+                } catch (System.ArgumentException e) {
+                    if (!e.ParamName.Equals("chars")) throw;
 
-            charCount = Math.Min(chars.Free, charCount);
-            while (bytes.ReadLength > 0 && charCount > 0) {
-                decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
-                    chars.Array, chars.End, Math.Min(chars.WriteLength, charCount),
-                    false, out bu, out cu, out completed);
-                bytes.Consume(bu);
-                chars.Produce(cu);
+                    // Decoder tried to write bytes, but not enough free space. We need to write to a temp
+                    // array, then copy into the circular buffer. We assume that the underlying decoder
+                    // hasn't changed state.
+                    if (charCount <= chars.WriteLength) {
+                        // There's no free space left, so we raise the same exception as the decoder
+                        if (bytesUsed == 0) throw;
+                        completed = false;
+                        return;
+                    }
+
+                    int tlen = Math.Min(16, charCount);
+                    char[] tmp = new char[tlen];
+                    try {
+                        decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
+                            tmp, 0, tmp.Length, oflush, out bu, out cu, out completed);
+                    } catch (System.ArgumentException e2) {
+                        if (!e2.ParamName.Equals("chars")) throw;
+                        if (bytesUsed == 0) throw;
+                        completed = false;
+                        return;
+                    }
+                    bytes.Consume(bu);
+                    chars.Append(tmp, 0, cu);
+                }
                 bytesUsed += bu;
                 charCount -= cu;
                 charsUsed += cu;
-            }
-
-            if (flush) {
-                // We don't use 'flush' in the loop above, as we really can't tell when the conversion
-                // should be complete (without having to precalculate the number of bytes we need). So
-                // if we have space in the output buffer, we do a last conversion (bytes.ReadLength
-                // should be zero here).
-                if (charCount > 0) {
-                    decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
-                        chars.Array, chars.End, charCount,
-                        true, out bu, out cu, out completed);
-                    bytes.Consume(bu);
-                    chars.Produce(cu);
-                    bytesUsed += bu;
-                    charCount -= cu;
-                    charsUsed += cu;
-                } else {
-                    completed = false;
-                }
-            }
+            } while (bytes.ReadLength > 0 && charCount > 0);
         }
 
         /// <summary>
@@ -756,50 +786,13 @@ namespace RJCP.Datastructures
         /// <param name="completed">When this method returns, contains true if all the characters
         /// specified by byteCount were converted; otherwise, false. This parameter is
         /// passed uninitialized.</param>
+        /// <exception cref="System.ArgumentException">The output buffer is too small to contain any of the
+        /// converted input</exception>
         public static void Convert(this Decoder decoder, CircularBuffer<byte> bytes, CircularBuffer<char> chars, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
         {
             if (bytes == null) throw new ArgumentNullException("bytes", "Circular buffer bytes may not be null");
             if (chars == null) throw new ArgumentNullException("chars", "Circular buffer chars may not be null");
-
-            int bu;
-            int cu;
-
-            completed = true;
-            bytesUsed = 0;
-            charsUsed = 0;
-
-            if (bytes.ReadLength == 0) return;
-            if (chars.WriteLength == 0) {
-                completed = false;
-                return;
-            }
-
-            while (bytes.ReadLength > 0 && chars.WriteLength > 0) {
-                decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
-                    chars.Array, chars.End, chars.WriteLength,
-                    false, out bu, out cu, out completed);
-                bytes.Consume(bu);
-                chars.Produce(cu);
-                bytesUsed += bu;
-                charsUsed += cu;
-            }
-            if (flush) {
-                // We don't use 'flush' in the loop above, as we really can't tell when the conversion
-                // should be complete (without having to precalculate the number of bytes we need). So
-                // if we have space in the output buffer, we do a last conversion (bytes.ReadLength
-                // should be zero here).
-                if (chars.WriteLength > 0) {
-                    decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
-                        chars.Array, chars.End, chars.WriteLength,
-                        true, out bu, out cu, out completed);
-                    bytes.Consume(bu);
-                    chars.Produce(cu);
-                    bytesUsed += bu;
-                    charsUsed += cu;
-                } else {
-                    completed = false;
-                }
-            }
+            decoder.Convert(bytes, chars, chars.Free, flush, out bytesUsed, out charsUsed, out completed);
         }
 
         /// <summary>
@@ -820,62 +813,62 @@ namespace RJCP.Datastructures
         /// passed uninitialized.</param>
         public static void Convert(this Encoder encoder, char[] chars, int charIndex, int charCount, CircularBuffer<byte> bytes, bool flush, out int charsUsed, out int bytesUsed, out bool completed)
         {
+            // The code here is the same as the "Decoder" version as they do the same thing. Unfortunately,
+            // .NET doesn't have a base class for this, so we need two separate encoder/decoder methods.
+
             if (chars == null) throw new ArgumentNullException("chars", "chars may not be null");
             if (bytes == null) throw new ArgumentNullException("bytes", "Circular buffer bytes may not be null");
             if (charIndex < 0) throw new ArgumentOutOfRangeException("charIndex", "Negative offset provided");
             if (charCount < 0) throw new ArgumentOutOfRangeException("charCount", "Negative count provided");
             if (chars.Length - charIndex < charCount) throw new ArgumentException("charIndex and charCount exceed char buffer boundaries");
 
-            int bu;
-            int cu;
-
-            completed = true;
             bytesUsed = 0;
             charsUsed = 0;
-            if (charCount == 0) return;
-            if (bytes.WriteLength == 0) {
-                completed = false;
-                return;
-            }
 
-            // The encoder will not cache UCS16 bytes in between. It converts one chraacter at a time. If there
-            // is insufficient buffer space in the output, it will not fill it up.
+            do {
+                int bu;
+                int cu;
+                try {
+                    encoder.Convert(chars, charIndex, charCount, 
+                        bytes.Array, bytes.End, bytes.WriteLength,
+                        flush, out cu, out bu, out completed);
+                    charCount -= cu;
+                    charsUsed += cu;
+                    charIndex += cu;
+                    bytes.Produce(bu);
+                    bytesUsed += bu;
+                } catch (System.ArgumentException e) {
+                    if (!e.ParamName.Equals("bytes")) throw;
 
-            while (bytes.WriteLength > 0 && charCount > 0) {
-                int bf = bytes.WriteLength;
-                encoder.Convert(chars, charIndex, charCount, 
-                    bytes.Array, bytes.End, bf,
-                    false, out cu, out bu, out completed);
-                charIndex += cu;
-                charCount -= cu;
-                bytesUsed += bu;
-                charsUsed += cu;
-                bytes.Produce(bu);
-
-                if (!completed && bu < bf) {
-                    // The decoder couldn't encode the complete byte, so we must manually convert
-                    // the next character and split it up for the circular buffer
-                    byte[] sc = new byte[128];
-                    encoder.Convert(chars, charIndex, 1, sc, 0, sc.Length, false, out cu, out bu, out completed);
-                    if (bu <= bytes.Free) {
-                        charIndex += cu;
-                        charCount -= cu;
-                        bytesUsed += bu;
-                        charsUsed += cu;
-                        bytes.Append(sc, 0, bu);
-                    } else {
-                        // Couldn't atomically write the last byte, so we exit
-                        charCount = 0;
+                    // Encoder tried to write chars, but not enough free space. We need to write to a temp
+                    // array, then copy into the circular buffer. We assume that the underlying encoder
+                    // hasn't changed state.
+                    if (bytes.WriteLength == bytes.Free) {
+                        // There's no free space left, so we raise the same exception as the decoder
+                        if (charsUsed == 0) throw;
                         completed = false;
+                        return;
                     }
-                }
-            }
 
-            if (flush) {
-                // Not implemented. Because I have no example where this is used to be tested. For example, 
-                // UTF8 will not write partially to an output byte buffer if it doesn't contain enough
-                // space, hence the workaround above with (!completed && bytesUsed < bf).
-            }
+                    int tlen = Math.Min(16, bytes.Free);
+                    byte[] tmp = new byte[tlen];
+                    try {
+                        encoder.Convert(chars, charIndex, charCount,
+                            tmp, 0, tmp.Length, flush, out cu, out bu, out completed);
+                    } catch (System.ArgumentException e2) {
+                        // There still isn't enough space, so abort
+                        if (!e2.ParamName.Equals("bytes")) throw;
+                        if (charsUsed == 0) throw;
+                        completed = false;
+                        return;
+                    }
+                    charCount -= cu;
+                    charsUsed += cu;
+                    charIndex += cu;
+                    bytes.Append(tmp, 0, bu);
+                    bytesUsed += bu;
+                }
+            } while (!completed);
         }
     }
 }
