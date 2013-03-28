@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialPortStream", "code\Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialPortStreamTest", "test\SerialPortStreamTest\SerialPortStreamTest.csproj", "{A12A6274-BA1D-484C-B695-28B9A7EE6DAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatastructuresTest", "test\DatastructuresTest\DatastructuresTest.csproj", "{0FC877B6-A140-4687-B67E-EF41BB2C8604}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = SerialPortStream.vsmdi
@@ -22,6 +24,10 @@ Global
 		{A12A6274-BA1D-484C-B695-28B9A7EE6DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A12A6274-BA1D-484C-B695-28B9A7EE6DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A12A6274-BA1D-484C-B695-28B9A7EE6DAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FC877B6-A140-4687-B67E-EF41BB2C8604}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FC877B6-A140-4687-B67E-EF41BB2C8604}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FC877B6-A140-4687-B67E-EF41BB2C8604}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FC877B6-A140-4687-B67E-EF41BB2C8604}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

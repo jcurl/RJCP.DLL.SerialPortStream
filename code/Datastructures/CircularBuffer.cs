@@ -796,6 +796,79 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
+        /// Use a decoder to convert from an array of bytes into a char CircularBuffer
+        /// </summary>
+        /// <param name="decoder">The decoder to do the conversion.</param>
+        /// <param name="bytes">The array of bytes to convert</param>
+        /// <param name="byteIndex">Start index in bytes array</param>
+        /// <param name="byteCount">Number of bytes to convert in the byte array</param>
+        /// <param name="chars">The circular buffer of chars to convert to</param>
+        /// <param name="flush"><b>true</b> to indicate that no further data is to be converted; otherwise, <b>false</b>.</param>
+        /// <param name="bytesUsed">When this method returns, contains the number of bytes that were
+        /// used in the conversion. This parameter is passed uninitialized.</param>
+        /// <param name="charsUsed">When this method returns, contains the number of characters from
+        /// chars that were produced by the conversion. This parameter is passed uninitialized.</param>
+        /// <param name="completed">When this method returns, contains true if all the characters
+        /// specified by byteCount were converted; otherwise, false. This parameter is
+        /// passed uninitialized.</param>
+        public static void Convert(this Decoder decoder, byte[] bytes, int byteIndex, int byteCount, CircularBuffer<char> chars, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
+        {
+            if (bytes == null) throw new ArgumentNullException("bytes", "Array bytes may not be null");
+            if (chars == null) throw new ArgumentNullException("chars", "CircularBuffer chars may not be null");
+            if (byteIndex < 0) throw new ArgumentOutOfRangeException("byteIndex", "Negative offset provided");
+            if (byteCount < 0) throw new ArgumentOutOfRangeException("byteCount", "Negative count provided");
+            if (bytes.Length - byteIndex < byteCount) throw new ArgumentException("byteIndex and byteCount exceed byte buffer boundaries");
+
+            bytesUsed = 0;
+            charsUsed = 0;
+
+            do {
+                int bu;
+                int cu;
+                try {
+                    decoder.Convert(bytes, byteIndex, byteCount,
+                        chars.Array, chars.End, chars.WriteLength,
+                        flush, out bu, out cu, out completed);
+                    byteCount -= bu;
+                    bytesUsed += bu;
+                    byteIndex += bu;
+                    chars.Produce(cu);
+                    charsUsed += cu;
+                } catch (System.ArgumentException e) {
+                    if (!e.ParamName.Equals("chars")) throw;
+
+                    // Decoder tried to write bytes, but not enough free space. We need to write to a temp
+                    // array, then copy into the circular buffer. We assume that the underlying decoder
+                    // hasn't changed state.
+                    if (chars.WriteLength == chars.Free) {
+                        // There's no free space left, so we raise the same exception as the decoder
+                        if (bytesUsed == 0) throw;
+                        completed = false;
+                        return;
+                    }
+
+                    int tlen = Math.Min(16, chars.Free);
+                    char[] tmp = new char[tlen];
+                    try {
+                        decoder.Convert(bytes, byteIndex, byteCount,
+                            tmp, 0, tmp.Length, flush, out bu, out cu, out completed);
+                    } catch (System.ArgumentException e2) {
+                        // There still isn't enough space, so abort
+                        if (!e2.ParamName.Equals("chars")) throw;
+                        if (bytesUsed == 0) throw;
+                        completed = false;
+                        return;
+                    }
+                    byteCount -= bu;
+                    bytesUsed += bu;
+                    byteIndex += bu;
+                    chars.Append(tmp, 0, cu);
+                    charsUsed += cu;
+                }
+            } while (!completed);
+        }
+
+        /// <summary>
         /// Converts an array of Unicode characters to a byte sequence storing the result in a circular buffer
         /// </summary>
         /// <param name="encoder">The encoder to use for the conversion</param>
