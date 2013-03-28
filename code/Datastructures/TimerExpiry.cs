@@ -72,7 +72,7 @@ namespace RJCP.Datastructures
         /// <returns>The time to expiry in milliseconds</returns>
         public int RemainingTime()
         {
-            if (m_Milliseconds <= 0) return -1;
+            if (m_Milliseconds < 0) return -1;
 
             long elapsed = m_StopWatch.ElapsedMilliseconds;
             if (elapsed >= m_Milliseconds) return 0;

@@ -25,8 +25,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     [TestClass]
     public class SerialPortStreamTest
     {
-        private const string c_SourcePort = "COM5";
-        private const string c_DestPort = "COM4";
+        private const string c_SourcePort = "COM7";
+        private const string c_DestPort = "COM8";
 
         private const int c_Timeout = 300;
 
@@ -34,6 +34,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// Test the basic features of a serial port
         /// </summary>
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_Basic()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -62,6 +63,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// Check that Open() and Close() can be called multiple times
         /// </summary>
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_OpenClose()
         {
             SerialPortStream src;
@@ -102,6 +104,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_OpenInUse()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -120,6 +123,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_GetPortSettings()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -137,6 +141,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_NewLine()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -159,6 +164,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_SendReceive()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -227,6 +233,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_ListPorts()
         {
             bool result = true;
@@ -276,6 +283,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_WriteReadLine()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -293,6 +301,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_WriteReadLine_Timeout1()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -320,6 +329,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_WriteReadLine_Timeout2()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -347,6 +357,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_WriteReadLine_Multilines()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -375,6 +386,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_WriteReadLine_CharForChar()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -405,6 +417,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_WriteReadLine_MbcsByteForByte()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -438,6 +451,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_ReadTo_Cached()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -474,6 +488,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_ReadTo_Normal()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -495,6 +510,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_ReadTo_Overflow()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
