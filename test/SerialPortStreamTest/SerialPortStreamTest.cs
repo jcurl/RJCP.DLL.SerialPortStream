@@ -25,8 +25,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     [TestClass]
     public class SerialPortStreamTest
     {
-        private const string c_SourcePort = "COM7";
-        private const string c_DestPort = "COM8";
+        private const string c_SourcePort = "COM4";
+        private const string c_DestPort = "COM5";
 
         private const int c_Timeout = 300;
 

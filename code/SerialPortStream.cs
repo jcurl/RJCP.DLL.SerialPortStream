@@ -15,6 +15,7 @@ using System.Text;
 using System.IO;
 using System.Management;
 using System.Threading;
+using System.Runtime.Remoting.Messaging;
 using Microsoft.Win32;
 using RJCP.Datastructures;
 
@@ -798,6 +799,15 @@ namespace RJCP.IO.Ports
         }
 #endif
 
+        private void ReadCheck(byte[] buffer, int offset, int count)
+        {
+            if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
+            if (buffer == null) throw new ArgumentNullException("buffer", "NULL buffer provided");
+            if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Negative offset provided");
+            if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
+            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+        }
+
         /// <summary>
         /// Read data from the buffered serial stream into the array provided.
         /// </summary>
@@ -807,17 +817,47 @@ namespace RJCP.IO.Ports
         /// <returns>The actual number of bytes copied into the buffer, 0 if there was a timeout</returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-            if (buffer == null) throw new ArgumentNullException("buffer", "NULL buffer provided");
-            if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Negative offset provided");
-            if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
-            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            ReadCheck(buffer, offset, count);
             if (count == 0) return 0;
+            return BlockingRead(buffer, offset, count);
+        }
 
+        private int BlockingRead(byte[] buffer, int offset, int count)
+        {
             if (!m_SerialPort.SerialPortIo.WaitForReadEvent(m_ReadTimeout)) return 0;
             int bytes = m_SerialPort.SerialPortIo.Read(buffer, offset, count);
             if (bytes > 0) ReadToReset();
             return bytes;
+        }
+
+        delegate int ReadDelegate(byte[] buffer, int offset, int count);
+
+        /// <summary>
+        /// Begins an asynchronous read operation.
+        /// </summary>
+        /// <param name="buffer">The buffer to read the data into.</param>
+        /// <param name="offset">The byte offset in <paramref name="buffer"/> at which to begin writing data read from the stream.</param>
+        /// <param name="count">The maximum number of bytes to read.</param>
+        /// <param name="callback">An optional asynchronous callback, to be called when the read is complete.</param>
+        /// <param name="state">A user-provided object that distinguishes this particular asynchronous read request from other requests.</param>
+        /// <returns></returns>
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            ReadCheck(buffer, offset, count);
+            ReadDelegate read = this.Read;
+            return read.BeginInvoke(buffer, offset, count, callback, state);
+        }
+
+        /// <summary>
+        /// Waits for the pending asynchronous read to complete.
+        /// </summary>
+        /// <param name="asyncResult">The reference to the pending asynchronous request to finish.</param>
+        /// <returns>The number of bytes read from the stream, between zero (0) and the number of bytes you requested. Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.</returns>
+        public override int EndRead(IAsyncResult asyncResult)
+        {
+            AsyncResult result = (AsyncResult)asyncResult;
+            ReadDelegate caller = (ReadDelegate)result.AsyncDelegate;
+            return caller.EndInvoke(asyncResult);
         }
 
         /// <summary>
@@ -1344,6 +1384,27 @@ namespace RJCP.IO.Ports
             m_SerialPort.SerialPortIo.WaitForWriteEmptyEvent(m_WriteTimeout);
         }
 
+        private bool WriteCheck(byte[] buffer, int offset, int count)
+        {
+            if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
+            if (buffer == null) throw new ArgumentNullException("buffer", "NULL buffer provided");
+            if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Negative offset provided");
+            if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
+            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            if (count == 0) return false;
+
+            if (!m_SerialPort.SerialPortIo.IsRunning) {
+                throw new InvalidOperationException("Serial I/O Thread not running");
+            }
+
+            // Check that count is less than the total size of the buffer, else raise
+            // an exception immediately that the local buffer is too small.
+            if (count > m_SerialPort.SerialPortIo.WriteBufferSize) {
+                throw new InvalidOperationException("Insufficient buffer for the data requested");
+            }
+            return true;
+        }
+
         /// <summary>
         /// Write the given data into the buffered serial stream for sending over the serial port
         /// </summary>
@@ -1370,26 +1431,49 @@ namespace RJCP.IO.Ports
         /// before the timeout expired</exception>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-            if (buffer == null) throw new ArgumentNullException("buffer", "NULL buffer provided");
-            if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Negative offset provided");
-            if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
-            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            if (!WriteCheck(buffer, offset, count)) return;
+            BlockingWrite(buffer, offset, count);
+        }
+
+        private void BlockingWrite(byte[] buffer, int offset, int count)
+        {
             if (count == 0) return;
-
-            if (!m_SerialPort.SerialPortIo.IsRunning) {
-                throw new InvalidOperationException("Serial I/O Thread not running");
-            }
-
-            // Check that count is less than the total size of the buffer, else raise
-            // an exception immediately that the local buffer is too small.
-            if (count > m_SerialPort.SerialPortIo.WriteBufferSize) {
-                throw new InvalidOperationException("Insufficient buffer for the data requested");
-            }
             if (!m_SerialPort.SerialPortIo.WaitForWriteEvent(count, m_WriteTimeout)) {
                 throw new TimeoutException("Couldn't write into buffer");
             }
             m_SerialPort.SerialPortIo.Write(buffer, offset, count);
+        }
+
+        delegate void WriteDelegate(byte[] buffer, int offset, int count);
+
+        /// <summary>
+        /// Begins an asynchronous write operation.
+        /// </summary>
+        /// <param name="buffer">The buffer to write data from.</param>
+        /// <param name="offset">The byte offset in buffer from which to begin writing.</param>
+        /// <param name="count">The maximum number of bytes to write.</param>
+        /// <param name="callback">An optional asynchronous callback, to be called when the write is complete.</param>
+        /// <param name="state">A user-provided object that distinguishes this particular asynchronous write request from other requests.</param>
+        /// <returns>An IAsyncResult that represents the asynchronous write, which could still be pending.</returns>
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            WriteCheck(buffer, offset, count);
+            WriteDelegate write = this.BlockingWrite;
+            return write.BeginInvoke(buffer, offset, count, callback, state);
+        }
+
+        /// <summary>
+        /// Ends an asynchronous write operation.
+        /// </summary>
+        /// <param name="asyncResult">A reference to the outstanding asynchronous I/O request.</param>
+        /// <remarks>
+        /// EndWrite must be called exactly once on every IAsyncResult from BeginWrite.
+        /// </remarks>
+        public override void EndWrite(IAsyncResult asyncResult)
+        {
+            AsyncResult result = (AsyncResult)asyncResult;
+            WriteDelegate caller = (WriteDelegate)result.AsyncDelegate;
+            caller.EndInvoke(asyncResult);
         }
 
         /// <summary>
