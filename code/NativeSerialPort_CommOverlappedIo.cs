@@ -962,6 +962,7 @@ namespace RJCP.IO.Ports
                     }
 
                     m_Thread = new Thread(new ThreadStart(OverlappedIoThread));
+                    m_Thread.IsBackground = true;
                     m_Thread.Start();
                 }
 
