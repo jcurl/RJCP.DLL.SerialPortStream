@@ -1379,10 +1379,12 @@ namespace RJCP.IO.Ports
         }
     }
 
+    [SuppressUnmanagedCodeSecurity]
     internal static class SafeNativeMethods
     {
     }
 
+    [SuppressUnmanagedCodeSecurity]
     internal static class UnsafeNativeMethods
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
