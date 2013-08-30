@@ -8,6 +8,7 @@ using System;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Collections.Specialized;
+using System.Security;
 using Microsoft.Win32.SafeHandles;
 
 namespace RJCP.IO.Ports

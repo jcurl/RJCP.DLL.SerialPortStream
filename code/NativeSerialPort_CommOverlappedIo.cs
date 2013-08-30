@@ -126,6 +126,12 @@ namespace RJCP.IO.Ports
                 private ManualResetEvent m_TxBufferEmpty = new ManualResetEvent(true);
 
                 /// <summary>
+                /// A EV_TXEMPTY event occurred, but the buffer wasn't empty. When the write is finished,
+                /// we should empty the buffer
+                /// </summary>
+                private volatile bool m_TxEmptyEvent = false;
+
+                /// <summary>
                 /// Indicates that there is a byte available for reading
                 /// </summary>
                 /// <remarks>
@@ -905,6 +911,7 @@ namespace RJCP.IO.Ports
                         bytes = m_Buffers.WriteBuffer.Append(buffer, offset, count);
                         // The serial thread can now send data to the serial port
                         m_WriteBufferNotEmptyEvent.Set();
+                        m_TxEmptyEvent = false;
                     }
                     return bytes;
                 }
@@ -1234,6 +1241,11 @@ namespace RJCP.IO.Ports
                             if (m_Buffers.WriteBuffer.Length == 0) {
                                 m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "SerialThread: ProcessWaitCommEvent: TX-BUFFER empty"); 
                                 m_TxBufferEmpty.Set();
+                                m_TxEmptyEvent = false;
+                            } else {
+                                // Because the main event loop handles CommEvents before WriteEvents, it could be
+                                // that a write event occurs immediately after, actually emptying the buffer.
+                                m_TxEmptyEvent = true;
                             }
                         }
                     }
@@ -1397,6 +1409,11 @@ namespace RJCP.IO.Ports
                             m_Buffers.WriteBuffer.Consume((int)bytes);
                             if (m_Buffers.WriteBuffer.Length == 0) {
                                 m_WriteBufferNotEmptyEvent.Reset();
+                                if (m_TxEmptyEvent) {
+                                    m_TxEmptyEvent = false;
+                                    m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "SerialThread: ProcessWriteEvent: TX-BUFFER empty");
+                                    m_TxBufferEmpty.Set();
+                                }
                             }
                             m_WriteBufferNotFullEvent.Set();
                         }
