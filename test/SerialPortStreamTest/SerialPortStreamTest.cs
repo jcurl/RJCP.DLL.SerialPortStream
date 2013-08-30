@@ -234,6 +234,38 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [TestMethod]
         [TestCategory("SerialPortStream")]
+        [Timeout(2000)]
+        public void SerialPortStream_SendAndFlush1()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open();
+                src.WriteLine("Connected");
+                src.Flush();
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("SerialPortStream")]
+        [Timeout(2000)]
+        public void SerialPortStream_SendAndFlush2()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                Trace.WriteLine("1. Open()");
+                src.Open();
+                Trace.WriteLine("2. WriteLine()");
+                src.WriteLine("Connected");
+                Trace.WriteLine("3. Sleep()");
+                System.Threading.Thread.Sleep(100);
+                Trace.WriteLine("4. WriteLine()");
+                src.WriteLine("Disconnected");
+                Trace.WriteLine("5. Flush()");
+                src.Flush();
+                Trace.WriteLine("6. Dispose()");
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("IO.Ports.SerialPortStream")]
         public void SerialPortStream_ListPorts()
         {
             bool result = true;
