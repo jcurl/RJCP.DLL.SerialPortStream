@@ -4,17 +4,17 @@
 // Copyright © Jason Curl 2012
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
-using System.Collections.Specialized;
-using RJCP.Datastructures;
-
 namespace RJCP.IO.Ports
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.IO;
+    using System.Runtime.InteropServices;
+    using Microsoft.Win32.SafeHandles;
+    using System.Collections.Specialized;
+    using RJCP.Datastructures;
+
     public partial class SerialPortStream
     {
         private sealed partial class NativeSerialPort : IDisposable

@@ -9,18 +9,18 @@
 // this implementation.
 //#define DRIVERBUFFEREDBYTES
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Management;
-using System.Threading;
-using System.Runtime.Remoting.Messaging;
-using Microsoft.Win32;
-using RJCP.Datastructures;
-
 namespace RJCP.IO.Ports
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.IO;
+    using System.Management;
+    using System.Threading;
+    using System.Runtime.Remoting.Messaging;
+    using Microsoft.Win32;
+    using RJCP.Datastructures;
+
     /// <summary>
     /// A class containing information about a serial port
     /// </summary>
@@ -47,7 +47,6 @@ namespace RJCP.IO.Ports
             Description = description;
         }
     }
-
 
     /// <summary>
     /// The SerialPortStream is a stream class to communicate with serial port based devices

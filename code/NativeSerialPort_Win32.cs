@@ -4,15 +4,15 @@
 // Copyright © Jason Curl 2012
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
-using System;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Collections.Specialized;
-using System.Security;
-using Microsoft.Win32.SafeHandles;
-
 namespace RJCP.IO.Ports
 {
+    using System;
+    using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Collections.Specialized;
+    using System.Security;
+    using Microsoft.Win32.SafeHandles;
+
     internal static class NativeMethods
     {
         [Flags]
