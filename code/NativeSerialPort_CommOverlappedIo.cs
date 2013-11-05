@@ -7,17 +7,17 @@
 //#define STRESSTEST
 #define PL2303_WORKAROUNDS
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Microsoft.Win32.SafeHandles;
-using RJCP.Datastructures;
-
 namespace RJCP.IO.Ports
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using Microsoft.Win32.SafeHandles;
+    using RJCP.Datastructures;
+
     public partial class SerialPortStream
     {
         private sealed partial class NativeSerialPort : IDisposable

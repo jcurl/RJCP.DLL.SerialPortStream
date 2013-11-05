@@ -4,12 +4,12 @@
 // Copyright © Jason Curl 2012
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace RJCP.IO.Ports
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
     /// <summary>
     /// The type of parity to use
     /// </summary>
