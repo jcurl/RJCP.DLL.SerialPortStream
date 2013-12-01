@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012
+// Copyright © Jason Curl 2012-2013
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 //#define STRESSTEST
@@ -297,7 +297,10 @@ namespace RJCP.IO.Ports
                 private void OnCommEvent(NativeMethods.SerialEventMask e)
                 {
                     if (e == 0) return;
-                    m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "CommEvent: " + e.ToString());
+                    if (m_Trace.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                        // e.ToString() is relatively expensive, so only do it if we're logging
+                        m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "CommEvent: " + e.ToString());
+                    }
                     if (CommEvent != null) CommEvent(this, new CommEventArgs(e));
                 }
 
@@ -312,7 +315,10 @@ namespace RJCP.IO.Ports
                 private void OnCommErrorEvent(NativeMethods.ComStatErrors e)
                 {
                     if (e == 0) return;
-                    m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "CommErrorEvent: " + e.ToString());
+                    if (m_Trace.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                        // e.ToString() is relatively expensive, so only do it if we're logging
+                        m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "CommErrorEvent: " + e.ToString());
+                    }
                     if (CommErrorEvent != null) CommErrorEvent(this, new CommErrorEventArgs(e));
                 }
                 #endregion
@@ -950,7 +956,8 @@ namespace RJCP.IO.Ports
                     NativeMethods.COMMTIMEOUTS timeouts = new NativeMethods.COMMTIMEOUTS();
                     // We read only the data that is buffered
 #if PL2303_WORKAROUNDS
-                    timeouts.ReadIntervalTimeout = -1;
+                    // Timeout if data hasn't arrived in 10ms, or if the read takes longer than 100ms in total
+                    timeouts.ReadIntervalTimeout = 10;
                     timeouts.ReadTotalTimeoutConstant = 100;
                     timeouts.ReadTotalTimeoutMultiplier = 0;
 #else
@@ -1000,6 +1007,33 @@ namespace RJCP.IO.Ports
                 }
                 #endregion
                 
+                private const NativeMethods.SerialEventMask maskRead =
+                    NativeMethods.SerialEventMask.EV_BREAK |
+                    NativeMethods.SerialEventMask.EV_CTS |
+                    NativeMethods.SerialEventMask.EV_DSR |
+                    NativeMethods.SerialEventMask.EV_ERR |
+                    NativeMethods.SerialEventMask.EV_RING |
+                    NativeMethods.SerialEventMask.EV_RLSD |
+                    NativeMethods.SerialEventMask.EV_RXCHAR |
+                    NativeMethods.SerialEventMask.EV_TXEMPTY |
+                    NativeMethods.SerialEventMask.EV_EVENT1 |
+                    NativeMethods.SerialEventMask.EV_EVENT2 |
+                    NativeMethods.SerialEventMask.EV_PERR |
+                    NativeMethods.SerialEventMask.EV_RX80FULL |
+                    NativeMethods.SerialEventMask.EV_RXFLAG;
+
+                private const NativeMethods.SerialEventMask maskReadPending = 
+                    NativeMethods.SerialEventMask.EV_BREAK |
+                    NativeMethods.SerialEventMask.EV_CTS |
+                    NativeMethods.SerialEventMask.EV_DSR |
+                    NativeMethods.SerialEventMask.EV_ERR |
+                    NativeMethods.SerialEventMask.EV_RING |
+                    NativeMethods.SerialEventMask.EV_RLSD |
+                    NativeMethods.SerialEventMask.EV_TXEMPTY |
+                    NativeMethods.SerialEventMask.EV_EVENT1 |
+                    NativeMethods.SerialEventMask.EV_EVENT2 |
+                    NativeMethods.SerialEventMask.EV_PERR;
+
                 /// <summary>
                 /// Entry point to the I/O thread
                 /// </summary>
@@ -1025,20 +1059,7 @@ namespace RJCP.IO.Ports
                     writeOverlapped.EventHandle = m_WriteEvent.SafeWaitHandle.DangerousGetHandle();
 
                     // Set up the types of serial events we want to see
-                    UnsafeNativeMethods.SetCommMask(m_ComPortHandle,
-                        NativeMethods.SerialEventMask.EV_BREAK |
-                        NativeMethods.SerialEventMask.EV_CTS |
-                        NativeMethods.SerialEventMask.EV_DSR |
-                        NativeMethods.SerialEventMask.EV_ERR |
-                        NativeMethods.SerialEventMask.EV_RING |
-                        NativeMethods.SerialEventMask.EV_RLSD |
-                        NativeMethods.SerialEventMask.EV_RXCHAR |
-                        NativeMethods.SerialEventMask.EV_TXEMPTY |
-                        NativeMethods.SerialEventMask.EV_EVENT1 |
-                        NativeMethods.SerialEventMask.EV_EVENT2 |
-                        NativeMethods.SerialEventMask.EV_PERR |
-                        NativeMethods.SerialEventMask.EV_RX80FULL |
-                        NativeMethods.SerialEventMask.EV_RXFLAG);
+                    UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
 
                     bool result;
                     NativeMethods.SerialEventMask commEventMask = 0;
@@ -1046,8 +1067,9 @@ namespace RJCP.IO.Ports
                     bool running = true;
                     uint bytes;
 
+                    List<WaitHandle> handles = new List<WaitHandle>(10);
                     while (running) {
-                        List<WaitHandle> handles = new List<WaitHandle>(10);
+                        handles.Clear();
                         handles.Add(m_StopRunning);
 
 #if PL2303_WORKAROUNDS
@@ -1058,33 +1080,12 @@ namespace RJCP.IO.Ports
                         // for reading data. To do so will result in errors. 
                         // Have no idea why.
                         if (!readPending) {
-                            UnsafeNativeMethods.SetCommMask(m_ComPortHandle,
-                                NativeMethods.SerialEventMask.EV_BREAK |
-                                NativeMethods.SerialEventMask.EV_CTS |
-                                NativeMethods.SerialEventMask.EV_DSR |
-                                NativeMethods.SerialEventMask.EV_ERR |
-                                NativeMethods.SerialEventMask.EV_RING |
-                                NativeMethods.SerialEventMask.EV_RLSD |
-                                NativeMethods.SerialEventMask.EV_RXCHAR |
-                                NativeMethods.SerialEventMask.EV_TXEMPTY |
-                                NativeMethods.SerialEventMask.EV_EVENT1 |
-                                NativeMethods.SerialEventMask.EV_EVENT2 |
-                                NativeMethods.SerialEventMask.EV_PERR |
-                                NativeMethods.SerialEventMask.EV_RX80FULL |
-                                NativeMethods.SerialEventMask.EV_RXFLAG);
+                            UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
                         } else {
-                            UnsafeNativeMethods.SetCommMask(m_ComPortHandle,
-                                NativeMethods.SerialEventMask.EV_BREAK |
-                                NativeMethods.SerialEventMask.EV_CTS |
-                                NativeMethods.SerialEventMask.EV_DSR |
-                                NativeMethods.SerialEventMask.EV_ERR |
-                                NativeMethods.SerialEventMask.EV_RING |
-                                NativeMethods.SerialEventMask.EV_RLSD |
-                                NativeMethods.SerialEventMask.EV_TXEMPTY |
-                                NativeMethods.SerialEventMask.EV_EVENT1 |
-                                NativeMethods.SerialEventMask.EV_EVENT2 |
-                                NativeMethods.SerialEventMask.EV_PERR);
+                            UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskReadPending);
                         }
+#else
+                        UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
 #endif
 
                         // commEventMask is on the stack, and is therefore fixed
@@ -1303,9 +1304,11 @@ namespace RJCP.IO.Ports
                     uint bufRead;
                     bool result = UnsafeNativeMethods.ReadFile(m_ComPortHandle, bufPtr, bufLen, out bufRead, ref overlap);
                     int e = Marshal.GetLastWin32Error();
-                    m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, 
-                        "SerialThread: DoReadEvent: ReadFile({0}, {1}, {2}) == {3}", 
-                        m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
+                    if (m_Trace.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                        m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId,
+                            "SerialThread: DoReadEvent: ReadFile({0}, {1}, {2}) == {3}",
+                            m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
+                    }
                     if (result) {
                         // MS Documentation for ReadFile() says that the 'bufRead' parameter should be NULL.
                         // However, in the case that the COMMTIMEOUTS is set up so that no wait is required
@@ -1338,8 +1341,11 @@ namespace RJCP.IO.Ports
                         m_ReadByteAvailable = false;
                     } else {
                         lock (m_ReadLock) {
-                            m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, 
-                                "SerialThread: ProcessReadEvent: End=" + m_Buffers.ReadBuffer.End + "; Bytes=" + bytes.ToString());
+                            if (m_Trace.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                                // Converting everything to strings before the call is expensive.
+                                m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId,
+                                    "SerialThread: ProcessReadEvent: End=" + m_Buffers.ReadBuffer.End + "; Bytes=" + bytes.ToString());
+                            }
                             m_Buffers.ReadBuffer.Produce((int)bytes);
                             if (m_Buffers.ReadBuffer.Free == 0) {
                                 m_ReadBufferNotFullEvent.Reset();
