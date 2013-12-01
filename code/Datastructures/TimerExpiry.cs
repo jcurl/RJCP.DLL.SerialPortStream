@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012
+// Copyright © Jason Curl 2012-2013.
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 using System;

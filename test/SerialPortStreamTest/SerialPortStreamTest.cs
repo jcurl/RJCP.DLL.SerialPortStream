@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012
+// Copyright © Jason Curl 2012-2013
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 using System;
@@ -25,8 +25,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     [TestClass]
     public class SerialPortStreamTest
     {
-        private const string c_SourcePort = "COM4";
-        private const string c_DestPort = "COM5";
+        private const string c_SourcePort = "CNCA0";
+        private const string c_DestPort = "CNCB0";
 
         private const int c_Timeout = 300;
 
@@ -237,7 +237,11 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         [Timeout(2000)]
         public void SerialPortStream_SendAndFlush1()
         {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                // Required for com0com to send the data (the remote side must receive it)
+                dst.Open();
+
                 src.Open();
                 src.WriteLine("Connected");
                 src.Flush();
@@ -249,7 +253,11 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         [Timeout(2000)]
         public void SerialPortStream_SendAndFlush2()
         {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                // Required for com0com to send the data (the remote side must receive it)
+                dst.Open();
+
                 Trace.WriteLine("1. Open()");
                 src.Open();
                 Trace.WriteLine("2. WriteLine()");
@@ -265,7 +273,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [TestMethod]
-        [TestCategory("IO.Ports.SerialPortStream")]
+        [TestCategory("SerialPortStream")]
         public void SerialPortStream_ListPorts()
         {
             bool result = true;

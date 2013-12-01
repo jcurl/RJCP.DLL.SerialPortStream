@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012
+// Copyright © Jason Curl 2012-2013
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 // Enable the following define to enable behaviour in the number of bytes similar to the MS
@@ -2144,18 +2144,28 @@ namespace RJCP.IO.Ports
 
         private void SerialPortIo_CommEvent(object sender, NativeSerialPort.CommOverlappedIo.CommEventArgs e)
         {
-            lock (m_EventCheck) {
-                m_CommEvent |= e.EventType;
+            if (m_Disposed || DataReceived == null && PinChanged == null) {
+                m_CommEvent = 0;
+                return;
+            } else {
+                lock (m_EventCheck) {
+                    m_CommEvent |= e.EventType;
+                }
+                CallEvent();
             }
-            CallEvent();
         }
 
         private void SerialPortIo_CommErrorEvent(object sender, NativeSerialPort.CommOverlappedIo.CommErrorEventArgs e)
         {
-            lock (m_EventCheck) {
-                m_CommErrorEvent |= e.EventType;
+            if (m_Disposed || ErrorReceived == null) {
+                m_CommErrorEvent = 0;
+                return;
+            } else {
+                lock (m_EventCheck) {
+                    m_CommErrorEvent |= e.EventType;
+                }
+                CallEvent();
             }
-            CallEvent();
         }
 
         /// <summary>
@@ -2168,21 +2178,7 @@ namespace RJCP.IO.Ports
         private void CallEvent()
         {
             if (m_EventProcessing.WaitOne(0)) return;
-
-            if (DataReceived == null && PinChanged == null && ErrorReceived == null) {
-                lock (m_EventCheck) {
-                    m_CommEvent = 0;
-                    m_CommErrorEvent = 0;
-                    return;
-                }
-            }
-
-            lock (m_EventCheck) {
-                // Check if there is an event to process.
-                if (m_Disposed) return;
-                if ((m_CommEvent == 0) && m_CommErrorEvent == 0) return;
-                m_EventProcessing.Set();
-            }
+            m_EventProcessing.Set();
 
             ThreadPool.QueueUserWorkItem(HandleEvent);
         }
@@ -2200,14 +2196,17 @@ namespace RJCP.IO.Ports
             NativeMethods.SerialEventMask commEvent;
             NativeMethods.ComStatErrors commErrorEvent;
 
-            bool handleEvent = true;
+            bool handleEvent;
+            lock (m_EventCheck) {
+                handleEvent = (m_CommEvent != 0) || (m_CommErrorEvent != 0);
+                commEvent = m_CommEvent;
+                m_CommEvent = 0;
+                commErrorEvent = m_CommErrorEvent;
+                m_CommErrorEvent = 0;
+            }
+
             while (handleEvent) {
                 // Received Data
-                lock (m_EventCheck) {
-                    commEvent = m_CommEvent;
-                    m_CommEvent &= ~(NativeMethods.SerialEventMask.EV_RXCHAR |
-                        NativeMethods.SerialEventMask.EV_RXFLAG);
-                }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RXFLAG) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Eof));
@@ -2219,13 +2218,6 @@ namespace RJCP.IO.Ports
                 }
 
                 // Modem Pin States
-                lock (m_EventCheck) {
-                    m_CommEvent &= ~(NativeMethods.SerialEventMask.EV_CTS |
-                        NativeMethods.SerialEventMask.EV_RING |
-                        NativeMethods.SerialEventMask.EV_RLSD |
-                        NativeMethods.SerialEventMask.EV_DSR |
-                        NativeMethods.SerialEventMask.EV_BREAK);
-                }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_CTS) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
@@ -2248,11 +2240,6 @@ namespace RJCP.IO.Ports
                 }
 
                 // Error States
-                lock (m_EventCheck) {
-                    commErrorEvent = m_CommErrorEvent;
-                    m_CommErrorEvent = 0;
-                }
-
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_TXFULL) != 0) {
                     lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.TXFull));
@@ -2275,10 +2262,11 @@ namespace RJCP.IO.Ports
                 }
 
                 lock (m_EventCheck) {
-                    if (m_CommErrorEvent == 0 && m_CommEvent == 0) {
-                        handleEvent = false;
-                        break;
-                    }
+                    handleEvent = (m_CommEvent != 0) || (m_CommErrorEvent != 0);
+                    commEvent = m_CommEvent;
+                    m_CommEvent = 0;
+                    commErrorEvent = m_CommErrorEvent;
+                    m_CommErrorEvent = 0;
                 }
             }
 
