@@ -1595,7 +1595,7 @@ namespace RJCP.IO.Ports
         public void DiscardOutBuffer()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-            throw new NotImplementedException();
+            m_SerialPort.SerialPortIo.DiscardOutBuffer();
         }
         #endregion
 
