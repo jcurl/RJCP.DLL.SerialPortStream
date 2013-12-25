@@ -930,13 +930,14 @@ namespace RJCP.IO.Ports
                 /// </remarks>
                 public void DiscardOutBuffer()
                 {
+                    if (m_Buffers == null) return;
                     lock (m_WriteLock) {
-                        // We do NOT issue a Reset() here. If there is a background ReadFile() in
-                        // progress, a Reset() could cause corrupt data in the buffer as the ReadFile()
-                        // will write to a different portion of data and then produce the bytes. A
+                        // We do NOT issue a Reset() here. If there is a background WriteFile() in
+                        // progress, a Reset() could cause corrupt data in the buffer as the WriteFile()
+                        // will read from a different portion of data and then consume the bytes. A
                         // Consume() advances the pointers, so that when the IO thread calls Produce(),
                         // pointers are advanced correctly to the data that was actually written.
-                        m_Buffers.ReadBuffer.Consume(m_Buffers.WriteBuffer.Length);
+                        m_Buffers.WriteBuffer.Consume(m_Buffers.WriteBuffer.Length);
                         m_WriteBufferNotEmptyEvent.Reset();
                         UnsafeNativeMethods.PurgeComm(m_ComPortHandle, NativeMethods.PurgeFlags.PURGE_TXABORT | NativeMethods.PurgeFlags.PURGE_TXCLEAR);
                         m_WriteBufferNotFullEvent.Set();
