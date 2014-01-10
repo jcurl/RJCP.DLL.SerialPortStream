@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013.
+// Copyright © Jason Curl 2012-2014.
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 using System;
@@ -23,13 +23,11 @@ namespace RJCP.IO
         /// Initializes a new instance of the <see cref="LocalAsync"/> class.
         /// </summary>
         /// <param name="state">The state object given by the user in a BeginWrite/EndWrite method</param>
-        /// <param name="handle">The handle which indicates the object is signalled</param>
         /// <remarks>
-        /// Provide a WaitHandle if you have one that will be signalled when the I/O operation is finished.
-        /// You must still set the IsCompleted flag before you execute the users callback. If you do not
-        /// provide a handle, but instead give <b>null</b> for <paramref name="handle"/>, then this object
-        /// will create a ManualResetEvent for you automatically, that will be signalled when you set the
-        /// <see cref="IsCompleted"/> property, or reset when you clear the property.
+        /// When your asynchronous operation is finished, you should set the <see cref="IsCompleted"/>
+        /// property, which will automatically trigger the <see cref="AsyncWaitHandle"/> if the user is
+        /// waiting on this. When you're finished, be sure to call the <see cref="Dispose"/> method in
+        /// your EndXXX() method.
         /// </remarks>
         public LocalAsync(object state)
         {
@@ -120,13 +118,11 @@ namespace RJCP.IO
         /// Initializes a new instance of the <see cref="LocalAsync"/> class.
         /// </summary>
         /// <param name="state">The state object given by the user in a BeginWrite/EndWrite method</param>
-        /// <param name="handle">The handle which indicates the object is signalled</param>
         /// <remarks>
-        /// Provide a WaitHandle if you have one that will be signalled when the I/O operation is finished.
-        /// You must still set the IsCompleted flag before you execute the users callback. If you do not
-        /// provide a handle, but instead give <b>null</b> for <paramref name="handle"/>, then this object
-        /// will create a ManualResetEvent for you automatically, that will be signalled when you set the
-        /// <see name="IsCompleted"/> property, or reset when you clear the property.
+        /// When your asynchronous operation is finished, you should set the <see cref="LocalAsync.IsCompleted"/>
+        /// property, which will automatically trigger the <see cref="LocalAsync.AsyncWaitHandle"/> if the user is
+        /// waiting on this. When you're finished, be sure to call the <see cref="LocalAsync.Dispose"/> method in
+        /// your EndXXX() method.
         /// </remarks>
         public LocalAsync(object state) : base(state) { }
 

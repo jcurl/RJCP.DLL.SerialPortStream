@@ -33,12 +33,24 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\Release\RJCP.SerialPortStream.XML</DocumentationFile>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>rjcp_serialportstream.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>20140110_RJCP_SerialPortStream.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signed_Release|AnyCPU'">
+    <OutputPath>bin\Signed_Release\</OutputPath>
+    <DefineConstants>TRACE;SIGNED_RELEASE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\RJCP.SerialPortStream.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -63,7 +75,7 @@
     <Compile Include="SerialTrace.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="rjcp_serialportstream.pfx" />
+    <None Include="20140110_RJCP_SerialPortStream.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
