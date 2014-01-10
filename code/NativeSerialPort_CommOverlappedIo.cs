@@ -723,6 +723,10 @@ namespace RJCP.IO.Ports
                     bytesRead = 0;
                     if (m_Buffers == null) return -1;
 
+                    // We don't lock the ReadBuffer in this case because we're not modifying the
+                    // content of the ReadBuffer. We expect it only to grow and also not to
+                    // shrink after reading the length, a valid assumption so long as there
+                    // is no parallel Read() call during this method.
                     int readlen = m_Buffers.ReadBuffer.Length;
                     if (offset >= readlen) return -1;
 

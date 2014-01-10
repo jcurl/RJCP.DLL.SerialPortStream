@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-#if DEBUG
+#if !SIGNED_RELEASE
 [assembly: InternalsVisibleTo("RJCP.DatastructuresTest")]
 #endif
 
