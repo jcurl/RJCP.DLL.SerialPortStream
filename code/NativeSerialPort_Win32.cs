@@ -52,7 +52,7 @@ namespace RJCP.IO.Ports
             public int DCBLength;
 
             /// <summary>
-            /// Baudrate at which the communications device operates
+            /// Baud rate at which the communications device operates
             /// </summary>
             public uint BaudRate;
 
@@ -693,7 +693,7 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// Specifies possible baudrates in the GetCommProperties method
+        /// Specifies possible baud rates in the GetCommProperties method
         /// </summary>
         [Flags]
         public enum MaxBaud
@@ -871,7 +871,7 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// Bitmask of capabilities in the GetCommProperties method
+        /// Bit mask of capabilities in the GetCommProperties method
         /// </summary>
         [Flags]
         public enum ProvCapabilities
@@ -970,7 +970,7 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// Number of databits that can be set
+        /// Number of data bits that can be set
         /// </summary>
         [Flags]
         public enum SettableData
@@ -986,17 +986,17 @@ namespace RJCP.IO.Ports
             DATABITS_6 = 0x0002,
 
             /// <summary>
-            /// 7 databits
+            /// 7 data bits
             /// </summary>
             DATABITS_7 = 0x0004,
 
             /// <summary>
-            /// 8 databits
+            /// 8 data bits
             /// </summary>
             DATABITS_8 = 0x0008,
 
             /// <summary>
-            /// 16 databits
+            /// 16 data bits
             /// </summary>
             DATABITS_16 = 0x0010,
 
@@ -1076,7 +1076,7 @@ namespace RJCP.IO.Ports
             public ushort wPacketVersion;
 
             /// <summary>
-            /// A bitmask indicating which services are implemented by this provider. The SP_SERIALCOMM
+            /// A bit mask indicating which services are implemented by this provider. The SP_SERIALCOMM
             /// value is always specified for communications providers, including modem providers
             /// </summary>
             public uint dwServiceMask;
@@ -1110,7 +1110,7 @@ namespace RJCP.IO.Ports
             public ProvSubType dwProvSubType;
 
             /// <summary>
-            /// A bitmask indicating the capabilities offered by the provider
+            /// A bit mask indicating the capabilities offered by the provider
             /// </summary>
             public BitVector32 dwProvCapabilities;           // ProvCapabilities
 
@@ -1398,22 +1398,11 @@ namespace RJCP.IO.Ports
             [MarshalAs(UnmanagedType.U4)] NativeMethods.FileAttributes dwFlagsAndAttributes,
             IntPtr hTemplateFile);
 
-        //[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool WriteFile(SafeFileHandle hFile, byte[] lpBuffer,
-        //    uint nNumberOfBytesToWrite, out uint lpNumberOfBytesWritten,
-        //    [In] ref System.Threading.NativeOverlapped lpOverlapped);
-
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool WriteFile(SafeFileHandle hFile, IntPtr lpBuffer,
             uint nNumberOfBytesToWrite, out uint lpNumberOfBytesWritten,
             [In] ref System.Threading.NativeOverlapped lpOverlapped);
-
-        //[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool ReadFile(SafeFileHandle hFile, [Out] byte[] lpBuffer, uint nNumberOfBytesToRead,
-        //    out uint lpNumberOfBytesRead, [In] ref System.Threading.NativeOverlapped lpOverlapped);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]

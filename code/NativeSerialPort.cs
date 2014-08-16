@@ -176,7 +176,7 @@ namespace RJCP.IO.Ports
                 m_CommState = new CommState(m_ComPortHandle, m_CommState);
                 m_CommProperties = new CommProperties(m_ComPortHandle);
                 m_CommModem = new CommModemStatus(m_ComPortHandle);
-                m_CommIo = new CommOverlappedIo(m_ComPortHandle, m_CommIo);
+                m_CommIo = new CommOverlappedIo(m_ComPortHandle, m_CommIo, Port);
             }
 
             /// <summary>

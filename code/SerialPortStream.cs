@@ -153,10 +153,10 @@ namespace RJCP.IO.Ports
         /// Constructor. Create a stream that connects to the specified port and sets the initial baud rate.
         /// </summary>
         /// <remarks>
-        /// The stream doesn't impose any arbitrary limits on setting the baudrate. It is passed
-        /// directly to the driver and it is up to the driver to determine if the baudrate is
-        /// settable or not. Normally, a driver will attempt to set a baudrate that is within 5%
-        /// of the requested baudrate (but not guaranteed). 
+        /// The stream doesn't impose any arbitrary limits on setting the baud rate. It is passed
+        /// directly to the driver and it is up to the driver to determine if the baud rate is
+        /// settable or not. Normally, a driver will attempt to set a baud rate that is within 5%
+        /// of the requested baud rate (but not guaranteed). 
         /// </remarks>
         /// <param name="port">The name of the COM port, such as "COM1" or "COM33".</param>
         /// <param name="baud">The baud rate that is passed to the underlying driver.</param>
@@ -169,16 +169,16 @@ namespace RJCP.IO.Ports
         /// Constructor. Create a stream that connects to the specified port with standard parameters.
         /// </summary>
         /// <remarks>
-        /// The stream doesn't impose any arbitrary limits on setting the baudrate. It is passed
-        /// directly to the driver and it is up to the driver to determine if the baudrate is
-        /// settable or not. Normally, a driver will attempt to set a baudrate that is within 5%
-        /// of the requested baudrate (but not guaranteed). 
+        /// The stream doesn't impose any arbitrary limits on setting the baud rate. It is passed
+        /// directly to the driver and it is up to the driver to determine if the baud rate is
+        /// settable or not. Normally, a driver will attempt to set a baud rate that is within 5%
+        /// of the requested baud rate (but not guaranteed). 
         /// <para>Not all combinations are supported. The driver will interpret the data and indicate
         /// if configuration is possible or not.</para>
         /// </remarks>
         /// <param name="port">The name of the COM port, such as "COM1" or "COM33".</param>
         /// <param name="baud">The baud rate that is passed to the underlying driver.</param>
-        /// <param name="data">The number of databits. This is checked that the driver 
+        /// <param name="data">The number of data bits. This is checked that the driver 
         /// supports the data bits provided. The special type 16X is not supported.</param>
         /// <param name="parity">The parity for the data stream.</param>
         /// <param name="stopbits">Number of stop bits.</param>
@@ -391,7 +391,7 @@ namespace RJCP.IO.Ports
         /// If this object is already managing a serial port, this object raises an exception.
         /// <para>When opening the port, only the settings explicitly applied will be given to the
         /// port. That is, if you read the default BaudRate as 115200, this value will only be
-        /// applied if you explicitly set it to 115200. Else the default baudrate of the serial
+        /// applied if you explicitly set it to 115200. Else the default baud rate of the serial
         /// port when its opened will be used.</para>
         /// <para>Normally when you instantiate this stream on a COM port, it is opened for a brief
         /// time and queried for the capabilities and default settings. This allows your application
@@ -898,7 +898,7 @@ namespace RJCP.IO.Ports
         /// calls if characters may require more than one byte of data for its interpretation
         /// as a character.
         /// </remarks>
-        /// <param name="buffer">The character array to write the input to. </param>
+        /// <param name="buffer">The character array to write the input to.</param>
         /// <param name="offset">Offset into the buffer where to start putting the data.</param>
         /// <param name="count">Maximum number of bytes to read into the buffer.</param>
         /// <returns>The actual number of bytes copied into the buffer, 0 if there was a timeout.</returns>
@@ -1010,7 +1010,7 @@ namespace RJCP.IO.Ports
         /// Reads a string up to the specified <i>text</i> in the input buffer.
         /// </summary>
         /// <remarks>
-        /// The ReadTo() function will read text from the byte buffer upto a predetermined
+        /// The ReadTo() function will read text from the byte buffer up to a predetermined
         /// limit (1024 characters) when looking for the string <i>text</i>. If <i>text</i>
         /// is not found within this limit, data is thrown away and more data is read
         /// (effectively consuming the earlier bytes).
@@ -1455,7 +1455,7 @@ namespace RJCP.IO.Ports
         /// <param name="buffer">The buffer containing data to send.</param>
         /// <param name="offset">Offset into the array buffer where data begins.</param>
         /// <param name="count">Number of bytes to copy into the local buffer.</param>
-        /// <exception cref="TimeoutException">Not enough bufferspace was made available
+        /// <exception cref="TimeoutException">Not enough buffer space was made available
         /// before the timeout expired.</exception>
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -1579,7 +1579,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Writes the specified string and the NewLine value to the output buffer.
         /// </summary>
-        /// <param name="text">The string to write to the output buffer. </param>
+        /// <param name="text">The string to write to the output buffer.</param>
         public void WriteLine(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -1684,12 +1684,12 @@ namespace RJCP.IO.Ports
         /// Gets or sets the serial baud rate.
         /// </summary>
         /// <remarks>
-        /// The stream doesn't impose any arbitrary limits on setting the baudrate. It is passed
-        /// directly to the driver and it is up to the driver to determine if the baudrate is
-        /// settable or not. Normally, a driver will attempt to set a baudrate that is within 5%
-        /// of the requested baudrate (but not guaranteed). 
-        /// <para>If the serial driver doesn't support setting the baudrate, setting this property
-        /// is silently ignored and the baudrate isn't updated.</para>
+        /// The stream doesn't impose any arbitrary limits on setting the baud rate. It is passed
+        /// directly to the driver and it is up to the driver to determine if the baud rate is
+        /// settable or not. Normally, a driver will attempt to set a baud rate that is within 5%
+        /// of the requested baud rate (but not guaranteed). 
+        /// <para>If the serial driver doesn't support setting the baud rate, setting this property
+        /// is silently ignored and the baud rate isn't updated.</para>
         /// </remarks>
         public int BaudRate
         {
@@ -1716,10 +1716,10 @@ namespace RJCP.IO.Ports
         /// size requested, an exception is raised.
         /// <para>Not all possible combinations are allowed by all drivers. That implies, that an exception
         /// may be raised for a valid setting of the DataBits property, if the other parameters are not
-        /// valid. Such an example might be that 5-bits are only supported with 2 stopbits and not otherwise.
+        /// valid. Such an example might be that 5-bits are only supported with 2 stop bits and not otherwise.
         /// The driver itself will raise an exception to the application in this case.</para>
-        /// <para>If the serial driver doesn't support setting the databits, setting this property is silently ignored
-        /// and the number of databits isn't updated.</para>
+        /// <para>If the serial driver doesn't support setting the data bits, setting this property is silently ignored
+        /// and the number of data bits isn't updated.</para>
         /// </remarks>
         public int DataBits
         {
@@ -1737,12 +1737,12 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// Gets or sets the standard number of stopbits per byte.
+        /// Gets or sets the standard number of stop bits per byte.
         /// </summary>
         /// <remarks>
         /// Gets or sets the stop bits that should be used when transmitting and receiving data over the serial
-        /// port. If the serial driver doesn't support setting the stopbits, setting this property is silently ignored
-        /// and the number of stopbits isn't updated.
+        /// port. If the serial driver doesn't support setting the stop bits, setting this property is silently ignored
+        /// and the number of stop bits isn't updated.
         /// </remarks>
         public StopBits StopBits
         {
@@ -1766,8 +1766,8 @@ namespace RJCP.IO.Ports
         /// Gets or sets the parity-checking protocol.
         /// </summary>
         /// <remarks>
-        /// Parity is an error-checking procedure in which the number of 1s must always be the same—either
-        /// even or odd—for each group of bits that is transmitted without error. In modem-to-modem
+        /// Parity is an error-checking procedure in which the number of 1s must always be the same — either
+        /// even or odd — for each group of bits that is transmitted without error. In modem-to-modem
         /// communications, parity is often one of the parameters that must be agreed upon by sending parties
         /// and receiving parties before transmission can take place.
         /// </remarks>
