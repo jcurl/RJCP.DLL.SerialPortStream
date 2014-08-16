@@ -132,7 +132,7 @@ namespace RJCP.IO.Ports
     }
 
     /// <summary>
-    /// Event Args for DataReceived
+    /// EventArgs for DataReceived
     /// </summary>
     public class SerialDataReceivedEventArgs  : EventArgs
     {
@@ -201,7 +201,7 @@ namespace RJCP.IO.Ports
     }
 
     /// <summary>
-    /// Event Args for ErrorReceived
+    /// EventArgs for ErrorReceived
     /// </summary>
     public class SerialErrorReceivedEventArgs : EventArgs
     {
@@ -269,7 +269,7 @@ namespace RJCP.IO.Ports
     }
 
     /// <summary>
-    /// Event Args for PinChanged
+    /// EventArgs for PinChanged
     /// </summary>
     public class SerialPinChangedEventArgs : EventArgs
     {
