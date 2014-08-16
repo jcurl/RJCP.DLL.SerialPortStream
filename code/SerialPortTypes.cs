@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013
+// Copyright © Jason Curl 2012-2014
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
@@ -11,100 +11,100 @@ namespace RJCP.IO.Ports
     using System.Text;
 
     /// <summary>
-    /// The type of parity to use
+    /// The type of parity to use.
     /// </summary>
     public enum Parity
     {
         /// <summary>
-        /// No parity
+        /// No parity.
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// Odd parity
+        /// Odd parity.
         /// </summary>
         Odd = 1,
 
         /// <summary>
-        /// Even parity
+        /// Even parity.
         /// </summary>
         Even = 2,
 
         /// <summary>
-        /// Mark parity
+        /// Mark parity.
         /// </summary>
         Mark = 3,
 
         /// <summary>
-        /// Space parity
+        /// Space parity.
         /// </summary>
         Space = 4
     }
 
     /// <summary>
-    /// Number of stop bits to use
+    /// Number of stop bits to use.
     /// </summary>
     public enum StopBits
     {
         /// <summary>
-        /// One stop bit
+        /// One stop bit.
         /// </summary>
         One = 0,
 
         /// <summary>
-        /// 1.5 stop bits
+        /// 1.5 stop bits.
         /// </summary>
         One5 = 1,
 
         /// <summary>
-        /// Two stop bits
+        /// Two stop bits.
         /// </summary>
         Two = 2
     }
 
     /// <summary>
-    /// Handshaking mode to use
+    /// Handshaking mode to use.
     /// </summary>
     [Flags]
     public enum Handshake
     {
         /// <summary>
-        /// No handshaking
+        /// No handshaking.
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// Software handshaking
+        /// Software handshaking.
         /// </summary>
         XOn = 1,
 
         /// <summary>
-        /// Hardware handshaking (RTS/CTS)
+        /// Hardware handshaking (RTS/CTS).
         /// </summary>
         Rts = 2,
 
         /// <summary>
-        /// Hardware handshaking (DTR/DSR) (uncommon)
+        /// Hardware handshaking (DTR/DSR) (uncommon).
         /// </summary>
         Dtr = 4,
 
         /// <summary>
-        /// RTS and Software handshaking
+        /// RTS and Software handshaking.
         /// </summary>
         RtsXOn = Rts | XOn,
 
         /// <summary>
-        /// DTR and Software handshaking (uncommon)
+        /// DTR and Software handshaking (uncommon).
         /// </summary>
         DtrXOn = Dtr | XOn,
 
         /// <summary>
-        /// Hardware handshaking with RTS/CTS and DTR/DSR (uncommon)
+        /// Hardware handshaking with RTS/CTS and DTR/DSR (uncommon).
         /// </summary>
         DtrRts = Dtr | Rts,
 
         /// <summary>
-        /// Hardware handshaking with RTS/CTS and DTR/DSR and Software handshaking (uncommon)
+        /// Hardware handshaking with RTS/CTS and DTR/DSR and Software handshaking (uncommon).
         /// </summary>
         DtrRtsXOn = Dtr | Rts | XOn
     }
@@ -164,7 +164,7 @@ namespace RJCP.IO.Ports
     public delegate void SerialDataReceivedEventHandler(object sender, SerialDataReceivedEventArgs e);
 
     /// <summary>
-    /// Event related informaiton on ErrorReceived
+    /// Event related information on ErrorReceived
     /// </summary>
     // Values are obtained from ClearCommErrors() Win32API
     public enum SerialError

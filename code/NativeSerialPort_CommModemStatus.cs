@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013
+// Copyright © Jason Curl 2012-2014
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
@@ -19,7 +19,7 @@ namespace RJCP.IO.Ports
         private sealed partial class NativeSerialPort : IDisposable
         {
             /// <summary>
-            /// Abstracts the Win32 API GetCommModemStatus()
+            /// Abstracts the Win32 API GetCommModemStatus().
             /// </summary>
             public sealed class CommModemStatus
             {

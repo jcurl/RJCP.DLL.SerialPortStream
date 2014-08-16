@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013
+// Copyright © Jason Curl 2012-2014
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
@@ -152,7 +152,7 @@ namespace RJCP.IO.Ports
             /// The caller can perform a wait operation on the object
             /// </summary>
             /// <remarks>
-            /// This enables a thread to wait until the object is in the signaled state. Some object 
+            /// This enables a thread to wait until the object is in the signalled state. Some object 
             /// types do not support this access right. 
             /// </remarks>
             SYNCHRONIZE = 0x100000,
@@ -271,7 +271,7 @@ namespace RJCP.IO.Ports
             /// The right to create a subdirectory
             /// </summary>
             /// <remarks>
-            /// For local directorys, write operations will not overwrite existing
+            /// For local directories, write operations will not overwrite existing
             /// data if this flag is specified without FILE_ADD_SUBDIRECTORY.
             /// </remarks>
             FILE_ADD_SUBDIRECTORY = 0x0004,
@@ -435,7 +435,7 @@ namespace RJCP.IO.Ports
             /// </summary>
             /// <remarks>
             /// Applications can read the file, but cannot write to it or delete
-            /// it. This attribute is not honored on directories. For more information,
+            /// it. This attribute is not honoured on directories. For more information,
             /// see "You cannot view or change the Read-only or the System attributes
             /// of folders in Windows Server 2003, in Windows XP, in Windows Vista or
             /// in Windows 7". 
@@ -609,7 +609,7 @@ namespace RJCP.IO.Ports
             /// The system can use this as a hint to optimize file caching. This flag
             /// should not be used if read-behind (that is, reverse scans) will be used.
             /// This flag has no effect if the file system does not support cached I/O
-            /// and FILE_FLAG_NO_BUFFERING. For more information, see the Caching Behavior
+            /// and FILE_FLAG_NO_BUFFERING. For more information, see the Caching Behaviour
             /// section of CreateFile(). 
             /// </remarks>
             FILE_FLAG_SEQUENTIAL_SCAN = 0x08000000,
@@ -620,7 +620,7 @@ namespace RJCP.IO.Ports
             /// <remarks>
             /// The system can use this as a hint to optimize file caching. This flag
             /// has no effect if the file system does not support cached I/O and
-            /// FILE_FLAG_NO_BUFFERING. For more information, see the Caching Behavior
+            /// FILE_FLAG_NO_BUFFERING. For more information, see the Caching Behaviour
             /// section of CreateFile()
             /// </remarks>
             FILE_FLAG_RANDOM_ACCESS = 0x10000000,
@@ -642,7 +642,7 @@ namespace RJCP.IO.Ports
             /// </summary>
             /// <remarks>
             /// When subsequent I/O operations are completed on this handle, the event
-            /// specified in the OVERLAPPED structure will be set to the signaled state. 
+            /// specified in the OVERLAPPED structure will be set to the signalled state. 
             /// If this flag is specified, the file can be used for simultaneous read
             /// and write operations. If this flag is not specified, then I/O operations
             /// are serialized, even if the calls to the read and write functions specify
@@ -656,7 +656,7 @@ namespace RJCP.IO.Ports
             /// Write operations will not go through any intermediate cache, they will go directly to disk.
             /// </summary>
             /// <remarks>
-            /// For additional information, see the Caching Behavior section of CreateFile().
+            /// For additional information, see the Caching Behaviour section of CreateFile().
             /// </remarks>
             FILE_FLAG_WRITE_THROUGH = unchecked((int)0x80000000),
         }
@@ -1246,7 +1246,7 @@ namespace RJCP.IO.Ports
             SETBREAK = 8,
 
             /// <summary>
-            /// Restores character transmission and places the transmission line in a nonbreak 
+            /// Restores character transmission and places the transmission line in a non-break 
             /// state. The CLRBREAK extended function code is identical to the ClearCommBreak function
             /// </summary>
             CLRBREAK = 9

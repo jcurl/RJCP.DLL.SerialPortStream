@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013
+// Copyright © Jason Curl 2012-2014
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
@@ -27,54 +27,54 @@ namespace RJCP.IO.Ports
             private CommOverlappedIo m_CommIo;
 
             /// <summary>
-            /// Type of DTR (Data Terminal Ready) control to use
+            /// Type of DTR (Data Terminal Ready) control to use.
             /// </summary>
             public enum DtrControl
             {
                 /// <summary>
-                /// Disable DTR line
+                /// Disable DTR line.
                 /// </summary>
                 Disable = 0,
 
                 /// <summary>
-                /// Enable DTR line
+                /// Enable DTR line.
                 /// </summary>
                 Enable = 1,
 
                 /// <summary>
-                /// DTR Handshaking
+                /// DTR Handshaking.
                 /// </summary>
                 Handshake = 2
             }
 
             /// <summary>
-            /// RTS (Request to Send) to use
+            /// RTS (Request to Send) to use.
             /// </summary>
             public enum RtsControl
             {
                 /// <summary>
-                /// Disable RTS line
+                /// Disable RTS line.
                 /// </summary>
                 Disable = 0,
 
                 /// <summary>
-                /// Enable the RTS line
+                /// Enable the RTS line.
                 /// </summary>
                 Enable = 1,
 
                 /// <summary>
-                /// RTS Handshaking
+                /// RTS Handshaking.
                 /// </summary>
                 Handshake = 2,
 
                 /// <summary>
-                /// RTS Toggling
+                /// RTS Toggling.
                 /// </summary>
                 Toggle = 3
             }
 
             /// <summary>
-            /// Default constructor, doesn't associate with a COM port
+            /// Default constructor, doesn't associate with a COM port.
             /// </summary>
             public NativeSerialPort() 
             {
@@ -83,9 +83,9 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Create a new NativeSerialPort object, opening a connection to the COM port specified
+            /// Create a new NativeSerialPort object, opening a connection to the COM port specified.
             /// </summary>
-            /// <param name="port">The port to open</param>
+            /// <param name="port">The port to open.</param>
             public NativeSerialPort(string port)
             {
                 Port = port;
@@ -93,7 +93,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// The name of the port to open and operate with
+            /// The name of the port to open and operate with.
             /// </summary>
             public string Port
             {
@@ -112,7 +112,7 @@ namespace RJCP.IO.Ports
             private int m_DriverInQueue = 4096;
 
             /// <summary>
-            /// Specify the driver In Queue at the time it is opened
+            /// Specify the driver In Queue at the time it is opened.
             /// </summary>
             /// <remarks>
             /// This provides the driver a recommended internal input buffer, in bytes. 
@@ -130,7 +130,7 @@ namespace RJCP.IO.Ports
             private int m_DriverOutQueue = 2048;
 
             /// <summary>
-            /// Specify the driver Out Queue at the time it is opened
+            /// Specify the driver Out Queue at the time it is opened.
             /// </summary>
             /// <remarks>
             /// This provides the driver a recommended internal output buffer, in bytes. 
@@ -146,7 +146,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Open the port specified by the Port property
+            /// Open the port specified by the Port property.
             /// </summary>
             public void Open()
             {
@@ -180,9 +180,9 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Open the port specified, changing also the Port property
+            /// Open the port specified, changing also the Port property.
             /// </summary>
-            /// <param name="port">The port to open</param>
+            /// <param name="port">The port to open.</param>
             public void Open(string port)
             {
                 Port = port;
@@ -190,7 +190,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Tests if the Com Port is still managed by this class
+            /// Tests if the COM Port is still managed by this class.
             /// </summary>
             public bool IsOpen
             {
@@ -198,7 +198,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Get information about the Comm Port status via GetCommState() and SetCommState()
+            /// Get information about the Comm Port status via GetCommState() and SetCommState().
             /// </summary>
             public CommState SerialPortCommState
             {
@@ -206,7 +206,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Get information about the Comm Port status via GetCommProperties()
+            /// Get information about the Comm Port status via GetCommProperties().
             /// </summary>
             public CommProperties SerialPortCommProperties
             {
@@ -214,7 +214,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Get information about the Comm Port status via GetCommModemStatus()
+            /// Get information about the Comm Port status via GetCommModemStatus().
             /// </summary>
             public CommModemStatus SerialPortModemStatus
             {
@@ -222,7 +222,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// An object to manage overlapped I/O. Through this you can start/stop I/O
+            /// An object to manage overlapped I/O. Through this you can start/stop I/O.
             /// </summary>
             public CommOverlappedIo SerialPortIo
             {
@@ -248,7 +248,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Close the filehandle and release resources
+            /// Close the file handle and release resources.
             /// </summary>
             public void Close() 
             {
@@ -259,11 +259,11 @@ namespace RJCP.IO.Ports
                 }
             }
 
-            // CA1805: false is the default value
+            // CA1805: false is the default value.
             private bool m_IsDisposed;
 
             /// <summary>
-            /// Indicate if the NativeSerialPort object is disposed
+            /// Indicate if the NativeSerialPort object is disposed.
             /// </summary>
             public bool IsDisposed
             {
@@ -271,7 +271,7 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Close the filehandle and release resources, disposing this object
+            /// Close the file handle and release resources, disposing this object.
             /// </summary>
             public void Dispose()
             {
@@ -280,10 +280,10 @@ namespace RJCP.IO.Ports
             }
 
             /// <summary>
-            /// Release resources
+            /// Release resources.
             /// </summary>
             /// <param name="disposing"><b>true</b> if this is being called from dispose(), or <b>false</b> 
-            /// if by the finalizer.</param>
+            /// if by the finaliser.</param>
             private void Dispose(bool disposing)
             {
                 if (IsOpen) {
