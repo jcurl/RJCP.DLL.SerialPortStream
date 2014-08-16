@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013
+// Copyright © Jason Curl 2012-2014
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
@@ -19,7 +19,7 @@ namespace RJCP.IO.Ports
         private sealed partial class NativeSerialPort : IDisposable
         {
             /// <summary>
-            /// Abstracts the Win32 API GetCommProperties()
+            /// Abstracts the Win32 API GetCommProperties().
             /// </summary>
             public sealed class CommProperties
             {
@@ -75,10 +75,10 @@ namespace RJCP.IO.Ports
                 public bool IsFaxType { get { return m_CommProp.dwProvSubType == NativeMethods.ProvSubType.PST_FAX; } }
 
                 /// <summary>
-                /// Check if the number of databits is settable
+                /// Check if the number of data bits is settable.
                 /// </summary>
-                /// <param name="databits">The number of databits the user wants to set</param>
-                /// <returns><b>true</b> if the number of databits is indicated as supported</returns>
+                /// <param name="databits">The number of data bits the user wants to set.</param>
+                /// <returns><b>true</b> if the number of data bits is indicated as supported.</returns>
                 public bool IsValidDataBits(int databits)
                 {
                     if ((databits < 5 || databits > 8) && databits != 16) return false;
@@ -93,10 +93,10 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Check if the number of stopbits is settable
+                /// Check if the number of stop bits is settable.
                 /// </summary>
-                /// <param name="stopbits">The number of stopbits the user wants to set</param>
-                /// <returns><b>true</b> if the number of stop bits is indicated as supported</returns>
+                /// <param name="stopbits">The number of stop bits the user wants to set.</param>
+                /// <returns><b>true</b> if the number of stop bits is indicated as supported.</returns>
                 public bool IsValidStopBits(Ports.StopBits stopbits)
                 {
                     switch (stopbits) {
@@ -108,10 +108,10 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Check if the parity is supported
+                /// Check if the parity is supported.
                 /// </summary>
-                /// <param name="parity">The parity the user wants to set</param>
-                /// <returns><b>true</b> if the parity is indicated as supported</returns>
+                /// <param name="parity">The parity the user wants to set.</param>
+                /// <returns><b>true</b> if the parity is indicated as supported.</returns>
                 public bool IsValidParity(Ports.Parity parity)
                 {
                     switch (parity) {
@@ -125,14 +125,14 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Check if the baudrate value given is settable
+                /// Check if the baud rate value given is settable.
                 /// </summary>
                 /// <remarks>
                 /// This function relies on the <c>dwSettableBaud</c> parameter. It does not rely on the <c>dwMaxBaud</c>
                 /// parameter as if they don't match, then this is an inconsistency in the Windows serial driver.
                 /// </remarks>
-                /// <param name="baudrate">The baudrate to check for</param>
-                /// <returns><b>true</b> if the baudrate is indicated to be supported</returns>
+                /// <param name="baudrate">The baud rate to check for.</param>
+                /// <returns><b>true</b> if the baud rate is indicated to be supported.</returns>
                 public bool IsValidBaud(int baudrate)
                 {
                     if (baudrate <= 0) return false;

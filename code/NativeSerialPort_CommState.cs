@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013
+// Copyright © Jason Curl 2012-2014
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
@@ -19,7 +19,7 @@ namespace RJCP.IO.Ports
         private sealed partial class NativeSerialPort : IDisposable
         {
             /// <summary>
-            /// Abstracts the Win32 API GetCommState() and SetCommState()
+            /// Abstracts the Win32 API GetCommState() and SetCommState().
             /// </summary>
             public sealed class CommState
             {
@@ -27,7 +27,7 @@ namespace RJCP.IO.Ports
                 private NativeMethods.DCB m_Dcb = new NativeMethods.DCB();
 
                 /// <summary>
-                /// Default constructor for a DCB
+                /// Default constructor for a DCB.
                 /// </summary>
                 /// <remarks>
                 /// The default constructor allocates space for the serial DCB (Device Control Block).
@@ -40,20 +40,20 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Constructor for a DCB, prefilled with data from the handle provided
+                /// Constructor for a DCB, prefilled with data from the handle provided.
                 /// </summary>
                 /// <remarks>
                 /// This constructor allocates space for a DCB (Device Control Block) and gets the
                 /// state of the serial port provided by the handle. You can then update the DCB
                 /// with the properties of this class and set them with the SetCommState() method.
                 /// </remarks>
-                /// <param name="handle">Valid handle to a serial port object</param>
+                /// <param name="handle">Valid handle to a serial port object.</param>
                 internal CommState(SafeFileHandle handle) : this(handle, null) { }
 
                 /// <summary>
-                /// Constructor for a DCB, using the DCB provided by another object
+                /// Constructor for a DCB, using the DCB provided by another object.
                 /// </summary>
-                /// <param name="handle">Valid handle to a serial port object</param>
+                /// <param name="handle">Valid handle to a serial port object.</param>
                 /// <param name="state">A CommState object for which the DCB settings should be
                 /// taken. Note, the handle managed by the state object is ignored. If this
                 /// parameter is null, then a default DCB is created.</param>
@@ -69,15 +69,15 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Call Win32API to get the DCB for the current serial port object
+                /// Call Win32API to get the DCB for the current serial port object.
                 /// </summary>
                 /// <remarks>
                 /// Calls the Win32 native API to get the DCB for the current serial port object.
                 /// This assumes that the handle is valid. The Operating System will check the
                 /// handle for validity. If there are problems, the IOException() exception
-                /// will be raised
+                /// will be raised.
                 /// </remarks>
-                /// <exception cref="IOException">The DCB could not be obtained</exception>
+                /// <exception cref="IOException">The DCB could not be obtained.</exception>
                 public void GetCommState()
                 {
                     if (!UnsafeNativeMethods.GetCommState(m_ComPortHandle, ref m_Dcb)) {
@@ -86,7 +86,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Call Win32API to set the DCB based on the current properties of this object
+                /// Call Win32API to set the DCB based on the current properties of this object.
                 /// </summary>
                 /// <remarks>
                 /// Calls the Win32 native API to get the DCB for the current serial port object.

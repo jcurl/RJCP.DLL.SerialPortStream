@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013
+// Copyright © Jason Curl 2012-2014
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 //#define STRESSTEST
@@ -23,58 +23,58 @@ namespace RJCP.IO.Ports
         private sealed partial class NativeSerialPort : IDisposable
         {
             /// <summary>
-            /// Managed Overlapped IO
+            /// Managed Overlapped IO.
             /// </summary>
             public sealed class CommOverlappedIo : IDisposable
             {
                 #region Local variables
                 /// <summary>
-                /// Handle to the already opened Com Port
+                /// Handle to the already opened COM Port.
                 /// </summary>
                 private SafeFileHandle m_ComPortHandle;
 
                 /// <summary>
-                /// The OverlappedIoThread
+                /// The OverlappedIoThread.
                 /// </summary>
                 private Thread m_Thread;
 
                 /// <summary>
-                /// Read and Write buffers that are pinned
+                /// Read and Write buffers that are pinned.
                 /// </summary>
                 private OverlappedIoState m_Buffers;
 
                 /// <summary>
-                /// Object to use for locking during concurrent access to the read buffer
+                /// Object to use for locking during concurrent access to the read buffer.
                 /// </summary>
                 private object m_ReadLock = new object();
 
                 /// <summary>
-                /// Object to use for locking during concurrent access to the write buffer
+                /// Object to use for locking during concurrent access to the write buffer.
                 /// </summary>
                 private object m_WriteLock = new object();
 
                 /// <summary>
-                /// Event to abort OverlappedIoThread (for OverlappedIoThread)
+                /// Event to abort OverlappedIoThread (for OverlappedIoThread).
                 /// </summary>
                 private ManualResetEvent m_StopRunning = new ManualResetEvent(false);
 
                 /// <summary>
-                /// Overlapped I/O for WaitCommEvent() finished (for OverlappedIoThread)
+                /// Overlapped I/O for WaitCommEvent() finished (for OverlappedIoThread).
                 /// </summary>
                 private ManualResetEvent m_SerialCommEvent = new ManualResetEvent(false);
 
                 /// <summary>
-                /// Overlapped I/O for ReadFile() finished (for OverlappedIoThread)
+                /// Overlapped I/O for ReadFile() finished (for OverlappedIoThread).
                 /// </summary>
                 private ManualResetEvent m_ReadEvent = new ManualResetEvent(false);
 
                 /// <summary>
-                /// Overlapped I/O for WriteFile() finished (for OverlappedIoThread)
+                /// Overlapped I/O for WriteFile() finished (for OverlappedIoThread).
                 /// </summary>
                 private ManualResetEvent m_WriteEvent = new ManualResetEvent(false);
 
                 /// <summary>
-                /// OverlappedIoThread can write into the read buffer
+                /// OverlappedIoThread can write into the read buffer.
                 /// </summary>
                 /// <remarks>
                 /// Used for flow control with the OverlappedIoThread when reading data from the
@@ -84,7 +84,7 @@ namespace RJCP.IO.Ports
                 private ManualResetEvent m_ReadBufferNotFullEvent = new ManualResetEvent(true);
 
                 /// <summary>
-                /// OverlappedIoThread can read from the write buffer
+                /// OverlappedIoThread can read from the write buffer.
                 /// </summary>
                 /// <remarks>
                 /// Used for flow control with the OverlappedIoThread when writing data to the
@@ -94,7 +94,7 @@ namespace RJCP.IO.Ports
                 private ManualResetEvent m_WriteBufferNotEmptyEvent = new ManualResetEvent(false);
 
                 /// <summary>
-                /// Main thread can read from the read buffer
+                /// Main thread can read from the read buffer.
                 /// </summary>
                 /// <remarks>
                 /// Used for flow control, then the main thread wants to read from the read buffer,
@@ -105,12 +105,12 @@ namespace RJCP.IO.Ports
                 private ManualResetEvent m_ReadBufferNotEmptyEvent = new ManualResetEvent(false);
 
                 /// <summary>
-                /// Main thread can Reset this event, then wait for the next byte to arrive
+                /// Main thread can Reset this event, then wait for the next byte to arrive.
                 /// </summary>
                 private ManualResetEvent m_ReadBufferEvent = new ManualResetEvent(false);
 
                 /// <summary>
-                /// Main thread can write to the write buffer
+                /// Main thread can write to the write buffer.
                 /// </summary>
                 /// <remarks>
                 /// Used for flow control, then the main thread wants to write into the write buffer,
@@ -121,18 +121,18 @@ namespace RJCP.IO.Ports
                 private ManualResetEvent m_WriteBufferNotFullEvent = new ManualResetEvent(true);
 
                 /// <summary>
-                /// Indicator that the transmit buffer is empty
+                /// Indicator that the transmit buffer is empty.
                 /// </summary>
                 private ManualResetEvent m_TxBufferEmpty = new ManualResetEvent(true);
 
                 /// <summary>
                 /// A EV_TXEMPTY event occurred, but the buffer wasn't empty. When the write is finished,
-                /// we should empty the buffer
+                /// we should empty the buffer.
                 /// </summary>
                 private volatile bool m_TxEmptyEvent = false;
 
                 /// <summary>
-                /// Indicates that there is a byte available for reading
+                /// Indicates that there is a byte available for reading.
                 /// </summary>
                 /// <remarks>
                 /// The WaitCommEvent() method indicates if a byte has been received (EV_RXCHAR). This
@@ -142,7 +142,7 @@ namespace RJCP.IO.Ports
                 private bool m_ReadByteAvailable;
 
                 /// <summary>
-                /// Basic state machine managing the EOF byte
+                /// Basic state machine managing the EOF byte.
                 /// </summary>
                 /// <remarks>
                 /// When the EV_RXFLAG is called, we first indicate that the byte is in the driver. This
@@ -153,28 +153,28 @@ namespace RJCP.IO.Ports
                 private enum EofByte
                 {
                     /// <summary>
-                    /// The EOF byte has not been received
+                    /// The EOF byte has not been received.
                     /// </summary>
                     NotReceived = 0,
 
                     /// <summary>
-                    /// The EOF byte is now in our local buffer. Raise the event
+                    /// The EOF byte is now in our local buffer. Raise the event.
                     /// </summary>
                     InBuffer = 1,
 
                     /// <summary>
-                    /// The EOF byte is in the buffer of the driver (EV_RXFLAG received)
+                    /// The EOF byte is in the buffer of the driver (EV_RXFLAG received).
                     /// </summary>
                     InDriver = 2
                 }
 
                 /// <summary>
-                /// Indicates that there is a EOF character that has arrived
+                /// Indicates that there is a EOF character that has arrived.
                 /// </summary>
                 /// <remarks>
                 /// The WaitCommEvent() method indicates if a byte has been received (RX_CHAR) covered
                 /// by the variable m_ReadByteAvailable. If m_ReadByteAvailable, this indicates if a
-                /// the EOF character has arrived (EV_RXFLAG)
+                /// the EOF character has arrived (EV_RXFLAG).
                 /// </remarks>
                 private EofByte m_ReadByteEof = EofByte.NotReceived;
 
@@ -188,13 +188,13 @@ namespace RJCP.IO.Ports
                 public CommOverlappedIo() { }
 
                 /// <summary>
-                /// Constructor, based on an already opened serial port
+                /// Constructor, based on an already opened serial port.
                 /// </summary>
                 /// <param name="handle">The ComPort handle to use</param>
                 public CommOverlappedIo(SafeFileHandle handle):this(handle, null) { }
 
                 /// <summary>
-                /// Constructor, copying properties from another instance
+                /// Constructor, copying properties from another instance.
                 /// </summary>
                 /// <param name="handle">The ComPort handle to use</param>
                 /// <param name="commio">Properties to use</param>
@@ -213,23 +213,23 @@ namespace RJCP.IO.Ports
 
                 #region Events
                 /// <summary>
-                /// Event Arguments for a WaitCommEvent() event
+                /// Event Arguments for a WaitCommEvent() event.
                 /// </summary>
                 public class CommEventArgs : EventArgs
                 {
                     private NativeMethods.SerialEventMask m_EventType;
 
                     /// <summary>
-                    /// Constructor
+                    /// Constructor.
                     /// </summary>
-                    /// <param name="eventType">The event results</param>
+                    /// <param name="eventType">The event results.</param>
                     public CommEventArgs(NativeMethods.SerialEventMask eventType)
                     {
                         m_EventType = eventType;
                     }
 
                     /// <summary>
-                    /// The event bitfield
+                    /// The event bit field.
                     /// </summary>
                     public NativeMethods.SerialEventMask EventType
                     {
@@ -238,23 +238,23 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Event Arguments for a CommStatErrors result
+                /// Event Arguments for a CommStatErrors result.
                 /// </summary>
                 public class CommErrorEventArgs : EventArgs
                 {
                     private NativeMethods.ComStatErrors m_EventType;
 
                     /// <summary>
-                    /// Constructor
+                    /// Constructor.
                     /// </summary>
-                    /// <param name="eventType">ComStatErrors result</param>
+                    /// <param name="eventType">ComStatErrors result.</param>
                     public CommErrorEventArgs(NativeMethods.ComStatErrors eventType)
                     {
                         m_EventType = eventType;
                     }
 
                     /// <summary>
-                    /// CommStatErrors result
+                    /// CommStatErrors result.
                     /// </summary>
                     public NativeMethods.ComStatErrors EventType
                     {
@@ -263,10 +263,10 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Delegate for the CommEvent
+                /// Delegate for the CommEvent.
                 /// </summary>
-                /// <param name="sender"></param>
-                /// <param name="e"></param>
+                /// <param name="sender">The sender.</param>
+                /// <param name="e">The <see cref="CommEventArgs"/> instance containing the event data.</param>
                 public delegate void CommEventHandler(object sender, CommEventArgs e);
 
                 /// <summary>
@@ -275,10 +275,10 @@ namespace RJCP.IO.Ports
                 public event CommEventHandler CommEvent;
 
                 /// <summary>
-                /// Delegate for the Comm Error Event, occurred on EV_ERR or EV_RXCHAR
+                /// Delegate for the Comm Error Event, occurred on EV_ERR or EV_RXCHAR.
                 /// </summary>
-                /// <param name="sender"></param>
-                /// <param name="e"></param>
+                /// <param name="sender">The sender.</param>
+                /// <param name="e">The <see cref="CommErrorEventArgs"/> instance containing the event data.</param>
                 public delegate void CommErrorEventHandler(object sender, CommErrorEventArgs e);
 
                 /// <summary>
@@ -287,13 +287,13 @@ namespace RJCP.IO.Ports
                 public event CommErrorEventHandler CommErrorEvent;
 
                 /// <summary>
-                /// Calls the event when data is received
+                /// Calls the event when data is received.
                 /// </summary>
                 /// <remarks>
                 /// This method simply calls the event on the current thread that is running.
                 /// No checks or serialization occurs.
                 /// </remarks>
-                /// <param name="e">Event details</param>
+                /// <param name="e">Event details.</param>
                 private void OnCommEvent(NativeMethods.SerialEventMask e)
                 {
                     if (e == 0) return;
@@ -305,13 +305,13 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Calls the event when an error is detected
+                /// Calls the event when an error is detected.
                 /// </summary>
                 /// <remarks>
                 /// This method simply calls the event on the current thread that is running.
                 /// No checks or serialization occurs.
                 /// </remarks>
-                /// <param name="e">Event details</param>
+                /// <param name="e">Event details.</param>
                 private void OnCommErrorEvent(NativeMethods.ComStatErrors e)
                 {
                     if (e == 0) return;
@@ -325,7 +325,7 @@ namespace RJCP.IO.Ports
 
                 #region Buffer Management
                 /// <summary>
-                /// Maintains buffers used for reading and writing
+                /// Maintains buffers used for reading and writing.
                 /// </summary>
                 private sealed class OverlappedIoState : IDisposable
                 {
@@ -343,8 +343,8 @@ namespace RJCP.IO.Ports
                     /// and WriteBufferOffsetStart can provide the addresses of the buffers, used for
                     /// Platform Invoke (P/Invoke).
                     /// </remarks>
-                    /// <param name="readBuffer">Size of the read buffer to allocate</param>
-                    /// <param name="writeBuffer">Size of the write buffer to allocate</param>
+                    /// <param name="readBuffer">Size of the read buffer to allocate.</param>
+                    /// <param name="writeBuffer">Size of the write buffer to allocate.</param>
                     public OverlappedIoState(int readBuffer, int writeBuffer)
                     {
                         byte[] read = new byte[readBuffer];
@@ -357,17 +357,17 @@ namespace RJCP.IO.Ports
                     }
 
                     /// <summary>
-                    /// Get the read buffer object
+                    /// Get the read buffer object.
                     /// </summary>
                     public CircularBuffer<byte> ReadBuffer { get { return m_ReadBuffer; } }
 
                     /// <summary>
-                    /// Get the write buffer object
+                    /// Get the write buffer object.
                     /// </summary>
                     public CircularBuffer<byte> WriteBuffer { get { return m_WriteBuffer; } }
 
                     /// <summary>
-                    /// Get the address for where you can write into the read buffer
+                    /// Get the address for where you can write into the read buffer.
                     /// </summary>
                     public IntPtr ReadBufferOffsetEnd
                     {
@@ -375,7 +375,7 @@ namespace RJCP.IO.Ports
                     }
 
                     /// <summary>
-                    /// Get the address for where you can read from the beginning of the write buffer
+                    /// Get the address for where you can read from the beginning of the write buffer.
                     /// </summary>
                     public IntPtr WriteBufferOffsetStart
                     {
@@ -383,7 +383,7 @@ namespace RJCP.IO.Ports
                     }
 
                     /// <summary>
-                    /// Dispose resources for this object
+                    /// Dispose resources for this object.
                     /// </summary>
                     public void Dispose()
                     {
@@ -392,10 +392,10 @@ namespace RJCP.IO.Ports
                     }
 
                     /// <summary>
-                    /// Dispose resources for this object
+                    /// Dispose resources for this object.
                     /// </summary>
                     /// <param name="disposing"><b>true</b> if we're disposing from the program, <b>false</b> if
-                    /// disposing from the finalizer</param>
+                    /// disposing from the finaliser.</param>
                     private void Dispose(bool disposing)
                     {
                         // This is a sealed class, so we have "private void" instead of "protected virtual"
@@ -417,11 +417,11 @@ namespace RJCP.IO.Ports
                 private int m_ReadBufferSize = 1024 * 1024;
 
                 /// <summary>
-                /// Define the internal buffer size for reading when Start() is called
+                /// Define the internal buffer size for reading when Start() is called.
                 /// </summary>
                 /// <remarks>
                 /// Modifying this value when buffers are already allocated will cause the buffers
-                /// to be discarded (and any data along with it)
+                /// to be discarded (and any data along with it).
                 /// </remarks>
                 public int ReadBufferSize
                 {
@@ -449,7 +449,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Gets the number of bytes of data in the receive buffer and that of the serial driver
+                /// Gets the number of bytes of data in the receive buffer and that of the serial driver.
                 /// </summary>
                 public int BytesToRead
                 {
@@ -493,12 +493,12 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Wait for data to arrive in the read buffer
+                /// Wait for data to arrive in the read buffer.
                 /// </summary>
-                /// <param name="timeout">Timeout in milliseconds</param>
+                /// <param name="timeout">Timeout in milliseconds.</param>
                 /// <returns><b>true</b> if data is available in the read buffer. <b>false</b>
                 /// if there is no data within the specified timeout (only applicable if IsRunning
-                /// is also true), else false with no timeout if no data is available</returns>
+                /// is also true), else false with no timeout if no data is available.</returns>
                 public bool WaitForReadEvent(int timeout)
                 {
                     if (IsRunning) {
@@ -519,13 +519,13 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Wait for there to be at least <i>bytes</i> by a timeout
+                /// Wait for there to be at least <i>bytes</i> by a timeout.
                 /// </summary>
                 /// <param name="bytes">Number of bytes expected to be in the input buffer</param>
                 /// <param name="timeout">Timeout in milliseconds</param>
                 /// <returns><b>true</b> if there is at least <i>bytes</i> number of data in the
                 /// read buffer. <b>false</b> if there is not enough data within the timeout
-                /// specified</returns>
+                /// specified.</returns>
                 public bool WaitForReadEvent(int bytes, int timeout)
                 {
                     if (IsRunning) {
@@ -552,10 +552,10 @@ namespace RJCP.IO.Ports
                 /// <summary>
                 /// Read data from the buffered serial stream into the array provided.
                 /// </summary>
-                /// <param name="buffer">The buffer to receive the data</param>
-                /// <param name="offset">Offset into the buffer where to start putting the data</param>
-                /// <param name="count">Maximum number of bytes to read into the buffer</param>
-                /// <returns>The actual number of bytes copied into the buffer</returns>
+                /// <param name="buffer">The buffer to receive the data.</param>
+                /// <param name="offset">Offset into the buffer where to start putting the data.</param>
+                /// <param name="count">Maximum number of bytes to read into the buffer.</param>
+                /// <returns>The actual number of bytes copied into the buffer.</returns>
                 public int Read(byte[] buffer, int offset, int count)
                 {
                     if (m_Buffers == null) return 0;
@@ -609,16 +609,16 @@ namespace RJCP.IO.Ports
                 /// were consumed in the incoming buffer.</para>
                 /// <para>You may receive notification that data is available to read with the
                 /// WaitForReadEvent(), but still have no data returned. This could be the case in
-                /// particular if a multibyte character is in the pipeline, but it hasn't been
+                /// particular if a multi-byte character is in the pipeline, but it hasn't been
                 /// completely transmitted. For example, the Euro symbol is three bytes in the UTF8
                 /// encoding scheme. If only one byte arrives, there is insufficient bytes to generate
                 /// a single character. You should loop until a timeout occurs.</para>
                 /// </remarks>
-                /// <param name="buffer">Buffer convert data into</param>
-                /// <param name="offset">Offset into buffer</param>
-                /// <param name="count">Number of characters to write</param>
-                /// <param name="decoder">The decoder to use</param>
-                /// <returns>Number of characters copied into the buffer</returns>
+                /// <param name="buffer">Buffer convert data into.</param>
+                /// <param name="offset">Offset into buffer.</param>
+                /// <param name="count">Number of characters to write.</param>
+                /// <param name="decoder">The decoder to use.</param>
+                /// <returns>Number of characters copied into the buffer.</returns>
                 public int Read(char[] buffer, int offset, int count, Decoder decoder)
                 {
                     int bytesUsed;
@@ -638,17 +638,17 @@ namespace RJCP.IO.Ports
                 /// were consumed in the incoming buffer.</para>
                 /// <para>You may receive notification that data is available to read with the
                 /// WaitForReadEvent(), but still have no data returned. This could be the case in
-                /// particular if a multibyte character is in the pipeline, but it hasn't been
+                /// particular if a multi-byte character is in the pipeline, but it hasn't been
                 /// completely transmitted. For example, the Euro symbol is three bytes in the UTF8
                 /// encoding scheme. If only one byte arrives, there is insufficient bytes to generate
                 /// a single character. You should loop until a timeout occurs.</para>
                 /// </remarks>
-                /// <param name="buffer">Buffer convert data into</param>
-                /// <param name="offset">Offset into buffer</param>
-                /// <param name="count">Number of characters to write</param>
-                /// <param name="decoder">The decoder to use</param>
-                /// <param name="bytesUsed">Number of bytes consumed by the internal read buffer</param>
-                /// <returns>Number of characters copied into the buffer</returns>
+                /// <param name="buffer">Buffer convert data into.</param>
+                /// <param name="offset">Offset into buffer.</param>
+                /// <param name="count">Number of characters to write.</param>
+                /// <param name="decoder">The decoder to use.</param>
+                /// <param name="bytesUsed">Number of bytes consumed by the internal read buffer.</param>
+                /// <returns>Number of characters copied into the buffer.</returns>
                 public int Read(char[] buffer, int offset, int count, Decoder decoder, out int bytesUsed)
                 {
                     if (m_Buffers == null) {
@@ -666,20 +666,20 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Read data from the buffered serial stream, using the encoder given
+                /// Read data from the buffered serial stream, using the encoder given.
                 /// </summary>
                 /// <remarks>
                 /// This function will convert to a single character using the current decoder. The
                 /// decoder may maintain state from a previous Read(char[], ...) operation.
                 /// <para>You may receive notification that data is available to read with the
                 /// WaitForReadEvent(), but still have no data returned. This could be the case in
-                /// particular if a multibyte character is in the pipeline, but it hasn't been
+                /// particular if a multi-byte character is in the pipeline, but it hasn't been
                 /// completely transmitted. For example, the Euro symbol is three bytes in the UTF8
                 /// encoding scheme. If only one byte arrives, there is insufficient bytes to generate
                 /// a single character. You should loop until a timeout occurs.</para>
                 /// </remarks>
-                /// <param name="decoder">The decoder to use</param>
-                /// <returns>The character interpreted, or -1 if no data available</returns>
+                /// <param name="decoder">The decoder to use.</param>
+                /// <returns>The character interpreted, or -1 if no data available.</returns>
                 public int ReadChar(Decoder decoder)
                 {
                     if (m_Buffers == null) return -1;
@@ -697,7 +697,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Convert a single character in the read buffer
+                /// Convert a single character in the read buffer.
                 /// </summary>
                 /// <remarks>
                 /// This method is designed for the ReadTo() method. One would read byte for byte, without
@@ -714,10 +714,10 @@ namespace RJCP.IO.Ports
                 /// back, but the number of bytes read via <i>bytesRead</i> may be non-zero.</para>
                 /// </remarks>
                 /// <param name="offset">The offset from the beginning of the read byte buffer to read from</param>
-                /// <param name="decoder">The decoder to use to get a single character</param>
+                /// <param name="decoder">The decoder to use to get a single character.</param>
                 /// <param name="bytesRead">If a character is read, the number of bytes consumed to generate
-                /// this character</param>
-                /// <returns>The character at the position defined by <i>offset</i></returns>
+                /// this character.</param>
+                /// <returns>The character at the position defined by <i>offset</i>.</returns>
                 public int PeekChar(int offset, Decoder decoder, out int bytesRead)
                 {
                     bytesRead = 0;
@@ -770,13 +770,13 @@ namespace RJCP.IO.Ports
 
                 /// <summary>
                 /// Discards data from the read buffer, but won't discard data already received by the
-                /// driver
+                /// driver.
                 /// </summary>
                 /// <remarks>
                 /// This method will only discard data that has already been read from the driver
                 /// and cached locally. It will not discard data in the driver's buffer.
                 /// </remarks>
-                /// <param name="bytes">Number of bytes to discard</param>
+                /// <param name="bytes">Number of bytes to discard.</param>
                 public void DiscardInBuffer(int bytes)
                 {
                     if (m_Buffers == null) return;
@@ -790,11 +790,11 @@ namespace RJCP.IO.Ports
                 private int m_WriteBufferSize = 128 * 1024;
 
                 /// <summary>
-                /// Define the internal buffer size for writing when Start() is called
+                /// Define the internal buffer size for writing when Start() is called.
                 /// </summary>
                 /// <remarks>
                 /// Modifying this value when buffers are already allocated will cause the buffers
-                /// to be discarded (and any data along with it)
+                /// to be discarded (and any data along with it).
                 /// </remarks>
                 public int WriteBufferSize
                 {
@@ -845,13 +845,13 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Wait for sufficient buffer space to be available in the write buffer witin a timeout
+                /// Wait for sufficient buffer space to be available in the write buffer within a timeout.
                 /// </summary>
-                /// <param name="count">The number of bytes that should be available</param>
-                /// <param name="timeout">The timeout in milliseconds</param>
-                /// <returns><b>true</b> if there is at least <c>count</c> bytes availalbe in the write
+                /// <param name="count">The number of bytes that should be available.</param>
+                /// <param name="timeout">The timeout in milliseconds.</param>
+                /// <returns><b>true</b> if there is at least <c>count</c> bytes available in the write
                 /// buffer within <c>timeout</c> milliseconds. <b>false</b> is always returned if no
-                /// buffers have been allocated or if the serial thread isn't running (without a timeout)
+                /// buffers have been allocated or if the serial thread isn't running (without a timeout).
                 /// </returns>
                 public bool WaitForWriteEvent(int count, int timeout)
                 {
@@ -882,9 +882,9 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Wait for when the write operation is complete
+                /// Wait for when the write operation is complete.
                 /// </summary>
-                /// <param name="timeout">Time to wait for the buffers to be empty</param>
+                /// <param name="timeout">Time to wait for the buffers to be empty.</param>
                 /// <returns><b>true</b> if the write buffers completed within the timeout period. <b>false</b> otherwise.</returns>
                 public bool WaitForWriteEmptyEvent(int timeout)
                 {
@@ -895,7 +895,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Write the given data into the buffered serial stream for sending over the serial port
+                /// Write the given data into the buffered serial stream for sending over the serial port.
                 /// </summary>
                 /// <remarks>
                 /// Data is copied from the array provided into the local stream buffer. It does
@@ -905,12 +905,12 @@ namespace RJCP.IO.Ports
                 /// the missing data will be silently ignored, with the return value being the number
                 /// of bytes that were copied into the local buffer.
                 /// </remarks>
-                /// <param name="buffer">The buffer containing data to send</param>
-                /// <param name="offset">Offset into the array buffer where data begins</param>
-                /// <param name="count">Number of bytes to copy into the local buffer</param>
+                /// <param name="buffer">The buffer containing data to send.</param>
+                /// <param name="offset">Offset into the array buffer where data begins.</param>
+                /// <param name="count">Number of bytes to copy into the local buffer.</param>
                 /// <exception cref="TimeoutException">Not enough bufferspace was made available
-                /// before the timeout expired</exception>
-                /// <returns>The number of bytes copied into the buffer</returns>
+                /// before the timeout expired.</exception>
+                /// <returns>The number of bytes copied into the buffer.</returns>
                 public int Write(byte[] buffer, int offset, int count)
                 {
                     if (m_Buffers == null || !IsRunning) throw new InvalidOperationException("Serial I/O Thread not running");
@@ -927,7 +927,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Discards data from the serial driver's receive buffer.
+                /// Discards data from the serial driver's transmit buffer.
                 /// </summary>
                 /// <remarks>
                 /// This function will discard the receive buffer of the SerialPortStream.
@@ -951,7 +951,7 @@ namespace RJCP.IO.Ports
 
                 #region Thread Control
                 /// <summary>
-                /// Start the I/O thread
+                /// Start the I/O thread.
                 /// </summary>
                 public void Start()
                 {
@@ -986,7 +986,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Cancel pending I/O, stop the I/O thread, wait and then return
+                /// Cancel pending I/O, stop the I/O thread, wait and then return.
                 /// </summary>
                 public void Stop()
                 {
@@ -1004,7 +1004,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Test if the I/O thread is running
+                /// Test if the I/O thread is running.
                 /// </summary>
                 public bool IsRunning
                 {
@@ -1040,7 +1040,7 @@ namespace RJCP.IO.Ports
                     NativeMethods.SerialEventMask.EV_PERR;
 
                 /// <summary>
-                /// Entry point to the I/O thread
+                /// Entry point to the I/O thread.
                 /// </summary>
                 private void OverlappedIoThread()
                 {
@@ -1188,7 +1188,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Check if we should execute WaitCommEvent() and get the result if immediately available
+                /// Check if we should execute WaitCommEvent() and get the result if immediately available.
                 /// </summary>
                 /// <remarks>
                 /// This function abstracts the Win32 API WaitCommEvent(). It assumes overlapped I/O.
@@ -1199,9 +1199,9 @@ namespace RJCP.IO.Ports
                 /// <para>You should not call this function if a pending I/O operation for WaitCommEvent()
                 /// is still open. It is an error otherwise.</para>
                 /// </remarks>
-                /// <param name="mask">The mask value if information is available immediately</param>
-                /// <param name="overlap">The overlap structure to use</param>
-                /// <returns>If the operation is pending or not</returns>
+                /// <param name="mask">The mask value if information is available immediately.</param>
+                /// <param name="overlap">The overlap structure to use.</param>
+                /// <returns>If the operation is pending or not.</returns>
                 private bool DoWaitCommEvent(out NativeMethods.SerialEventMask mask, ref NativeOverlapped overlap)
                 {
                     bool result = UnsafeNativeMethods.WaitCommEvent(m_ComPortHandle, out mask, ref overlap);
@@ -1218,9 +1218,9 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Do work based on the mask event that has occurred
+                /// Do work based on the mask event that has occurred.
                 /// </summary>
-                /// <param name="mask">The mask that was provided</param>
+                /// <param name="mask">The mask that was provided.</param>
                 private void ProcessWaitCommEvent(NativeMethods.SerialEventMask mask)
                 {
                     if (mask != (int)0) {
@@ -1273,7 +1273,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Check if we should ReadFile() and process the data if serial data is immediately
+                /// Check if we should ReadFile() and process the data if serial data is immediately.
                 /// available.
                 /// </summary>
                 /// <remarks>
@@ -1283,11 +1283,11 @@ namespace RJCP.IO.Ports
                 /// indicates that asynchronous I/O is happening, <b>true</b> is returned. Else this
                 /// function automatically calls ProcessReadEvent() with the number of bytes read. If
                 /// an asynchronous operation is pending, then you should wait on the event in the
-                /// overlapped structure not not call this function until GetOverlappedResult() has
+                /// overlapped structure not call this function until GetOverlappedResult() has
                 /// been called.
                 /// </remarks>
-                /// <param name="overlap">The overlap structure to use for reading</param>
-                /// <returns>If the operation is pending or not</returns>
+                /// <param name="overlap">The overlap structure to use for reading.</param>
+                /// <returns>If the operation is pending or not.</returns>
                 private bool DoReadEvent(ref NativeOverlapped overlap)
                 {
                     // If WaitCommEvent() hasn't been called, there's no data
@@ -1330,7 +1330,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Produce the number of bytes read in the buffer
+                /// Produce the number of bytes read in the buffer.
                 /// </summary>
                 /// <remarks>
                 /// If the number of bytes read is zero, this function should also be called, as it indicates
@@ -1338,7 +1338,7 @@ namespace RJCP.IO.Ports
                 /// from the serial port indicates to read the buffer data, until a result of zero is given,
                 /// which indicates to wait for the next receiving character.
                 /// </remarks>
-                /// <param name="bytes">Number of bytes read</param>
+                /// <param name="bytes">Number of bytes read.</param>
                 private void ProcessReadEvent(uint bytes)
                 {
                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "SerialThread: ProcessReadEvent: {0} bytes", bytes);
@@ -1369,18 +1369,18 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Check if we should WriteFile() and update buffers if serial data is immediately cached by driver
+                /// Check if we should WriteFile() and update buffers if serial data is immediately cached by driver.
                 /// </summary>
                 /// <remarks>
                 /// This function should be called if there is no existing pending write operation. If
                 /// the result indicates that asynchronous I/O is happening, <b>true</b> is returned.
                 /// Else this function automatically calls ProcessWriteEvent() with the number of bytes
                 /// written. If an asynchronous operation is pending, then you should wait on the event
-                /// in the overlapped structure not not call this function until GetOverlappedResult()
+                /// in the overlapped structure not call this function until GetOverlappedResult()
                 /// has been called.
                 /// </remarks>
-                /// <param name="overlap">The overlap structure to use for writing</param>
-                /// <returns>If the operation is pending or not</returns>
+                /// <param name="overlap">The overlap structure to use for writing.</param>
+                /// <returns>If the operation is pending or not.</returns>
                 private bool DoWriteEvent(ref NativeOverlapped overlap)
                 {
                     IntPtr bufPtr;
@@ -1409,9 +1409,9 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Consume the number of bytes written from the write buffer
+                /// Consume the number of bytes written from the write buffer.
                 /// </summary>
-                /// <param name="bytes">Number of bytes written to the driver</param>
+                /// <param name="bytes">Number of bytes written to the driver.</param>
                 private void ProcessWriteEvent(uint bytes)
                 {
                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, m_DebugId, "SerialThread: ProcessWriteEvent: {0} bytes", bytes);
@@ -1432,7 +1432,7 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Dispose this object
+                /// Dispose this object.
                 /// </summary>
                 public void Dispose()
                 {
@@ -1441,10 +1441,10 @@ namespace RJCP.IO.Ports
                 }
 
                 /// <summary>
-                /// Dispose resources for this object
+                /// Dispose resources for this object.
                 /// </summary>
                 /// <param name="disposing"><b>true</b> if we're disposing from the program, <b>false</b> if
-                /// disposing from the finalizer</param>
+                /// disposing from the finaliser.</param>
                 private void Dispose(bool disposing)
                 {
                     if (disposing) {
