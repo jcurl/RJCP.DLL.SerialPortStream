@@ -815,7 +815,7 @@ namespace RJCP.IO.Ports
                 /// </summary>
                 public const int ERROR_OPLOCK_NOT_GRANTED = 300;
                 /// <summary>
-                /// An invalid oplock acknowledgment was received by the system.
+                /// An invalid oplock acknowledgement was received by the system.
                 /// </summary>
                 public const int ERROR_INVALID_OPLOCK_PROTOCOL = 301;
                 /// <summary>
@@ -4675,7 +4675,7 @@ namespace RJCP.IO.Ports
                 /// </summary>
                 public const int PEERDIST_ERROR_OPERATION_NOTFOUND = 4059;
                 /// <summary>
-                /// Can not perform the reqested operation because it has already been carried out.
+                /// Can not perform the requested operation because it has already been carried out.
                 /// </summary>
                 public const int PEERDIST_ERROR_ALREADY_COMPLETED = 4060;
                 /// <summary>
@@ -6179,7 +6179,7 @@ namespace RJCP.IO.Ports
                 /// </summary>
                 public const int ERROR_CANNOT_ACCEPT_TRANSACTED_WORK = 6847;
                 /// <summary>
-                /// The transactional resource manager had too many tranactions outstanding that could not be aborted. The transactional resource manger has been shut down.
+                /// The transactional resource manager had too many transactions outstanding that could not be aborted. The transactional resource manger has been shut down.
                 /// </summary>
                 public const int ERROR_CANNOT_ABORT_TRANSACTIONS = 6848;
                 /// <summary>
@@ -9347,7 +9347,7 @@ namespace RJCP.IO.Ports
                 /// </summary>
                 public const int ERROR_IPSEC_IKE_KILL_DUMMY_NAP_TUNNEL = 13898;
                 /// <summary>
-                /// Error in assigning inner IP address to intiator in tunnel mode.
+                /// Error in assigning inner IP address to initiator in tunnel mode.
                 /// </summary>
                 public const int ERROR_IPSEC_IKE_INNER_IP_ASSIGNMENT_FAILURE = 13899;
                 /// <summary>
