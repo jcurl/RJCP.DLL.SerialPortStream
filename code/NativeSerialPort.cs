@@ -286,26 +286,19 @@ namespace RJCP.IO.Ports
             /// if by the finaliser.</param>
             private void Dispose(bool disposing)
             {
-                if (IsOpen) {
-                    if (disposing) {
-                        Close();
-                        m_CommIo.Dispose();
-                        m_CommIo = null;
-                        m_CommState = null;
-                        m_CommProperties = null;
-                        m_CommModem = null;
-                    }
-
-                    // Note: the SafeFileHandle will close the object itself when finalising, so
-                    // we don't need to do it here. It would be different if we managed the handle
-                    // with an IntPtr however.
+                if (disposing) {
+                    if (IsOpen) Close();
+                    m_CommIo.Dispose();
+                    m_CommIo = null;
+                    m_CommState = null;
+                    m_CommProperties = null;
+                    m_CommModem = null;
                 }
-                m_IsDisposed = true;
-            }
 
-            ~NativeSerialPort()
-            {
-                Dispose(false);
+                // Note: the SafeFileHandle will close the object itself when finalising, so
+                // we don't need to do it here. It would be different if we managed the handle
+                // with an IntPtr however.
+                m_IsDisposed = true;
             }
         }
     }
