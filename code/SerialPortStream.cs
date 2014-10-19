@@ -2149,7 +2149,7 @@ namespace RJCP.IO.Ports
 
         private void SerialPortIo_CommEvent(object sender, NativeSerialPort.CommOverlappedIo.CommEventArgs e)
         {
-            if (m_Disposed || DataReceived == null && PinChanged == null) {
+            if (IsDisposed || DataReceived == null && PinChanged == null) {
                 m_CommEvent = 0;
                 return;
             } else {
@@ -2162,7 +2162,7 @@ namespace RJCP.IO.Ports
 
         private void SerialPortIo_CommErrorEvent(object sender, NativeSerialPort.CommOverlappedIo.CommErrorEventArgs e)
         {
-            if (m_Disposed || ErrorReceived == null) {
+            if (IsDisposed || ErrorReceived == null) {
                 m_CommErrorEvent = 0;
                 return;
             } else {
@@ -2213,10 +2213,10 @@ namespace RJCP.IO.Ports
             while (handleEvent) {
                 // Received Data
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RXFLAG) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Eof));
                 } else if ((commEvent & NativeMethods.SerialEventMask.EV_RXCHAR) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     if (m_SerialPort.SerialPortIo.BytesToRead >= m_RxThreshold) {
                         OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Chars));
                     }
@@ -2224,45 +2224,45 @@ namespace RJCP.IO.Ports
 
                 // Modem Pin States
                 if ((commEvent & NativeMethods.SerialEventMask.EV_CTS) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RING) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Ring));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RLSD) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_DSR) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_BREAK) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Break));
                 }
 
                 // Error States
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_TXFULL) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.TXFull));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_FRAME) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Frame));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXPARITY) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXParity));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_OVERRUN) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Overrun));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXOVER) != 0) {
-                    lock (m_EventCheck) { if (m_Disposed) { handleEvent = false; break; } }
+                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXOver));
                 }
 
@@ -2306,8 +2306,6 @@ namespace RJCP.IO.Ports
             m_SerialPort.Close();
         }
 
-        private bool m_Disposed;
-
         /// <summary>
         /// Clean up all resources managed by this object.
         /// </summary>
@@ -2315,34 +2313,31 @@ namespace RJCP.IO.Ports
         /// <b>false</b> if being cleaned up by the finaliser.</param>
         protected override void Dispose(bool disposing)
         {
-            if (!IsDisposed) {
-                if (disposing) {
-                    // Wait for events to finish before we dispose
-                    bool eventRunning = false;
-                    lock (m_EventCheck) {
-                        if (m_EventProcessing.WaitOne(0)) {
-                            m_Disposed = true;
-                            eventRunning = true;
-                        }
-                    }
-                    if (eventRunning) m_EventProcessing.WaitOne();
+            if (IsDisposed) return;
 
-                    m_Trace.Close();
-                    if (m_SerialPort != null) Close();
-                    m_EventProcessing.Dispose();
+            if (disposing) {
+                // Wait for events to finish before we dispose
+                bool eventRunning = false;
+                lock (m_EventCheck) {
+                    if (m_EventProcessing.WaitOne(0)) {
+                        IsDisposed = true;
+                        eventRunning = true;
+                    }
                 }
-                base.Dispose(disposing);
+                if (eventRunning) m_EventProcessing.WaitOne();
+
+                m_Trace.Close();
+                if (m_SerialPort != null) Close();
+                m_EventProcessing.Dispose();
             }
-            m_Disposed = true;
+            IsDisposed = true;
+            base.Dispose(disposing);
         }
 
         /// <summary>
         /// Indicates if this object has already been disposed.
         /// </summary>
-        public bool IsDisposed
-        {
-            get { return m_Disposed; }
-        }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
