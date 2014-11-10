@@ -416,7 +416,12 @@ namespace RJCP.IO.Ports
 
             // Fetch the actual settings and get the capabilities
             GetPortSettings(null);
-            m_SerialPort.SerialPortModemStatus.ClearCommBreak();
+            try {
+                m_SerialPort.SerialPortModemStatus.ClearCommBreak();
+            } catch (System.IO.IOException) {
+                // Ignore IOException. Not all serial port drivers support clearing the
+                // Break signal, so we ignore it when opening.
+            }
 
             // Set the state of the RTS line if handshaking is disabled
             if (!m_SerialPort.SerialPortCommState.OutCtsFlow) {

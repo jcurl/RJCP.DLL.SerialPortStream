@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RJCP")]
 [assembly: AssemblyProduct("SerialPortStream")]
-[assembly: AssemblyCopyright("Copyright © Jason Curl 2012")]
+[assembly: AssemblyCopyright("Copyright © Jason Curl 2012-2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

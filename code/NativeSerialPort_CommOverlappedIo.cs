@@ -1392,9 +1392,17 @@ namespace RJCP.IO.Ports
                         // asynchronous I/O operation and return the number of bytes copied in bufRead. 
                         ProcessReadEvent(bufRead);
                     } else {
+                        if (e == WinError.ERROR_OPERATION_ABORTED) {
+                            m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "{0}: SerialThread: DoReadEvent: ReadFile() error {1}", Name, e);
+                            return false;
+                        }
                         if (e != WinError.ERROR_IO_PENDING) {
                             m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "{0}: SerialThread: DoReadEvent: ReadFile() error {1}", Name, e);
-                            //throw new IOException("ReadFile error", e);
+                            // In case an unexpected error occurs here, no more data will be read from the
+                            // serial port. This method will return !result which is true, meaning that a
+                            // read operation is pending, resulting in probably no more incoming data. This
+                            // is better than returning false, which might result in a high load situation
+                            // if the error is permanent.
                         }
                     }
                     return !result;
@@ -1472,9 +1480,17 @@ namespace RJCP.IO.Ports
                     if (result) {
                         ProcessWriteEvent(bufWrite);
                     } else {
+                        if (e == WinError.ERROR_OPERATION_ABORTED) {
+                            m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "{0}: SerialThread: DoWriteEvent: WriteFile() error {1}", Name, e);
+                            return false;
+                        }
                         if (e != WinError.ERROR_IO_PENDING) {
                             m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "{0}: SerialThread: DoWriteEvent: WriteFile() error {1}", Name, e);
-                            //throw new IOException("WriteFile error", e);
+                            // In case an unexpected error occurs here, no more data will be written to the
+                            // serial port. This method will return !result which is true, meaning that a
+                            // write operation is pending, resulting in probably no more sent data. This
+                            // is better than returning false, which might result in a high load situation
+                            // if the error is permanent.
                         }
                     }
                     return !result;
