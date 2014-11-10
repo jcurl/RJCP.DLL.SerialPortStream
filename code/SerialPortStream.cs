@@ -480,6 +480,7 @@ namespace RJCP.IO.Ports
         public static string[] GetPortNames()
         {
             using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
+                if (local == null) return new string[0];
                 string[] k = local.GetValueNames();
                 if (k.Length > 0) {
                     string[] ports = new string[local.ValueCount];
