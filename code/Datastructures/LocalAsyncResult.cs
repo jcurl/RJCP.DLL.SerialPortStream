@@ -17,7 +17,7 @@ namespace RJCP.IO
     internal class LocalAsync : IAsyncResult, IDisposable
     {
         private object m_State;
-        private Lazy<ManualResetEvent> m_LazyHandle;
+        private ManualResetEvent m_Handle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalAsync"/> class.
@@ -26,15 +26,12 @@ namespace RJCP.IO
         /// <remarks>
         /// When your asynchronous operation is finished, you should set the <see cref="IsCompleted"/>
         /// property, which will automatically trigger the <see cref="AsyncWaitHandle"/> if the user is
-        /// waiting on this. When you're finished, be sure to call the <see cref="Dispose"/> method in
+        /// waiting on this. When you're finished, be sure to call the <see cref="Dispose()"/> method in
         /// your EndXXX() method.
         /// </remarks>
         public LocalAsync(object state)
         {
             m_State = state;
-            m_LazyHandle = new Lazy<ManualResetEvent>(() => {
-                return new ManualResetEvent(m_IsCompleted);
-            });
         }
 
         /// <summary>
@@ -58,7 +55,23 @@ namespace RJCP.IO
         {
             get
             {
-                return m_LazyHandle.Value;
+                if (m_Handle == null) {
+                    bool done = IsCompleted;
+                    ManualResetEvent mre = new ManualResetEvent(done);
+                    if (Interlocked.CompareExchange(ref m_Handle,
+                        mre, null) != null) {
+                        // Another thread created this object's event; dispose 
+                        // the event we just created
+                        mre.Close();
+                    } else {
+                        if (!done && IsCompleted) {
+                            // If the operation wasn't done when we created 
+                            // the event but now it is done, set the event
+                            m_Handle.Set();
+                        }
+                    }
+                }
+                return m_Handle;
             }
         }
 
@@ -87,13 +100,9 @@ namespace RJCP.IO
             get { return m_IsCompleted; }
             set
             {
-                m_IsCompleted = value;
-                if (m_LazyHandle.IsValueCreated) {
-                    if (value) {
-                        m_LazyHandle.Value.Set();
-                    } else {
-                        m_LazyHandle.Value.Reset();
-                    }
+                if (value == true) {
+                    m_IsCompleted = true;
+                    if (m_Handle != null) m_Handle.Set();
                 }
             }
         }
@@ -104,8 +113,22 @@ namespace RJCP.IO
         /// </summary>
         public void Dispose()
         {
-            if (m_LazyHandle.IsValueCreated) {
-                m_LazyHandle.Value.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources;
+        /// <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing) {
+                if (m_Handle != null) {
+                    m_Handle.Dispose();
+                    m_Handle = null;
+                }
             }
         }
     }
@@ -121,7 +144,7 @@ namespace RJCP.IO
         /// <remarks>
         /// When your asynchronous operation is finished, you should set the <see cref="LocalAsync.IsCompleted"/>
         /// property, which will automatically trigger the <see cref="LocalAsync.AsyncWaitHandle"/> if the user is
-        /// waiting on this. When you're finished, be sure to call the <see cref="LocalAsync.Dispose"/> method in
+        /// waiting on this. When you're finished, be sure to call the <see cref="LocalAsync.Dispose()"/> method in
         /// your EndXXX() method.
         /// </remarks>
         public LocalAsync(object state) : base(state) { }
