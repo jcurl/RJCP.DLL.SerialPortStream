@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>SerialPortStream</id>
-        <version>1.1.2.0-r1</version>
+        <version>1.1.2.0</version>
         <title>SerialPortStream</title>
         <authors>Jason Curl</authors>
         <owners>Jason Curl</owners>
@@ -14,11 +14,11 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.dll" target="lib\net40\RJCP.SerialPortStream.dll" />
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40\RJCP.SerialPortStream.pdb" />
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.XML" target="lib\net40\RJCP.SerialPortStream.XML" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.dll" target="lib\net45\RJCP.SerialPortStream.dll" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.pdb" target="lib\net45\RJCP.SerialPortStream.pdb" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.XML" target="lib\net45\RJCP.SerialPortStream.XML" />
+        <file src="lib\net40\RJCP.SerialPortStream.dll" target="lib\net40\RJCP.SerialPortStream.dll" />
+        <file src="lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40\RJCP.SerialPortStream.pdb" />
+        <file src="lib\net40\RJCP.SerialPortStream.XML" target="lib\net40\RJCP.SerialPortStream.XML" />
+        <file src="lib\net45\RJCP.SerialPortStream.dll" target="lib\net45\RJCP.SerialPortStream.dll" />
+        <file src="lib\net45\RJCP.SerialPortStream.pdb" target="lib\net45\RJCP.SerialPortStream.pdb" />
+        <file src="lib\net45\RJCP.SerialPortStream.XML" target="lib\net45\RJCP.SerialPortStream.XML" />
     </files>
 </package>
