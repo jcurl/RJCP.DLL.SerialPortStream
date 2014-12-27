@@ -4,13 +4,13 @@
 // Copyright © Jason Curl 2012-2014.
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-
 namespace RJCP.IO
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Threading;
+
     /// <summary>
     /// Provides a local implementation of an IAsyncResult
     /// </summary>
@@ -22,7 +22,7 @@ namespace RJCP.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalAsync"/> class.
         /// </summary>
-        /// <param name="state">The state object given by the user in a BeginWrite/EndWrite method</param>
+        /// <param name="state">The state object given by the user in a BeginWrite/EndWrite method.</param>
         /// <remarks>
         /// When your asynchronous operation is finished, you should set the <see cref="IsCompleted"/>
         /// property, which will automatically trigger the <see cref="AsyncWaitHandle"/> if the user is
@@ -140,7 +140,7 @@ namespace RJCP.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalAsync"/> class.
         /// </summary>
-        /// <param name="state">The state object given by the user in a BeginWrite/EndWrite method</param>
+        /// <param name="state">The state object given by the user in a BeginWrite/EndWrite method.</param>
         /// <remarks>
         /// When your asynchronous operation is finished, you should set the <see cref="LocalAsync.IsCompleted"/>
         /// property, which will automatically trigger the <see cref="LocalAsync.AsyncWaitHandle"/> if the user is
