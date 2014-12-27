@@ -4,34 +4,52 @@
 // Copyright © Jason Curl 2012-2013.
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
-using System;
-using System.Diagnostics;
-using System.Text;
-
 namespace RJCP.Datastructures
 {
+    using System;
+    using System.Diagnostics;
+    using System.Text;
+
     /// <summary>
     /// A class to maintain how much time is remaining since the last reset, until
     /// expiry.
     /// </summary>
     /// <remarks>
-    /// Often used when implementing timeouts in other methods, this class can
+    /// This class is useful when implementing timeouts in other methods. It can
     /// provide the remaining time, in units of milliseconds, that can be used
     /// with many Operating System calls as an expiry time.
-    /// <para>One example is the System.Threading.WaitHandle.WaitAny() which
-    /// expects a timeout parameter. Call the Reset() method at the beginning
+    /// <para>One example is the <see cref="M:System.Threading.WaitHandle.WaitOne"/>
+    /// method which expects a timeout parameter. Either instantiate the
+    /// <see cref="TimerExpiry"/> class at the beginning immediately before its
+    /// use, or call the <see cref="Reset"/> method at the beginning
     /// of the timeout operation. Then on return of the function, if no other
-    /// operation occurred, the RemainingTime() method should return 0 indicating
-    /// that the timer has expired</para>
-    /// <para>Another thread can be programmed to Reset() the timer class during
+    /// operation occurred, the method <see cref="RemainingTime"/> should return 0 indicating
+    /// that the timer has expired.</para>
+    /// <para>Another thread can be programmed to <see cref="Reset"/> the timer class during
     /// a timeout operation, so that even if the result of Wait operation by the
-    /// Operating system resulted in a timeout, a Reset(), which results in the
-    /// RemainingTime() being more than 0 milliseconds, indicates that another
+    /// Operating system resulted in a timeout, a <see cref="Reset"/>, which results in the
+    /// <see cref="RemainingTime"/> being more than 0 milliseconds, indicates that another
     /// wait operation should occur.</para>
     /// <para>Even if no expiry is to occur, but the Operating System function
     /// returns early, you can opt to restart the timeout operation which will
     /// then take into account the current time and reduce the timeout so that
-    /// the operation ends as expected</para>
+    /// the operation ends as expected.</para>
+    /// <para>As an example, say you need to wait for data by calling a method which waits
+    /// for the first set of data within a timeout. But your method must wait for at least
+    /// two elements of data within the timeout. This can be implemented as follows:</para>
+    /// <example>
+    /// public true MyFunc(int timeout)
+    /// {
+    ///     TimerExpiry myExpiry = new TimerExpiry(timeout);
+    ///     int elements = 0;
+    ///     do {
+    ///         elements += GetData(myExpiry.RemainingTime());
+    ///     } while (elements &lt; 2 &amp;&amp; !myExpiry.Expired);
+    ///     
+    ///     if (elements &gt;=2) return true;
+    ///     return false;
+    /// }
+    /// </example>
     /// </remarks>
     internal sealed class TimerExpiry
     {
@@ -39,16 +57,20 @@ namespace RJCP.Datastructures
         private int m_Milliseconds;
 
         /// <summary>
-        /// Constructor. Initialise expiry based on the current time
+        /// Constructor. Initialise expiry based on the current time.
         /// </summary>
-        /// <param name="milliseconds"></param>
+        /// <param name="milliseconds">The initial timeout in milliseconds.</param>
+        /// <remarks>
+        /// The constructor sets the initial time out that should be used. On construction
+        /// of the new object, the timer is automatically started.
+        /// </remarks>
         public TimerExpiry(int milliseconds)
         {
             Timeout = milliseconds;
         }
 
         /// <summary>
-        /// The time for expiry on the next reset. -1 indicates no expiry
+        /// The time for expiry on the next reset. -1 indicates no expiry.
         /// </summary>
         public int Timeout
         {
@@ -66,10 +88,10 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Estimate the amount of time remaining from when this function is called
-        /// until expiry
+        /// Estimate the amount of time (ms) remaining from when this function is called
+        /// until expiry.
         /// </summary>
-        /// <returns>The time to expiry in milliseconds</returns>
+        /// <returns>The time to expiry in milliseconds.</returns>
         public int RemainingTime()
         {
             if (m_Milliseconds < 0) return -1;
@@ -80,7 +102,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Test if the timer expiry has expired
+        /// Test if the timer expiry has expired.
         /// </summary>
         public bool Expired
         {
@@ -88,7 +110,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Reset the timeout so it occurs with the given Timeout
+        /// Reset the timeout so it occurs with the given Timeout.
         /// </summary>
         public void Reset()
         {

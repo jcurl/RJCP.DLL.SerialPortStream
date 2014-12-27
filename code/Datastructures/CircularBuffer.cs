@@ -4,46 +4,58 @@
 // Copyright © Jason Curl 2012-2013.
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
-using System;
-using System.Text;
-using System.Diagnostics;
-
 namespace RJCP.Datastructures
 {
+    using System;
+    using System.Text;
+    using System.Diagnostics;
+
     /// <summary>
-    /// A simple datastructure to manage an array as a circular buffer
+    /// A simple datastructure to manage an array as a circular buffer.
     /// </summary>
     /// <remarks>
     /// This class provides simple methods for abstracting a circular buffer. A circular buffer
     /// allows for faster access of data by avoiding potential copy operations for data that
     /// is at the beginning.
+    /// <para>Stream data structures can benefit from this data structure by allocating a
+    /// single block on the heap of an arbitrary size. If the stream is long-lived the benefits
+    /// are larger. In the .NET framework (4.0 and earlier), all allocations of data structures
+    /// that are 80kb and larger are automatically allocated on the heap. The heap is not
+    /// garbage collected like smaller objects. Instead, new elements are added to the heap
+    /// in an incremental fashion. It is theoretically possible to exhaust all memory in an
+    /// application by allocating and deallocating regularly on a heap if such a new heap element
+    /// requires space and there is not a single block large enough. By using the
+    /// <see cref="CircularBuffer{T}"/> with the type <c>T</c> as <c>byte</c>, you can preallocate a buffer for a stream
+    /// of any reasonable size (as a simple example 5MB). That block is allocated once and
+    /// remains for the lifetime of the stream. No time will be allocated for compacting or
+    /// garbage collection.</para>
     /// </remarks>
-    /// <typeparam name="T">Type to use for the array</typeparam>
+    /// <typeparam name="T">Type to use for the array.</typeparam>
     [DebuggerDisplay("Start = {Start}; Length = {Length}; Free = {Free}")]
     internal class CircularBuffer<T>
     {
         /// <summary>
-        /// Circular buffer itself. Exposed by property "Array"
+        /// Circular buffer itself. Exposed by property "Array".
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private T[] m_Array;
 
         /// <summary>
-        /// Start index into the buffer. Exposed by property "Start"
+        /// Start index into the buffer. Exposed by property "Start".
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int m_Start;
 
         /// <summary>
-        /// Length of data in circular buffer. Exposed by property "Length"
+        /// Length of data in circular buffer. Exposed by property "Length".
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int m_Count;
 
         /// <summary>
-        /// Allocate an Array of type T[] of particular capacity
+        /// Allocate an Array of type T[] of particular capacity.
         /// </summary>
-        /// <param name="capacity">Size of array to allocate</param>
+        /// <param name="capacity">Size of array to allocate.</param>
         public CircularBuffer(int capacity)
         {
             m_Array = new T[capacity];
@@ -52,7 +64,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Circular buffer based on an already allocated array
+        /// Circular buffer based on an already allocated array.
         /// </summary>
         /// <remarks>
         /// The array is used as the storage for the circular buffer. No copy of the array
@@ -60,7 +72,7 @@ namespace RJCP.Datastructures
         /// array is assumed to be completely used (i.e. it is initialised with zero bytes
         /// Free).
         /// </remarks>
-        /// <param name="array">Array (zero indexed) to allocate</param>
+        /// <param name="array">Array (zero indexed) to allocate.</param>
         public CircularBuffer(T[] array)
         {
             m_Array = array;
@@ -69,7 +81,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Circular buffer based on an already allocated array
+        /// Circular buffer based on an already allocated array.
         /// </summary>
         /// <remarks>
         /// The array is used as the storage for the circular buffer. No copy of the array
@@ -77,8 +89,8 @@ namespace RJCP.Datastructures
         /// <c>count</c> sets the initial length of the array. So an initial <c>count</c>
         /// of zero would imply an empty circular buffer.
         /// </remarks>
-        /// <param name="array">Array (zero indexed) to allocate</param>
-        /// <param name="count">Length of data in array, beginning from offset 0</param>
+        /// <param name="array">Array (zero indexed) to allocate.</param>
+        /// <param name="count">Length of data in array, beginning from offset 0.</param>
         public CircularBuffer(T[] array, int count)
         {
             if (count < 0) throw new ArgumentOutOfRangeException("count", "must be positive");
@@ -92,7 +104,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Circular buffer based on an already allocated array
+        /// Circular buffer based on an already allocated array.
         /// </summary>
         /// <remarks>
         /// The array is used as the storage for the circular buffer. No copy of the array
@@ -103,9 +115,9 @@ namespace RJCP.Datastructures
         /// of count may be set so that data can be considered at the end and beginning of
         /// the array given).
         /// </remarks>
-        /// <param name="array">Array (zero indexed) to allocate</param>
-        /// <param name="offset">Offset of first byte in the array</param>
-        /// <param name="count">Length of data in array, wrapping to the start of the array</param>
+        /// <param name="array">Array (zero indexed) to allocate.</param>
+        /// <param name="offset">Offset of first byte in the array.</param>
+        /// <param name="count">Length of data in array, wrapping to the start of the array.</param>
         public CircularBuffer(T[] array, int offset, int count)
         {
             if (count < 0) throw new ArgumentOutOfRangeException("count", "must be positive");
@@ -123,48 +135,74 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Get start index into array where data begins
+        /// Get start index into array where data begins.
         /// </summary>
         public int Start { get { return m_Start; } }
 
         /// <summary>
-        /// Get end index into array where data ends
+        /// Get end index into array where data ends.
         /// </summary>
+        /// <remarks>
+        /// This property is useful to know from what element in the underlying array
+        /// that data can be written to.
+        /// </remarks>
         public int End { get { return (m_Start + m_Count) % m_Array.Length; } }
 
         /// <summary>
-        /// Get total length of data in array
+        /// Get total length of data in array.
         /// </summary>
+        /// <remarks>
+        /// Returns the amount of allocated data in the circular buffer. The
+        /// following rule applies: <see cref="Length"/> + <see cref="Free"/> = <see cref="Capacity"/>.
+        /// </remarks>
         public int Length { get { return m_Count; } }
 
         /// <summary>
-        /// Get total free data in array
+        /// Get total free data in array.
         /// </summary>
+        /// <remarks>
+        /// Returns the total amount of free elements in the circular buffer. The
+        /// following rule applies: <see cref="Length"/> + <see cref="Free"/> = <see cref="Capacity"/>.
+        /// </remarks>
         public int Free { get { return m_Array.Length - m_Count; } }
 
         /// <summary>
-        /// Get the total capacity of the array
+        /// Get the total capacity of the array.
         /// </summary>
+        /// <remarks>
+        /// Get the total number of elements allocated for the underlying array of the
+        /// circular buffer. The following rule applies:
+        /// <see cref="Length"/> + <see cref="Free"/> = <see cref="Capacity"/>.
+        /// </remarks>
         public int Capacity { get { return m_Array.Length; } }
 
         /// <summary>
-        /// Convert an index from the start of the data to read to an array index
+        /// Convert an index from the start of the data to read to an array index.
         /// </summary>
-        /// <param name="index">Index in data</param>
-        /// <returns>Index in array</returns>
+        /// <param name="index">Index in circular buffer, where an index of 0 is equivalent
+        /// to the <see cref="Start"/> property.</param>
+        /// <returns>Index in array that can be used in array based operations.</returns>
         public int ToArrayIndex(int index) { return (m_Start + index) % m_Array.Length; }
 
         /// <summary>
-        /// Get maximum amount of data that can be written in one operation
+        /// Get length of continuous available space from the current position to the end of the array
+        /// or until the buffer is full.
         /// </summary>
         /// <remarks>
         /// This function is useful if you need to pass the array to another function that will
-        /// then fill the contents. You would pass <c>End</c> as the offset for writing data
-        /// and <c>WriteLength</c> as the count. Then either the array is completely full, or
-        /// until the end of the array.
+        /// then fill the contents of the buffer. You would pass <see cref="End"/> as the offset for 
+        /// where writing the data should start, and <b>WriteLength</b> as the length of buffer
+        /// space available until the end of the array buffer. After the read operation that
+        /// writes in to your buffer, the array is completely full, or until the end of the array.
         /// <para>Such a property is necessary in case that the free space wraps around the
-        /// buffer. By calling X.Write(b.Array, b.End, b.WriteLength); b.Consume(b.WriteLength);
-        /// and then testing if data is still free when we write again.</para>
+        /// buffer. Where below <c>X</c> is your stream you wish to read from, <c>b</c> is the
+        /// circular buffer instantiated as the type <c>CircularBuffer{T}</c>.
+        /// <code>
+        /// c = X.Read(b.Array, b.End, b.WriteLength);
+        /// b.Produce(c);
+        /// </code>
+        /// If the property <b>WriteLength</b> is not zero, then there is space in the buffer
+        /// to read data.</para>
         /// </remarks>
         public int WriteLength
         {
@@ -176,13 +214,14 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Get maximum amount of data that can be read in one operation
+        /// Get the length of the continuous amount of data that can be read in a single copy
+        /// operation from the start of the buffer data.
         /// </summary>
         /// <remarks>
         /// This function is useful if you need to pass the array to another function that will
-        /// use the contents of the array. You would pass <c>Start</c> as the offset for reading
-        /// data and <c>ReadLength</c> as the count. Then based on the amount of data operated
-        /// on, you would free space with <c>Consume(ReadLength)</c>
+        /// use the contents of the array. You would pass <see cref="Start"/> as the offset for reading
+        /// data and <see cref="ReadLength"/> as the count. Then based on the amount of data operated
+        /// on, you would free space with <c><see cref="Consume"/>(ReadLength).</c>
         /// </remarks>
         public int ReadLength
         {
@@ -195,7 +234,7 @@ namespace RJCP.Datastructures
 
         /// <summary>
         /// Given an offset, calculate the length of data that can be read until the end of the
-        /// block
+        /// block.
         /// </summary>
         /// <remarks>
         /// Similar to the property <c>ReadLength</c>, this function takes an argument <c>offset</c>
@@ -203,11 +242,11 @@ namespace RJCP.Datastructures
         /// either the end of the block, or the end of the buffer.
         /// <para>This function is useful if you want to read a block of data, not starting from
         /// the offset 0 (and you don't want to consume the data before hand to reach an offset
-        /// of zero)</para>
+        /// of zero).</para>
         /// <para>The example below, will calculate a checksum from the third byte in the block
         /// for the length of data. If the block to read from offset 3 can be done in one
         /// operation, it will do so. Else it must be done in two operations, first from offset
-        /// 3 to the end, then from offset 0 for the remaining data</para>
+        /// 3 to the end, then from offset 0 for the remaining data.</para>
         /// </remarks>
         /// <example>
         /// UInt16 crc;
@@ -218,8 +257,8 @@ namespace RJCP.Datastructures
         ///     crc = crc16.Compute(crc, buffer.Array, 0, length - buffer.ReadLength);
         /// }
         /// </example>
-        /// <param name="offset">Offset</param>
-        /// <returns>Length</returns>
+        /// <param name="offset">Offset.</param>
+        /// <returns>Length.</returns>
         public int GetReadBlock(int offset)
         {
             if (offset < 0) throw new ArgumentOutOfRangeException("offset", "offset must be zero or greater");
@@ -233,7 +272,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Consume array elements (freeing space from the beginning) updating pointers in the circular buffer
+        /// Consume array elements (freeing space from the beginning) updating pointers in the circular buffer.
         /// </summary>
         /// <remarks>
         /// This method advances the internal pointers for <i>Start</i> based on the <i>length</i>
@@ -247,7 +286,7 @@ namespace RJCP.Datastructures
         /// pinned), but data corruption would occur if this method were not used in this particular
         /// scenario.
         /// </remarks>
-        /// <param name="length">Amount of data to consume</param>
+        /// <param name="length">Amount of data to consume.</param>
         public void Consume(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException("length", "must be positive");
@@ -262,9 +301,11 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Produce bytes (allocating space at the end) updating pointers in the circular buffer
+        /// Produce bytes (allocating space at the end) updating pointers in the circular buffer.
         /// </summary>
-        /// <param name="length"></param>
+        /// <param name="length">The number of bytes to indicate that have been added from the
+        /// index <see cref="End"/> to the end of the array and possibly again from the start
+        /// of the array if overlapped.</param>
         public void Produce(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException("length", "must be positive");
@@ -275,9 +316,17 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Revert elements produced to the end of the circular buffer
+        /// Revert elements produced to the end of the circular buffer.
         /// </summary>
-        /// <param name="length"></param>
+        /// <param name="length">The number of bytes to remove from the end of the array, moving
+        /// the <see cref="End"/> property to the left, leaving the <see cref="Start"/> property
+        /// untouched.</param>
+        /// <remarks>
+        /// This method can be used to remove data that has been added to the end of the circular
+        /// buffer. When using this data structure for streams, you would not use this property
+        /// to ensure consistency of your stream (the <c>Read</c> operation would consume from
+        /// your circular buffer and <c>Write</c> would produce data to your circular buffer.
+        /// </remarks>
         public void Revert(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException("length", "must be positive");
@@ -287,7 +336,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Reset the pointers in the circular buffer
+        /// Reset the pointers in the circular buffer, effectively noting the circular buffer as empty.
         /// </summary>
         public void Reset()
         {
@@ -296,15 +345,21 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Get the reference to the array that's allocated
+        /// Get the reference to the array that's allocated.
         /// </summary>
+        /// <remarks>
+        /// This property allows you to access the content of the data in the circular buffer in an
+        /// efficient manner. You can then use this property along with <see cref="Start"/>,
+        /// <see cref="ReadLength"/>, <see cref="End"/> and <see cref="WriteLength"/> for knowing
+        /// where in the buffer to read and write.
+        /// </remarks>
         public T[] Array { get { return m_Array; } }
 
         /// <summary>
-        /// Access an element in the array using the Start as index 0
+        /// Access an element in the array using the Start as index 0.
         /// </summary>
-        /// <param name="index">Index into the array referenced from <i>Start</i></param>
-        /// <returns>Contents of the array</returns>
+        /// <param name="index">Index into the array referenced from <i>Start</i>.</param>
+        /// <returns>Contents of the array.</returns>
         public T this[int index]
         {
             get { return m_Array[(m_Start + index) % m_Array.Length]; }
@@ -312,8 +367,10 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from array to the end of this circular buffer and update the length
+        /// Copy data from array to the end of this circular buffer and update the length.
         /// </summary>
+        /// <param name="array">Array to copy from.</param>
+        /// <returns>Number of bytes copied.</returns>
         /// <remarks>
         /// Data is copied to the end of the Circular Buffer. The amount of data
         /// that could be copied is dependent on the amount of free space. The result
@@ -321,8 +378,6 @@ namespace RJCP.Datastructures
         /// into the Circular Buffer. Pointers in the circular buffer are updated
         /// appropriately.
         /// </remarks>
-        /// <param name="array">Array to copy from</param>
-        /// <returns>Number of bytes copied</returns>
         public int Append(T[] array)
         {
             if (array == null) throw new ArgumentNullException("array");
@@ -330,8 +385,12 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from array to the end of this circular buffer and update the length
+        /// Copy data from array to the end of this circular buffer and update the length.
         /// </summary>
+        /// <param name="array">Array to copy from.</param>
+        /// <param name="offset">Offset to copy data from.</param>
+        /// <param name="count">Length of data to copy.</param>
+        /// <returns>Number of bytes copied.</returns>
         /// <remarks>
         /// Data is copied to the end of the Circular Buffer. The amount of data
         /// that could be copied is dependent on the amount of free space. The result
@@ -339,10 +398,6 @@ namespace RJCP.Datastructures
         /// into the Circular Buffer. Pointers in the circular buffer are updated
         /// appropriately.
         /// </remarks>
-        /// <param name="array">Array to copy from</param>
-        /// <param name="offset">Offset to copy data from</param>
-        /// <param name="count">Length of data to copy</param>
-        /// <returns>Number of bytes copied</returns>
         public int Append(T[] array, int offset, int count)
         {
             if (array == null) throw new ArgumentNullException("array");
@@ -366,17 +421,17 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from the circular buffer to the end of this circular buffer
+        /// Copy data from the circular buffer to the end of this circular buffer.
         /// </summary>
+        /// <param name="buffer">Buffer to append.</param>
+        /// <returns>Amount of data appended.</returns>
         /// <remarks>
         /// Data is copied to the end of the Circular Buffer. The amount of data
         /// that could be copied is dependent on the amount of free space. The result
         /// is the number of elements from the <c>buffer</c> array that is copied
-        /// into the Circular Buffer. Pointers in the cirucular buffer are updated
+        /// into the Circular Buffer. Pointers in the circular buffer are updated
         /// appropriately.
         /// </remarks>
-        /// <param name="buffer">Buffer to append</param>
-        /// <returns>Amount of data appended</returns>
         public int Append(CircularBuffer<T> buffer)
         {
             if (buffer == null) throw new ArgumentNullException("buffer");
@@ -384,37 +439,37 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from the circular buffer to the end of this circular buffer
+        /// Copy data from the circular buffer to the end of this circular buffer.
         /// </summary>
+        /// <param name="buffer">Buffer to append.</param>
+        /// <param name="count">Number of bytes to append.</param>
+        /// <returns>Amount of data appended.</returns>
         /// <remarks>
         /// Data is copied to the end of the Circular Buffer. The amount of data
         /// that could be copied is dependent on the amount of free space. The result
         /// is the number of elements from the <c>buffer</c> array that is copied
-        /// into the Circular Buffer. Pointers in the cirucular buffer are updated
+        /// into the Circular Buffer. Pointers in the circular buffer are updated
         /// appropriately.
         /// </remarks>
-        /// <param name="buffer">Buffer to append</param>
-        /// <param name="count">Number of bytes to append</param>
-        /// <returns>Amount of data appended</returns>
         public int Append(CircularBuffer<T> buffer, int count)
         {
             return Append(buffer, 0, count);
         }
 
         /// <summary>
-        /// Copy data from the circular buffer to the end of this circular buffer
+        /// Copy data from the circular buffer to the end of this circular buffer.
         /// </summary>
+        /// <param name="buffer">Buffer to append.</param>
+        /// <param name="count">Number of bytes to append.</param>
+        /// <param name="offset">Offset into the buffer to start appending.</param>
+        /// <returns>Amount of data appended.</returns>
         /// <remarks>
         /// Data is copied to the end of the Circular Buffer. The amount of data
         /// that could be copied is dependent on the amount of free space. The result
         /// is the number of elements from the <c>buffer</c> array that is copied
-        /// into the Circular Buffer. Pointers in the cirucular buffer are updated
+        /// into the Circular Buffer. Pointers in the circular buffer are updated
         /// appropriately.
         /// </remarks>
-        /// <param name="buffer">Buffer to append</param>
-        /// <param name="count">Number of bytes to append</param>
-        /// <param name="offset">Offset into the buffer to start appending</param>
-        /// <returns>Amount of data appended</returns>
         public int Append(CircularBuffer<T> buffer, int offset, int count)
         {
             if (buffer == null) throw new ArgumentNullException("buffer");
@@ -441,10 +496,10 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Append a single element to the end of the Circular Buffer
+        /// Append a single element to the end of the Circular Buffer.
         /// </summary>
-        /// <param name="element">The element to add at the end of the buffer</param>
-        /// <returns>Amount of data appended. 1 if successful, 0 if no space available</returns>
+        /// <param name="element">The element to add at the end of the buffer.</param>
+        /// <returns>Amount of data appended. 1 if successful, 0 if no space available.</returns>
         public int Append(T element)
         {
             if (m_Count == Capacity) return 0;
@@ -455,9 +510,9 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Retrieve a single element from the Circular buffer and consume it
+        /// Retrieve a single element from the Circular buffer and consume it.
         /// </summary>
-        /// <returns>The value at index 0</returns>
+        /// <returns>The value at index 0.</returns>
         public T Pop()
         {
             if (m_Count == 0) throw new InvalidOperationException("Circular Buffer is empty");
@@ -467,14 +522,14 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from the circular buffer to the array and then consume the data from the circular buffer
+        /// Copy data from the circular buffer to the array and then consume the data from the circular buffer.
         /// </summary>
         /// <remarks>
         /// Data is copied to the first element in the array, up to the length
         /// of the array.
         /// </remarks>
-        /// <param name="array">The array to copy the data to</param>
-        /// <returns>The number of bytes that were moved</returns>
+        /// <param name="array">The array to copy the data to.</param>
+        /// <returns>The number of bytes that were moved.</returns>
         public int MoveTo(T[] array)
         {
             int l = CopyTo(array);
@@ -483,12 +538,16 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from the circular buffer to the array and then consume the data from the circular buffer
+        /// Copy data from the circular buffer to the array and then consume the data from the circular buffer.
         /// </summary>
-        /// <param name="array">The array to copy the data to</param>
-        /// <param name="offset">Offset into the array to copy to</param>
-        /// <param name="count">Amount of data to copy to</param>
-        /// <returns>The number of bytes that were moved</returns>
+        /// <param name="array">The array to copy the data to.</param>
+        /// <param name="offset">Offset into the array to copy to.</param>
+        /// <param name="count">Amount of data to copy to.</param>
+        /// <returns>The number of bytes that were moved.</returns>
+        /// <remarks>
+        /// This method is very similar to the <see cref="CopyTo(T[], int, int)"/> method, but it will also
+        /// consume the data that was copied also.
+        /// </remarks>
         public int MoveTo(T[] array, int offset, int count)
         {
             int l = CopyTo(array, offset, count);
@@ -497,15 +556,15 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from the circular buffer to the array
+        /// Copy data from the circular buffer to the array.
         /// </summary>
+        /// <param name="array">The array to copy the data to.</param>
+        /// <returns>The number of bytes that were copied.</returns>
         /// <remarks>
         /// Data is copied from the first element in the array, up to the length
         /// of the array. The data from the Circular Buffer is <i>not</i> consumed. 
         /// You must do this yourself. Else use the MoveTo() method.
         /// </remarks>
-        /// <param name="array">The array to copy the data to</param>
-        /// <returns>The number of bytes that were copied</returns>
         public int CopyTo(T[] array)
         {
             if (array == null) throw new ArgumentNullException("array");
@@ -513,17 +572,17 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Copy data from the circular buffer to the array
+        /// Copy data from the circular buffer to the array.
         /// </summary>
+        /// <param name="array">The array to copy the data to.</param>
+        /// <param name="offset">Offset into the array to copy to.</param>
+        /// <param name="count">Amount of data to copy to.</param>
+        /// <returns>The number of bytes that were copied.</returns>
         /// <remarks>
         /// Data is copied from the circular buffer into the array specified, at the offset given.
         /// The data from the Circular Buffer is <i>not</i> consumed. You must do this yourself.
         /// Else use the MoveTo() method.
         /// </remarks>
-        /// <param name="array">The array to copy the data to</param>
-        /// <param name="offset">Offset into the array to copy to</param>
-        /// <param name="count">Amount of data to copy to</param>
-        /// <returns>The number of bytes that were copied</returns>
         public int CopyTo(T[] array, int offset, int count)
         {
             if (array == null) throw new ArgumentNullException("array");
@@ -547,17 +606,17 @@ namespace RJCP.Datastructures
     }
 
     /// <summary>
-    /// A set of useful extensions to the CircularBuffer for specific data types
+    /// A set of useful extensions to the CircularBuffer for specific data types.
     /// </summary>
     internal static class CircularBufferExtensions
     {
         /// <summary>
-        /// Convert the contents of the circular buffer into a string
+        /// Convert the contents of the circular buffer into a string.
         /// </summary>
-        /// <param name="buff">The circular buffer based on char</param>
-        /// <returns>A string</returns>
+        /// <param name="buff">The circular buffer based on char.</param>
+        /// <returns>A string containing the contents of the circular buffer.</returns>
         /// <remarks>
-        /// This method will not consume the data in the CircularBuffer&lt;char&gt;.
+        /// This method will not consume the data in the CircularBuffer{char}.
         /// </remarks>
         public static string GetString(this CircularBuffer<char> buff)
         {
@@ -566,13 +625,13 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Convert the contents of the circular buffer into a string
+        /// Convert the contents of the circular buffer into a string.
         /// </summary>
-        /// <param name="buff">The circular buffer based on char</param>
-        /// <param name="length">Number of characters to convert to a string</param>
-        /// <returns>A string</returns>
+        /// <param name="buff">The circular buffer based on char.</param>
+        /// <param name="length">Number of characters to convert to a string.</param>
+        /// <returns>A string of up to length characters.</returns>
         /// <remarks>
-        /// This method will not consume the data in the CircularBuffer&lt;char&gt;.
+        /// This method will not consume the data in the CircularBuffer{char}.
         /// </remarks>
         public static string GetString(this CircularBuffer<char> buff, int length)
         {
@@ -590,14 +649,14 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Convert the contents of the circular buffer into a string
+        /// Convert the contents of the circular buffer into a string.
         /// </summary>
-        /// <param name="buff">The circular buffer based on char</param>
-        /// <param name="offset">The offset into the circular buffer</param>
-        /// <param name="length">Number of characters to convert to a string</param>
-        /// <returns>A string</returns>
+        /// <param name="buff">The circular buffer based on char.</param>
+        /// <param name="offset">The offset into the circular buffer.</param>
+        /// <param name="length">Number of characters to convert to a string.</param>
+        /// <returns>A string of up to length characters, from the circular buffer starting at the offset specified..</returns>
         /// <remarks>
-        /// This method will not consume the data in the CircularBuffer&lt;char&gt;.
+        /// This method will not consume the data in the CircularBuffer{char}.
         /// </remarks>
         public static string GetString(this CircularBuffer<char> buff, int offset, int length)
         {
@@ -618,7 +677,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Use a decoder to convert from a Circular Buffer of bytes into a char array
+        /// Use a decoder to convert from a Circular Buffer of bytes into a char array.
         /// </summary>
         /// <param name="decoder">The decoder to do the conversion.</param>
         /// <param name="bytes">The circular buffer of bytes to convert from.</param>
@@ -634,7 +693,7 @@ namespace RJCP.Datastructures
         /// specified by byteCount were converted; otherwise, false. This parameter is
         /// passed uninitialized.</param>
         /// <exception cref="System.ArgumentException">The output buffer is too small to contain any of the
-        /// converted input</exception>
+        /// converted input.</exception>
         /// <remarks>
         /// This method should behave the same as the decoder for an array of bytes of equal size.
         /// <para>The <i>completed</i> output parameter indicates whether all the data in the input buffer 
@@ -645,7 +704,7 @@ namespace RJCP.Datastructures
         /// This situation occurs if there is still data in the Decoder object that has not been stored
         /// in the bytes buffer.</para>
         /// <para>There are a few noted deviations from using the Decoder on an array of bytes, instead
-        /// of a Circular Buffer</para>
+        /// of a Circular Buffer.</para>
         /// <list type="bullet">
         /// <item>When converting a sequence of bytes to multiple chars, if those sequences result in
         /// the minimum number of characters being written as 2 or more characters, slight discrepancies
@@ -670,16 +729,16 @@ namespace RJCP.Datastructures
 
             bytesUsed = 0;
             charsUsed = 0;
-            bool oflush = false;
+            bool outFlush = false;
 
             do {
                 int bu;
                 int cu;
-                if (bytes.ReadLength == bytes.Length) oflush = flush;
+                if (bytes.ReadLength == bytes.Length) outFlush = flush;
                 try {
                     decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
                         chars, charIndex, charCount,
-                        oflush, out bu, out cu, out completed);
+                        outFlush, out bu, out cu, out completed);
                 } catch (System.ArgumentException e) {
                     if (!e.ParamName.Equals("chars")) throw;
 
@@ -703,12 +762,12 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Use a decoder to convert from a Circular Buffer of bytes into a Circular Buffer of chars
+        /// Use a decoder to convert from a Circular Buffer of bytes into a Circular Buffer of chars.
         /// </summary>
-        /// <param name="decoder">The decoder to do the conversion</param>
-        /// <param name="bytes">The circular buffer of bytes to convert from</param>
-        /// <param name="chars">The circular buffer of chars to convert to</param>
-        /// <param name="charCount">Maximum number of characters to write</param>
+        /// <param name="decoder">The decoder to do the conversion.</param>
+        /// <param name="bytes">The circular buffer of bytes to convert from.</param>
+        /// <param name="chars">The circular buffer of chars to convert to.</param>
+        /// <param name="charCount">Maximum number of characters to write.</param>
         /// <param name="flush"><b>true</b> to indicate that no further data is to be converted; otherwise, <b>false</b>.</param>
         /// <param name="bytesUsed">When this method returns, contains the number of bytes that were
         /// used in the conversion. This parameter is passed uninitialized.</param>
@@ -718,7 +777,7 @@ namespace RJCP.Datastructures
         /// specified by byteCount were converted; otherwise, false. This parameter is
         /// passed uninitialized.</param>
         /// <exception cref="System.ArgumentException">The output buffer is too small to contain any of the
-        /// converted input</exception>
+        /// converted input.</exception>
         public static void Convert(this Decoder decoder, CircularBuffer<byte> bytes, CircularBuffer<char> chars, int charCount, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
         {
             if (bytes == null) throw new ArgumentNullException("bytes", "Circular buffer bytes may not be null");
@@ -727,16 +786,16 @@ namespace RJCP.Datastructures
             charCount = Math.Min(chars.Free, charCount);
             bytesUsed = 0;
             charsUsed = 0;
-            bool oflush = false;
+            bool outFlush = false;
 
             do {
                 int bu;
                 int cu;
-                if (bytes.ReadLength == bytes.Length) oflush = flush;
+                if (bytes.ReadLength == bytes.Length) outFlush = flush;
                 try {
                     decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
                         chars.Array, chars.End, Math.Min(chars.WriteLength, charCount),
-                        oflush, out bu, out cu, out completed);
+                        outFlush, out bu, out cu, out completed);
                     bytes.Consume(bu);
                     chars.Produce(cu);
                 } catch (System.ArgumentException e) {
@@ -752,11 +811,11 @@ namespace RJCP.Datastructures
                         return;
                     }
 
-                    int tlen = Math.Min(16, charCount);
-                    char[] tmp = new char[tlen];
+                    int tmpLen = Math.Min(16, charCount);
+                    char[] tmp = new char[tmpLen];
                     try {
                         decoder.Convert(bytes.Array, bytes.Start, bytes.ReadLength,
-                            tmp, 0, tmp.Length, oflush, out bu, out cu, out completed);
+                            tmp, 0, tmp.Length, outFlush, out bu, out cu, out completed);
                     } catch (System.ArgumentException e2) {
                         if (!e2.ParamName.Equals("chars")) throw;
                         if (bytesUsed == 0) throw;
@@ -773,11 +832,11 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Use a decoder to convert from a Circular Buffer of bytes into a Circular Buffer of chars
+        /// Use a decoder to convert from a Circular Buffer of bytes into a Circular Buffer of chars.
         /// </summary>
-        /// <param name="decoder">The decoder to do the conversion</param>
-        /// <param name="bytes">The circular buffer of bytes to convert from</param>
-        /// <param name="chars">The circular buffer of chars to convert to</param>
+        /// <param name="decoder">The decoder to do the conversion.</param>
+        /// <param name="bytes">The circular buffer of bytes to convert from.</param>
+        /// <param name="chars">The circular buffer of chars to convert to.</param>
         /// <param name="flush"><b>true</b> to indicate that no further data is to be converted; otherwise, <b>false</b>.</param>
         /// <param name="bytesUsed">When this method returns, contains the number of bytes that were
         /// used in the conversion. This parameter is passed uninitialized.</param>
@@ -787,7 +846,7 @@ namespace RJCP.Datastructures
         /// specified by byteCount were converted; otherwise, false. This parameter is
         /// passed uninitialized.</param>
         /// <exception cref="System.ArgumentException">The output buffer is too small to contain any of the
-        /// converted input</exception>
+        /// converted input.</exception>
         public static void Convert(this Decoder decoder, CircularBuffer<byte> bytes, CircularBuffer<char> chars, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
         {
             if (bytes == null) throw new ArgumentNullException("bytes", "Circular buffer bytes may not be null");
@@ -796,13 +855,13 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Use a decoder to convert from an array of bytes into a char CircularBuffer
+        /// Use a decoder to convert from an array of bytes into a char CircularBuffer.
         /// </summary>
         /// <param name="decoder">The decoder to do the conversion.</param>
-        /// <param name="bytes">The array of bytes to convert</param>
-        /// <param name="byteIndex">Start index in bytes array</param>
-        /// <param name="byteCount">Number of bytes to convert in the byte array</param>
-        /// <param name="chars">The circular buffer of chars to convert to</param>
+        /// <param name="bytes">The array of bytes to conver.</param>
+        /// <param name="byteIndex">Start index in bytes array.</param>
+        /// <param name="byteCount">Number of bytes to convert in the byte array.</param>
+        /// <param name="chars">The circular buffer of chars to convert to.</param>
         /// <param name="flush"><b>true</b> to indicate that no further data is to be converted; otherwise, <b>false</b>.</param>
         /// <param name="bytesUsed">When this method returns, contains the number of bytes that were
         /// used in the conversion. This parameter is passed uninitialized.</param>
@@ -847,8 +906,8 @@ namespace RJCP.Datastructures
                         return;
                     }
 
-                    int tlen = Math.Min(16, chars.Free);
-                    char[] tmp = new char[tlen];
+                    int tempLen = Math.Min(16, chars.Free);
+                    char[] tmp = new char[tempLen];
                     try {
                         decoder.Convert(bytes, byteIndex, byteCount,
                             tmp, 0, tmp.Length, flush, out bu, out cu, out completed);
@@ -869,13 +928,13 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Converts an array of Unicode characters to a byte sequence storing the result in a circular buffer
+        /// Converts an array of Unicode characters to a byte sequence storing the result in a circular buffer.
         /// </summary>
-        /// <param name="encoder">The encoder to use for the conversion</param>
-        /// <param name="chars">An array of characters to convert</param>
-        /// <param name="charIndex">The first element of <i>chars</i> to convert</param>
-        /// <param name="charCount">The number of elements of <i>chars</i> to convert</param>
-        /// <param name="bytes">Circular buffer where converted bytes are stored</param>
+        /// <param name="encoder">The encoder to use for the conversion.</param>
+        /// <param name="chars">An array of characters to convert.</param>
+        /// <param name="charIndex">The first element of <i>chars</i> to convert.</param>
+        /// <param name="charCount">The number of elements of <i>chars</i> to convert.</param>
+        /// <param name="bytes">Circular buffer where converted bytes are stored.</param>
         /// <param name="flush"><b>true</b> to indicate no further data is to be converted; otherwise, false</param>
         /// <param name="charsUsed">When this method returns, contains the number of characters from
         /// chars that were produced by the conversion. This parameter is passed uninitialized.</param>
@@ -923,8 +982,8 @@ namespace RJCP.Datastructures
                         return;
                     }
 
-                    int tlen = Math.Min(16, bytes.Free);
-                    byte[] tmp = new byte[tlen];
+                    int tempLen = Math.Min(16, bytes.Free);
+                    byte[] tmp = new byte[tempLen];
                     try {
                         encoder.Convert(chars, charIndex, charCount,
                             tmp, 0, tmp.Length, flush, out cu, out bu, out completed);
