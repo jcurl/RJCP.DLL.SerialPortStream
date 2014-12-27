@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Datastructures\CircularBuffer.cs" />
-    <Compile Include="Datastructures\LocalAsyncResult.cs" />
+    <Compile Include="LocalAsyncResult.cs" />
     <Compile Include="Datastructures\TimerExpiry.cs" />
     <Compile Include="NativeSerialPort.cs" />
     <Compile Include="NativeSerialPort_CommModemStatus.cs" />
