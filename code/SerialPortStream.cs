@@ -247,7 +247,7 @@ namespace RJCP.IO.Ports
             bool setPort = false;
 
             if (m_SerialPort == null) {
-                // We need to create a new instance
+                // We need to create a new instance. This is called from the constructor.
                 if (port == null) {
                     m_SerialPort = new NativeSerialPort();
 
@@ -386,6 +386,9 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Opens a new serial port connection.
         /// </summary>
+        /// <exception cref="InvalidOperationException">This object is already managing a serial port
+        /// connection.</exception>
+        /// <exception cref="System.ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// Opens a connection to the serial port provided by the constructor or the Port property.
         /// If this object is already managing a serial port, this object raises an exception.
@@ -404,35 +407,57 @@ namespace RJCP.IO.Ports
         /// you with a consistent environment (independent of the state of the Operating System
         /// or the driver beforehand).</para>
         /// </remarks>
-        /// <exception cref="InvalidOperationException">This object is already managing a serial port
-        /// connection.</exception>
         public void Open()
+        {
+            Open(true);
+        }
+
+        /// <summary>
+        /// Opens a new serial port connection with control if the port settings are initialised or not.
+        /// </summary>
+        /// <param name="setCommState">if set to <c>true</c> then set the communication settings.</param>
+        /// <exception cref="System.ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="System.InvalidOperationException">Serial Port already opened</exception>
+        /// <remarks>
+        /// Opens a connection to the serial port provided by the constructor or the Port property.
+        /// If this object is already managing a serial port, this object raises an exception.
+        /// <para>If the parameter <paramref name="setCommState"/> is <c>true</c>, this method is functionally
+        /// the same as <see cref="Open()"/> and you should use that method instead. Otherwise, you can
+        /// override the open so that no communication settings are retrieved or set on start. This is useful
+        /// for virtual COM ports that do not manage state bits (some as some emulated COM ports or USB
+        /// based communications that present themselves as a COM port but do not have any underlying
+        /// physical RS232 implementation).</para>
+        /// </remarks>
+        public void Open(bool setCommState)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (m_SerialPort.IsOpen) throw new InvalidOperationException("Serial Port already opened");
 
             m_SerialPort.Open();
-            m_SerialPort.SerialPortCommState.SetCommState();
+            if (setCommState) {
+                m_SerialPort.SerialPortCommState.SetCommState();
 
-            // Fetch the actual settings and get the capabilities
-            GetPortSettings(null);
-            try {
-                m_SerialPort.SerialPortModemStatus.ClearCommBreak();
-            } catch (System.IO.IOException) {
-                // Ignore IOException. Not all serial port drivers support clearing the
-                // Break signal, so we ignore it when opening.
-            }
+                // Fetch the actual settings and get the capabilities
+                GetPortSettings(null);
 
-            // Set the state of the RTS line if handshaking is disabled
-            if (!m_SerialPort.SerialPortCommState.OutCtsFlow) {
-                // OutCtsFlow is only enabled if RtsControl is handshaking.
-                m_SerialPort.SerialPortModemStatus.SetRts(RtsEnable);
-            }
+                try {
+                    m_SerialPort.SerialPortModemStatus.ClearCommBreak();
+                } catch (System.IO.IOException) {
+                    // Ignore IOException. Not all serial port drivers support clearing the
+                    // Break signal, so we ignore it when opening.
+                }
 
-            // Set the state of the DTR line if handshaking is disabled
-            if (!m_SerialPort.SerialPortCommState.OutDsrFlow) {
-                // OutDsrFlow is only enabled if DtrControl is handshaking
-                m_SerialPort.SerialPortModemStatus.SetDtr(DtrEnable);
+                // Set the state of the RTS line if handshaking is disabled
+                if (!m_SerialPort.SerialPortCommState.OutCtsFlow) {
+                    // OutCtsFlow is only enabled if RtsControl is handshaking.
+                    m_SerialPort.SerialPortModemStatus.SetRts(RtsEnable);
+                }
+
+                // Set the state of the DTR line if handshaking is disabled
+                if (!m_SerialPort.SerialPortCommState.OutDsrFlow) {
+                    // OutDsrFlow is only enabled if DtrControl is handshaking
+                    m_SerialPort.SerialPortModemStatus.SetDtr(DtrEnable);
+                }
             }
 
             // Create threads and start working with local buffers
