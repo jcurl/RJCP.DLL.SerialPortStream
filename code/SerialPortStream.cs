@@ -421,14 +421,20 @@ namespace RJCP.IO.Ports
         /// <remarks>
         /// Opens a connection to the serial port provided by the constructor or the Port property.
         /// If this object is already managing a serial port, this object raises an exception.
-        /// <para>If the parameter <paramref name="setCommState"/> is <c>true</c>, this method is functionally
-        /// the same as <see cref="Open()"/> and you should use that method instead. Otherwise, you can
-        /// override the open so that no communication settings are retrieved or set on start. This is useful
-        /// for virtual COM ports that do not manage state bits (some as some emulated COM ports or USB
-        /// based communications that present themselves as a COM port but do not have any underlying
-        /// physical RS232 implementation).</para>
+        /// <para>You can override the open so that no communication settings are retrieved or set.
+        /// This is useful for virtual COM ports that do not manage state bits (some as some emulated
+        /// COM ports or USB based communications that present themselves as a COM port but do not have
+        /// any underlying physical RS232 implementation).</para>
+        /// <note type="note">If you use this method to avoid setting parameters for the serial port,
+        /// instead only to open the serial port, you should be careful not to set any properties
+        /// associated with the serial port, as they will set the communications properties.</note>
         /// </remarks>
-        public void Open(bool setCommState)
+        public void OpenDirect()
+        {
+            Open(false);
+        }
+
+        private void Open(bool setCommState)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (m_SerialPort.IsOpen) throw new InvalidOperationException("Serial Port already opened");
