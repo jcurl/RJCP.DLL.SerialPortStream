@@ -415,7 +415,6 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Opens a new serial port connection with control if the port settings are initialised or not.
         /// </summary>
-        /// <param name="setCommState">if set to <c>true</c> then set the communication settings.</param>
         /// <exception cref="System.ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <exception cref="System.InvalidOperationException">Serial Port already opened</exception>
         /// <remarks>
