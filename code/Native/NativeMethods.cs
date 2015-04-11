@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿// $URL$
+// $Id$
+
+// Copyright © Jason Curl 2012-2014.
+// See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports.Native
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Text;
+
     internal static class NativeMethods
     {
         [Flags]
