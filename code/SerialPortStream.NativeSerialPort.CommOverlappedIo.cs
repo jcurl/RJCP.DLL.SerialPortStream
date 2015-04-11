@@ -17,6 +17,7 @@ namespace RJCP.IO.Ports
     using System.Threading;
     using Microsoft.Win32.SafeHandles;
     using RJCP.Datastructures;
+    using RJCP.IO.Ports.Native;
 
     public partial class SerialPortStream
     {

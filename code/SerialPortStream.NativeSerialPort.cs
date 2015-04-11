@@ -8,12 +8,13 @@ namespace RJCP.IO.Ports
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Text;
     using System.IO;
     using System.Runtime.InteropServices;
     using Microsoft.Win32.SafeHandles;
-    using System.Collections.Specialized;
     using RJCP.Datastructures;
+    using RJCP.IO.Ports.Native;
 
     public partial class SerialPortStream
     {
