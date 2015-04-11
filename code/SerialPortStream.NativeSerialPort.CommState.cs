@@ -13,6 +13,7 @@ namespace RJCP.IO.Ports
     using System.IO;
     using System.Runtime.InteropServices;
     using Microsoft.Win32.SafeHandles;
+    using RJCP.IO.Ports.Native;
 
     public partial class SerialPortStream
     {
