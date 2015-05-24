@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2014
+// Copyright © Jason Curl 2012-2015
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
@@ -177,7 +177,9 @@ namespace RJCP.IO.Ports
                 m_CommState = new CommState(m_ComPortHandle, m_CommState);
                 m_CommProperties = new CommProperties(m_ComPortHandle);
                 m_CommModem = new CommModemStatus(m_ComPortHandle);
-                m_CommIo = new CommOverlappedIo(m_ComPortHandle, m_CommIo, Port);
+                CommOverlappedIo commIo = new CommOverlappedIo(m_ComPortHandle, m_CommIo, Port);
+                m_CommIo.Dispose();
+                m_CommIo = commIo;
             }
 
             /// <summary>
