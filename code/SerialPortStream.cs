@@ -258,10 +258,8 @@ namespace RJCP.IO.Ports
 
                 m_BreakState = false;
 
-                m_SerialPort.SerialPortIo.CommEvent +=
-                    new NativeSerialPort.CommOverlappedIo.CommEventHandler(SerialPortIo_CommEvent);
-                m_SerialPort.SerialPortIo.CommErrorEvent += 
-                    new NativeSerialPort.CommOverlappedIo.CommErrorEventHandler(SerialPortIo_CommErrorEvent);
+                m_SerialPort.SerialPortIo.CommEvent += SerialPortIo_CommEvent;
+                m_SerialPort.SerialPortIo.CommErrorEvent += SerialPortIo_CommErrorEvent;
             } else {
                 if (m_SerialPort.IsOpen) {
                     if (port == null || m_SerialPort.Port == port) {
