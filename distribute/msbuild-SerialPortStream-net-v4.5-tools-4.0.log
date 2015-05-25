@@ -1,0 +1,24 @@
+Build started 25/05/2015 11:30:16.
+Project "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\code\SerialPortStream.csproj" on node 1 (Rebuild target(s)).
+CoreClean:
+  Deleting file "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.dll".
+  Deleting file "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.pdb".
+  Deleting file "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.XML".
+  Deleting file "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\code\obj\Release\SerialPortStream.csprojResolveAssemblyReference.cache".
+  Deleting file "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\code\obj\Release\RJCP.SerialPortStream.dll".
+  Deleting file "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\code\obj\Release\RJCP.SerialPortStream.pdb".
+CoreCompile:
+  C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe /noconfig /unsafe+ /nowarn:1701,1702 /nostdlib+ /errorreport:prompt /warn:4 /doc:bin\Release\RJCP.SerialPortStream.XML /define:SIGNED_RELEASE /highentropyva+ /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" /reference:"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Management.dll" /debug:pdbonly /filealign:512 /keycontainer:VS_KEY_4C1025FD77857536 /optimize+ /out:obj\Release\RJCP.SerialPortStream.dll /subsystemversion:6.00 /target:library /utf8output Native\NativeMethods.cs Native\SafeNativeMethods.cs Native\UnsafeNativeMethods.cs Properties\AssemblyInfo.cs Datastructures\CircularBuffer.cs Datastructures\TimerExpiry.cs LocalAsyncResult.cs PortDescription.cs SerialPortStream.cs SerialPortStream.NativeSerialPort.cs SerialPortStream.NativeSerialPort.CommState.cs SerialPortStream.NativeSerialPort.CommProperties.cs SerialPortStream.NativeSerialPort.CommModemStatus.cs SerialPortStream.NativeSerialPort.CommOverlappedIo.cs SerialPortStream.SerialTrace.cs SerialPortStream.WinError.cs SerialPortTypes.cs "C:\Users\jcurl\AppData\Local\Temp\.NETFramework,Version=v4.5.AssemblyAttributes.cs"
+CopyFilesToOutputDirectory:
+  Copying file from "obj\Release\RJCP.SerialPortStream.dll" to "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.dll".
+  SerialPortStream -> C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.dll
+  Copying file from "obj\Release\RJCP.SerialPortStream.pdb" to "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.pdb".
+  Copying file from "bin\Release\RJCP.SerialPortStream.XML" to "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.XML".
+Done Building Project "C:\Users\jcurl\Documents\Visual Studio 2013\Projects\serialportstream\code\SerialPortStream.csproj" (Rebuild target(s)).
+
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.14
