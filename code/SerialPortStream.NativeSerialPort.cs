@@ -77,7 +77,7 @@ namespace RJCP.IO.Ports
             /// <summary>
             /// Default constructor, doesn't associate with a COM port.
             /// </summary>
-            public NativeSerialPort() 
+            public NativeSerialPort()
             {
                 m_CommState = new CommState();
                 m_CommIo = new CommOverlappedIo();
@@ -99,7 +99,8 @@ namespace RJCP.IO.Ports
             public string Port
             {
                 get { return m_Port; }
-                set {
+                set
+                {
                     if (IsDisposed) throw new ObjectDisposedException("NativeSerialPort");
                     if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Must provide a valid port name");
 
@@ -157,7 +158,7 @@ namespace RJCP.IO.Ports
 
                 m_ComPortHandle = UnsafeNativeMethods.CreateFile(@"\\.\" + m_Port,
                     NativeMethods.FileAccess.GENERIC_READ | NativeMethods.FileAccess.GENERIC_WRITE,
-                    NativeMethods.FileShare.FILE_SHARE_NONE, 
+                    NativeMethods.FileShare.FILE_SHARE_NONE,
                     IntPtr.Zero,
                     NativeMethods.CreationDisposition.OPEN_EXISTING,
                     NativeMethods.FileAttributes.FILE_FLAG_OVERLAPPED,
@@ -173,7 +174,7 @@ namespace RJCP.IO.Ports
 
                 // Set the default parameters
                 UnsafeNativeMethods.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
-                
+
                 m_CommState = new CommState(m_ComPortHandle, m_CommState);
                 m_CommProperties = new CommProperties(m_ComPortHandle);
                 m_CommModem = new CommModemStatus(m_ComPortHandle);
@@ -253,7 +254,7 @@ namespace RJCP.IO.Ports
             /// <summary>
             /// Close the file handle and release resources.
             /// </summary>
-            public void Close() 
+            public void Close()
             {
                 if (!IsDisposed && IsOpen) {
                     m_CommIo.Stop();

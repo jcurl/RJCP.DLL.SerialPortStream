@@ -106,7 +106,7 @@ namespace RJCP.IO.Ports
         /// This constructor initialises a stream object, but doesn't assign it to any COM port.
         /// The properties then assume default settings. No COM port is opened and queried.
         /// </remarks>
-        public SerialPortStream():this(null) { }
+        public SerialPortStream() : this(null) { }
 
         /// <summary>
         /// Constructor. Create a stream that connects to the specified port.
@@ -134,7 +134,8 @@ namespace RJCP.IO.Ports
         /// </remarks>
         /// <param name="port">The name of the COM port, such as "COM1" or "COM33".</param>
         /// <param name="baud">The baud rate that is passed to the underlying driver.</param>
-        public SerialPortStream(string port, int baud): this(port)
+        public SerialPortStream(string port, int baud)
+            : this(port)
         {
             BaudRate = baud;
         }
@@ -156,7 +157,8 @@ namespace RJCP.IO.Ports
         /// supports the data bits provided. The special type 16X is not supported.</param>
         /// <param name="parity">The parity for the data stream.</param>
         /// <param name="stopbits">Number of stop bits.</param>
-        public SerialPortStream(string port, int baud, int data, Ports.Parity parity, StopBits stopbits):this(port)
+        public SerialPortStream(string port, int baud, int data, Ports.Parity parity, StopBits stopbits)
+            : this(port)
         {
             BaudRate = baud;
             DataBits = data;
@@ -471,7 +473,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Event raised when Modem PIN changes are detected.
         /// </summary>
-        public event SerialPinChangedEventHandler PinChanged; 
+        public event SerialPinChangedEventHandler PinChanged;
         #endregion
 
         #region Computer Configuration and Ports
@@ -589,7 +591,8 @@ namespace RJCP.IO.Ports
         /// </summary>
         private Decoder Decoder
         {
-            get {
+            get
+            {
                 if (m_Encoding != null) {
                     if (m_Decoder == null) m_Decoder = m_Encoding.GetDecoder();
                     return m_Decoder;
@@ -696,7 +699,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
                 if (value < 0) {
-                     m_ReadTimeout = -1;
+                    m_ReadTimeout = -1;
                 } else {
                     m_ReadTimeout = value;
                 }
@@ -742,7 +745,7 @@ namespace RJCP.IO.Ports
                 if (value <= 0) throw new ArgumentOutOfRangeException("value", "Must be a positive value (1 or greater)");
                 if (value > m_SerialPort.SerialPortIo.ReadBufferSize)
                     throw new ArgumentOutOfRangeException("value", "Must be less or equal to the ReadBufferSize");
-                
+
                 // Only raise an event if we think that we wouldn't have received an event otherwise
                 int btr = m_SerialPort.SerialPortIo.BytesToRead;
                 if (btr < m_RxThreshold && btr > value) {
@@ -918,7 +921,7 @@ namespace RJCP.IO.Ports
             if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
             if (count == 0) return 0;
-            
+
             // Dealing with cached characters read by the ReadTo() method
             int cached = 0;
             ReadToOverflowCheck();
@@ -1123,7 +1126,7 @@ namespace RJCP.IO.Ports
                                 m_TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadTo: m_ReadIncomplete == false; m_Read.Free == 0");
                                 m_TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadTo: m_Read.Consume(1)");
                                 m_TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadTo: m_ReadOffset = {0} - {1}", m_ReadOffset, m_ReadOffsets[0]);
-                                
+
                                 // Discard the oldest character in preference for the newer character
                                 if (m_ReadOverflow == -1) {
                                     // Overflow. We capture the first byte, because we'll have to reset the decoder later
@@ -1762,7 +1765,7 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-                if (!Enum.IsDefined(typeof(StopBits), value)) 
+                if (!Enum.IsDefined(typeof(StopBits), value))
                     throw new ArgumentOutOfRangeException("value", "Unknown setting for StopBits");
 
                 m_SerialPort.SerialPortCommState.StopBits = value;
@@ -1818,7 +1821,7 @@ namespace RJCP.IO.Ports
                 if (IsOpen) {
                     try {
                         m_SerialPort.SerialPortCommState.SetCommState();
-                    }  catch {
+                    } catch {
                         m_SerialPort.SerialPortCommState.ParityEnable = parityEnabled;
                         m_SerialPort.SerialPortCommState.Parity = parity;
                         m_SerialPort.SerialPortCommState.ErrorCharEnabled = errorEnabled;
@@ -1846,7 +1849,7 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-                
+
                 m_ParityReplace = value;
                 if (Parity != Ports.Parity.None) {
                     if (value == 0) {
