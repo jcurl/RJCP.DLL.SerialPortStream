@@ -2193,7 +2193,7 @@ namespace RJCP.IO.Ports
         /// </remarks>
         private void CallEvent()
         {
-            if (m_EventProcessing.WaitOne(0)) return;
+            if (IsDisposed || m_EventProcessing.WaitOne(0)) return;
             m_EventProcessing.Set();
 
             ThreadPool.QueueUserWorkItem(HandleEvent);
@@ -2214,6 +2214,7 @@ namespace RJCP.IO.Ports
 
             bool handleEvent;
             lock (m_EventCheck) {
+                if (IsDisposed) return;
                 handleEvent = (m_CommEvent != 0) || (m_CommErrorEvent != 0);
                 commEvent = m_CommEvent;
                 m_CommEvent = 0;
@@ -2224,60 +2225,53 @@ namespace RJCP.IO.Ports
             while (handleEvent) {
                 // Received Data
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RXFLAG) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Eof));
                 } else if ((commEvent & NativeMethods.SerialEventMask.EV_RXCHAR) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
-                    if (m_SerialPort.SerialPortIo.BytesToRead >= m_RxThreshold) {
+                    bool aboveThreshold;
+                    lock (m_EventCheck) {
+                        aboveThreshold = m_SerialPort.SerialPortIo.BytesToRead >= m_RxThreshold;
+                    }
+                    if (aboveThreshold) {
                         OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Chars));
                     }
                 }
 
                 // Modem Pin States
                 if ((commEvent & NativeMethods.SerialEventMask.EV_CTS) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RING) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Ring));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RLSD) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_DSR) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_BREAK) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Break));
                 }
 
                 // Error States
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_TXFULL) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.TXFull));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_FRAME) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Frame));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXPARITY) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXParity));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_OVERRUN) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.Overrun));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXOVER) != 0) {
-                    lock (m_EventCheck) { if (IsDisposed) { handleEvent = false; break; } }
                     OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXOver));
                 }
 
                 lock (m_EventCheck) {
+                    if (IsDisposed) return;
                     handleEvent = (m_CommEvent != 0) || (m_CommErrorEvent != 0);
                     commEvent = m_CommEvent;
                     m_CommEvent = 0;
@@ -2286,7 +2280,10 @@ namespace RJCP.IO.Ports
                 }
             }
 
-            m_EventProcessing.Reset();
+            lock (m_EventCheck) {
+                if (IsDisposed) return;
+                m_EventProcessing.Reset();
+            };
         }
 
         private void OnDataReceived(SerialDataReceivedEventArgs args)
