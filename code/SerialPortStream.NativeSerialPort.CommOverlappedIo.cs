@@ -500,7 +500,7 @@ namespace RJCP.IO.Ports
                 /// a failure in obtaining the information, zero is returned.
                 /// </summary>
                 /// <param name="bytesInRecvQueue">Output indicating number of bytes in queue but not read by ReadFile.</param>
-                /// <param name="eofReceived">Output indicating whether an EOF character was received<./param>
+                /// <param name="eofReceived">Output indicating whether an EOF character was received.</param>
                 /// <returns>true if the stats were received, otherwise false.</returns>
                 /// <remarks>
                 /// Getting this information has the side effect of processing and clearing any serial port
@@ -1140,10 +1140,21 @@ namespace RJCP.IO.Ports
                         // If we have a read pending, we don't request events
                         // for reading data. To do so will result in errors. 
                         // Have no idea why.
-                        if (!readPending) {
-                            UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
-                        } else {
+                        if (readPending) {
                             UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskReadPending);
+                        } else {
+                            UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
+
+                            // While the comm event mask was set to ignore read events, data could have been written
+                            // to the input queue. Check for that and if there are bytes waiting or EOF was received,
+                            // set the appropriate flags.
+                            uint bytesInQueue;
+                            bool eofReceived;
+                            if (GetReceiveStats(out bytesInQueue, out eofReceived) && (bytesInQueue > 0 || eofReceived)) {
+                                // Tell DoReadEvent that there is data pending
+                                m_ReadByteAvailable = true;
+                                if (eofReceived) m_ReadByteEof |= EofByte.InDriver;
+                            }
                         }
 #else
                         UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
