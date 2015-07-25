@@ -134,7 +134,7 @@ namespace RJCP.IO.Ports
     /// <summary>
     /// EventArgs for DataReceived
     /// </summary>
-    public class SerialDataReceivedEventArgs  : EventArgs
+    public class SerialDataReceivedEventArgs : EventArgs
     {
         private SerialData m_EventType;
 
@@ -230,7 +230,7 @@ namespace RJCP.IO.Ports
     /// </summary>
     /// <param name="sender">Object raising the event</param>
     /// <param name="e">Event arguments</param>
-    public delegate void SerialErrorReceivedEventHandler(object sender, SerialErrorReceivedEventArgs e); 
+    public delegate void SerialErrorReceivedEventHandler(object sender, SerialErrorReceivedEventArgs e);
 
     /// <summary>
     /// Event related data on PinChanged
@@ -298,6 +298,6 @@ namespace RJCP.IO.Ports
     /// </summary>
     /// <param name="sender">Object raising the event</param>
     /// <param name="e">Event arguments</param>
-    public delegate void SerialPinChangedEventHandler(object sender, SerialPinChangedEventArgs e); 
-#endregion
+    public delegate void SerialPinChangedEventHandler(object sender, SerialPinChangedEventArgs e);
+    #endregion
 }

@@ -95,8 +95,8 @@ namespace RJCP.Datastructures
         {
             if (count < 0) throw new ArgumentOutOfRangeException("count", "must be positive");
             if (count > array.Length)
-                throw new ArgumentOutOfRangeException("Count (" + count.ToString() + 
-                    ") exceeds the array boundaries (" + array.Length.ToString()+")");
+                throw new ArgumentOutOfRangeException("Count (" + count.ToString() +
+                    ") exceeds the array boundaries (" + array.Length.ToString() + ")");
 
             m_Array = array;
             m_Start = 0;
@@ -206,7 +206,7 @@ namespace RJCP.Datastructures
         /// </remarks>
         public int WriteLength
         {
-            get 
+            get
             {
                 if (m_Start + m_Count >= m_Array.Length) return m_Array.Length - m_Count;
                 return m_Array.Length - m_Start - m_Count;
@@ -225,7 +225,7 @@ namespace RJCP.Datastructures
         /// </remarks>
         public int ReadLength
         {
-            get 
+            get
             {
                 if (m_Start + m_Count >= m_Array.Length) return m_Array.Length - m_Start;
                 return m_Count;
@@ -290,8 +290,8 @@ namespace RJCP.Datastructures
         public void Consume(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException("length", "must be positive");
-            if (length > m_Count) 
-                throw new ArgumentOutOfRangeException("Can't consume more data than exists: Length=" + 
+            if (length > m_Count)
+                throw new ArgumentOutOfRangeException("Can't consume more data than exists: Length=" +
                     m_Count.ToString() + "; Consume=" + length.ToString());
 
             // Note, some implementations may rely on the pointers being correctly advanced also in
@@ -961,7 +961,7 @@ namespace RJCP.Datastructures
                 int bu;
                 int cu;
                 try {
-                    encoder.Convert(chars, charIndex, charCount, 
+                    encoder.Convert(chars, charIndex, charCount,
                         bytes.Array, bytes.End, bytes.WriteLength,
                         flush, out cu, out bu, out completed);
                     charCount -= cu;
