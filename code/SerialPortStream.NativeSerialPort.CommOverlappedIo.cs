@@ -208,7 +208,7 @@ namespace RJCP.IO.Ports
                 /// Constructor, based on an already opened serial port.
                 /// </summary>
                 /// <param name="handle">The ComPort handle to use</param>
-                public CommOverlappedIo(SafeFileHandle handle):this(handle, null, null) { }
+                public CommOverlappedIo(SafeFileHandle handle) : this(handle, null, null) { }
 
                 /// <summary>
                 /// Constructor, copying properties from another instance.
@@ -482,17 +482,47 @@ namespace RJCP.IO.Ports
                     {
                         int bytes = 0;
                         lock (m_ReadLock) {
-                            if (IsRunning) {
-                                NativeMethods.ComStatErrors cErr;
-                                NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
-                                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, out comStat);
-                                if (result) bytes += (int)comStat.cbInQue;
+                            uint bytesInRecvQueue;
+                            bool eofReceived;
+                            if (GetReceiveStats(out bytesInRecvQueue, out eofReceived)) {
+                                bytes += (int)bytesInRecvQueue;
                             }
                             if (m_Buffers != null) {
                                 bytes += m_Buffers.ReadBuffer.Length;
                             }
                         }
                         return bytes;
+                    }
+                }
+
+                /// <summary>
+                /// Gets the status of bytes received by the serial provider that haven't been read yet. If there is
+                /// a failure in obtaining the information, zero is returned.
+                /// </summary>
+                /// <param name="bytesInRecvQueue">Output indicating number of bytes in queue but not read by ReadFile.</param>
+                /// <param name="eofReceived">Output indicating whether an EOF character was received<./param>
+                /// <returns>true if the stats were received, otherwise false.</returns>
+                /// <remarks>
+                /// Getting this information has the side effect of processing and clearing any serial port
+                /// errors and firing CommErrorEvent.
+                /// </remarks>
+                private bool GetReceiveStats(out uint bytesInRecvQueue, out bool eofReceived)
+                {
+                    lock (m_ReadLock) {
+                        bytesInRecvQueue = 0;
+                        eofReceived = false;
+                        if (IsRunning) {
+                            NativeMethods.ComStatErrors cErr;
+                            NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
+                            if (UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, out comStat)) {
+                                if (cErr != 0) OnCommErrorEvent(cErr);
+                                bytesInRecvQueue = comStat.cbInQue;
+                                eofReceived = ((comStat.Flags & NativeMethods.ComStatFlags.Eof) == NativeMethods.ComStatFlags.Eof);
+                                return true;
+                            }
+                            m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "{0}: SerialThread: BytesInSerialQueue: ClearCommError() error {1}", Name, cErr.ToString());
+                        }
+                        return false;
                     }
                 }
 
@@ -1052,7 +1082,7 @@ namespace RJCP.IO.Ports
                     NativeMethods.SerialEventMask.EV_RX80FULL |
                     NativeMethods.SerialEventMask.EV_RXFLAG;
 
-                private const NativeMethods.SerialEventMask maskReadPending = 
+                private const NativeMethods.SerialEventMask maskReadPending =
                     NativeMethods.SerialEventMask.EV_BREAK |
                     NativeMethods.SerialEventMask.EV_CTS |
                     NativeMethods.SerialEventMask.EV_DSR |
@@ -1127,7 +1157,7 @@ namespace RJCP.IO.Ports
                             if (!m_ReadBufferNotFullEvent.WaitOne(0)) {
                                 m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Read Buffer Full", Name);
                                 handles.Add(m_ReadBufferNotFullEvent);
-                            } else { 
+                            } else {
                                 readPending = DoReadEvent(ref readOverlapped);
                             }
                         }
@@ -1154,7 +1184,7 @@ namespace RJCP.IO.Ports
                                 m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Thread closing", Name);
                                 result = UnsafeNativeMethods.CancelIo(m_ComPortHandle);
                                 if (!result) {
-                                    m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0, 
+                                    m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0,
                                         "{0}: SerialThread: CancelIo error {1}", Name, Marshal.GetLastWin32Error());
                                 }
                                 running = false;
@@ -1216,7 +1246,7 @@ namespace RJCP.IO.Ports
                                 if (writePending) {
                                     m_Trace.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: PurgeComm() write pending", Name);
                                     m_PurgePending = true;
-                                    result = UnsafeNativeMethods.PurgeComm(m_ComPortHandle, 
+                                    result = UnsafeNativeMethods.PurgeComm(m_ComPortHandle,
                                         NativeMethods.PurgeFlags.PURGE_TXABORT | NativeMethods.PurgeFlags.PURGE_TXCLEAR);
                                     if (!result) {
                                         int e = Marshal.GetLastWin32Error();
