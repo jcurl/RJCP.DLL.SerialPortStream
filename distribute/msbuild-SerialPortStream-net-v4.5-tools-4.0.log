@@ -1,4 +1,4 @@
-Build started 01/08/2015 17:15:07.
+Build started 01/08/2015 17:15:50.
 Project "C:\Users\jcurl.HOME\Documents\Visual Studio 2012\Projects\serialportstream\code\SerialPortStream.csproj" on node 1 (Rebuild target(s)).
 CoreClean:
   Deleting file "C:\Users\jcurl.HOME\Documents\Visual Studio 2012\Projects\serialportstream\distribute\lib\net45\RJCP.SerialPortStream.dll".
@@ -23,4 +23,4 @@ Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:00.54
+Time Elapsed 00:00:00.52
