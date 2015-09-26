@@ -512,10 +512,12 @@ namespace RJCP.IO.Ports
         {
             Dictionary<string, PortDescription> list = new Dictionary<string, PortDescription>();
             using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
-                string[] k = local.GetValueNames();
-                foreach (string p in k) {
-                    string n = local.GetValue(p) as string;
-                    list.Add(n, new PortDescription(n, ""));
+                if (local != null) {
+                    string[] k = local.GetValueNames();
+                    foreach (string p in k) {
+                        string n = local.GetValue(p) as string;
+                        list.Add(n, new PortDescription(n, ""));
+                    }
                 }
             }
 
