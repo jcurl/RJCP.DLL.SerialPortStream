@@ -2227,49 +2227,49 @@ namespace RJCP.IO.Ports
             while (handleEvent) {
                 // Received Data
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RXFLAG) != 0) {
-                    OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Eof));
+                    OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Eof));
                 } else if ((commEvent & NativeMethods.SerialEventMask.EV_RXCHAR) != 0) {
                     bool aboveThreshold;
                     lock (m_EventCheck) {
                         aboveThreshold = m_SerialPort.SerialPortIo.BytesToRead >= m_RxThreshold;
                     }
                     if (aboveThreshold) {
-                        OnDataReceived(new SerialDataReceivedEventArgs(SerialData.Chars));
+                        OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Chars));
                     }
                 }
 
                 // Modem Pin States
                 if ((commEvent & NativeMethods.SerialEventMask.EV_CTS) != 0) {
-                    OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
+                    OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RING) != 0) {
-                    OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Ring));
+                    OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Ring));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_RLSD) != 0) {
-                    OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
+                    OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_DSR) != 0) {
-                    OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
+                    OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
                 }
                 if ((commEvent & NativeMethods.SerialEventMask.EV_BREAK) != 0) {
-                    OnPinChanged(new SerialPinChangedEventArgs(SerialPinChange.Break));
+                    OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Break));
                 }
 
                 // Error States
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_TXFULL) != 0) {
-                    OnCommError(new SerialErrorReceivedEventArgs(SerialError.TXFull));
+                    OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.TXFull));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_FRAME) != 0) {
-                    OnCommError(new SerialErrorReceivedEventArgs(SerialError.Frame));
+                    OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Frame));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXPARITY) != 0) {
-                    OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXParity));
+                    OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXParity));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_OVERRUN) != 0) {
-                    OnCommError(new SerialErrorReceivedEventArgs(SerialError.Overrun));
+                    OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Overrun));
                 }
                 if ((commErrorEvent & NativeMethods.ComStatErrors.CE_RXOVER) != 0) {
-                    OnCommError(new SerialErrorReceivedEventArgs(SerialError.RXOver));
+                    OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXOver));
                 }
 
                 lock (m_EventCheck) {
@@ -2288,19 +2288,43 @@ namespace RJCP.IO.Ports
             };
         }
 
-        private void OnDataReceived(SerialDataReceivedEventArgs args)
+        /// <summary>
+        /// Handles the <see cref="DataReceived" /> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="SerialDataReceivedEventArgs"/> instance containing the event data.</param>
+        protected virtual void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
-            if (DataReceived != null) DataReceived(this, args);
+            SerialDataReceivedEventHandler handler = DataReceived;
+            if (handler != null) {
+                handler(sender, args);
+            }
         }
 
-        private void OnPinChanged(SerialPinChangedEventArgs args)
+        /// <summary>
+        /// Handles the <see cref="PinChanged" /> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="SerialPinChangedEventArgs"/> instance containing the event data.</param>
+        protected virtual void OnPinChanged(object sender, SerialPinChangedEventArgs args)
         {
-            if (PinChanged != null) PinChanged(this, args);
+            SerialPinChangedEventHandler handler = PinChanged;
+            if (handler != null) {
+                handler(sender, args);
+            }
         }
 
-        private void OnCommError(SerialErrorReceivedEventArgs args)
+        /// <summary>
+        /// Handles the <see cref="CommError" /> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="SerialErrorReceivedEventArgs"/> instance containing the event data.</param>
+        protected virtual void OnCommError(object sender, SerialErrorReceivedEventArgs args)
         {
-            if (ErrorReceived != null) ErrorReceived(this, args);
+            SerialErrorReceivedEventHandler handler = ErrorReceived;
+            if (handler != null) {
+                handler(sender, args);
+            }
         }
         #endregion
 
