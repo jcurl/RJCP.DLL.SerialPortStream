@@ -153,7 +153,7 @@ namespace RJCP.IO.Ports
         /// supports the data bits provided. The special type 16X is not supported.</param>
         /// <param name="parity">The parity for the data stream.</param>
         /// <param name="stopbits">Number of stop bits.</param>
-        public SerialPortStream(string port, int baud, int data, Ports.Parity parity, StopBits stopbits)
+        public SerialPortStream(string port, int baud, int data, Parity parity, StopBits stopbits)
             : this(port)
         {
             BaudRate = baud;
@@ -228,9 +228,9 @@ namespace RJCP.IO.Ports
                     // what normal values should be.
                     BaudRate = 115200;
                     DataBits = 8;
-                    Parity = Ports.Parity.None;
-                    StopBits = Ports.StopBits.One;
-                    Handshake = Ports.Handshake.None;
+                    Parity = Parity.None;
+                    StopBits = StopBits.One;
+                    Handshake = Handshake.None;
                     TxContinueOnXOff = false;
                     DiscardNull = false;
                     XOnLimit = 2048;
@@ -249,8 +249,8 @@ namespace RJCP.IO.Ports
 
                         BaudRate = 115200;
                         DataBits = 8;
-                        Parity = Ports.Parity.None;
-                        StopBits = Ports.StopBits.One;
+                        Parity = Parity.None;
+                        StopBits = StopBits.One;
                     }
                 }
 
@@ -302,8 +302,8 @@ namespace RJCP.IO.Ports
 
             // Ensure the parity settings are consistent
             if (!m_SerialPort.SerialPortCommState.ParityEnable) {
-                if (m_SerialPort.SerialPortCommState.Parity != Ports.Parity.None) {
-                    m_SerialPort.SerialPortCommState.Parity = Ports.Parity.None;
+                if (m_SerialPort.SerialPortCommState.Parity != Parity.None) {
+                    m_SerialPort.SerialPortCommState.Parity = Parity.None;
                     setPort = true;
                 }
             }
@@ -314,7 +314,7 @@ namespace RJCP.IO.Ports
             // implementation by Microsoft.
             m_ParityReplace = m_SerialPort.SerialPortCommState.ErrorChar;
             if (m_ParityReplace == 0 && m_SerialPort.SerialPortCommState.ErrorCharEnabled &&
-                m_SerialPort.SerialPortCommState.ParityEnable && m_SerialPort.SerialPortCommState.Parity != Ports.Parity.None) {
+                m_SerialPort.SerialPortCommState.ParityEnable && m_SerialPort.SerialPortCommState.Parity != Parity.None) {
                 m_ParityReplace = 126;
             }
 
@@ -872,7 +872,7 @@ namespace RJCP.IO.Ports
                 return ar;
             } else {
                 // No data in buffer, so we create a thread in the background
-                ReadDelegate read = this.InternalBlockingRead;
+                ReadDelegate read = InternalBlockingRead;
                 return read.BeginInvoke(buffer, offset, count, callback, state);
             }
         }
@@ -948,7 +948,7 @@ namespace RJCP.IO.Ports
             int timeout = m_ReadTimeout;
             do {
                 if (!m_SerialPort.SerialPortIo.WaitForReadEvent(timeout)) return 0;
-                int c = m_SerialPort.SerialPortIo.Read(buffer, offset, count, this.Decoder);
+                int c = m_SerialPort.SerialPortIo.Read(buffer, offset, count, Decoder);
                 if (c > 0) return c;
                 timeout = t.RemainingTime();
             } while (timeout > 0);
@@ -997,7 +997,7 @@ namespace RJCP.IO.Ports
             int timeout = m_ReadTimeout;
             do {
                 if (!m_SerialPort.SerialPortIo.WaitForReadEvent(timeout)) return -1;
-                int c = m_SerialPort.SerialPortIo.ReadChar(this.Decoder);
+                int c = m_SerialPort.SerialPortIo.ReadChar(Decoder);
                 if (c != -1) return c;
                 timeout = t.RemainingTime();
             } while (timeout > 0);
@@ -1291,7 +1291,7 @@ namespace RJCP.IO.Ports
             int b = m_SerialPort.SerialPortIo.BufferedBytesToRead;
             while (b > 0) {
                 int bytesUsed;
-                int cr = m_SerialPort.SerialPortIo.Read(c, 0, c.Length, this.Decoder, out bytesUsed);
+                int cr = m_SerialPort.SerialPortIo.Read(c, 0, c.Length, Decoder, out bytesUsed);
                 b -= bytesUsed;
                 sb.Append(c, 0, cr);
 
@@ -1511,7 +1511,7 @@ namespace RJCP.IO.Ports
                 if (callback != null) callback(ar);
                 return ar;
             } else {
-                WriteDelegate write = this.InternalBlockingWrite;
+                WriteDelegate write = InternalBlockingWrite;
                 return write.BeginInvoke(buffer, offset, count, callback, state);
             }
         }
@@ -1550,7 +1550,7 @@ namespace RJCP.IO.Ports
                 throw new InvalidOperationException("Serial I/O Thread not running");
             }
 
-            int bytes = this.Encoding.GetByteCount(buffer, offset, count);
+            int bytes = Encoding.GetByteCount(buffer, offset, count);
             if (bytes > m_SerialPort.SerialPortIo.WriteBufferSize) {
                 throw new InvalidOperationException("Insufficient buffer for the data requested");
             }
@@ -1558,7 +1558,7 @@ namespace RJCP.IO.Ports
                 throw new TimeoutException("Couldn't write into buffer");
             }
 
-            byte[] bbuffer = this.Encoding.GetBytes(buffer, offset, count);
+            byte[] bbuffer = Encoding.GetBytes(buffer, offset, count);
             m_SerialPort.SerialPortIo.Write(bbuffer, 0, bbuffer.Length);
         }
 
@@ -1573,7 +1573,7 @@ namespace RJCP.IO.Ports
                 throw new InvalidOperationException("Serial I/O Thread not running");
             }
 
-            int bytes = this.Encoding.GetByteCount(text);
+            int bytes = Encoding.GetByteCount(text);
             if (bytes > m_SerialPort.SerialPortIo.WriteBufferSize) {
                 throw new InvalidOperationException("Insufficient buffer for the data requested");
             }
@@ -1581,7 +1581,7 @@ namespace RJCP.IO.Ports
                 throw new TimeoutException("Couldn't write into buffer");
             }
 
-            byte[] bbuffer = this.Encoding.GetBytes(text);
+            byte[] bbuffer = Encoding.GetBytes(text);
             m_SerialPort.SerialPortIo.Write(bbuffer, 0, bbuffer.Length);
         }
 
@@ -1780,28 +1780,28 @@ namespace RJCP.IO.Ports
         /// communications, parity is often one of the parameters that must be agreed upon by sending parties
         /// and receiving parties before transmission can take place.
         /// </remarks>
-        public Ports.Parity Parity
+        public Parity Parity
         {
             get
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
                 if (m_SerialPort.SerialPortCommState.ParityEnable) return m_SerialPort.SerialPortCommState.Parity;
-                return Ports.Parity.None;
+                return Parity.None;
             }
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-                if (!Enum.IsDefined(typeof(Ports.Parity), value))
+                if (!Enum.IsDefined(typeof(Parity), value))
                     throw new ArgumentOutOfRangeException("value", "Unknown setting for Parity");
 
-                Ports.Parity parity = m_SerialPort.SerialPortCommState.Parity;
+                Parity parity = m_SerialPort.SerialPortCommState.Parity;
                 bool parityEnabled = m_SerialPort.SerialPortCommState.ParityEnable;
                 byte errorChar = m_SerialPort.SerialPortCommState.ErrorChar;
                 bool errorEnabled = m_SerialPort.SerialPortCommState.ErrorCharEnabled;
 
-                if (value == Ports.Parity.None) {
+                if (value == Parity.None) {
                     m_SerialPort.SerialPortCommState.ParityEnable = false;
-                    m_SerialPort.SerialPortCommState.Parity = Ports.Parity.None;
+                    m_SerialPort.SerialPortCommState.Parity = Parity.None;
                     m_SerialPort.SerialPortCommState.ErrorCharEnabled = false;
                     m_SerialPort.SerialPortCommState.ErrorChar = 0;
                 } else {
@@ -1849,7 +1849,7 @@ namespace RJCP.IO.Ports
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
 
                 m_ParityReplace = value;
-                if (Parity != Ports.Parity.None) {
+                if (Parity != Parity.None) {
                     if (value == 0) {
                         m_SerialPort.SerialPortCommState.ErrorCharEnabled = false;
                         m_SerialPort.SerialPortCommState.ErrorChar = 0;
@@ -1971,26 +1971,26 @@ namespace RJCP.IO.Ports
         {
             get
             {
-                Handshake handshake = Ports.Handshake.None;
-                if (m_SerialPort.SerialPortCommState.RtsControl == NativeSerialPort.RtsControl.Handshake) handshake |= Ports.Handshake.Rts;
-                if (m_SerialPort.SerialPortCommState.DtrControl == NativeSerialPort.DtrControl.Handshake) handshake |= Ports.Handshake.Dtr;
-                if (m_SerialPort.SerialPortCommState.InX) handshake |= Ports.Handshake.XOn;
+                Handshake handshake = Handshake.None;
+                if (m_SerialPort.SerialPortCommState.RtsControl == NativeSerialPort.RtsControl.Handshake) handshake |= Handshake.Rts;
+                if (m_SerialPort.SerialPortCommState.DtrControl == NativeSerialPort.DtrControl.Handshake) handshake |= Handshake.Dtr;
+                if (m_SerialPort.SerialPortCommState.InX) handshake |= Handshake.XOn;
                 return handshake;
             }
             set
             {
-                bool rts = (value & Ports.Handshake.Rts) != 0;
+                bool rts = (value & Handshake.Rts) != 0;
                 m_SerialPort.SerialPortCommState.OutCtsFlow = rts;
                 m_SerialPort.SerialPortCommState.RtsControl = rts ? NativeSerialPort.RtsControl.Handshake : NativeSerialPort.RtsControl.Enable;
                 if (IsOpen && !rts) m_SerialPort.SerialPortModemStatus.SetRts(true);
 
-                bool dtr = (value & Ports.Handshake.Dtr) != 0;
+                bool dtr = (value & Handshake.Dtr) != 0;
                 m_SerialPort.SerialPortCommState.OutDsrFlow = dtr;
                 m_SerialPort.SerialPortCommState.DsrSensitivity = dtr;
                 m_SerialPort.SerialPortCommState.DtrControl = dtr ? NativeSerialPort.DtrControl.Handshake : NativeSerialPort.DtrControl.Enable;
                 if (IsOpen && !dtr) m_SerialPort.SerialPortModemStatus.SetDtr(true);
 
-                bool xon = (value & Ports.Handshake.XOn) != 0;
+                bool xon = (value & Handshake.XOn) != 0;
                 m_SerialPort.SerialPortCommState.InX = xon;
                 m_SerialPort.SerialPortCommState.OutX = xon;
 
@@ -2311,7 +2311,7 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// Handles the <see cref="CommError" /> event.
+        /// Handles the <see cref="ErrorReceived" /> event.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="args">The <see cref="SerialErrorReceivedEventArgs"/> instance containing the event data.</param>
@@ -2387,19 +2387,19 @@ namespace RJCP.IO.Ports
 
             char p;
             switch (Parity) {
-            case Ports.Parity.Even: p = 'E'; break;
-            case Ports.Parity.Mark: p = 'M'; break;
-            case Ports.Parity.None: p = 'N'; break;
-            case Ports.Parity.Odd: p = 'O'; break;
-            case Ports.Parity.Space: p = 'S'; break;
+            case Parity.Even: p = 'E'; break;
+            case Parity.Mark: p = 'M'; break;
+            case Parity.None: p = 'N'; break;
+            case Parity.Odd: p = 'O'; break;
+            case Parity.Space: p = 'S'; break;
             default: p = '?'; break;
             }
 
             string s;
             switch (StopBits) {
-            case Ports.StopBits.One: s = "1"; break;
-            case Ports.StopBits.One5: s = "1.5"; break;
-            case Ports.StopBits.Two: s = "2"; break;
+            case StopBits.One: s = "1"; break;
+            case StopBits.One5: s = "1.5"; break;
+            case StopBits.Two: s = "2"; break;
             default: s = "?"; break;
             }
 

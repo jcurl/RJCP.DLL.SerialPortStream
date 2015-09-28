@@ -95,7 +95,7 @@ namespace RJCP.IO.Ports
                 /// </summary>
                 /// <param name="stopbits">The number of stop bits the user wants to set.</param>
                 /// <returns><b>true</b> if the number of stop bits is indicated as supported.</returns>
-                public bool IsValidStopBits(Ports.StopBits stopbits)
+                public bool IsValidStopBits(StopBits stopbits)
                 {
                     switch (stopbits) {
                     case StopBits.One: return m_CommProp.dwSettableDataStopParity[(int)NativeMethods.SettableStopParity.STOPBITS_10];
@@ -110,7 +110,7 @@ namespace RJCP.IO.Ports
                 /// </summary>
                 /// <param name="parity">The parity the user wants to set.</param>
                 /// <returns><b>true</b> if the parity is indicated as supported.</returns>
-                public bool IsValidParity(Ports.Parity parity)
+                public bool IsValidParity(Parity parity)
                 {
                     switch (parity) {
                     case Parity.None: return m_CommProp.dwSettableDataStopParity[(int)NativeMethods.SettableStopParity.PARITY_NONE];
