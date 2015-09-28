@@ -1,19 +1,16 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2014
+// Copyright © Jason Curl 2012-2015
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.IO.Ports
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using System.IO;
     using System.Runtime.InteropServices;
-    using System.Collections.Specialized;
     using Microsoft.Win32.SafeHandles;
-    using RJCP.IO.Ports.Native;
+    using Native;
 
     public partial class SerialPortStream
     {

@@ -1,14 +1,13 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2013.
+// Copyright © Jason Curl 2012-2015.
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 namespace RJCP.Datastructures
 {
     using System;
     using System.Diagnostics;
-    using System.Text;
 
     /// <summary>
     /// A class to maintain how much time is remaining since the last reset, until

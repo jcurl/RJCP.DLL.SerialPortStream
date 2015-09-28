@@ -7,8 +7,6 @@
 namespace RJCP.IO.Ports
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
 
     /// <summary>
     /// The type of parity to use.

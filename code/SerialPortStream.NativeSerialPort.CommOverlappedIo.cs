@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2014
+// Copyright © Jason Curl 2012-2015
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 //#define STRESSTEST
@@ -16,8 +16,8 @@ namespace RJCP.IO.Ports
     using System.Runtime.InteropServices;
     using System.Threading;
     using Microsoft.Win32.SafeHandles;
-    using RJCP.Datastructures;
-    using RJCP.IO.Ports.Native;
+    using Datastructures;
+    using Native;
 
     public partial class SerialPortStream
     {
