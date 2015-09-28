@@ -1,7 +1,7 @@
 ﻿// $URL$
 // $Id$
 
-// Copyright © Jason Curl 2012-2014
+// Copyright © Jason Curl 2012-2015
 // See http://serialportstream.codeplex.com for license details (MS-PL License)
 
 // Enable the following define to enable behaviour in the number of bytes similar to the MS
@@ -19,8 +19,8 @@ namespace RJCP.IO.Ports
     using System.Threading;
     using System.Runtime.Remoting.Messaging;
     using Microsoft.Win32;
-    using RJCP.Datastructures;
-    using RJCP.IO.Ports.Native;
+    using Datastructures;
+    using Native;
 
     /// <summary>
     /// The SerialPortStream is a stream class to communicate with serial port based devices.
@@ -43,7 +43,7 @@ namespace RJCP.IO.Ports
         #region Private Variables - ReadTo() implementation
         /// <summary>
         /// This is the maximum amount of buffer space to allocate when using the ReadTo().
-        /// method
+        /// method.
         /// </summary>
         private const int c_MaxLine = 1024;
 
@@ -60,13 +60,11 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// If the last byte has consumed byte data but not yet generated a character.
         /// </summary>
-        // CA1805: false is the default value
         private bool m_ReadIncomplete;
 
         /// <summary>
         /// Cached offset in the byte buffer which corresponds to the next character.
         /// </summary>
-        // CA1805: 0 is the default value
         private int m_ReadOffset;
 
         /// <summary>
@@ -81,13 +79,11 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// First character in the byte buffer in case of a read overflow.
         /// </summary>
-        // CA1805: '\0' is the default value
         private char m_ReadOverflowChar;
 
         /// <summary>
         /// Last string sought for.
         /// </summary>
-        // CA1805: Null is the default value
         private string m_ReadToString;
         #endregion
 
