@@ -1,5 +1,7 @@
-﻿// $URL$
-// $Id$
+﻿// Copyright © Jason Curl 2012-2016
+// Sources at https://github.com/jcurl/SerialPortStream
+// Licensed under the Microsoft Public License (Ms-PL)
+
 using System;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

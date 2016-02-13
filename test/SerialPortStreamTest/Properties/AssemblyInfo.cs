@@ -1,4 +1,8 @@
-﻿using System.Reflection;
+﻿// Copyright © Jason Curl 2012-2016
+// Sources at https://github.com/jcurl/SerialPortStream
+// Licensed under the Microsoft Public License (Ms-PL)
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
