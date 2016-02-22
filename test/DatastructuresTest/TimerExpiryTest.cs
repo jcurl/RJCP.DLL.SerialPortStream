@@ -1,18 +1,15 @@
 ﻿// Copyright © Jason Curl 2012-2016
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
-
-using System;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace RJCP.Datastructures.TimerExpiryTest
 {
-    [TestClass]
+    using NUnit.Framework;
+
+    [TestFixture]
     public class TimerExpiryTest
     {
-        [TestMethod]
-        [TestCategory("Datastructures/PassiveTimer")]
+        [Test]
+        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Basic()
         {
             TimerExpiry te = new TimerExpiry(200);
@@ -43,8 +40,8 @@ namespace RJCP.Datastructures.TimerExpiryTest
             }
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/PassiveTimer")]
+        [Test]
+        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Reset()
         {
             TimerExpiry te = new TimerExpiry(1000);
@@ -72,8 +69,8 @@ namespace RJCP.Datastructures.TimerExpiryTest
             Assert.IsTrue(te.RemainingTime() > 500);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/PassiveTimer")]
+        [Test]
+        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Reset2()
         {
             TimerExpiry te = new TimerExpiry(1000);
@@ -89,8 +86,8 @@ namespace RJCP.Datastructures.TimerExpiryTest
             Assert.IsTrue(te.RemainingTime() < 500);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/PassiveTimer")]
+        [Test]
+        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Negative()
         {
             TimerExpiry te = new TimerExpiry(-1);
@@ -107,8 +104,8 @@ namespace RJCP.Datastructures.TimerExpiryTest
 
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/PassiveTimer")]
+        [Test]
+        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Zero()
         {
             TimerExpiry te = new TimerExpiry(0);

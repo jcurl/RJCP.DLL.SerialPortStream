@@ -1,22 +1,18 @@
 ﻿// Copyright © Jason Curl 2012-2016
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
-
-using System;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RJCP.Datastructures;
-
 namespace RJCP.Datastructures.CircularBufferTest
 {
-    /// <summary>
-    /// Summary description for CircularBufferTest
-    /// </summary>
-    [TestClass]
+    using System;
+    using System.Text;
+    using NUnit.Framework;
+    using Datastructures;
+
+    [TestFixture]
     public class CircularBufferTest
     {
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_ProduceConsume()
         {
             CircularBuffer<byte> cb = new CircularBuffer<byte>(50);
@@ -105,8 +101,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(25, cb.WriteLength);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_Indexing()
         {
             CircularBuffer<byte> cb = new CircularBuffer<byte>(50);
@@ -139,8 +135,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             }
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_ReadBlock()
         {
             CircularBuffer<byte> cb = new CircularBuffer<byte>(50);
@@ -163,8 +159,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(0, cb.GetReadBlock(50));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_Revert()
         {
             CircularBuffer<byte> cb = new CircularBuffer<byte>(50);
@@ -201,8 +197,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(20, cb.WriteLength);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_ReadWrite()
         {
             CircularBuffer<byte> cb = new CircularBuffer<byte>(50);
@@ -223,8 +219,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             }
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_GetStringSimple()
         {
             CircularBuffer<char> cb = new CircularBuffer<char>(15);
@@ -245,8 +241,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.IsNull(cb.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_GetStringLength()
         {
             CircularBuffer<char> cb = new CircularBuffer<char>(15);
@@ -282,8 +278,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.IsNull(cb.GetString(20));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_GetStringOffsetLength()
         {
             CircularBuffer<char> cb = new CircularBuffer<char>(15);
@@ -325,8 +321,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.IsNull(cb.GetString(2, 20));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_AppendArray()
         {
             CircularBuffer<char> cb = new CircularBuffer<char>(20);
@@ -351,8 +347,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("12345678901234567890", cb.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_AppendBuffer()
         {
             CircularBuffer<char> cb1 = new CircularBuffer<char>(20);
@@ -427,8 +423,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("123456789012345", cb1.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_ConstructorArray()
         {
             byte[] m = new byte[] { 
@@ -467,8 +463,8 @@ namespace RJCP.Datastructures.CircularBufferTest
         /// This test places one byte of the Euro symbol at the end of the byte array
         /// that wraps around, to ensure multibyte arrays are handled correctly.
         /// </remarks>
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_Boundaries()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -503,8 +499,8 @@ namespace RJCP.Datastructures.CircularBufferTest
         /// This test places one byte of the Euro symbol at the end of the byte array
         /// that wraps around, to ensure multibyte arrays are handled correctly.
         /// </remarks>
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_BoundariesFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -541,8 +537,8 @@ namespace RJCP.Datastructures.CircularBufferTest
         /// char array to convert everything, but enough to convert the Euro
         /// symbol
         /// </remarks>
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_InsufficientCharSpace()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -571,8 +567,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", new string(c));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_InsufficientCharSpaceFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -601,8 +597,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", new string(c));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_InsufficientCharSpaceMbcs1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -630,8 +626,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€", new string(c));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_IncompleteBuff()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -667,8 +663,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("€@ABCDEFGHIJKLMN", new string(c, 0, 16));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_IncompleteBuffFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
@@ -695,8 +691,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ.", new string(c, 0, 13));
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_IncompleteBuffFlush2()
         {
             int bu;
@@ -724,8 +720,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(2, cb.Length);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars1()
         {
             int bu;
@@ -753,8 +749,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(0, cb.Length);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars2()
         {
             int bu;
@@ -788,8 +784,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             // behaviour in this case.
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars3()
         {
             int bu;
@@ -865,8 +861,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(2, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_Boundaries()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -893,8 +889,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_BoundariesFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -921,8 +917,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_InsufficientCharSpace()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -950,8 +946,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(8, cb.Length);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_InsufficientCharSpaceFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -979,8 +975,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(8, cb.Length);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_InsufficientCharSpaceMbcs1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1007,8 +1003,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_IncompleteBuff()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1045,8 +1041,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_IncompleteBuffFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
@@ -1074,8 +1070,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ.", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_IncompleteBuffFlush2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
@@ -1103,8 +1099,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(2, cb.Length);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars1a()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1132,8 +1128,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(0, cb.Length);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars1b()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1162,8 +1158,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(0, cb.Length);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1197,8 +1193,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             // behaviour in this case.
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars3()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1274,8 +1270,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(2, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_CircularFull()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1303,8 +1299,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_MultiChar1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1330,8 +1326,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("\uDB40\uDC840123456789@ABCDIJKLMNOPQRSTU", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert2_MultiChar2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1365,8 +1361,8 @@ namespace RJCP.Datastructures.CircularBufferTest
                 if (!e.ParamName.Equals("chars")) throw;
             }
         }
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert3_BoundariesWithFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1405,8 +1401,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.IsTrue(complete);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert3_CircularFull2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1434,8 +1430,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_Boundaries1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1461,8 +1457,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_Boundaries2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1489,8 +1485,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_BoundariesFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1517,8 +1513,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_InsufficientCharSpace()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1545,8 +1541,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_InsufficientCharSpaceFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1573,8 +1569,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_InsufficientCharSpaceMbcs1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1601,8 +1597,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ€", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_IncompleteBuff()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1636,8 +1632,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("€@ABCDEFGHIJKLMN", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_IncompleteBuffFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
@@ -1664,8 +1660,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ.", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_IncompleteBuffFlush2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
@@ -1692,8 +1688,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_Utf16Chars1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1720,8 +1716,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ\uDB40\uDC84", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_Utf16Chars2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
@@ -1748,8 +1744,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_DecoderConvert4_Utf16Chars3()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
@@ -1798,8 +1794,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(2, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1828,8 +1824,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.IsTrue(complete);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Full1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1856,8 +1852,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(0x43, cb[19]);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Full2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1883,8 +1879,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(0x43, cb[19]);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Overfill()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1908,8 +1904,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             }
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Boundaries()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1929,8 +1925,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(22, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Boundaries2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1950,8 +1946,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(22, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_BoundariesFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1971,8 +1967,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(22, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Boundaries2Flush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -1992,8 +1988,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(22, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpace()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2013,8 +2009,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(18, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpaceFlush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2034,8 +2030,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(18, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpace2()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2055,8 +2051,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(15, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpace2Flush()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2076,8 +2072,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(15, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars1()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2097,8 +2093,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(14, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars1a()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2118,8 +2114,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(14, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars2a()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2139,8 +2135,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(12, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars2b()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2160,8 +2156,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(12, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars3a()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2181,8 +2177,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(2, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars3b()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2202,8 +2198,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.AreEqual(2, cu);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars4a()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
@@ -2228,8 +2224,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.IsTrue(exception);
         }
 
-        [TestMethod]
-        [TestCategory("Datastructures/CircularBuffer")]
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBufferExt_EncoderConvert_Utf16Chars4b()
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
