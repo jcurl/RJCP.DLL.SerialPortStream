@@ -1,0 +1,8 @@
+/code/bin
+/code/obj
+/test/DatastructuresTest/bin
+/test/DatastructuresTest/obj
+/test/SerialPortStreamTest/bin
+/test/SerialPortStreamTest/obj
+/packages/NUnit.2.6.4
+/.vs
