@@ -579,5 +579,33 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 }
             }
         }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void SerialPortStream_Flush()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
+                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
+                src.Open(); Assert.IsTrue(src.IsOpen);
+                dst.Open(); Assert.IsTrue(dst.IsOpen);
+
+                byte[] sdata = new byte[512];
+                for (int i = 0; i < sdata.Length; i++) {
+                    sdata[i] = (byte)(64 + i % 48);
+                }
+
+                src.Write(sdata, 0, sdata.Length);
+                //System.Threading.Thread.Sleep(10);
+                src.Flush();
+                Assert.That(src.BytesToWrite, Is.EqualTo(0));
+
+                src.Write(sdata, 0, sdata.Length);
+                //System.Threading.Thread.Sleep(10);
+                src.Flush();
+                Assert.That(src.BytesToWrite, Is.EqualTo(0));
+            }
+        }
     }
 }
