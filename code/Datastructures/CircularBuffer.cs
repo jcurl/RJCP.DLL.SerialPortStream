@@ -641,9 +641,8 @@ namespace RJCP.Datastructures
                 sb.Append(buff.Array, buff.Start, buff.Capacity - buff.Start);
                 sb.Append(buff.Array, 0, length + buff.Start - buff.Capacity);
                 return sb.ToString();
-            } else {
-                return new string(buff.Array, buff.Start, length);
             }
+            return new string(buff.Array, buff.Start, length);
         }
 
         /// <summary>
