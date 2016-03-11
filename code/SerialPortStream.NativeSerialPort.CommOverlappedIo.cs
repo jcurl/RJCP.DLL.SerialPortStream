@@ -974,6 +974,7 @@ namespace RJCP.IO.Ports
                         bytes = m_Buffers.WriteBuffer.Append(buffer, offset, count);
                         // The serial thread can now send data to the serial port
                         m_WriteBufferNotEmptyEvent.Set();
+                        m_TxBufferEmpty.Reset();
                         m_TxEmptyEvent = false;
                     }
                     return bytes;

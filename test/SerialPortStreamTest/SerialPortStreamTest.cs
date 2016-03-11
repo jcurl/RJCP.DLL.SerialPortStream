@@ -597,12 +597,10 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 }
 
                 src.Write(sdata, 0, sdata.Length);
-                //System.Threading.Thread.Sleep(10);
                 src.Flush();
                 Assert.That(src.BytesToWrite, Is.EqualTo(0));
 
                 src.Write(sdata, 0, sdata.Length);
-                //System.Threading.Thread.Sleep(10);
                 src.Flush();
                 Assert.That(src.BytesToWrite, Is.EqualTo(0));
             }
