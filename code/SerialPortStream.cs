@@ -299,9 +299,9 @@ namespace RJCP.IO.Ports
             m_SerialPort.SerialPortCommState.Binary = true;
 
             // Ensure the parity settings are consistent
-            if (!m_SerialPort.SerialPortCommState.ParityEnable) {
-                if (m_SerialPort.SerialPortCommState.Parity != Parity.None) {
-                    m_SerialPort.SerialPortCommState.Parity = Parity.None;
+            if (m_SerialPort.SerialPortCommState.Parity != Parity.None) {
+                if (!m_SerialPort.SerialPortCommState.ParityEnable) {
+                    m_SerialPort.SerialPortCommState.ParityEnable = true;
                     setPort = true;
                 }
             }
