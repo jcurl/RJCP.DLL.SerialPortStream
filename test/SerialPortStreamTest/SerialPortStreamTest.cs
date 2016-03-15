@@ -187,7 +187,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 int c = 0;
                 byte[] rcvbuf = new byte[sendbuf.Length + 10];
                 while (rcv < rcvbuf.Length) {
-                    Trace.WriteLine("Begin Receive: Offset=" + rcv.ToString() + "; Count=" + (rcvbuf.Length - rcv).ToString());
+                    Console.WriteLine("Begin Receive: Offset=" + rcv.ToString() + "; Count=" + (rcvbuf.Length - rcv).ToString());
                     int b = dst.Read(rcvbuf, rcv, rcvbuf.Length - rcv);
                     if (b == 0) {
                         if (c == 0) break;
@@ -200,7 +200,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
                 bool dump = false;
                 if (rcv != sendbuf.Length) {
-                    Trace.WriteLine("Read length not the same as the amount of data sent (got " + rcv.ToString() + " bytes)");
+                    Console.WriteLine("Read length not the same as the amount of data sent (got " + rcv.ToString() + " bytes)");
                     dump = true;
                 }
                 for (int i = 0; i < sendbuf.Length; i++) {
@@ -212,14 +212,14 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 }
 
                 if (dump) {
-                    Trace.WriteLine("Send Buffer DUMP");
+                    Console.WriteLine("Send Buffer DUMP");
                     for (int i = 0; i < sendbuf.Length; i++) {
-                        Trace.WriteLine(sendbuf[i].ToString("X2"));
+                        Console.WriteLine(sendbuf[i].ToString("X2"));
                     }
 
-                    Trace.WriteLine("Receive Buffer DUMP");
+                    Console.WriteLine("Receive Buffer DUMP");
                     for (int i = 0; i < rcv; i++) {
-                        Trace.WriteLine(rcvbuf[i].ToString("X2"));
+                        Console.WriteLine(rcvbuf[i].ToString("X2"));
                     }
                 }
                 src.Close();
