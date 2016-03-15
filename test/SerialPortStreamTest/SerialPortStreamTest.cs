@@ -176,9 +176,9 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 Random r = new Random();
                 r.NextBytes(sendbuf);
 #else
-            for (int i = 0; i < sendbuf.Length; i++) {
-                sendbuf[i] = (byte)((i % 77) + 1);
-            }
+                for (int i = 0; i < sendbuf.Length; i++) {
+                    sendbuf[i] = (byte)((i % 77) + 1);
+                }
 #endif
                 src.Write(sendbuf, 0, sendbuf.Length);
 
