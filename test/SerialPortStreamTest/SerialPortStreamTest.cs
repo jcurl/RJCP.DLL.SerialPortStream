@@ -617,6 +617,56 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             }
         }
 
+        private void TestOddParity(SerialPortStream src, SerialPortStream dst)
+        {
+            src.Write(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F }, 0, 16);
+            src.Flush();
+
+            int offset = 0;
+            int counter = 0;
+            byte[] recv = new byte[256];
+            while (offset < 16 && counter < 10) {
+                offset += dst.Read(recv, offset, recv.Length - offset);
+                counter++;
+                Console.WriteLine("Buffer Bytes Received: {0}; Read attempts: {1}", offset, counter);
+            }
+
+            for (int i = 0; i < offset; i++) {
+                Console.WriteLine("Offset: {0} = {1:X2}", i, recv[i]);
+            }
+
+            Assert.That(offset, Is.EqualTo(16), "Expected 16 bytes received, but only got {0} bytes", offset);
+            byte[] expectedrecv = new byte[] { 0x80, 0x01, 0x02, 0x83, 0x04, 0x85, 0x86, 0x07, 0x08, 0x89, 0x8A, 0x0B, 0x8C, 0x0D, 0x0E, 0x8F };
+            for (int i = 0; i < offset; i++) {
+                Assert.That(recv[i], Is.EqualTo(expectedrecv[i]), "Offset {0} got {1}; expected {2}", i, recv[i], expectedrecv[i]);
+            }
+        }
+
+        private void TestEvenParity(SerialPortStream src, SerialPortStream dst)
+        {
+            src.Write(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F }, 0, 16);
+            src.Flush();
+
+            int offset = 0;
+            int counter = 0;
+            byte[] recv = new byte[256];
+            while (offset < 16 && counter < 10) {
+                offset += dst.Read(recv, offset, recv.Length - offset);
+                counter++;
+                Console.WriteLine("Buffer Bytes Received: {0}; Read attempts: {1}", offset, counter);
+            }
+
+            for (int i = 0; i < offset; i++) {
+                Console.WriteLine("Offset: {0} = {1:X2}", i, recv[i]);
+            }
+
+            Assert.That(offset, Is.EqualTo(16), "Expected 16 bytes received, but only got {0} bytes", offset);
+            byte[] expectedrecv = new byte[] { 0x00, 0x81, 0x82, 0x03, 0x84, 0x05, 0x06, 0x87, 0x88, 0x09, 0x0A, 0x8B, 0x0C, 0x8D, 0x8E, 0x0F };
+            for (int i = 0; i < offset; i++) {
+                Assert.That(recv[i], Is.EqualTo(expectedrecv[i]), "Offset {0} got {1}; expected {2}", i, recv[i], expectedrecv[i]);
+            }
+        }
+
         [Test]
         [Category("SerialPortStream")]
         public void SerialPortStream_OddParityLoopback()
@@ -626,27 +676,42 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 src.Open(); src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
                 dst.Open(); dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
 
-                src.Write(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F }, 0, 16);
-                src.Flush();
+                TestOddParity(src, dst);
+            }
+        }
 
-                int offset = 0;
-                int counter = 0;
-                byte[] recv = new byte[256];
-                while (offset < 16 && counter < 10) {
-                    offset += dst.Read(recv, offset, recv.Length - offset);
-                    counter++;
-                    Console.WriteLine("Buffer Bytes Received: {0}; Read attempts: {1}", offset, counter);
-                }
+        [Test]
+        [Category("SerialPortStream")]
+        public void SerialPortStream_EvenParityLoopback()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 7, Parity.Even, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
+                dst.Open(); dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
 
-                for (int i = 0; i < offset; i++) {
-                    Console.WriteLine("Offset: {0} = {1:X2}", i, recv[i]);
-                }
+                TestEvenParity(src, dst);
+            }
+        }
 
-                Assert.That(offset, Is.EqualTo(16), "Expected 16 bytes received, but only got {0} bytes", offset);
-                byte[] expectedrecv = new byte[] { 0x80, 0x01, 0x02, 0x83, 0x04, 0x85, 0x86, 0x07, 0x08, 0x89, 0x8A, 0x0B, 0x8C, 0x0D, 0x0E, 0x8F };
-                for (int i = 0; i < offset; i++) {
-                    Assert.That(recv[i], Is.EqualTo(expectedrecv[i]), "Offset {0} got {1}; expected {2}", i, recv[i], expectedrecv[i]);
-                }
+        [Test]
+        [Category("SerialPortStream")]
+        public void SerialPortStram_ParityChangeLoopback()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 7, Parity.Even, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
+                dst.Open(); dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
+                TestEvenParity(src, dst);
+
+                src.Parity = Parity.Odd;
+                dst.Parity = Parity.None;
+                TestOddParity(src, dst);
+
+                src.Parity = Parity.None;
+                src.DataBits = 8;
+                dst.DataBits = 7;
+                dst.Parity = Parity.Odd;
+                TestOddParity(dst, src);
             }
         }
     }

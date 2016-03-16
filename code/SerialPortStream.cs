@@ -298,14 +298,6 @@ namespace RJCP.IO.Ports
             // Binary mode must always be set per MSDN
             m_SerialPort.SerialPortCommState.Binary = true;
 
-            // Ensure the parity settings are consistent
-            if (m_SerialPort.SerialPortCommState.Parity != Parity.None) {
-                if (!m_SerialPort.SerialPortCommState.ParityEnable) {
-                    m_SerialPort.SerialPortCommState.ParityEnable = true;
-                    setPort = true;
-                }
-            }
-
             // Get the Error Char. Only if it is zero and parity is enabled, we change it to 126
             // This is because the interface can't provide for an error char of zero and active.
             // This is a limitation of the API as taken over from the System.IO.Ports.SerialPort
@@ -1783,8 +1775,7 @@ namespace RJCP.IO.Ports
             get
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-                if (m_SerialPort.SerialPortCommState.ParityEnable) return m_SerialPort.SerialPortCommState.Parity;
-                return Parity.None;
+                return m_SerialPort.SerialPortCommState.Parity;
             }
             set
             {
@@ -1797,14 +1788,12 @@ namespace RJCP.IO.Ports
                 byte errorChar = m_SerialPort.SerialPortCommState.ErrorChar;
                 bool errorEnabled = m_SerialPort.SerialPortCommState.ErrorCharEnabled;
 
+                m_SerialPort.SerialPortCommState.ParityEnable = true;
+                m_SerialPort.SerialPortCommState.Parity = value;
                 if (value == Parity.None) {
-                    m_SerialPort.SerialPortCommState.ParityEnable = false;
-                    m_SerialPort.SerialPortCommState.Parity = Parity.None;
                     m_SerialPort.SerialPortCommState.ErrorCharEnabled = false;
                     m_SerialPort.SerialPortCommState.ErrorChar = 0;
                 } else {
-                    m_SerialPort.SerialPortCommState.ParityEnable = true;
-                    m_SerialPort.SerialPortCommState.Parity = value;
                     if (m_ParityReplace == 0) {
                         m_SerialPort.SerialPortCommState.ErrorCharEnabled = false;
                         m_SerialPort.SerialPortCommState.ErrorChar = 0;
