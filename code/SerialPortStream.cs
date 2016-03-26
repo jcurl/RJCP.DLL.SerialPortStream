@@ -1950,7 +1950,7 @@ namespace RJCP.IO.Ports
         /// flow control is disabled, the DSR line is ignored. For more detailed information about
         /// how windows works with flow control, see the site:
         /// http://msdn.microsoft.com/en-us/library/ms810467.aspx. When DTR flow control is specified,
-        /// the fOutxDsrFlow is set along with fDsrSenstivity.</para>
+        /// the fOutxDsrFlow is set along with fDsrSensitivity.</para>
         /// <para>Note, the windows feature RTS_CONTROL_TOGGLE is not supported by this class. This
         /// is also not supported by the Microsoft implementation.</para>
         /// </remarks>
