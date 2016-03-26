@@ -93,8 +93,8 @@ namespace RJCP.Datastructures
         {
             if (count < 0) throw new ArgumentOutOfRangeException("count", "must be positive");
             if (count > array.Length)
-                throw new ArgumentOutOfRangeException("Count (" + count.ToString() +
-                    ") exceeds the array boundaries (" + array.Length.ToString() + ")");
+                throw new ArgumentOutOfRangeException("Count (" + count +
+                    ") exceeds the array boundaries (" + array.Length + ")");
 
             m_Array = array;
             m_Start = 0;
@@ -121,11 +121,11 @@ namespace RJCP.Datastructures
             if (count < 0) throw new ArgumentOutOfRangeException("count", "must be positive");
             if (offset < 0) throw new ArgumentOutOfRangeException("offset", "must be positive");
             if (count > array.Length)
-                throw new ArgumentOutOfRangeException("Count (" + count.ToString() +
-                    ") exceeds the array boundaries (" + array.Length.ToString() + ")");
+                throw new ArgumentOutOfRangeException("Count (" + count +
+                    ") exceeds the array boundaries (" + array.Length + ")");
             if (offset >= array.Length)
-                throw new ArgumentOutOfRangeException("Offset (" + offset.ToString() +
-                    ") exceeds the array boundaries (" + (array.Length - 1).ToString() + ")");
+                throw new ArgumentOutOfRangeException("Offset (" + offset +
+                    ") exceeds the array boundaries (" + (array.Length - 1) + ")");
 
             m_Array = array;
             m_Start = offset;
@@ -290,7 +290,7 @@ namespace RJCP.Datastructures
             if (length < 0) throw new ArgumentOutOfRangeException("length", "must be positive");
             if (length > m_Count)
                 throw new ArgumentOutOfRangeException("Can't consume more data than exists: Length=" +
-                    m_Count.ToString() + "; Consume=" + length.ToString());
+                    m_Count + "; Consume=" + length);
 
             // Note, some implementations may rely on the pointers being correctly advanced also in
             // the case that data is consumed.
@@ -309,7 +309,7 @@ namespace RJCP.Datastructures
             if (length < 0) throw new ArgumentOutOfRangeException("length", "must be positive");
             if (m_Count + length > m_Array.Length)
                 throw new ArgumentOutOfRangeException("length", "Can't produce more data than buffer size: Free=" +
-                    Free.ToString() + "; Produce=" + length.ToString());
+                    Free + "; Produce=" + length);
             m_Count += length;
         }
 
@@ -855,7 +855,7 @@ namespace RJCP.Datastructures
         /// Use a decoder to convert from an array of bytes into a char CircularBuffer.
         /// </summary>
         /// <param name="decoder">The decoder to do the conversion.</param>
-        /// <param name="bytes">The array of bytes to conver.</param>
+        /// <param name="bytes">The array of bytes to convert.</param>
         /// <param name="byteIndex">Start index in bytes array.</param>
         /// <param name="byteCount">Number of bytes to convert in the byte array.</param>
         /// <param name="chars">The circular buffer of chars to convert to.</param>

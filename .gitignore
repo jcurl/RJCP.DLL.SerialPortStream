@@ -6,3 +6,6 @@
 /test/SerialPortStreamTest/obj
 /packages/NUnit.2.6.4
 /.vs
+/*.suo
+/code/*.user
+*.GhostDoc.xml

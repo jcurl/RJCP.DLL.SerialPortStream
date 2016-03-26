@@ -2,14 +2,11 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.Native
+namespace RJCP.IO.Ports.Native.Windows
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Specialized;
-    using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Text;
 
     internal static class NativeMethods
     {

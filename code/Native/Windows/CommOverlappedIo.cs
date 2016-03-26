@@ -1,0 +1,807 @@
+﻿//#define STRESSTEST
+#define PL2303_WORKAROUNDS
+
+namespace RJCP.IO.Ports.Native.Windows
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading;
+    using System.Runtime.InteropServices;
+    using Microsoft.Win32.SafeHandles;
+
+    internal class CommOverlappedIo : IDisposable
+    {
+        #region Local variables
+        /// <summary>
+        /// Handle to the already opened COM Port.
+        /// </summary>
+        private readonly SafeFileHandle m_ComPortHandle;
+
+        /// <summary>
+        /// The OverlappedIoThread.
+        /// </summary>
+        private Thread m_Thread;
+
+        /// <summary>
+        /// Read and Write buffers that are pinned.
+        /// </summary>
+        private SerialBuffer m_Buffer;
+
+        /// <summary>
+        /// Event to abort OverlappedIoThread (for OverlappedIoThread).
+        /// </summary>
+        private readonly ManualResetEvent m_StopRunning = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Overlapped I/O for WaitCommEvent() finished (for OverlappedIoThread).
+        /// </summary>
+        private readonly ManualResetEvent m_SerialCommEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Overlapped I/O for ReadFile() finished (for OverlappedIoThread).
+        /// </summary>
+        private readonly ManualResetEvent m_ReadEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Overlapped I/O for WriteFile() finished (for OverlappedIoThread).
+        /// </summary>
+        private readonly ManualResetEvent m_WriteEvent = new ManualResetEvent(false);
+
+        /// <summary>
+        /// Triggered to indicate to purge data in the write buffer by the OverlappedIO thread.
+        /// </summary>
+        private readonly AutoResetEvent m_WriteClearEvent = new AutoResetEvent(false);
+
+        /// <summary>
+        /// Triggered when the purge is complete from the OverlappedIO thread.
+        /// </summary>
+        private readonly AutoResetEvent m_WriteClearDoneEvent = new AutoResetEvent(false);
+
+        /// <summary>
+        /// Used by the OverlappedIO thread to finalise a purge of the write buffer if a write
+        /// operation was previously pending.
+        /// </summary>
+        private bool m_PurgePending;
+
+        /// <summary>
+        /// Indicates if the OverlappedIO thread is running.
+        /// </summary>
+        private volatile bool m_IsRunning;
+
+        /// <summary>
+        /// Indicates that there is a byte available for reading.
+        /// </summary>
+        /// <remarks>
+        /// The WaitCommEvent() method indicates if a byte has been received (EV_RXCHAR). This
+        /// is cleared when the read operation is finished.
+        /// </remarks>
+        private bool m_ReadByteAvailable;
+
+        /// <summary>
+        /// Indicates that there is a EOF character that has arrived.
+        /// </summary>
+        /// <remarks>
+        /// The WaitCommEvent() method indicates if a byte has been received (RX_CHAR) covered
+        /// by the variable m_ReadByteAvailable. If m_ReadByteAvailable, this indicates if a
+        /// the EOF character has arrived (EV_RXFLAG).
+        /// </remarks>
+        private bool m_ReadByteEof;
+
+        private string m_Name;
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommOverlappedIo"/> class.
+        /// </summary>
+        /// <param name="handle">The serial port handle.</param>
+        public CommOverlappedIo(SafeFileHandle handle)
+        {
+            m_ComPortHandle = handle;
+        }
+        #endregion
+
+        #region Buffer Management
+        /// <summary>
+        /// Gets the number of bytes in the driver queue still to be read.
+        /// </summary>
+        /// <value>
+        /// The bytes to read.
+        /// </value>
+        public int BytesToRead
+        {
+            get
+            {
+                if (!IsRunning) return 0;
+
+                uint bytesInRecvQueue;
+                bool eofReceived;
+                if (GetReceiveStats(out bytesInRecvQueue, out eofReceived)) {
+                    return (int)bytesInRecvQueue;
+                }
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the status of bytes received by the serial provider that haven't been read yet. If there is
+        /// a failure in obtaining the information, zero is returned.
+        /// </summary>
+        /// <param name="bytesInRecvQueue">Output indicating number of bytes in queue but not read by ReadFile.</param>
+        /// <param name="eofReceived">Output indicating whether an EOF character was received.</param>
+        /// <returns>true if the stats were received, otherwise false.</returns>
+        /// <remarks>
+        /// Getting this information has the side effect of processing and clearing any serial port
+        /// errors and firing CommErrorEvent.
+        /// </remarks>
+        private bool GetReceiveStats(out uint bytesInRecvQueue, out bool eofReceived)
+        {
+            bytesInRecvQueue = 0;
+            eofReceived = false;
+            lock (m_Buffer.ReadLock) {
+                NativeMethods.ComStatErrors cErr;
+                NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
+                if (UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, out comStat)) {
+                    if (cErr != 0) OnCommErrorEvent(new CommErrorEventArgs(cErr));
+                    bytesInRecvQueue = comStat.cbInQue;
+                    eofReceived = ((comStat.Flags & NativeMethods.ComStatFlags.Eof) == NativeMethods.ComStatFlags.Eof);
+                    return true;
+                }
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                    "{0}: SerialThread: BytesInSerialQueue: ClearCommError() error {1}", m_Name, cErr.ToString());
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the number bytes to of data in the transmit buffer.
+        /// </summary>
+        /// <value>
+        /// The number of bytes in the transmit buffer.
+        /// </value>
+        public int BytesToWrite
+        {
+            get
+            {
+                NativeMethods.ComStatErrors cErr;
+                NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
+                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, out comStat);
+                if (result) return (int)comStat.cbOutQue;
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Discards data from the serial driver's transmit buffer.
+        /// </summary>
+        /// <remarks>
+        /// This function will discard the receive buffer of the SerialPortStream.
+        /// </remarks>
+        public void DiscardOutBuffer()
+        {
+            if (!IsRunning) {
+                lock (m_Buffer.WriteLock) {
+                    m_Buffer.Serial.Purge();
+                }
+            } else {
+                m_WriteClearEvent.Set();
+                m_WriteClearDoneEvent.WaitOne(-1);
+            }
+        }
+        #endregion
+
+        #region Thread Control
+        /// <summary>
+        /// Start the I/O thread.
+        /// </summary>
+        public void Start(SerialBuffer buffer, string name)
+        {
+            m_Buffer = buffer;
+            m_Name = name;
+            m_IsRunning = true;
+            try {
+                // Set the time outs
+                NativeMethods.COMMTIMEOUTS timeouts = new NativeMethods.COMMTIMEOUTS();
+                // We read only the data that is buffered
+#if PL2303_WORKAROUNDS
+                // Time out if data hasn't arrived in 10ms, or if the read takes longer than 100ms in total
+                timeouts.ReadIntervalTimeout = 10;
+                timeouts.ReadTotalTimeoutConstant = 100;
+                timeouts.ReadTotalTimeoutMultiplier = 0;
+#else
+                // Non-asynchronous behaviour
+                timeouts.ReadIntervalTimeout = -1;
+                timeouts.ReadTotalTimeoutConstant = 0;
+                timeouts.ReadTotalTimeoutMultiplier = 0;
+#endif
+                // We have no time outs when writing
+                timeouts.WriteTotalTimeoutMultiplier = 0;
+                timeouts.WriteTotalTimeoutConstant = 500;
+
+                bool result = UnsafeNativeMethods.SetCommTimeouts(m_ComPortHandle, ref timeouts);
+                if (!result) throw new IOException("Couldn't set CommTimeouts", Marshal.GetLastWin32Error());
+
+                m_Thread = new Thread(new ThreadStart(OverlappedIoThread));
+                m_Thread.Name = "SerialPortStream_" + m_Name;
+                m_Thread.IsBackground = true;
+                m_Thread.Start();
+            } catch {
+                m_IsRunning = false;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Cancel pending I/O, stop the I/O thread, wait and then return.
+        /// </summary>
+        private void Stop()
+        {
+            if (!IsRunning) return;
+
+            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: OverlappedIO: Stopping Thread", m_Name);
+            m_StopRunning.Set();
+            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: OverlappedIO: Waiting for Thread", m_Name);
+            m_Thread.Join();
+            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: OverlappedIO: Thread Stopped", m_Name);
+            m_Thread = null;
+
+            // Clear the write buffer. Anything that's still in the driver serial buffer will continue to write. The I/O was cancelled
+            // so no need to purge the actual driver itself.
+            m_Buffer.Serial.Purge();
+        }
+
+        /// <summary>
+        /// Test if the I/O thread is running.
+        /// </summary>
+        public bool IsRunning { get { return m_IsRunning; } }
+        #endregion
+
+        private const NativeMethods.SerialEventMask maskRead =
+            NativeMethods.SerialEventMask.EV_BREAK |
+            NativeMethods.SerialEventMask.EV_CTS |
+            NativeMethods.SerialEventMask.EV_DSR |
+            NativeMethods.SerialEventMask.EV_ERR |
+            NativeMethods.SerialEventMask.EV_RING |
+            NativeMethods.SerialEventMask.EV_RLSD |
+            NativeMethods.SerialEventMask.EV_RXCHAR |
+            NativeMethods.SerialEventMask.EV_TXEMPTY |
+            NativeMethods.SerialEventMask.EV_EVENT1 |
+            NativeMethods.SerialEventMask.EV_EVENT2 |
+            NativeMethods.SerialEventMask.EV_PERR |
+            NativeMethods.SerialEventMask.EV_RX80FULL |
+            NativeMethods.SerialEventMask.EV_RXFLAG;
+
+        private const NativeMethods.SerialEventMask maskReadPending =
+            NativeMethods.SerialEventMask.EV_BREAK |
+            NativeMethods.SerialEventMask.EV_CTS |
+            NativeMethods.SerialEventMask.EV_DSR |
+            NativeMethods.SerialEventMask.EV_ERR |
+            NativeMethods.SerialEventMask.EV_RING |
+            NativeMethods.SerialEventMask.EV_RLSD |
+            NativeMethods.SerialEventMask.EV_TXEMPTY |
+            NativeMethods.SerialEventMask.EV_EVENT1 |
+            NativeMethods.SerialEventMask.EV_EVENT2 |
+            NativeMethods.SerialEventMask.EV_PERR;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Runtime.InteropServices.SafeHandle.DangerousGetHandle")]
+        private void OverlappedIoThread()
+        {
+            // WaitCommEvent
+            bool serialCommPending = false;
+            m_SerialCommEvent.Reset();
+            NativeOverlapped serialCommOverlapped = new NativeOverlapped();
+            serialCommOverlapped.EventHandle = m_SerialCommEvent.SafeWaitHandle.DangerousGetHandle();
+
+            // ReadFile
+            bool readPending = false;
+            m_ReadEvent.Reset();
+            NativeOverlapped readOverlapped = new NativeOverlapped();
+            readOverlapped.EventHandle = m_ReadEvent.SafeWaitHandle.DangerousGetHandle();
+
+            // WriteFile
+            bool writePending = false;
+            m_WriteEvent.Reset();
+            NativeOverlapped writeOverlapped = new NativeOverlapped();
+            m_ReadByteAvailable = false;
+            writeOverlapped.EventHandle = m_WriteEvent.SafeWaitHandle.DangerousGetHandle();
+
+            // SEt up the types of serial events we want to see.
+            UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
+
+            bool result;
+            NativeMethods.SerialEventMask commEventMask = 0;
+
+            bool running = true;
+            uint bytes;
+
+            List<WaitHandle> handles = new List<WaitHandle>(10);
+            while (running) {
+                handles.Clear();
+                handles.Add(m_StopRunning);
+                handles.Add(m_WriteClearEvent);
+
+#if PL2303_WORKAROUNDS
+                // - - - - - - - - - - - - - - - - - - - - - - - - -
+                // PROLIFIC PL23030 WORKAROUND
+                // - - - - - - - - - - - - - - - - - - - - - - - - -
+                // If we have a read pending, we don't request events
+                // for reading data. To do so will result in errors. 
+                // Have no idea why.
+                if (readPending) {
+                    UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskReadPending);
+                } else {
+                    UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
+
+                    // While the comm event mask was set to ignore read events, data could have been written
+                    // to the input queue. Check for that and if there are bytes waiting or EOF was received,
+                    // set the appropriate flags.
+                    uint bytesInQueue;
+                    bool eofReceived;
+                    if (GetReceiveStats(out bytesInQueue, out eofReceived) && (bytesInQueue > 0 || eofReceived)) {
+                        // Tell DoReadEvent that there is data pending
+                        m_ReadByteAvailable = true;
+                        m_ReadByteEof |= eofReceived;
+                    }
+                }
+#else
+                UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
+#endif
+
+                // commEventMask is on the stack, and is therefore fixed
+                if (!serialCommPending) serialCommPending = DoWaitCommEvent(out commEventMask, ref serialCommOverlapped);
+                if (serialCommPending) handles.Add(m_SerialCommEvent);
+
+                if (!readPending) {
+                    if (!m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) {
+                        SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Read Buffer Full", m_Name);
+                        handles.Add(m_Buffer.Serial.ReadBufferNotFull);
+                    } else {
+                        readPending = DoReadEvent(ref readOverlapped);
+                    }
+                }
+                if (readPending) handles.Add(m_ReadEvent);
+
+                 if (!writePending) {
+                    if (!m_Buffer.Serial.WriteBufferNotEmpty.WaitOne(0)) {
+                        handles.Add(m_Buffer.Serial.WriteBufferNotEmpty);
+                    } else {
+                        writePending = DoWriteEvent(ref writeOverlapped);
+                    }
+                }
+                if (writePending) handles.Add(m_WriteEvent);
+
+                // We wait up to 100ms, in case we're not actually pending on anything. Normally, we should always be
+                // pending on a Comm event. Just in case this is not so (and is a theoretical possibility), we will
+                // slip out of this WaitAny() after 100ms and then restart the loop, effectively polling every 100ms in
+                // worst case.
+                WaitHandle[] whandles = handles.ToArray();
+                int ev = WaitHandle.WaitAny(whandles, 100);
+
+                if (ev != WaitHandle.WaitTimeout) {
+                    if (whandles[ev] == m_StopRunning) {
+                        SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Thread closing", m_Name);
+                        result = UnsafeNativeMethods.CancelIo(m_ComPortHandle);
+                        if (!result) {
+                            int win32Error = Marshal.GetLastWin32Error();
+                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0,
+                                "{0}: SerialThread: CancelIo error {1}", m_Name, win32Error);
+                        }
+                        running = false;
+                    } else if (whandles[ev] == m_SerialCommEvent) {
+                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref serialCommOverlapped, out bytes, false);
+                        int e = Marshal.GetLastWin32Error();
+                        if (result) {
+                            ProcessWaitCommEvent(commEventMask);
+                        } else {
+                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                "{0}: SerialThread: Overlapped WaitCommEvent() error {1}", m_Name, e);
+                        }
+                        serialCommPending = false;
+                    } else if (whandles[ev] == m_ReadEvent) {
+                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref readOverlapped, out bytes, false);
+                        int e = Marshal.GetLastWin32Error();
+                        if (result) {
+                            ProcessReadEvent(bytes);
+                        } else {
+                            // Should never get ERROR_IO_PENDING, as this method is only called when the event is triggered.
+                            if (e != WinError.ERROR_OPERATION_ABORTED || bytes > 0) {
+                                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                    "{0}: SerialThread: Overlapped ReadFile() error {1} bytes {2}", m_Name, e, bytes);
+                            } else {
+                                // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
+                                if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                        "{0}: SerialThread: Overlapped ReadFile() error {1} bytes {2}", m_Name, e, bytes);
+                                }
+                            }
+                        }
+                        readPending = false;
+                    } else if (whandles[ev] == m_Buffer.Serial.ReadBufferNotFull) {
+                        // The read buffer is no longer full. We just loop back to the beginning to test if we
+                        // should read or not.
+                    } else if (whandles[ev] == m_WriteEvent) {
+                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref writeOverlapped, out bytes, false);
+                        if (!result) {
+                            int e = Marshal.GetLastWin32Error();
+                            // Should never get ERROR_IO_PENDING, as this method is only called when the event is triggered.
+                            if (e != WinError.ERROR_OPERATION_ABORTED || bytes > 0) {
+                                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                    "{0}: SerialThread: Overlapped WriteFile() error {1} bytes {2}", m_Name, e, bytes);
+                            } else {
+                                // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
+                                if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                        "{0}: SerialThread: Overlapped WriteFile() error {1} bytes {2}", m_Name, e, bytes);
+                                }
+                            }
+                        } else {
+                            ProcessWriteEvent(bytes);
+                        }
+                        writePending = false;
+                    } else if (whandles[ev] == m_Buffer.Serial.WriteBufferNotEmpty) {
+                        // The write buffer is no longer empty. We just loop back to the beginning to test if we
+                        // should write or not.
+                    } else if (whandles[ev] == m_WriteClearEvent) {
+                        if (writePending) {
+                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: PurgeComm() write pending", m_Name);
+                            m_PurgePending = true;
+                            result = UnsafeNativeMethods.PurgeComm(m_ComPortHandle,
+                                NativeMethods.PurgeFlags.PURGE_TXABORT | NativeMethods.PurgeFlags.PURGE_TXCLEAR);
+                            if (!result) {
+                                int e = Marshal.GetLastWin32Error();
+                                if (e != WinError.ERROR_OPERATION_ABORTED) {
+                                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                        "{0}: SerialThread: PurgeComm() error {1}", m_Name, e);
+                                } else {
+                                    if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                                        SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                            "{0}: SerialThread: PurgeComm() error {1}", m_Name, e);
+                                    }
+                                }
+                            }
+                        } else {
+                            lock (m_Buffer.WriteLock) {
+                                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Purged", m_Name);
+                                m_Buffer.Serial.Purge();
+                                m_WriteClearDoneEvent.Set();
+                            }
+                        }
+                    }
+                }
+
+#if STRESSTEST
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: STRESSTEST SerialThread: Stress Test Delay of 1000ms", m_Name);
+                System.Threading.Thread.Sleep(1000);
+                NativeMethods.ComStatErrors commStateErrors = new NativeMethods.ComStatErrors();
+                NativeMethods.COMSTAT commStat = new NativeMethods.COMSTAT();
+                result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out commStateErrors, out commStat);
+                if (result) {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0,
+                        "{0}: STRESSTEST SerialThread: ClearCommError errors={1}", m_Name, commStateErrors);
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0,
+                        "{0}: STRESSTEST SerialThread: ClearCommError stats flags={1}, InQueue={2}, OutQueue={3}", m_Name, commStat.Flags, commStat.cbInQue, commStat.cbOutQue);
+                } else {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0,
+                        "{0}: STRESSTEST SerialThread: ClearCommError error: {1}", m_Name, Marshal.GetLastWin32Error());
+                }
+#endif
+            }
+            m_IsRunning = false;
+        }
+
+        /// <summary>
+        /// Check if we should execute WaitCommEvent() and get the result if immediately available.
+        /// </summary>
+        /// <remarks>
+        /// This function abstracts the Win32 API WaitCommEvent(). It assumes overlapped I/O.
+        /// Therefore, when calling this function, you should ensure that the parameter <c>mask</c>
+        /// and <c>overlap</c> are pinned for the duration of the overlapped I/O. Any easy way to
+        /// do this is to allocate the variables on the stack and then pass them by reference to
+        /// this function.
+        /// <para>You should not call this function if a pending I/O operation for WaitCommEvent()
+        /// is still open. It is an error otherwise.</para>
+        /// </remarks>
+        /// <param name="mask">The mask value if information is available immediately.</param>
+        /// <param name="overlap">The overlap structure to use.</param>
+        /// <returns>If the operation is pending or not.</returns>
+        private bool DoWaitCommEvent(out NativeMethods.SerialEventMask mask, ref NativeOverlapped overlap)
+        {
+            bool result = UnsafeNativeMethods.WaitCommEvent(m_ComPortHandle, out mask, ref overlap);
+            int e = Marshal.GetLastWin32Error();
+            if (result) {
+                ProcessWaitCommEvent(mask);
+            } else {
+                if (e != WinError.ERROR_IO_PENDING) {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "{0}: SerialThread: DoWaitCommEvent: Result: {1}", m_Name, e);
+                }
+            }
+            return !result;
+        }
+
+        /// <summary>
+        /// Do work based on the mask event that has occurred.
+        /// </summary>
+        /// <param name="mask">The mask that was provided.</param>
+        private void ProcessWaitCommEvent(NativeMethods.SerialEventMask mask)
+        {
+            if (mask != (int)0) {
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessWaitCommEvent: {1}", m_Name, mask);
+            }
+
+            // Reading a character
+            if ((mask & NativeMethods.SerialEventMask.EV_RXCHAR) != 0) {
+                m_ReadByteAvailable = true;
+            }
+            if ((mask & NativeMethods.SerialEventMask.EV_RXFLAG) != 0) {
+                m_ReadByteAvailable = true;
+                m_ReadByteEof = true;
+            }
+
+            // We don't raise an event for characters immediately, but only after the read operation
+            // is complete.
+            OnCommEvent(new CommEventArgs(mask & ~(NativeMethods.SerialEventMask.EV_RXCHAR | NativeMethods.SerialEventMask.EV_RXFLAG)));
+
+            if ((mask & NativeMethods.SerialEventMask.EV_TXEMPTY) != 0) {
+                lock (m_Buffer.WriteLock) {
+                    if (m_Buffer.Serial.TxEmptyEvent()) {
+                        SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty", m_Name);
+                    }
+                }
+            }
+
+            if ((mask & (NativeMethods.SerialEventMask.EV_RXCHAR | NativeMethods.SerialEventMask.EV_ERR)) != 0) {
+                NativeMethods.ComStatErrors comErr;
+                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out comErr, IntPtr.Zero);
+                int e = Marshal.GetLastWin32Error();
+                if (result) {
+                    comErr = (NativeMethods.ComStatErrors)((int)comErr & 0x10F);
+                    if (comErr != 0) {
+                        OnCommErrorEvent(new CommErrorEventArgs(comErr));
+                    }
+                } else {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                        "{0}: SerialThread: ClearCommError: WINERROR {1}", m_Name, e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if we should ReadFile() and process the data if serial data is immediately.
+        /// available.
+        /// </summary>
+        /// <remarks>
+        /// This function should be called if there is no existing pending read operation. It
+        /// will check if there is data to read (indicated by the variable m_ReadByteAvailable,
+        /// which is set by ProcessWaitCommEvent()) and then issue a ReadFile(). If the result
+        /// indicates that asynchronous I/O is happening, <b>true</b> is returned. Else this
+        /// function automatically calls ProcessReadEvent() with the number of bytes read. If
+        /// an asynchronous operation is pending, then you should wait on the event in the
+        /// overlapped structure not call this function until GetOverlappedResult() has
+        /// been called.
+        /// </remarks>
+        /// <param name="overlap">The overlap structure to use for reading.</param>
+        /// <returns>If the operation is pending or not.</returns>
+        private bool DoReadEvent(ref NativeOverlapped overlap)
+        {
+            // If WaitCommEvent() hasn't been called, there's no data
+            if (!m_ReadByteAvailable) return false;
+
+            // Read Buffer is full, so can't write into it.
+            if (!m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) return false;
+
+            // As C# can't convert an offset in the array to a pointer, we have to do
+            // our own marshalling with (IntPtr)ReadBufferOffsetEnd that is the address
+            // at the end of the read buffer.
+            IntPtr bufPtr;
+            uint bufLen;
+            lock (m_Buffer.ReadLock) {
+                bufPtr = m_Buffer.Serial.ReadBufferOffsetEnd;
+                bufLen = (uint)m_Buffer.Serial.ReadBuffer.WriteLength;
+            }
+
+            uint bufRead;
+            bool result = UnsafeNativeMethods.ReadFile(m_ComPortHandle, bufPtr, bufLen, out bufRead, ref overlap);
+            int e = Marshal.GetLastWin32Error();
+            if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                    "{0}: SerialThread: DoReadEvent: ReadFile({1}, {2}, {3}) == {4}", m_Name,
+                    m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
+            }
+            if (result) {
+                // MS Documentation for ReadFile() says that the 'bufRead' parameter should be NULL.
+                // However, in the case that the COMMTIMEOUTS is set up so that no wait is required
+                // (see COMMTIMEOUTS in Win32 API), this function will actually not perform an
+                // asynchronous I/O operation and return the number of bytes copied in bufRead. 
+                ProcessReadEvent(bufRead);
+            } else {
+                if (e == WinError.ERROR_OPERATION_ABORTED) {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "{0}: SerialThread: DoReadEvent: ReadFile() error {1}", m_Name, e);
+                    return false;
+                }
+                if (e != WinError.ERROR_IO_PENDING) {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "{0}: SerialThread: DoReadEvent: ReadFile() error {1}", m_Name, e);
+                    // In case an unexpected error occurs here, no more data will be read from the
+                    // serial port. This method will return !result which is true, meaning that a
+                    // read operation is pending, resulting in probably no more incoming data. This
+                    // is better than returning false, which might result in a high load situation
+                    // if the error is permanent.
+                }
+            }
+            return !result;
+        }
+
+        /// <summary>
+        /// Produce the number of bytes read in the buffer.
+        /// </summary>
+        /// <remarks>
+        /// If the number of bytes read is zero, this function should also be called, as it indicates
+        /// that there are no more bytes pending. The recommendation from MS documentation for reading
+        /// from the serial port indicates to read the buffer data, until a result of zero is given,
+        /// which indicates to wait for the next receiving character.
+        /// </remarks>
+        /// <param name="bytes">Number of bytes read.</param>
+        private void ProcessReadEvent(uint bytes)
+        {
+            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessReadEvent: {1} bytes", m_Name, bytes);
+            if (bytes == 0) {
+                m_ReadByteAvailable = false;
+            } else {
+                lock (m_Buffer.ReadLock) {
+                    if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                        // Converting everything to strings before the call is expensive.
+                        SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                            "{0}: SerialThread: ProcessReadEvent: End={1}; Bytes={2}", m_Name,
+                            m_Buffer.Serial.ReadBuffer.End, bytes);
+                    }
+                    m_Buffer.Serial.ReadBufferProduce((int)bytes);
+                }
+
+                OnCommEvent(new CommEventArgs((m_ReadByteEof ? NativeMethods.SerialEventMask.EV_RXFLAG : 0) | NativeMethods.SerialEventMask.EV_RXCHAR));
+                m_ReadByteEof = false;
+            }
+        }
+
+        /// <summary>
+        /// Check if we should WriteFile() and update buffers if serial data is immediately cached by driver.
+        /// </summary>
+        /// <remarks>
+        /// This function should be called if there is no existing pending write operation. If
+        /// the result indicates that asynchronous I/O is happening, <b>true</b> is returned.
+        /// Else this function automatically calls ProcessWriteEvent() with the number of bytes
+        /// written. If an asynchronous operation is pending, then you should wait on the event
+        /// in the overlapped structure not call this function until GetOverlappedResult()
+        /// has been called.
+        /// </remarks>
+        /// <param name="overlap">The overlap structure to use for writing.</param>
+        /// <returns>If the operation is pending or not.</returns>
+        private bool DoWriteEvent(ref NativeOverlapped overlap)
+        {
+            IntPtr bufPtr;
+            uint bufLen;
+            lock (m_Buffer.WriteLock) {
+                bufPtr = m_Buffer.Serial.WriteBufferOffsetStart;
+                bufLen = (uint)m_Buffer.Serial.WriteBuffer.ReadLength;
+            }
+
+            uint bufWrite;
+            bool result = UnsafeNativeMethods.WriteFile(m_ComPortHandle, bufPtr, bufLen, out bufWrite, ref overlap);
+            int e = Marshal.GetLastWin32Error();
+            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                "{0}: SerialThread: DoWriteEvent: WriteFile({1}, {2}, {3}, ...) == {4}", m_Name,
+                m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
+            if (result) {
+                ProcessWriteEvent(bufWrite);
+            } else {
+                if (e == WinError.ERROR_OPERATION_ABORTED) {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0, "{0}: SerialThread: DoWriteEvent: WriteFile() error {1}", m_Name, e);
+                    return false;
+                }
+                if (e != WinError.ERROR_IO_PENDING) {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0, "{0}: SerialThread: DoWriteEvent: WriteFile() error {1}", m_Name, e);
+                    // In case an unexpected error occurs here, no more data will be written to the
+                    // serial port. This method will return !result which is true, meaning that a
+                    // write operation is pending, resulting in probably no more sent data. This
+                    // is better than returning false, which might result in a high load situation
+                    // if the error is permanent.
+                }
+            }
+            return !result;
+        }
+
+        /// <summary>
+        /// Consume the number of bytes written from the write buffer.
+        /// </summary>
+        /// <param name="bytes">Number of bytes written to the driver.</param>
+        private void ProcessWriteEvent(uint bytes)
+        {
+            if (m_PurgePending) {
+                m_PurgePending = false;
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessWriteEvent: {1} bytes - Purged", m_Name, bytes);
+                lock (m_Buffer.WriteLock) {
+                    m_Buffer.Serial.Purge();
+                    m_WriteClearDoneEvent.Set();
+                }
+            } else {
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessWriteEvent: {1} bytes", m_Name, bytes);
+                if (bytes != 0) {
+                    lock (m_Buffer.WriteLock) {
+                        m_Buffer.Serial.WriteBufferConsume((int)bytes);
+                        if (m_Buffer.Serial.TxEmptyEvent()) {
+                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessWriteEvent: TX-BUFFER empty", m_Name);
+                        }
+                    }
+                }
+            }
+        }
+
+        #region Event Handling
+        public event EventHandler<CommEventArgs> CommEvent;
+
+        protected virtual void OnCommEvent(CommEventArgs args)
+        {
+            if (args.EventType == 0) return;
+
+            if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+            {
+                // args.EventType.ToString() is relatively expensive, so only do it if we're logging
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                    "{0}: CommEvent: {1}", m_Name, args.EventType.ToString());
+            }
+            EventHandler<CommEventArgs> handler = CommEvent;
+            if (handler != null)
+            {
+                handler(this, args);
+            }
+        }
+
+        public event EventHandler<CommErrorEventArgs> CommErrorEvent;
+
+        protected virtual void OnCommErrorEvent(CommErrorEventArgs args)
+        {
+            if (args.EventType == 0) return;
+
+            if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+            {
+                // args.EventType.ToString() is relatively expensive, so only do it if we're logging
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, 
+                    "{0}: CommErrorEvent: {1}", m_Name, args.EventType.ToString());
+            }
+
+            EventHandler<CommErrorEventArgs> handler = CommErrorEvent;
+            if (handler != null)
+            {
+                handler(this, args);
+            }
+        }
+        #endregion
+
+        #region IDisposable Support
+        private bool m_IsDisposed; // To detect redundant calls
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!m_IsDisposed) {
+                if (disposing) {
+                    if (IsRunning) Stop();
+                    m_StopRunning.Dispose();
+                    m_SerialCommEvent.Dispose();
+                    m_ReadEvent.Dispose();
+                    m_WriteEvent.Dispose();
+                    m_WriteClearEvent.Dispose();
+                    m_WriteClearDoneEvent.Dispose();
+                    CommErrorEvent = null;
+                    CommEvent = null;
+                }
+
+                m_IsDisposed = true;
+            }
+        }
+        #endregion
+    }
+}

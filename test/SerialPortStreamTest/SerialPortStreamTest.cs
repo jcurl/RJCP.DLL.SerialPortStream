@@ -4,12 +4,13 @@
 namespace RJCP.IO.Ports.SerialPortStreamTest
 {
     using System;
-    using System.Diagnostics;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Threading;
     using NUnit.Framework;
 
     /// <summary>
-    /// Test sending and receiving data via two serial ports
+    /// Test sending and receiving data via two serial ports.
     /// </summary>
     /// <remarks>
     /// You will need to have two serial ports connected to each other on the same computer
@@ -21,165 +22,272 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     [TestFixture]
     public class SerialPortStreamTest
     {
-        private const string c_SourcePort = "CNCA0";
-        private const string c_DestPort = "CNCB0";
+        //private const string c_SourcePort = "CNCA0";
+        //private const string c_DestPort = "CNCB0";
+        private const string c_SourcePort = "COM9";
+        private const string c_DestPort = "COM10";
 
-        private const int c_Timeout = 300;
+        private const int c_TimeOut = 300;
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void SimpleConstructor()
+        {
+            SerialPortStream src = new SerialPortStream();
+            src.Dispose();
+            Assert.That(src.IsDisposed, Is.True);
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void SimpleConstructorWithPort()
+        {
+            SerialPortStream src = new SerialPortStream(c_SourcePort);
+            Assert.That(src.PortName, Is.EqualTo(c_SourcePort));
+            src.Dispose();
+            Assert.That(src.IsDisposed, Is.True);
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void SimpleConstructorWithPortGetSettings()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                Assert.That(src.PortName, Is.EqualTo(c_SourcePort));
+                src.GetPortSettings();
+                Console.WriteLine("    PortName: {0}", src.PortName);
+                Console.WriteLine("    BaudRate: {0}", src.BaudRate);
+                Console.WriteLine("    DataBits: {0}", src.DataBits);
+                Console.WriteLine("      Parity: {0}", src.Parity);
+                Console.WriteLine("    StopBits: {0}", src.StopBits);
+                Console.WriteLine("   Handshake: {0}", src.Handshake);
+                Console.WriteLine(" DiscardNull: {0}", src.DiscardNull);
+                Console.WriteLine("  ParityRepl: {0}", src.ParityReplace);
+                Console.WriteLine("TxContOnXOff: {0}", src.TxContinueOnXOff);
+                Console.WriteLine("   XOffLimit: {0}", src.XOffLimit);
+                Console.WriteLine("    XOnLimit: {0}", src.XOnLimit);
+                Console.WriteLine("  DrvInQueue: {0}", src.DriverInQueue);
+                Console.WriteLine(" DrvOutQueue: {0}", src.DriverOutQueue);
+                Console.WriteLine("{0}", src.ToString());
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void SimpleConstructorWithPortGetSettings2()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                Assert.That(src.PortName, Is.EqualTo(c_SourcePort));
+                src.GetPortSettings();
+                Console.WriteLine("    PortName: {0}", src.PortName);
+                Console.WriteLine("    BaudRate: {0}", src.BaudRate);
+                Console.WriteLine("    DataBits: {0}", src.DataBits);
+                Console.WriteLine("      Parity: {0}", src.Parity);
+                Console.WriteLine("    StopBits: {0}", src.StopBits);
+                Console.WriteLine("   Handshake: {0}", src.Handshake);
+                Console.WriteLine(" DiscardNull: {0}", src.DiscardNull);
+                Console.WriteLine("  ParityRepl: {0}", src.ParityReplace);
+                Console.WriteLine("TxContOnXOff: {0}", src.TxContinueOnXOff);
+                Console.WriteLine("   XOffLimit: {0}", src.XOffLimit);
+                Console.WriteLine("    XOnLimit: {0}", src.XOnLimit);
+                Console.WriteLine("  DrvInQueue: {0}", src.DriverInQueue);
+                Console.WriteLine(" DrvOutQueue: {0}", src.DriverOutQueue);
+                Console.WriteLine("{0}", src.ToString());
+            }
+        }
 
         /// <summary>
-        /// Test the basic features of a serial port
+        /// Test the basic features of a serial port.
         /// </summary>
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_Basic()
+        public void OpenCloseBasicProperties()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = 100;
                 src.ReadTimeout = 100;
 
-                Assert.IsTrue(src.CanRead);
-                Assert.IsFalse(src.CanWrite);
-                Assert.AreEqual(c_SourcePort, src.PortName);
-                Assert.AreEqual(0, src.BytesToRead);
-                Assert.AreEqual(0, src.BytesToWrite);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.False);
+                Assert.That(src.IsOpen, Is.False);
+                Assert.That(src.PortName, Is.EqualTo(c_SourcePort));
+                Assert.That(src.BytesToRead, Is.EqualTo(0));
+                Assert.That(src.BytesToWrite, Is.EqualTo(0));
 
                 src.Open();
-                Assert.IsTrue(src.CanRead);
-                Assert.IsTrue(src.CanWrite);
-                Assert.IsTrue(src.IsOpen);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.True);
+                Assert.That(src.IsOpen, Is.True);
 
                 src.Close();
-                Assert.IsTrue(src.CanRead);
-                Assert.IsFalse(src.CanWrite);
-                Assert.IsFalse(src.IsOpen);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.False);
+                Assert.That(src.IsOpen, Is.False);
             }
         }
 
         /// <summary>
-        /// Check that Open() and Close() can be called multiple times
+        /// Check that Open() and Close() can be called multiple times.
         /// </summary>
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_OpenClose()
+        public void OpenClose()
         {
             SerialPortStream src;
             using (src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = 100;
                 src.ReadTimeout = 100;
 
-                Assert.IsTrue(src.CanRead);
-                Assert.IsFalse(src.CanWrite);
-                Assert.IsFalse(src.IsOpen);
-                Assert.IsFalse(src.IsDisposed);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.False);
+                Assert.That(src.IsOpen, Is.False);
+                Assert.That(src.IsDisposed, Is.False);
 
                 src.Open();
-                Assert.IsTrue(src.CanRead);
-                Assert.IsTrue(src.CanWrite);
-                Assert.IsTrue(src.IsOpen);
-                Assert.IsFalse(src.IsDisposed);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.True);
+                Assert.That(src.IsOpen, Is.True);
+                Assert.That(src.IsDisposed, Is.False);
 
                 src.Close();
-                Assert.IsTrue(src.CanRead);
-                Assert.IsFalse(src.CanWrite);
-                Assert.IsFalse(src.IsOpen);
-                Assert.IsFalse(src.IsDisposed);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.False);
+                Assert.That(src.IsOpen, Is.False);
+                Assert.That(src.IsDisposed, Is.False);
 
                 src.Open();
-                Assert.IsTrue(src.CanRead);
-                Assert.IsTrue(src.CanWrite);
-                Assert.IsTrue(src.IsOpen);
-                Assert.IsFalse(src.IsDisposed);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.True);
+                Assert.That(src.IsOpen, Is.True);
+                Assert.That(src.IsDisposed, Is.False);
 
                 src.Close();
-                Assert.IsTrue(src.CanRead);
-                Assert.IsFalse(src.CanWrite);
-                Assert.IsFalse(src.IsOpen);
-                Assert.IsFalse(src.IsDisposed);
+                Assert.That(src.CanRead, Is.True);
+                Assert.That(src.CanWrite, Is.False);
+                Assert.That(src.IsOpen, Is.False);
+                Assert.That(src.IsDisposed, Is.False);
             }
-            Assert.IsTrue(src.IsDisposed);
+            Assert.That(src.IsDisposed, Is.True);
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_OpenInUse()
+        public void OpenInUse()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open();
 
                 using (SerialPortStream s2 = new SerialPortStream(c_SourcePort, 9600, 8, Parity.None, StopBits.One)) {
-                    bool err = false;
-                    try {
-                        s2.Open();
-                    } catch {
-                        err = true;
-                    }
-                    Assert.IsTrue(err, "Expected exception opening the port twice");
+                    // The port is already open by src, and should be an exclusive resource.
+                    Assert.That(() => s2.Open(), Throws.Exception);
                 }
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_GetPortSettings()
+        public void GetPortSettings()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.GetPortSettings();
-
-                SerialPortStream s2 = new SerialPortStream();
-                bool err = false;
-                try {
-                    s2.GetPortSettings();
-                } catch {
-                    err = true;
-                }
-                Assert.IsTrue(err, "No exception raised when port not defined");
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_NewLine()
+        public void GetPortSettingsWithNoPort()
+        {
+            using (SerialPortStream s2 = new SerialPortStream()) {
+                Assert.That(() => s2.GetPortSettings(), Throws.Exception);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ModemSignals()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort)) {
+                src.Handshake = Handshake.None;
+                dst.Handshake = Handshake.None;
+
+                src.Open();
+                dst.Open();
+
+                src.RtsEnable = false;
+                Assert.That(dst.CtsHolding, Is.False);
+
+                src.RtsEnable = true;
+                Assert.That(dst.CtsHolding, Is.True);
+
+                src.DtrEnable = false;
+                Assert.That(dst.DsrHolding, Is.False);
+
+                src.DtrEnable = true;
+                Assert.That(dst.DsrHolding, Is.True);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ModemSignalsWithSleep10()
+        {
+            // On some chipsets (PL2303H Win7 x86), need small delays for this test case
+            // to work properly.
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort)) {
+                src.Handshake = Handshake.None;
+                dst.Handshake = Handshake.None;
+
+                src.Open();
+                dst.Open();
+
+                src.RtsEnable = false;
+                Thread.Sleep(10);  // Required for PL2303H
+                Assert.That(dst.CtsHolding, Is.False);
+
+                src.RtsEnable = true;
+                Thread.Sleep(10);  // Required for PL2303H
+                Assert.That(dst.CtsHolding, Is.True);
+
+                src.DtrEnable = false;
+                Thread.Sleep(10);  // Required for PL2303H
+                Assert.That(dst.DsrHolding, Is.False);
+
+                src.DtrEnable = true;
+                Thread.Sleep(10);  // Required for PL2303H
+                Assert.That(dst.DsrHolding, Is.True);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void NewLine()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
-                bool exception = false;
-                try {
-                    src.NewLine = "";
-                } catch (System.ArgumentException) {
-                    exception = true;
-                }
-                Assert.IsTrue(exception, "Expected exception when setting newline to empty string");
+                Assert.That(() => src.NewLine = "", Throws.Exception.TypeOf<ArgumentException>(),
+                    "Expected exception when setting newline to empty string");
 
-                exception = false;
-                try {
-                    src.NewLine = null;
-                } catch (System.ArgumentNullException) {
-                    exception = true;
-                }
-                Assert.IsTrue(exception, "Expected exception when setting newline to empty string");
+                Assert.That(() => src.NewLine = null, Throws.Exception.TypeOf<ArgumentNullException>(),
+                    "Expected exception when setting newline to null");
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_SendReceive()
+        public void SendReceive()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 // Send Maximum data in one go
                 byte[] sendbuf = new byte[src.WriteBufferSize];
-#if true
                 Random r = new Random();
                 r.NextBytes(sendbuf);
-#else
-            for (int i = 0; i < sendbuf.Length; i++) {
-                sendbuf[i] = (byte)((i % 77) + 1);
-            }
-#endif
                 src.Write(sendbuf, 0, sendbuf.Length);
 
                 // Receive sent data
@@ -187,7 +295,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 int c = 0;
                 byte[] rcvbuf = new byte[sendbuf.Length + 10];
                 while (rcv < rcvbuf.Length) {
-                    Trace.WriteLine("Begin Receive: Offset=" + rcv.ToString() + "; Count=" + (rcvbuf.Length - rcv).ToString());
+                    Console.WriteLine("Begin Receive: Offset=" + rcv + "; Count=" + (rcvbuf.Length - rcv));
                     int b = dst.Read(rcvbuf, rcv, rcvbuf.Length - rcv);
                     if (b == 0) {
                         if (c == 0) break;
@@ -200,38 +308,105 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
                 bool dump = false;
                 if (rcv != sendbuf.Length) {
-                    Trace.WriteLine("Read length not the same as the amount of data sent (got " + rcv.ToString() + " bytes)");
+                    Console.WriteLine("Read length not the same as the amount of data sent (got " + rcv + " bytes)");
                     dump = true;
                 }
                 for (int i = 0; i < sendbuf.Length; i++) {
                     if (sendbuf[i] != rcvbuf[i]) {
-                        Trace.WriteLine("Comparison failure at " + i.ToString());
+                        Console.WriteLine("Comparison failure at " + i);
                         dump = true;
                         break;
                     }
                 }
 
                 if (dump) {
-                    Trace.WriteLine("Send Buffer DUMP");
+                    Console.WriteLine("Send Buffer DUMP");
                     for (int i = 0; i < sendbuf.Length; i++) {
-                        Trace.WriteLine(sendbuf[i].ToString("X2"));
+                        Console.WriteLine(sendbuf[i].ToString("X2"));
                     }
 
-                    Trace.WriteLine("Receive Buffer DUMP");
+                    Console.WriteLine("Receive Buffer DUMP");
                     for (int i = 0; i < rcv; i++) {
-                        Trace.WriteLine(rcvbuf[i].ToString("X2"));
+                        Console.WriteLine(rcvbuf[i].ToString("X2"));
                     }
                 }
                 src.Close();
                 dst.Close();
-                Assert.IsFalse(dump, "Error in transfer");
+                Assert.That(dump, Is.False, "Error in transfer");
+            }
+        }
+
+        private class SendReceiveAsyncState
+        {
+            public ManualResetEvent finished = new ManualResetEvent(false);
+            public SerialPortStream src;
+            public SerialPortStream dst;
+            public byte[] sendBuf;
+            public byte[] recvBuf;
+            public int rcv;
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void SendReceiveWithBeginEnd()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                SendReceiveAsyncState state = new SendReceiveAsyncState();
+                state.src = src;
+                state.dst = dst;
+                state.sendBuf = new byte[src.WriteBufferSize];
+                state.recvBuf = new byte[src.WriteBufferSize + 10];
+                Random r = new Random();
+                r.NextBytes(state.sendBuf);
+
+                // Here we start the read and write in parallel. The read will wait up to c_Timeout for the first byte.
+                dst.BeginRead(state.recvBuf, 0, state.recvBuf.Length, SendReceiveAsyncReadComplete, state);
+                src.BeginWrite(state.sendBuf, 0, state.sendBuf.Length, SendReceiveAsyncWriteComplete, state);
+                if (!state.finished.WaitOne(30000)) {
+                    Assert.Fail("BeginWrite/BeginRead test case timeout");
+                }
+            }
+        }
+
+        private void SendReceiveAsyncWriteComplete(IAsyncResult ar)
+        {
+            SendReceiveAsyncState state = (SendReceiveAsyncState)ar.AsyncState;
+            state.src.EndWrite(ar);
+        }
+
+        private void SendReceiveAsyncReadComplete(IAsyncResult ar)
+        {
+            SendReceiveAsyncState state = (SendReceiveAsyncState)ar.AsyncState;
+            int bytes = state.dst.EndRead(ar);
+
+            if (bytes != 0) {
+                state.rcv += bytes;
+                if (state.rcv < state.recvBuf.Length) {
+                    Console.WriteLine("Begin Receive: Offset=" + state.rcv + "; Count=" + (state.recvBuf.Length - state.rcv));
+                    state.dst.BeginRead(state.recvBuf, state.rcv, state.recvBuf.Length - state.rcv, SendReceiveAsyncReadComplete, state);
+                } else {
+                    state.finished.Set();
+                    Assert.Fail("Received more data than expected");
+                }
+            } else {
+                if (state.rcv != state.sendBuf.Length) {
+                    state.finished.Set();
+                    Assert.Fail("Received more/less data than expected: {0} expected; {1} received", state.sendBuf.Length, state.rcv);
+                }
+                state.finished.Set();
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
         [Timeout(2000)]
-        public void SerialPortStream_SendAndFlush1()
+        public void SendAndFlush1()
         {
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -247,7 +422,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         [Test]
         [Category("SerialPortStream")]
         [Timeout(2000)]
-        public void SerialPortStream_SendAndFlush2()
+        public void SendAndFlush2()
         {
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -259,7 +434,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 Trace.WriteLine("2. WriteLine()");
                 src.WriteLine("Connected");
                 Trace.WriteLine("3. Sleep()");
-                System.Threading.Thread.Sleep(100);
+                Thread.Sleep(100);
                 Trace.WriteLine("4. WriteLine()");
                 src.WriteLine("Disconnected");
                 Trace.WriteLine("5. Flush()");
@@ -270,7 +445,143 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_ListPorts()
+        public void ReadChars()
+        {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = 2 * c_TimeOut + 500; src.ReadTimeout = 2 * c_TimeOut + 500;
+                dst.WriteTimeout = 2 * c_TimeOut + 500; dst.ReadTimeout = 2 * c_TimeOut + 500;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                byte[] send = new byte[] { 0x65, 0x66, 0x67 };
+                src.Write(send, 0, send.Length);
+                Thread.Sleep(c_TimeOut + 500);
+
+                char[] recv = new char[5];
+                int cread = dst.Read(recv, 0, recv.Length);
+                Assert.That(cread, Is.EqualTo(3));
+                Assert.That(recv[0], Is.EqualTo('e'));
+                Assert.That(recv[1], Is.EqualTo('f'));
+                Assert.That(recv[2], Is.EqualTo('g'));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadCharsWithTimeout()
+        {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = 2 * c_TimeOut + 500; src.ReadTimeout = 2 * c_TimeOut + 500;
+                dst.WriteTimeout = 2 * c_TimeOut + 500; dst.ReadTimeout = 2 * c_TimeOut + 500;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                new Thread(() => {
+                    Thread.Sleep(c_TimeOut + 500);
+                    byte[] send = new byte[] { 0x65, 0x66, 0x67 };
+                    src.Write(send, 0, send.Length);
+                }).Start();
+
+                char[] recv = new char[5];
+                int cread = 0; int counter = 0;
+                while (cread < 3 && counter < 2) {
+                    cread += dst.Read(recv, 0, recv.Length);
+                    counter++;
+                }
+                Assert.That(cread, Is.EqualTo(3));
+                Assert.That(recv[0], Is.EqualTo('e'));
+                Assert.That(recv[1], Is.EqualTo('f'));
+                Assert.That(recv[2], Is.EqualTo('g'));
+            }
+        }
+
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadSingleChar()
+        {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = 2 * c_TimeOut + 500; src.ReadTimeout = 2 * c_TimeOut + 500;
+                dst.WriteTimeout = 2 * c_TimeOut + 500; dst.ReadTimeout = 2 * c_TimeOut + 500;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                byte[] send = new byte[] { 0x65, 0x66, 0x67 };
+                src.Write(send, 0, send.Length);
+                Thread.Sleep(c_TimeOut + 500);
+
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'e'));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'f'));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'g'));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadSingleCharWithTimeout()
+        {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = 2 * c_TimeOut + 500; src.ReadTimeout = 2 * c_TimeOut + 500;
+                dst.WriteTimeout = 2 * c_TimeOut + 500; dst.ReadTimeout = 2 * c_TimeOut + 500;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                new Thread(() => {
+                    Thread.Sleep(c_TimeOut + 500);
+                    byte[] send = new byte[] { 0x65, 0x66, 0x67 };
+                    src.Write(send, 0, send.Length);
+                }).Start();
+
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'e'));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'f'));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'g'));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadSingleCharEuro()
+        {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                byte[] send = new byte[] { 0xE2, 0x82, 0xAC };
+                src.Write(send, 0, send.Length);
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'€'));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadSingleCharUtf32()
+        {
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                byte[] send = new byte[] { 0xF3, 0xA0, 0x82, 0x84 };
+                src.Write(send, 0, send.Length);
+
+                Assert.That(dst.ReadChar(), Is.EqualTo(0xDB40));
+                Assert.That(dst.ReadChar(), Is.EqualTo(0xDC84));
+                Assert.That(dst.ReadChar(), Is.EqualTo(-1));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ListPorts()
         {
             bool result = true;
 
@@ -320,71 +631,59 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_WriteReadLine()
+        public void WriteLineReadLine()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 string s;
                 src.WriteLine("TestString");
                 s = dst.ReadLine();
-                Assert.AreEqual("TestString", s);
+                Assert.That(s, Is.EqualTo("TestString"));
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_WriteReadLine_Timeout1()
+        public void WriteLineReadLineTimeout1()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
-
-                bool err = false;
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 string s;
+
                 src.Write("TestString");
-                try {
-                    s = dst.ReadLine();
-                } catch (System.Exception e) {
-                    if (e is TimeoutException) err = true;
-                }
-                Assert.IsTrue(err, "No timeout exception occurred");
+                Assert.Throws<TimeoutException>(() => { s = dst.ReadLine(); }, "No timeout exception occurred");
 
                 src.WriteLine("");
                 s = dst.ReadLine();
-                Assert.AreEqual("TestString", s);
+                Assert.That(s, Is.EqualTo("TestString"));
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_WriteReadLine_Timeout2()
+        public void WriteLineReadLineTimeout2()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
-
-                bool err = false;
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 string s;
+
                 src.Write("Test");
-                try {
-                    s = dst.ReadLine();
-                } catch (System.Exception e) {
-                    if (e is TimeoutException) err = true;
-                }
-                Assert.IsTrue(err, "No timeout exception occurred");
+                Assert.Throws<TimeoutException>(() => { s = dst.ReadLine(); }, "No timeout exception occurred");
 
                 src.WriteLine("String");
                 s = dst.ReadLine();
@@ -394,16 +693,14 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_WriteReadLine_Multilines()
+        public void WriteLineReadLineMultilines()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
-
-                bool err = false;
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 string s;
                 src.Write("Line1\nLine2\n");
@@ -412,25 +709,20 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 s = dst.ReadLine();
                 Assert.AreEqual("Line2", s);
 
-                try {
-                    s = dst.ReadLine();
-                } catch (System.Exception e) {
-                    if (e is TimeoutException) err = true;
-                }
-                Assert.IsTrue(err, "No timeout exception occurred");
+                Assert.Throws<TimeoutException>(() => { s = dst.ReadLine(); }, "No timeout exception occurred");
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_WriteReadLine_CharForChar()
+        public void WriteLineReadLineCharForChar()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 bool err = false;
                 string s = null;
@@ -445,31 +737,31 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         if (e is TimeoutException) err = true;
                     }
                     if (i < send.Length - 1) {
-                        Assert.IsTrue(err, "No timeout exception occurred when waiting for " + send[i].ToString() + " (position " + i.ToString() + ")");
+                        Assert.That(err, Is.True, "No timeout exception occurred when waiting for " + send[i] + " (position " + i + ")");
                     }
                 }
-                Assert.AreEqual("A Brief History Of Time", s);
+                Assert.That(s, Is.EqualTo("A Brief History Of Time"));
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_WriteReadLine_MbcsByteForByte()
+        public void WriteLineReadLineMbcsByteForByte()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 bool err = false;
                 string s = null;
 
                 byte[] buf = new byte[] {
-                0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A,
-                0xE2, 0x82, 0xAC, 0x0A
-            };
+                    0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A,
+                    0xE2, 0x82, 0xAC, 0x0A
+                };
 
                 for (int i = 0; i < buf.Length; i++) {
                     src.Write(buf, i, 1);
@@ -479,82 +771,71 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         if (e is TimeoutException) err = true;
                     }
                     if (i < buf.Length - 1) {
-                        Assert.IsTrue(err, "No timeout exception occurred when waiting for " + buf[i].ToString("X2") + " (position " + i.ToString() + ")");
+                        Assert.That(err, Is.True, "No timeout exception occurred when waiting for " + buf[i].ToString("X2") + " (position " + i + ")");
                     }
                 }
-                Assert.AreEqual("ABCDEFGHIJ€", s);
+                Assert.That(s, Is.EqualTo("ABCDEFGHIJ€"));
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_ReadTo_Cached()
+        public void ReadToCached()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                bool err = false;
                 string s;
 
                 src.Write("foobar");
-                try {
-                    s = dst.ReadTo("baz");
-                } catch (System.Exception e) {
-                    if (e is TimeoutException) err = true;
-                }
-                Assert.IsTrue(err, "No timeout exception occurred when reading 'baz'");
+                Assert.Throws<TimeoutException>(() => { s = dst.ReadTo("baz"); }, "No timeout exception occurred when reading 'baz'");
 
                 s = dst.ReadTo("foo");
-                Assert.AreEqual("", s);
+                Assert.That(s, Is.EqualTo(""));
 
                 s = dst.ReadTo("bar");
-                Assert.AreEqual("", s);
+                Assert.That(s, Is.EqualTo(""));
 
-                try {
-                    s = dst.ReadTo("baz");
-                } catch (System.Exception e) {
-                    if (e is TimeoutException) err = true;
-                }
-                Assert.IsTrue(err, "No timeout exception occurred when reading 'baz' when empty");
+                Assert.Throws<TimeoutException>(() => { s = dst.ReadTo("baz"); }, "No timeout exception occurred when reading 'baz' when empty");
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_ReadTo_Normal()
+        public void ReadToNormal()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 string s;
 
                 src.Write("superfoobar");
                 s = dst.ReadTo("foo");
-                Assert.AreEqual("super", s);
+                Assert.That(s, Is.EqualTo("super"));
 
                 s = dst.ReadExisting();
-                Assert.AreEqual("bar", s);
+                Assert.That(s, Is.EqualTo("bar"));
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_ReadTo_Overflow()
+        public void ReadToOverflow()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
-                src.Open(); Assert.IsTrue(src.IsOpen);
-                dst.Open(); Assert.IsTrue(dst.IsOpen);
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 // Send 2048 ASCII characters
                 Random r = new Random();
@@ -567,27 +848,160 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 src.Write(sdata, 0, sdata.Length);
                 src.Write("EOF");
                 while (dst.BytesToRead < sdata.Length) {
-                    System.Threading.Thread.Sleep(100);
+                    Thread.Sleep(100);
                 }
 
                 string result = dst.ReadTo("EOF");
-                Assert.AreEqual(0, dst.BytesToRead);
-                Assert.AreEqual(1024 - 3, result.Length);
+                Assert.That(dst.BytesToRead, Is.EqualTo(0));
+                Assert.That(result.Length, Is.EqualTo(1024 - 3));
                 int offset = sdata.Length - result.Length;
                 for (int i = 0; i < result.Length; i++) {
-                    Assert.AreEqual((int)sdata[offset + i], (int)result[i]);
+                    Assert.That((int)result[i], Is.EqualTo(sdata[offset + i]));
                 }
             }
         }
 
         [Test]
         [Category("SerialPortStream")]
-        public void SerialPortStream_Flush()
+        public void ReadToWithMbcs()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                src.WriteTimeout = c_Timeout; src.ReadTimeout = c_Timeout;
-                dst.WriteTimeout = c_Timeout; dst.ReadTimeout = c_Timeout;
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                src.Write(new byte[] { 0x61, 0xE2, 0x82, 0xAC, 0x40, 0x41 }, 0, 6);
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'a'));
+                Assert.That(dst.ReadByte(), Is.EqualTo((0xE2)));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'�'));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'�'));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'@'));
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'A'));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadToResetWithMbcs1()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                src.Write(new byte[] { 0x61, 0xE2, 0x82, 0xAC, 0x40, 0x41 }, 0, 6);
+                Assert.That(() => { dst.ReadLine(); }, Throws.Exception.TypeOf<TimeoutException>());
+
+                // So now we should have data in the character cache, but we'll ready a byte.
+                Assert.That(dst.ReadByte(), Is.EqualTo(0x61));
+                Assert.That(dst.ReadExisting(), Is.EqualTo("€@A"));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadToResetWithMbcs2()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                src.Write(new byte[] { 0xE2, 0x82, 0xAC, 0x40, 0x41, 0x62 }, 0, 6);
+                Assert.That(() => { dst.ReadLine(); }, Throws.Exception.TypeOf<TimeoutException>());
+
+                // So now we should have data in the character cache, but we'll ready a byte.
+                Assert.That(dst.ReadByte(), Is.EqualTo(0xE2));
+                Assert.That(dst.ReadExisting(), Is.EqualTo("��@Ab"));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadToResetWithMbcs3()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                src.Write(new byte[] { 0xE2, 0x82, 0xAC, 0x40, 0x41, 0x62 }, 0, 6);
+                Assert.That(() => { dst.ReadLine(); }, Throws.Exception.TypeOf<TimeoutException>());
+
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'€'));
+                Assert.That(dst.ReadByte(), Is.EqualTo(0x40));
+                Assert.That(dst.ReadExisting(), Is.EqualTo("Ab"));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadToResetWithOverflow()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                byte[] writeData = new byte[2048];
+                for (int i = 0; i < writeData.Length; i++) { writeData[i] = (byte)((i % 26) + 0x41); }
+
+                // We write 2048 bytes that starts with A..Z repeated.
+                //  Position 0 = A
+                //  Position 1023 = J
+                // To read a line, it parses the 2048 characters, not finding a new line. Then we read a character and
+                // we expect to get 'A'.
+                src.Write(writeData, 0, writeData.Length);
+                Assert.That(() => { dst.ReadLine(); }, Throws.Exception.TypeOf<TimeoutException>());
+                Assert.That(dst.ReadChar(), Is.EqualTo((int)'A'));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ReadToWithOverflow2()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = -1; src.ReadTimeout = -1;
+                dst.WriteTimeout = -1; dst.ReadTimeout = -1;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                byte[] writeData = new byte[2048];
+                for (int i = 0; i < writeData.Length - 1; i++) { writeData[i] = (byte)((i % 26) + 0x41); }
+                writeData[writeData.Length - 1] = (byte)'\n';
+
+                // We write 2048 bytes that starts with A..Z repeated.
+                //  Position 0 = A
+                //  Position 1023 = J
+                //  Position 1024 = K
+                //  Position 2047 = \n
+                src.Write(writeData, 0, writeData.Length);
+                string line = dst.ReadLine();
+                Assert.That(line[0], Is.EqualTo('K'));
+                Assert.That(line.Length, Is.EqualTo(1023));   // Is 1024 - Length('\n').
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void Flush()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
                 src.Open(); Assert.IsTrue(src.IsOpen);
                 dst.Open(); Assert.IsTrue(dst.IsOpen);
 
@@ -596,15 +1010,240 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                     sdata[i] = (byte)(64 + i % 48);
                 }
 
+                // It should take 512 * 10 / 115200 s = 44ms to send, timeout of 300ms.
                 src.Write(sdata, 0, sdata.Length);
-                //System.Threading.Thread.Sleep(10);
                 src.Flush();
                 Assert.That(src.BytesToWrite, Is.EqualTo(0));
 
                 src.Write(sdata, 0, sdata.Length);
-                //System.Threading.Thread.Sleep(10);
                 src.Flush();
                 Assert.That(src.BytesToWrite, Is.EqualTo(0));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void SettingsOnOpenParity()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.Odd, StopBits.One)) {
+                Assert.That(src.Parity, Is.EqualTo(Parity.Odd));
+                src.Open();
+                Assert.That(src.Parity, Is.EqualTo(Parity.Odd));
+            }
+        }
+
+        private void TestOddParity(SerialPortStream src, SerialPortStream dst)
+        {
+            src.Write(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F }, 0, 16);
+            src.Flush();
+
+            int offset = 0;
+            int counter = 0;
+            byte[] recv = new byte[256];
+            while (offset < 16 && counter < 10) {
+                offset += dst.Read(recv, offset, recv.Length - offset);
+                counter++;
+                Console.WriteLine("Buffer Bytes Received: {0}; Read attempts: {1}", offset, counter);
+            }
+
+            for (int i = 0; i < offset; i++) {
+                Console.WriteLine("Offset: {0} = {1:X2}", i, recv[i]);
+            }
+
+            Assert.That(offset, Is.EqualTo(16), "Expected 16 bytes received, but only got {0} bytes", offset);
+            byte[] expectedrecv = new byte[] { 0x80, 0x01, 0x02, 0x83, 0x04, 0x85, 0x86, 0x07, 0x08, 0x89, 0x8A, 0x0B, 0x8C, 0x0D, 0x0E, 0x8F };
+            for (int i = 0; i < offset; i++) {
+                Assert.That(recv[i], Is.EqualTo(expectedrecv[i]), "Offset {0} got {1}; expected {2}", i, recv[i], expectedrecv[i]);
+            }
+        }
+
+        private void TestEvenParity(SerialPortStream src, SerialPortStream dst)
+        {
+            src.Write(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F }, 0, 16);
+            src.Flush();
+
+            int offset = 0;
+            int counter = 0;
+            byte[] recv = new byte[256];
+            while (offset < 16 && counter < 10) {
+                offset += dst.Read(recv, offset, recv.Length - offset);
+                counter++;
+                Console.WriteLine("Buffer Bytes Received: {0}; Read attempts: {1}", offset, counter);
+            }
+
+            for (int i = 0; i < offset; i++) {
+                Console.WriteLine("Offset: {0} = {1:X2}", i, recv[i]);
+            }
+
+            Assert.That(offset, Is.EqualTo(16), "Expected 16 bytes received, but only got {0} bytes", offset);
+            byte[] expectedrecv = new byte[] { 0x00, 0x81, 0x82, 0x03, 0x84, 0x05, 0x06, 0x87, 0x88, 0x09, 0x0A, 0x8B, 0x0C, 0x8D, 0x8E, 0x0F };
+            for (int i = 0; i < offset; i++) {
+                Assert.That(recv[i], Is.EqualTo(expectedrecv[i]), "Offset {0} got {1}; expected {2}", i, recv[i], expectedrecv[i]);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void OddParityLoopback()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 7, Parity.Odd, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+
+                TestOddParity(src, dst);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void EvenParityLoopback()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 7, Parity.Even, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+
+                TestEvenParity(src, dst);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void ParityChangeLoopback()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 7, Parity.Even, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+                TestEvenParity(src, dst);
+
+                src.Parity = Parity.Odd;
+                dst.Parity = Parity.None;
+                TestOddParity(src, dst);
+
+                src.Parity = Parity.None;
+                src.DataBits = 8;
+                dst.DataBits = 7;
+                dst.Parity = Parity.Odd;
+                TestOddParity(dst, src);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void WaitForRxCharEventOn1Byte()
+        {
+            using (ManualResetEvent rxChar = new ManualResetEvent(false))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+
+                dst.ReceivedBytesThreshold = 1;
+                dst.DataReceived += (s, a) => { rxChar.Set(); };
+                src.WriteByte(0x00);
+                Assert.That(rxChar.WaitOne(1000), Is.True);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void WaitForRxCharEventOn2Bytes()
+        {
+            using (ManualResetEvent rxChar = new ManualResetEvent(false))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+
+                dst.ReceivedBytesThreshold = 2;
+                dst.DataReceived += (s, a) => { rxChar.Set(); };
+                src.WriteByte(0x00);
+                Assert.That(rxChar.WaitOne(1000), Is.False);
+                src.WriteByte(0x01);
+                Assert.That(rxChar.WaitOne(1000), Is.True);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void WaitForRxCharEventOnEofChar()
+        {
+            using (ManualResetEvent rxChar = new ManualResetEvent(false))
+            using (ManualResetEvent eofChar = new ManualResetEvent(false))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+
+                dst.ReceivedBytesThreshold = 5;
+                dst.DataReceived += (s, a) => {
+                    if (a.EventType == SerialData.Chars) rxChar.Set();
+                    if (a.EventType == SerialData.Eof) eofChar.Set();
+                };
+                src.WriteByte(0x00);
+                Assert.That(rxChar.WaitOne(500), Is.False);
+                Assert.That(eofChar.WaitOne(0), Is.False);
+                src.WriteByte(0x01);
+                Assert.That(rxChar.WaitOne(500), Is.False);
+                Assert.That(eofChar.WaitOne(0), Is.False);
+                src.WriteByte(0x1A);
+                Assert.That(rxChar.WaitOne(500), Is.False);
+                Assert.That(eofChar.WaitOne(0), Is.True);
+                eofChar.Reset();
+                src.WriteByte(0x02);
+                Assert.That(rxChar.WaitOne(500), Is.False);
+                Assert.That(eofChar.WaitOne(0), Is.False);
+                src.WriteByte(0x03);
+                Assert.That(rxChar.WaitOne(500), Is.True);
+                Assert.That(eofChar.WaitOne(0), Is.False);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void WaitForCtsChangedEvent()
+        {
+            using (ManualResetEvent cts = new ManualResetEvent(false))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+
+                Thread.Sleep(300);   // Wait for events to be cleared after opening.
+
+                dst.PinChanged += (s, a) => {
+                    if (a.EventType.HasFlag(SerialPinChange.CtsChanged)) cts.Set();
+                };
+
+                // By default, the RTS is enabled. So we toggle it to off.
+                src.RtsEnable = false;
+
+                Assert.That(cts.WaitOne(500), Is.True);
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void WaitForDsrChangedEvent()
+        {
+            using (ManualResetEvent dsr = new ManualResetEvent(false))
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.Open(); src.WriteTimeout = c_TimeOut; src.ReadTimeout = c_TimeOut;
+                dst.Open(); dst.WriteTimeout = c_TimeOut; dst.ReadTimeout = c_TimeOut;
+
+                Thread.Sleep(300);   // Wait for events to be cleared after opening.
+
+                dst.PinChanged += (s, a) => {
+                    if (a.EventType.HasFlag(SerialPinChange.DsrChanged)) dsr.Set();
+                };
+
+                // By default, the DTR is enabled. So we toggle it to off.
+                src.DtrEnable = false;
+
+                Assert.That(dsr.WaitOne(500), Is.True);
             }
         }
     }

@@ -12,32 +12,32 @@ namespace RJCP.Datastructures
     /// expiry.
     /// </summary>
     /// <remarks>
-    /// This class is useful when implementing timeouts in other methods. It can
+    /// This class is useful when implementing time outs in other methods. It can
     /// provide the remaining time, in units of milliseconds, that can be used
     /// with many Operating System calls as an expiry time.
     /// <para>One example is the <see cref="M:System.Threading.WaitHandle.WaitOne"/>
-    /// method which expects a timeout parameter. Either instantiate the
+    /// method which expects a time out parameter. Either instantiate the
     /// <see cref="TimerExpiry"/> class at the beginning immediately before its
     /// use, or call the <see cref="Reset"/> method at the beginning
-    /// of the timeout operation. Then on return of the function, if no other
+    /// of the time out operation. Then on return of the function, if no other
     /// operation occurred, the method <see cref="RemainingTime"/> should return 0 indicating
     /// that the timer has expired.</para>
     /// <para>Another thread can be programmed to <see cref="Reset"/> the timer class during
-    /// a timeout operation, so that even if the result of Wait operation by the
-    /// Operating system resulted in a timeout, a <see cref="Reset"/>, which results in the
+    /// a time out operation, so that even if the result of Wait operation by the
+    /// Operating system resulted in a time out, a <see cref="Reset"/>, which results in the
     /// <see cref="RemainingTime"/> being more than 0 milliseconds, indicates that another
     /// wait operation should occur.</para>
     /// <para>Even if no expiry is to occur, but the Operating System function
-    /// returns early, you can opt to restart the timeout operation which will
-    /// then take into account the current time and reduce the timeout so that
+    /// returns early, you can opt to restart the time out operation which will
+    /// then take into account the current time and reduce the time out so that
     /// the operation ends as expected.</para>
     /// <para>As an example, say you need to wait for data by calling a method which waits
-    /// for the first set of data within a timeout. But your method must wait for at least
-    /// two elements of data within the timeout. This can be implemented as follows:</para>
+    /// for the first set of data within a time out. But your method must wait for at least
+    /// two elements of data within the time out. This can be implemented as follows:</para>
     /// <example>
-    /// public true MyFunc(int timeout)
+    /// public true MyFunc(int timeOut)
     /// {
-    ///     TimerExpiry myExpiry = new TimerExpiry(timeout);
+    ///     TimerExpiry myExpiry = new TimerExpiry(timeOut);
     ///     int elements = 0;
     ///     do {
     ///         elements += GetData(myExpiry.RemainingTime());
@@ -56,7 +56,7 @@ namespace RJCP.Datastructures
         /// <summary>
         /// Constructor. Initialise expiry based on the current time.
         /// </summary>
-        /// <param name="milliseconds">The initial timeout in milliseconds.</param>
+        /// <param name="milliseconds">The initial time out in milliseconds.</param>
         /// <remarks>
         /// The constructor sets the initial time out that should be used. On construction
         /// of the new object, the timer is automatically started.
@@ -107,7 +107,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// Reset the timeout so it occurs with the given Timeout.
+        /// Reset the time out so it occurs with the given <see cref="Timeout"/>.
         /// </summary>
         public void Reset()
         {

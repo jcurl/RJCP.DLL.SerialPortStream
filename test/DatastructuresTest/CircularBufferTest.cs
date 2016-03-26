@@ -1,6 +1,7 @@
 ﻿// Copyright © Jason Curl 2012-2016
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
+
 namespace RJCP.Datastructures.CircularBufferTest
 {
     using System;
@@ -427,7 +428,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_ConstructorArray()
         {
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x80, 0x00, 0x2F,
                 0x11, 0x40, 0x2B, 0x00, 0xCD, 0xC0, 0x27, 0x90, 
                 0x22, 0x30, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00,
@@ -470,7 +471,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -506,7 +507,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -544,7 +545,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -574,7 +575,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -604,7 +605,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -633,7 +634,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -669,7 +670,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -703,7 +704,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             // Test the decoder on the circular buffer
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -732,7 +733,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             // Test the decoder on the circular buffer
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -761,7 +762,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             // Test the decoder on the circular buffer
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -796,7 +797,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             // Test the decoder on the circular buffer
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -867,7 +868,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -895,7 +896,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -923,7 +924,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -952,7 +953,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -981,7 +982,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1009,7 +1010,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1047,7 +1048,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1076,7 +1077,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1105,7 +1106,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1134,7 +1135,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1164,7 +1165,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1199,7 +1200,7 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1277,7 +1278,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] b = new byte[] { 
+            byte[] b = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1306,7 +1307,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
             
-            byte[] b = new byte[] { 
+            byte[] b = { 
                 0xF3, 0xA0, 0x82, 0x84, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41,
                 0x42, 0x43, 0x44, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55
             };
@@ -1333,7 +1334,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] b = new byte[] { 
+            byte[] b = { 
                 0xF3, 0xA0, 0x82, 0x84, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41,
                 0x42, 0x43, 0x44, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55
             };
@@ -1368,7 +1369,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] m = new byte[] { 0x41, 0xE2, 0x82, 0xAC };
+            byte[] m = { 0x41, 0xE2, 0x82, 0xAC };
             CircularBuffer<byte> cb;
             CircularBuffer<char> cc;
             int bu;
@@ -1408,7 +1409,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
 
-            byte[] b = new byte[] { 
+            byte[] b = { 
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
@@ -1436,11 +1437,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             CircularBuffer<char> cc = new CircularBuffer<char>(28);
 
@@ -1463,11 +1464,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[28];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
@@ -1491,11 +1492,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[28];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
@@ -1519,11 +1520,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[20];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 15, 0);
@@ -1547,11 +1548,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[20];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 15, 0);
@@ -1575,11 +1576,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[13];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 4, 0);
@@ -1603,11 +1604,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[30];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
@@ -1638,11 +1639,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82, 0xAC, 0x40,
                 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[30];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
@@ -1666,11 +1667,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82, 0xAC, 0x40,
                 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[12];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 11, 0);
@@ -1694,11 +1695,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0, 0x82, 0x84,
                 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[14];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 11, 0);
@@ -1722,11 +1723,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0, 0x82, 0x84,
                 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[13];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 11, 0);
@@ -1750,11 +1751,11 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            byte[] m = new byte[] { 
+            byte[] m = { 
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0, 0x82, 0x84,
                 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
+                0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E
             };
             char[] c = new char[1];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 0, 0);
@@ -1801,7 +1802,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Encoder e = enc.GetEncoder();
 
-            char[] c = new char[] { 'A', 'B', '€', 'C' };
+            char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
             int bu;
             int cu;
@@ -1831,7 +1832,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Encoder e = enc.GetEncoder();
 
-            char[] c = new char[] { 'A', 'B', '€', 'C' };
+            char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
             int bu;
             int cu;
@@ -1859,7 +1860,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Encoder e = enc.GetEncoder();
 
-            char[] c = new char[] { 'A', 'B', '€', 'C' };
+            char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
             int bu;
             int cu;
@@ -1886,7 +1887,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             Encoding enc = Encoding.GetEncoding("UTF-8");
             Encoder e = enc.GetEncoder();
 
-            char[] c = new char[] { 'A', 'B', '€', 'C' };
+            char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
             int bu;
             int cu;

@@ -12,7 +12,7 @@ namespace RJCP.IO
     /// </summary>
     internal class LocalAsync : IAsyncResult, IDisposable
     {
-        private object m_State;
+        readonly object m_State;
         private ManualResetEvent m_Handle;
 
         /// <summary>
@@ -47,6 +47,7 @@ namespace RJCP.IO
         /// </summary>
         /// <returns>A <see cref="T:System.Threading.WaitHandle" /> that is
         /// used to wait for an asynchronous operation to complete.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public WaitHandle AsyncWaitHandle
         {
             get
@@ -71,19 +72,14 @@ namespace RJCP.IO
             }
         }
 
-        private bool m_IsSynch;
-
         /// <summary>
         /// Gets a value that indicates whether the asynchronous
         /// operation completed synchronously.
         /// </summary>
         /// <returns>true if the asynchronous operation completed synchronously;
         /// otherwise, false.</returns>
-        public bool CompletedSynchronously
-        {
-            get { return m_IsSynch; }
-            internal set { m_IsSynch = value; }
-        }
+        
+        public bool CompletedSynchronously { get; internal set; }
 
         private volatile bool m_IsCompleted;
 
@@ -131,8 +127,6 @@ namespace RJCP.IO
 
     internal class LocalAsync<T> : LocalAsync
     {
-        private T m_Result;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalAsync"/> class.
         /// </summary>
@@ -151,10 +145,6 @@ namespace RJCP.IO
         /// <value>
         /// The result.
         /// </value>
-        internal T Result
-        {
-            get { return m_Result; }
-            set { m_Result = value; }
-        }
+        internal T Result { get; set; }
     }
 }

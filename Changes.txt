@@ -1,0 +1,19 @@
+Here is a list of some of the functional changes made in version 2.0.0.0
+
+* General changes: Refactored to make the code much simpler to read and
+  maintain, as well as to support for other platforms.
+
+* DtrEnable no longer throws an exception on getting if the Handshake is set.
+  Reading the property returns the value that would be set when handshaking
+  for DTR/DSR is disabled.
+* RtsEnable no longer throws an exception on getting if the Handshake is set.
+  Reading the property returns the value that would be set when handshaking
+  for RTS/CTS is disabled.
+
+
+
+TODO:
+* Clean up what methods check IsDisposed and not in SerialPortStream.
+* If there is a problem with SetPortSettings, we should roll back somehow.
+* WinNativeSerial doesn't need to set the DriverInQueue/DriverOutQueue as it
+  can only be called when the port is not opened.
