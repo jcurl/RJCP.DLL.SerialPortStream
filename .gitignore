@@ -5,7 +5,9 @@
 /test/SerialPortStreamTest/bin
 /test/SerialPortStreamTest/obj
 /packages/NUnit.2.6.4
+/packages/Mono.Posix.4.0.0.0
 /.vs
-/*.suo
-/code/*.user
+*.suo
+*.user
+*.userprefs
 *.GhostDoc.xml

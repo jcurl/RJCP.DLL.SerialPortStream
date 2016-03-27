@@ -410,6 +410,7 @@ namespace RJCP.IO.Ports.Native
                     if (m_SerialBuffer.m_WriteBuffer.Free == 0) {
                         m_SerialBuffer.m_WriteBufferNotFullEvent.Reset();
                     }
+                    m_SerialBuffer.OnWriteEvent(m_SerialBuffer, new EventArgs());
                     return bytes;
                 }
             }
@@ -518,6 +519,20 @@ namespace RJCP.IO.Ports.Native
         /// The object to use for locking access to the byte write buffer.
         /// </value>
         public object WriteLock { get { return m_WriteLock; } }
+
+        private void OnWriteEvent(object sender, EventArgs args)
+        {
+            EventHandler handler = WriteEvent;
+            if (handler != null) {
+                handler(sender, args);
+            }
+        }
+
+        /// <summary>
+        /// Event raised when data is available to write. This could be used to
+        /// abort an existing connection.
+        /// </summary>
+        public event EventHandler WriteEvent;
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.

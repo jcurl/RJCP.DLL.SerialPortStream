@@ -1,4 +1,8 @@
-﻿namespace RJCP.IO.Ports.Native
+﻿// Copyright © Jason Curl 2012-2016
+// Sources at https://github.com/jcurl/SerialPortStream
+// Licensed under the Microsoft Public License (Ms-PL)
+
+namespace RJCP.IO.Ports.Native
 {
     using System;
     using System.Text;
@@ -77,6 +81,12 @@
         /// </remarks>
         private bool PeekChar(SerialBuffer sbuffer)
         {
+            // Work around a MONO bug in Mono 4.2.3.4 (16/March/2016). When this is resolved, should kill this code and say
+            // which version of MONO is the minimum required.
+
+            if (Unix.MonoRuntime.IsMonoRuntime()) return PeekCharMono(sbuffer);
+        
+            // Once the bug from Mono is fixed, we just drop the code above.
             if (sbuffer == null) throw new ArgumentNullException("sbuffer");
             int readLen = sbuffer.Serial.ReadBuffer.Length;
             SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
@@ -91,16 +101,62 @@
                 int bu; bool complete;
                 try {
                     // Some UTF8 sequences may result in two UTF16 characters being generated.
-                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array, sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
-                        sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset), oneChar, 0, 1, false, out bu, out cu, out complete);
+                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array,
+                        sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
+                        sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset),
+                        oneChar, 0, 1, false, out bu, out cu, out complete);
                 } catch (System.ArgumentException ex) {
                     if (!ex.ParamName.Equals("chars")) throw;
-                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array, sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
-                        sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset), oneChar, 0, 2, false, out bu, out cu, out complete);
+                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array,
+                        sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
+                        sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset),
+                        oneChar, 0, 2, false, out bu, out cu, out complete);
                 }
                 m_ReadOffset += bu;
                 SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                     "PeekChar: Decoder.Convert(out bu={0}, out cu={1}); m_ReadOffset={2}", bu, cu, m_ReadOffset);
+            }
+            if (cu == 0) return false;
+
+            m_ReadCache.Append(oneChar, 0, cu);
+            m_ReadOffsets.Append(m_ReadOffset - m_LastChar);
+            if (cu > 1) m_ReadOffsets.Append(0);
+            m_LastChar = m_ReadOffset;
+            return true;
+        }
+
+        private bool PeekCharMono(SerialBuffer sbuffer)
+        {
+            if (sbuffer == null) throw new ArgumentNullException("sbuffer");
+            int readLen = sbuffer.Serial.ReadBuffer.Length;
+            SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                "PeekCharMono: readlen={0}; m_ReadOffset={1}; m_ReadCache.Free={2}", readLen, m_ReadOffset, m_ReadCache.Free);
+            if (m_ReadOffset >= readLen) return false;
+
+            if (m_ReadCache.Free <= 1) Overflow();
+
+            char[] oneChar = new char[2];
+            int cu = 0;
+            while (cu == 0 && m_ReadOffset < readLen) {
+                int bu; bool complete;
+                try {
+                    // Some UTF8 sequences may result in two UTF16 characters being generated.
+
+                    // Mono 4.2.3.4: the byteCount is set to "1" and not "sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset)"
+                    // as sometimes there is the bug that Mono consumes more bytes than it should. This may cause lost
+                    // data when mixing ReadByte() and ReadChar() in your program.
+                    //
+                    // See https://bugzilla.xamarin.com/show_bug.cgi?id=40002
+                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array, sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset), 1,
+                        oneChar, 0, 1, false, out bu, out cu, out complete);
+                } catch (System.ArgumentException ex) {
+                    if (!ex.ParamName.Equals("chars")) throw;
+                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array, sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset), 1,
+                        oneChar, 0, 2, false, out bu, out cu, out complete);
+                }
+                m_ReadOffset += bu;
+                SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                    "PeekCharMono: Decoder.Convert(out bu={0}, out cu={1}); m_ReadOffset={2}", bu, cu, m_ReadOffset);
             }
             if (cu == 0) return false;
 

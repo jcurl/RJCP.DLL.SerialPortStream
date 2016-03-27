@@ -1,6 +1,7 @@
 ﻿// Copyright © Jason Curl 2012-2016
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
+
 namespace RJCP.IO.Ports.SerialPortStreamTest
 {
     using System;
@@ -20,12 +21,25 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     /// of the two serial ports.</para>
     /// </remarks>
     [TestFixture]
+    [Timeout(10000)]
     public class SerialPortStreamTest
     {
-        //private const string c_SourcePort = "CNCA0";
-        //private const string c_DestPort = "CNCB0";
-        private const string c_SourcePort = "COM9";
-        private const string c_DestPort = "COM10";
+        private readonly string c_SourcePort;
+        private readonly string c_DestPort;
+
+        public SerialPortStreamTest()
+        {
+            int p = (int)Environment.OSVersion.Platform;
+            if (p == (int)PlatformID.Win32NT) {
+                //c_SourcePort = "CNCA0";
+                //c_DestPort = "CNCB0";
+                c_SourcePort = "COM9";
+                c_DestPort = "COM10";
+            } else if (p == 4 || p == 8 || p == 128) {
+                c_SourcePort = "/dev/ttyUSB0";
+                c_DestPort = "/dev/ttyUSB1";
+            }
+        }
 
         private const int c_TimeOut = 300;
 
@@ -36,6 +50,16 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             SerialPortStream src = new SerialPortStream();
             src.Dispose();
             Assert.That(src.IsDisposed, Is.True);
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void VersionString()
+        {
+            using (SerialPortStream src = new SerialPortStream()) {
+                Assert.That(src.Version, Is.Not.Null.Or.Empty);
+                Console.WriteLine("Version: {0}", src.Version);
+            }
         }
 
         [Test]
@@ -93,6 +117,136 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 Console.WriteLine("  DrvInQueue: {0}", src.DriverInQueue);
                 Console.WriteLine(" DrvOutQueue: {0}", src.DriverOutQueue);
                 Console.WriteLine("{0}", src.ToString());
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyBaudRate()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.BaudRate = 115200;
+                Assert.That(src.BaudRate, Is.EqualTo(115200));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyDataBits()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.DataBits = 8;
+                Assert.That(src.DataBits, Is.EqualTo(8));
+                src.DataBits = 7;
+                Assert.That(src.DataBits, Is.EqualTo(7));
+                src.DataBits = 6;
+                Assert.That(src.DataBits, Is.EqualTo(6));
+                src.DataBits = 5;
+                Assert.That(src.DataBits, Is.EqualTo(5));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyParity()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.Parity = Parity.None;
+                Assert.That(src.Parity, Is.EqualTo(Parity.None));
+                src.Parity = Parity.Even;
+                Assert.That(src.Parity, Is.EqualTo(Parity.Even));
+                src.Parity = Parity.Odd;
+                Assert.That(src.Parity, Is.EqualTo(Parity.Odd));
+                src.Parity = Parity.Mark;
+                Assert.That(src.Parity, Is.EqualTo(Parity.Mark));
+                src.Parity = Parity.Space;
+                Assert.That(src.Parity, Is.EqualTo(Parity.Space));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyStopBits()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.StopBits = StopBits.One;
+                Assert.That(src.StopBits, Is.EqualTo(StopBits.One));
+                src.StopBits = StopBits.Two;
+                Assert.That(src.StopBits, Is.EqualTo(StopBits.Two));
+                src.StopBits = StopBits.One5;
+                Assert.That(src.StopBits, Is.EqualTo(StopBits.One5));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyDiscardNull()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.DiscardNull = false;
+                Assert.That(src.DiscardNull, Is.EqualTo(false));
+                src.DiscardNull = true;
+                Assert.That(src.DiscardNull, Is.EqualTo(true));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyParityReplace()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.ParityReplace = 0;
+                Assert.That(src.ParityReplace, Is.EqualTo(0));
+                src.ParityReplace = (byte)'.';
+                Assert.That(src.ParityReplace, Is.EqualTo((byte)'.'));
+                src.ParityReplace = 255;
+                Assert.That(src.ParityReplace, Is.EqualTo(255));
+                src.ParityReplace = 127;
+                Assert.That(src.ParityReplace, Is.EqualTo(127));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyTxContinueOnXOff()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.TxContinueOnXOff = true;
+                Assert.That(src.TxContinueOnXOff, Is.EqualTo(true));
+                src.TxContinueOnXOff = false;
+                Assert.That(src.TxContinueOnXOff, Is.EqualTo(false));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyXOffLimit()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.XOffLimit = 512;
+                Assert.That(src.XOffLimit, Is.EqualTo(512));
+                src.XOffLimit = 2048;
+                Assert.That(src.XOffLimit, Is.EqualTo(2048));
+                src.XOffLimit = 1024;
+                Assert.That(src.XOffLimit, Is.EqualTo(1024));
+                src.XOffLimit = 8192;
+                Assert.That(src.XOffLimit, Is.EqualTo(8192));
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void PropertyXOnLimit()
+        {
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort)) {
+                src.XOnLimit = 512;
+                Assert.That(src.XOnLimit, Is.EqualTo(512));
+                src.XOnLimit = 2048;
+                Assert.That(src.XOnLimit, Is.EqualTo(2048));
+                src.XOnLimit = 1024;
+                Assert.That(src.XOnLimit, Is.EqualTo(1024));
+                src.XOnLimit = 8192;
+                Assert.That(src.XOnLimit, Is.EqualTo(8192));
             }
         }
 
@@ -275,6 +429,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
+        [Timeout(20000)]
         public void SendReceive()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -348,6 +503,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
+        [Timeout(20000)]
         public void SendReceiveWithBeginEnd()
         {
             using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -405,7 +561,6 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(2000)]
         public void SendAndFlush1()
         {
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
@@ -421,7 +576,6 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(2000)]
         public void SendAndFlush2()
         {
             using (SerialPortStream dst = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One))
@@ -486,10 +640,16 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
                 char[] recv = new char[5];
                 int cread = 0; int counter = 0;
-                while (cread < 3 && counter < 2) {
-                    cread += dst.Read(recv, 0, recv.Length);
+                while (cread < 3 && counter < 5) {
+                    cread += dst.Read(recv, cread, recv.Length - cread);
                     counter++;
+                    Console.WriteLine("dst.Read. Got cread={0} bytes in {1} loops", cread, counter);
                 }
+
+                for (int i = 0; i < cread; i++) {
+                    Console.WriteLine("cread[{0}] = {1}", i, recv[i]);
+                }
+
                 Assert.That(cread, Is.EqualTo(3));
                 Assert.That(recv[0], Is.EqualTo('e'));
                 Assert.That(recv[1], Is.EqualTo('f'));
@@ -821,6 +981,9 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 s = dst.ReadTo("foo");
                 Assert.That(s, Is.EqualTo("super"));
 
+                // Sleep for 100ms to allow all data to be sent and received. Else we might not receive the
+                // entire string, and sometimes only get it partially.
+                Thread.Sleep(100);
                 s = dst.ReadExisting();
                 Assert.That(s, Is.EqualTo("bar"));
             }

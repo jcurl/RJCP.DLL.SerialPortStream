@@ -53,7 +53,8 @@ namespace RJCP.IO.Ports
         public SerialPortStream()
         {
             m_NativeSerial = CreateNativeSerial();
-            if (m_NativeSerial == null) throw new NotSupportedException("SerialPortStream is not supported on this platform");
+            if (m_NativeSerial == null)
+                throw new NotSupportedException("SerialPortStream is not supported on this platform");
 
             InitialiseEvents();
             SerialTrace.AddRef();
@@ -118,10 +119,22 @@ namespace RJCP.IO.Ports
 
         private static INativeSerial CreateNativeSerial()
         {
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+            int p = (int)Environment.OSVersion.Platform;
+            if (p == (int)PlatformID.Win32NT) {
                 return new WinNativeSerial();
+            } else if (p == 4 || p == 8 || p == 128) {
+                return new UnixNativeSerial();
             }
             return null;
+        }
+
+        /// <summary>
+        /// Get the version of this assembly (or components driving this assembly).
+        /// </summary>
+        /// <value>The version of the assembly and/or subcomponents.</value>
+        public string Version
+        {
+            get { return m_NativeSerial.Version; }
         }
 
         /// <summary>
@@ -1682,7 +1695,6 @@ namespace RJCP.IO.Ports
 
         private void NativeSerial_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            SerialTrace.TraceSer.TraceEvent(TraceEventType.Verbose, 0, "{0}: NativeSerial_DataReceived: {1}", m_NativeSerial.PortName, e.EventType);
             lock (m_EventLock) {
                 m_SerialDataFlags |= e.EventType;
             }
@@ -1691,7 +1703,6 @@ namespace RJCP.IO.Ports
 
         private void NativeSerial_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
-            SerialTrace.TraceSer.TraceEvent(TraceEventType.Verbose, 0, "{0}: NativeSerial_ErrorReceived: {1}", m_NativeSerial.PortName, e.EventType);
             lock (m_EventLock) {
                 m_SerialErrorFlags |= e.EventType;
             }
@@ -1700,7 +1711,6 @@ namespace RJCP.IO.Ports
 
         private void NativeSerial_PinChanged(object sender, SerialPinChangedEventArgs e)
         {
-            SerialTrace.TraceSer.TraceEvent(TraceEventType.Verbose, 0, "{0}: NativeSerial_PinChanged: {1}", m_NativeSerial.PortName, e.EventType);
             lock (m_EventLock) {
                 m_SerialPinChange |= e.EventType;
             }
@@ -1709,8 +1719,10 @@ namespace RJCP.IO.Ports
 
         private void CallEvent()
         {
-            if (IsDisposed || m_EventProcessing.WaitOne(0)) return;
-            m_EventProcessing.Set();
+            lock (m_EventLock) {
+                if (IsDisposed || m_EventProcessing.WaitOne(0)) return;
+                m_EventProcessing.Set();
+            }
 
             ThreadPool.QueueUserWorkItem(HandleEvent);
         }
@@ -1802,6 +1814,17 @@ namespace RJCP.IO.Ports
             if (IsDisposed) return;
 
             if (disposing) {
+                // Wait for events to finish before we dispose
+                IsDisposed = true;
+                bool eventRunning = false;
+                lock (m_EventLock) {
+                    if (m_EventProcessing.WaitOne(0)) {
+                        eventRunning = true;
+                    }
+                }
+                if (eventRunning) m_EventProcessing.WaitOne();
+                m_EventProcessing.Dispose();
+
                 m_NativeSerial.Dispose();
                 m_NativeSerial = null;
 
@@ -1812,18 +1835,7 @@ namespace RJCP.IO.Ports
                 }
 
                 SerialTrace.Close();
-                // Wait for events to finish before we dispose
-                bool eventRunning = false;
-                lock (m_EventLock) {
-                    if (m_EventProcessing.WaitOne(0)) {
-                        IsDisposed = true;
-                        eventRunning = true;
-                    }
-                }
-                if (eventRunning) m_EventProcessing.WaitOne();
-                m_EventProcessing.Dispose();
             }
-            IsDisposed = true;
             base.Dispose(disposing);
         }
 

@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -38,10 +36,8 @@
     <DocumentationFile>bin\Release\RJCP.SerialPortStream.XML</DocumentationFile>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet />
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>rjcp_serialportstream.pfx</AssemblyOriginatorKeyFile>
@@ -51,12 +47,15 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Mono.Posix, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <HintPath>..\packages\Mono.Posix.4.0.0.0\lib\net40\Mono.Posix.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HandShake.cs" />
     <Compile Include="Native\INativeSerial.cs" />
-    <Compile Include="Native\INativeSerialDll.cs" />
     <Compile Include="Native\ReadToCache.cs" />
     <Compile Include="Native\Windows\CommErrorEventArgs.cs" />
     <Compile Include="Native\Windows\CommEventArgs.cs" />
@@ -87,9 +86,17 @@
     <Compile Include="SerialTrace.cs" />
     <Compile Include="Native\Windows\WinError.cs" />
     <Compile Include="StopBits.cs" />
+    <Compile Include="Native\UnixNativeSerial.cs" />
+    <Compile Include="Native\Unix\INativeSerialDll.cs" />
+    <Compile Include="Native\Unix\SerialUnix.cs" />
+    <Compile Include="Native\Unix\SerialReadWriteEvent.cs" />
+    <Compile Include="Native\Unix\MonoRuntime.cs" />
+    <Compile Include="Native\Unix\WaitForModemEvent.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="rjcp_serialportstream.pfx" />
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -99,4 +106,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup />
 </Project>
