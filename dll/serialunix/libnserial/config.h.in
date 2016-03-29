@@ -1,0 +1,69 @@
+/* This is the configuration file for the serialunix library. This
+ * header file is *private*, it should only be included by the sources
+ * of files in this build system, and not be made available outside.
+ */
+
+#define NSERIAL_VERSION_MAJOR @VERSION_MAJOR@
+#define NSERIAL_VERSION_MINOR @VERSION_MINOR@
+#define NSERIAL_VERSION_PATCH @VERSION_PATCH@
+
+/* serialoptions.cmake */
+#cmakedefine HAVE_TERMIOS_B0
+#cmakedefine HAVE_TERMIOS_B50
+#cmakedefine HAVE_TERMIOS_B75
+#cmakedefine HAVE_TERMIOS_B110
+#cmakedefine HAVE_TERMIOS_B134
+#cmakedefine HAVE_TERMIOS_B150
+#cmakedefine HAVE_TERMIOS_B200
+#cmakedefine HAVE_TERMIOS_B300
+#cmakedefine HAVE_TERMIOS_B600
+#cmakedefine HAVE_TERMIOS_B1200
+#cmakedefine HAVE_TERMIOS_B1800
+#cmakedefine HAVE_TERMIOS_B2400
+#cmakedefine HAVE_TERMIOS_B4800
+#cmakedefine HAVE_TERMIOS_B9600
+#cmakedefine HAVE_TERMIOS_B19200
+#cmakedefine HAVE_TERMIOS_B38400
+#cmakedefine HAVE_TERMIOS_B57600
+#cmakedefine HAVE_TERMIOS_B76800
+#cmakedefine HAVE_TERMIOS_B115200
+#cmakedefine HAVE_TERMIOS_B128000
+#cmakedefine HAVE_TERMIOS_B153600
+#cmakedefine HAVE_TERMIOS_B230400
+#cmakedefine HAVE_TERMIOS_B256000
+#cmakedefine HAVE_TERMIOS_B307200
+#cmakedefine HAVE_TERMIOS_B460800
+#cmakedefine HAVE_TERMIOS_B500000
+#cmakedefine HAVE_TERMIOS_B576000
+#cmakedefine HAVE_TERMIOS_B921600
+#cmakedefine HAVE_TERMIOS_B1000000
+#cmakedefine HAVE_TERMIOS_B1152000
+#cmakedefine HAVE_TERMIOS_B1500000
+#cmakedefine HAVE_TERMIOS_B2000000
+#cmakedefine HAVE_TERMIOS_B2500000
+#cmakedefine HAVE_TERMIOS_B3000000
+#cmakedefine HAVE_TERMIOS_B3500000
+#cmakedefine HAVE_TERMIOS_B4000000
+
+#cmakedefine HAVE_TERMIOS_CMSPAR
+
+#cmakedefine HAVE_TERMIOS_TIOCGICOUNT
+#cmakedefine HAVE_TERMIOS_TIOCMIWAIT
+#cmakedefine HAVE_LINUX_SERIAL_ICOUNTER_STRUCT
+#if defined(HAVE_LINUX_SERIAL_ICOUNTER_STRUCT) && defined(HAVE_TERMIOS_TIOCMIWAIT) && defined(HAVE_TERMIOS_TIOCGICOUNT)
+#define HAVE_TIOCMIWAIT
+#endif
+
+#cmakedefine HAVE_TERMIOS_TIOCSBRK
+#cmakedefine HAVE_TERMIOS_TIOCCBRK
+#if defined(HAVE_TERMIOS_TIOCSBRK) && defined(HAVE_TERMIOS_TIOCCBRK)
+#define HAVE_TERMIOS_BREAK
+#endif
+
+#cmakedefine HAVE_TERMIOS_TIOCINQ
+#cmakedefine HAVE_TERMIOS_FIONREAD
+#cmakedefine HAVE_TERMIOS_TIOCOUTQ
+#if !defined(HAVE_TERMIOS_TIOCINQ) && defined(HAVE_TERMIOS_FIONREAD)
+#define HAVE_TERMIOS_TIOCINQ
+#define TIOCINQ FIONREAD
+#endif

@@ -1,0 +1,39 @@
+The Component test tests sending and receiving data, that the connection is
+reliable.
+
+Prerequisites:
+* The unit test cases in the 'unittest' folder of this library should be run
+  first and work as expected. Failures there will explain some initialisation
+  failures that may be seen with this component test.
+
+Requirements:
+* You will need a NULL modem cable connected between two serial ports on your
+  computer. They could be a 16550A or a USB serial port, doesn't matter, so
+  long as it fully compatible with Linux. If it isn't then this component
+  test might find issues.
+
+Execution:
+* With appropriate permissions, you want to run the component test with paths
+  to the serial devices as parameters.
+
+e.g.
+
+  ./nserialcomptest /dev/ttyUSB0 /dev/ttyUSB1
+
+The Google test framework will execute and show you the results. For example:
+
+[==========] Running 2 tests from 2 test cases.
+[----------] Global test environment set-up.
+[----------] 1 test from SerialBasicTest
+[ RUN      ] SerialBasicTest.Version
+[       OK ] SerialBasicTest.Version (0 ms)
+[----------] 1 test from SerialBasicTest (0 ms total)
+
+[----------] 1 test from SerialSendReceiveTest
+[ RUN      ] SerialSendReceiveTest.SendReceive
+[       OK ] SerialSendReceiveTest.SendReceive (677 ms)
+[----------] 1 test from SerialSendReceiveTest (677 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 2 test cases ran. (677 ms total)
+[  PASSED  ] 2 tests.

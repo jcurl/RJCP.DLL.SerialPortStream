@@ -1,0 +1,18 @@
+The following work still needs to be done
+
+Serial Properties
+=================
+[ ] Changing of properties should use TCAFLUSH instead of TCSANOW
+
+Signals (man 4 tty_ioctl)
+=========================
+[-] Wait for DCD, RI, DSR, CTS to change (TIOCMIWAIT)
+    [ ] Check if signal on both raising/falling edge, or only on raising edge
+
+Other Operating Systems
+=======================
+[ ] Compile on FreeBSD
+[-] Compile on Cygwin32
+[ ] Compile on Cygwin64
+[ ] Compile on Solaris Sparc
+[ ] Compile on Solarix x86
