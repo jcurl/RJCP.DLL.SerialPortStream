@@ -196,6 +196,11 @@ Global
 		$26.NamingStyle = PascalCase
 		$26.IncludeInstanceMembers = True
 		$26.IncludeStaticEntities = True
+		$0.TextStylePolicy = $28
+		$28.FileWidth = 120
+		$28.inheritsSet = VisualStudio
+		$28.inheritsScope = text/plain
+		$28.scope = text/plain
 		version = 2.0.0.0
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
