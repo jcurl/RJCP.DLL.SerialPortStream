@@ -246,13 +246,6 @@ namespace RJCP.IO.Ports
                     m_NativeSerial.SetPortSettings();
                     // Fetch the actual settings and get the capabilities
                     m_NativeSerial.GetPortSettings();
-
-                    try {
-                        m_NativeSerial.BreakState = false;
-                    } catch (System.IO.IOException) {
-                        // Ignore IOException. Not all serial port drivers support clearing the
-                        // Break signal, so we ignore it when opening.
-                    }
                 }
 
                 // Create threads and start working with local buffers

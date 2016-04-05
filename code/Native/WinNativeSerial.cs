@@ -767,10 +767,15 @@ namespace RJCP.IO.Ports.Native
             if (m_CommState.RtsControl != RtsControl.Handshake) m_CommModemStatus.SetRts(m_RtsEnable);
             if (m_CommState.DtrControl != DtrControl.Handshake) m_CommModemStatus.SetDtr(m_DtrEnable);
 
-            if (m_BreakState) {
-                m_CommModemStatus.SetCommBreak();
-            } else {
-                m_CommModemStatus.ClearCommBreak();
+            try {
+	            if (m_BreakState) {
+	                m_CommModemStatus.SetCommBreak();
+	            } else {
+	                m_CommModemStatus.ClearCommBreak();
+	            }
+            } catch (System.IO.IOException) {
+                // Ignore IOException. Not all serial port drivers support clearing the
+                // Break signal, so we ignore it when opening.
             }
         }
 
