@@ -91,7 +91,6 @@
     <Compile Include="Native\Unix\INativeSerialDll.cs" />
     <Compile Include="Native\Unix\SerialUnix.cs" />
     <Compile Include="Native\Unix\SerialReadWriteEvent.cs" />
-    <Compile Include="Native\Unix\MonoRuntime.cs" />
     <Compile Include="Native\Unix\WaitForModemEvent.cs" />
   </ItemGroup>
   <ItemGroup>

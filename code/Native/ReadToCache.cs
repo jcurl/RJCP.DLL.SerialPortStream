@@ -8,6 +8,53 @@ namespace RJCP.IO.Ports.Native
     using System.Text;
     using Datastructures;
 
+    internal static class DecoderBug
+    {
+        // This is one dirty hack due to a bug in the .NET (and MONO) framework.
+        //
+        // When two bytes are in a byte buffer and we want to read one character,
+        // that should take exactly one byte, we've seen in the .NET framework two
+        // bytes are consumed. This is clearly wrong.
+        //
+        // See https://bugzilla.xamarin.com/show_bug.cgi?id=40002
+
+        private static bool m_IsRun;
+        private static bool m_IsPresent;
+        private static object m_SyncLock = new object();
+
+        public static bool IsPresent
+        {
+            get
+            {
+                if (!m_IsRun) {
+                    lock (m_SyncLock) {
+                        if (!m_IsRun) {
+                            m_IsRun = true;
+                            m_IsPresent = DoTest();
+                        }
+                    }
+                }
+                return m_IsPresent;
+            }
+        }
+
+        private static bool DoTest()
+        {
+            Encoding encoding = Encoding.GetEncoding("UTF-8");
+            Decoder decoder = encoding.GetDecoder();
+
+            byte[] data = new byte[] { 0x61, 0xE2, 0x82, 0xAC, 0x40, 0x41 };
+            char[] oneChar = new char[2];
+
+            int bu;
+            int cu;
+            bool complete;
+            decoder.Convert(data, 0, 2, oneChar, 0, 1, false, out bu, out cu, out complete);
+            if (bu != 1) return true;
+            return false;
+        }
+    }
+
     internal class ReadToCache
     {
         // Buffers for reading characters. We reserve one "char" at the end for 2-byte UTF16 sequences, to guarantee
@@ -23,7 +70,7 @@ namespace RJCP.IO.Ports.Native
         // Overflow of the first character is used to know the precise state of the decoder in case we
         // need to discard the cache. We can reset the decoder, and know what the first byte was that we
         // read to ensure consistent behaviour, because after we read the first byte, we know the
-        // decoder doesn't have any internal data cached anymore.
+        // decoder doesn't have any internal data cached any more.
         private int m_ReadOverflow = -1;         // Number of bytes to discard due to overflow
         private readonly char[] m_ReadOverflowChar = new char[2];   // First character that was lost
         private bool m_ReadOverflowUtf32;        // Indicates if two UTF16 overflowed or not.
@@ -84,7 +131,7 @@ namespace RJCP.IO.Ports.Native
             // Work around a MONO bug in Mono 4.2.3.4 (16/March/2016). When this is resolved, should kill this code and say
             // which version of MONO is the minimum required.
 
-            if (Unix.MonoRuntime.IsMonoRuntime()) return PeekCharMono(sbuffer);
+            if (DecoderBug.IsPresent) return PeekCharWorkaround(sbuffer);
         
             // Once the bug from Mono is fixed, we just drop the code above.
             if (sbuffer == null) throw new ArgumentNullException("sbuffer");
@@ -125,12 +172,12 @@ namespace RJCP.IO.Ports.Native
             return true;
         }
 
-        private bool PeekCharMono(SerialBuffer sbuffer)
+        private bool PeekCharWorkaround(SerialBuffer sbuffer)
         {
             if (sbuffer == null) throw new ArgumentNullException("sbuffer");
             int readLen = sbuffer.Serial.ReadBuffer.Length;
             SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                "PeekCharMono: readlen={0}; m_ReadOffset={1}; m_ReadCache.Free={2}", readLen, m_ReadOffset, m_ReadCache.Free);
+                "PeekCharWorkaround: readlen={0}; m_ReadOffset={1}; m_ReadCache.Free={2}", readLen, m_ReadOffset, m_ReadCache.Free);
             if (m_ReadOffset >= readLen) return false;
 
             if (m_ReadCache.Free <= 1) Overflow();
