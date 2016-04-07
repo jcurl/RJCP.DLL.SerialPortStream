@@ -29,16 +29,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         public SerialPortStreamTest()
         {
-            int p = (int)Environment.OSVersion.Platform;
-            if (p == (int)PlatformID.Win32NT) {
-                //c_SourcePort = "CNCA0";
-                //c_DestPort = "CNCB0";
-                c_SourcePort = "COM9";
-                c_DestPort = "COM10";
-            } else if (p == 4 || p == 8 || p == 128) {
-                c_SourcePort = "/dev/ttyUSB0";
-                c_DestPort = "/dev/ttyUSB1";
-            }
+            c_SourcePort = SerialConfiguration.SourcePort;
+            c_DestPort = SerialConfiguration.DestPort;
         }
 
         private const int c_TimeOut = 300;
