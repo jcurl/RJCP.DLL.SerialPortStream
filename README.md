@@ -5,7 +5,7 @@ maintainability.
 The SerialPortStream is a ground up implementation of a Stream that buffers
 data to and from a serial port. It uses low level Win32API for managing events
 and asynchronous I/O, using a programming model as in the MSDN
-(PipeServer)[http://msdn.microsoft.com/en-us/library/windows/desktop/aa365603.aspx]
+[PipeServer](http://msdn.microsoft.com/en-us/library/windows/desktop/aa365603.aspx)
 example.
 
 # Why another Serial Port implementation?
@@ -15,8 +15,8 @@ serial port. Unfortunately, documentation is sparse. When one tries to find
 information about how to program the serial port one comes across instead many
 blogs and forums describing the issues that they've observed.
 
-Through the implementation of SerialPortStream, I've used [http://ilspy.net/
-ILSpy] to reverse engineer how the Microsoft implementation works, discovering
+Through the implementation of SerialPortStream, I've used [ILSpy](http://ilspy.net)
+to reverse engineer how the Microsoft implementation works, discovering
 many other subtle, but noteworthy implementation issues.
 
 ## System Requirements
