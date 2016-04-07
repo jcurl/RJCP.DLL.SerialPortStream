@@ -20,8 +20,8 @@ the serial port. Unfortunately, documentation is sparse. When one tries to
 find information about how to program the serial port one comes across instead
 many blogs and forums describing the issues that they've observed.
 
-Through the implementation of SerialPortStream, I've used [http://ilspy.net/
-ILSpy] to reverse engineer how the Microsoft implementation works, discovering
+Through the implementation of SerialPortStream, I've used [ILSpy](http://ilspy.net/)
+to reverse engineer how the Microsoft implementation works, discovering
 many other subtle, but noteworthy implementation issues.
 
 # Goals
@@ -117,6 +117,9 @@ There are no releases at this time. NuGet packages are difficult for
 non-Windows platforms due to the large number of Linux distribution
 variants. The preferred mechanism for Linux is to compile the code from
 sources.
+
+I'm currently investigating making Debian packages for easy installation
+on Ubuntu and similar components.
 
 ### Windows
 
@@ -220,13 +223,18 @@ without losing functionality from v1.x.
 
 ## Windows
 
-On some computers with Modems, the function GetPortNames might not find it,
-while GetPortDescriptions does.
-
-This is not an issue, but when using the Com0Com for running unit tests, some
-specific test cases for Parity will fail. That is because Com0Com doesn't
-emulate data at a bit level.
-
+The following issues are known:
+* On some computers with Modems, the function GetPortNames might not find it,
+  while GetPortDescriptions does.
+* This is not an issue, but when using the Com0Com for running unit tests, some
+  specific test cases for Parity will fail. That is because Com0Com doesn't
+  emulate data at a bit level.
+* .NET 4.0 to the currently tested .NET 4.6 has a minor bug in System.Text.Decoder
+  that in a special circumstance it will consume too many bytes. The PeekChar()
+  method is slower when this bug is detected. Please refer to the Xamarin bug
+  [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
+  Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP also.
+  
 ## Mono on non-Windows Platforms
 
 Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
@@ -234,22 +242,21 @@ Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
   The System.Text implementation for converting bytes to UTF8 don't work. If
   you don't use the character based methods, it may work. But the software has
   not been tested against this framework.
-* The PeekChar() method is slower on Mono due to the Xamarin bug
-  [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
-  Mono 4.2.3.4. This bug has only been observed in this context and there is a
-  workaround implemented. But there may be other subtle unknown behaviours
-  still lurking to be found. This only affects character based APIs in
-  SerialPortStream
 * The DataReceived event doesn't fire for the EOF character (0x1A). On WIndows
   it does, as this is managed by the driver itself.
 * The test case for opening two serial ports simultaneously on Mono fails,
   meaning that it's possible to open the same device twice, which on Windows
   raises an UnauthorizedAccessException().
-* ListPorts is not implemented on Mono
+* ListPorts is not implemented on Mono and uses the SerialPort implementation.
+* Mono 4.2.3.4 (tested) has a minor bug in System.Text.Decoder as in the .NET references,
+  that in a special circumstance it will consume too many bytes. The PeekChar()
+  method is slower when this bug is detected. Please refer to the Xamarin bug
+  [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
+  Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP also.
 
 ### Linux
 
-Linux was tested on Ubuntu 14.04 and Ubuntu 16.04. Feedback welcome for other
+SerialPortStream was tested on Ubuntu 14.04 and Ubuntu 16.04. Feedback welcome for other
 distributions!
 
 The main functionality on Linux is provided by a support C library. The
