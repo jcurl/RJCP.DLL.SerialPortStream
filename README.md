@@ -42,7 +42,7 @@ Theoretically it should work on the following, but it hasn't been tested.
 
 ### Installation
 
-You can download the release for 1.1.4, which contains binaries compiled
+You can download the release for 1.2.0, which contains binaries compiled
 against Framework version 4.0 and 4.5. You can also install the NuGet package
 at http://www.nuget.org/packages/SerialPortStream/
 
