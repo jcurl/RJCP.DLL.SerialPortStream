@@ -2,40 +2,83 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>SerialPortStream</id>
-        <version>1.1.4.0</version>
+        <version>2.0.0.0</version>
         <title>SerialPortStream</title>
         <authors>Jason Curl</authors>
         <owners>Jason Curl</owners>
-        <licenseUrl>http://serialportstream.codeplex.com/license</licenseUrl>
-        <projectUrl>http://serialportstream.codeplex.com/</projectUrl>
+        <licenseUrl>https://github.com/jcurl/SerialPortStream/blob/v2.x/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/jcurl/serialportstream</projectUrl>
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.</description>
-        <copyright>(C) 2012-2015, Jason Curl</copyright>
+        <copyright>(C) 2012-2016, Jason Curl</copyright>
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.dll" target="lib\net40\RJCP.SerialPortStream.dll" />
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40\RJCP.SerialPortStream.pdb" />
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.XML" target="lib\net40\RJCP.SerialPortStream.XML" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.dll" target="lib\net45\RJCP.SerialPortStream.dll" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.pdb" target="lib\net45\RJCP.SerialPortStream.pdb" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.XML" target="lib\net45\RJCP.SerialPortStream.XML" />
-        <file src="..\code\Datastructures\CircularBuffer.cs" target="src\Datastructures\CircularBuffer.cs" />
-        <file src="..\code\Datastructures\TimerExpiry.cs" target="src\Datastructures\TimerExpiry.cs" />
-        <file src="..\code\Native\NativeMethods.cs" target="src\Native\NativeMethods.cs" />
-        <file src="..\code\Native\SafeNativeMethods.cs" target="src\Native\SafeNativeMethods.cs" />
-        <file src="..\code\Native\UnsafeNativeMethods.cs" target="src\Native\UnsafeNativeMethods.cs" />
-        <file src="..\code\Properties\AssemblyInfo.cs" target="src\Properties\AssemblyInfo.cs" />
-        <file src="..\code\LocalAsyncResult.cs" target="src\LocalAsyncResult.cs" />
-        <file src="..\code\PortDescription.cs" target="src\PortDescription.cs" />
-        <file src="..\code\SerialPortStream.cs" target="src\SerialPortStream.cs" />
-        <file src="..\code\SerialPortStream.NativeSerialPort.CommModemStatus.cs" target="src\SerialPortStream.NativeSerialPort.CommModemStatus.cs" />
-        <file src="..\code\SerialPortStream.NativeSerialPort.CommOverlappedIo.cs" target="src\SerialPortStream.NativeSerialPort.CommOverlappedIo.cs" />
-        <file src="..\code\SerialPortStream.NativeSerialPort.CommProperties.cs" target="src\SerialPortStream.NativeSerialPort.CommProperties.cs" />
-        <file src="..\code\SerialPortStream.NativeSerialPort.CommState.cs" target="src\SerialPortStream.NativeSerialPort.CommState.cs" />
-        <file src="..\code\SerialPortStream.NativeSerialPort.cs" target="src\SerialPortStream.NativeSerialPort.cs" />
-        <file src="..\code\SerialPortStream.SerialTrace.cs" target="src\SerialPortStream.SerialTrace.cs" />
-        <file src="..\code\SerialPortStream.WinError.cs" target="src\SerialPortStream.WinError.cs" />
-        <file src="..\code\SerialPortTypes.cs" target="src\SerialPortTypes.cs" />
+        <file src="..\..\distribute\lib\net40\RJCP.SerialPortStream.dll" target="lib\net40\RJCP.SerialPortStream.dll" />
+        <file src="..\..\distribute\lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40\RJCP.SerialPortStream.pdb" />
+        <file src="..\..\distribute\lib\net40\RJCP.SerialPortStream.XML" target="lib\net40\RJCP.SerialPortStream.XML" />
+        <file src="..\..\distribute\lib\net45\RJCP.SerialPortStream.dll" target="lib\net45\RJCP.SerialPortStream.dll" />
+        <file src="..\..\distribute\lib\net45\RJCP.SerialPortStream.pdb" target="lib\net45\RJCP.SerialPortStream.pdb" />
+        <file src="..\..\distribute\lib\net45\RJCP.SerialPortStream.XML" target="lib\net45\RJCP.SerialPortStream.XML" />
+        <file src="..\..\code\Datastructures\CircularBuffer.cs" target="src\Datastructures\CircularBuffer.cs" />
+        <file src="..\..\code\Datastructures\TimerExpiry.cs" target="src\Datastructures\TimerExpiry.cs" />
+        <file src="..\..\dll\serialunix\libnserial\basic.c" target="src\dll\serialunix\libnserial\basic.c" />
+        <file src="..\..\dll\serialunix\libnserial\baudrate.c" target="src\dll\serialunix\libnserial\baudrate.c" />
+        <file src="..\..\dll\serialunix\libnserial\baudrate.h" target="src\dll\serialunix\libnserial\baudrate.h" />
+        <file src="..\..\dll\serialunix\libnserial\break.c" target="src\dll\serialunix\libnserial\break.c" />
+        <file src="..\..\dll\serialunix\libnserial\errmsg.c" target="src\dll\serialunix\libnserial\errmsg.c" />
+        <file src="..\..\dll\serialunix\libnserial\errmsg.h" target="src\dll\serialunix\libnserial\errmsg.h" />
+        <file src="..\..\dll\serialunix\libnserial\events.c" target="src\dll\serialunix\libnserial\events.c" />
+        <file src="..\..\dll\serialunix\libnserial\flush.c" target="src\dll\serialunix\libnserial\flush.c" />
+        <file src="..\..\dll\serialunix\libnserial\flush.h" target="src\dll\serialunix\libnserial\flush.h" />
+        <file src="..\..\dll\serialunix\libnserial\lowlevel.c" target="src\dll\serialunix\libnserial\lowlevel.c" />
+        <file src="..\..\dll\serialunix\libnserial\modem.c" target="src\dll\serialunix\libnserial\modem.c" />
+        <file src="..\..\dll\serialunix\libnserial\nserial.c" target="src\dll\serialunix\libnserial\nserial.c" />
+        <file src="..\..\dll\serialunix\libnserial\nserial.h" target="src\dll\serialunix\libnserial\nserial.h" />
+        <file src="..\..\dll\serialunix\libnserial\openserial.c" target="src\dll\serialunix\libnserial\openserial.c" />
+        <file src="..\..\dll\serialunix\libnserial\openserial.h" target="src\dll\serialunix\libnserial\openserial.h" />
+        <file src="..\..\dll\serialunix\libnserial\properties.c" target="src\dll\serialunix\libnserial\properties.c" />
+        <file src="..\..\dll\serialunix\libnserial\serialhandle.h" target="src\dll\serialunix\libnserial\serialhandle.h" />
+        <file src="..\..\dll\serialunix\libnserial\threaddata.c" target="src\dll\serialunix\libnserial\threaddata.c" />
+        <file src="..\..\dll\serialunix\libnserial\threaddata.h" target="src\dll\serialunix\libnserial\threaddata.h" />
+        <file src="..\..\dll\serialunix\libnserial\types.h" target="src\dll\serialunix\libnserial\types.h" />
+        <file src="..\..\code\Native\Unix\INativeSerialDll.cs" target="src\Native\Unix\INativeSerialDll.cs" />
+        <file src="..\..\code\Native\Unix\SerialReadWriteEvent.cs" target="src\Native\Unix\SerialReadWriteEvent.cs" />
+        <file src="..\..\code\Native\Unix\SerialUnix.cs" target="src\Native\Unix\SerialUnix.cs" />
+        <file src="..\..\code\Native\Unix\WaitForModemEvent.cs" target="src\Native\Unix\WaitForModemEvent.cs" />
+        <file src="..\..\code\Native\Windows\CommErrorEventArgs.cs" target="src\Native\Windows\CommErrorEventArgs.cs" />
+        <file src="..\..\code\Native\Windows\CommEventArgs.cs" target="src\Native\Windows\CommEventArgs.cs" />
+        <file src="..\..\code\Native\Windows\CommModemStatus.cs" target="src\Native\Windows\CommModemStatus.cs" />
+        <file src="..\..\code\Native\Windows\CommOverlappedIo.cs" target="src\Native\Windows\CommOverlappedIo.cs" />
+        <file src="..\..\code\Native\Windows\CommProperties.cs" target="src\Native\Windows\CommProperties.cs" />
+        <file src="..\..\code\Native\Windows\CommState.cs" target="src\Native\Windows\CommState.cs" />
+        <file src="..\..\code\Native\Windows\DtrControl.cs" target="src\Native\Windows\DtrControl.cs" />
+        <file src="..\..\code\Native\Windows\NativeMethods.cs" target="src\Native\Windows\NativeMethods.cs" />
+        <file src="..\..\code\Native\Windows\RtsControl.cs" target="src\Native\Windows\RtsControl.cs" />
+        <file src="..\..\code\Native\Windows\SafeNativeMethods.cs" target="src\Native\Windows\SafeNativeMethods.cs" />
+        <file src="..\..\code\Native\Windows\UnsafeNativeMethods.cs" target="src\Native\Windows\UnsafeNativeMethods.cs" />
+        <file src="..\..\code\Native\Windows\WinError.cs" target="src\Native\Windows\WinError.cs" />
+        <file src="..\..\code\Native\INativeSerial.cs" target="src\Native\INativeSerial.cs" />
+        <file src="..\..\code\Native\ReadToCache.cs" target="src\Native\ReadToCache.cs" />
+        <file src="..\..\code\Native\SerialBuffer.cs" target="src\Native\SerialBuffer.cs" />
+        <file src="..\..\code\Native\UnixNativeSerial.cs" target="src\Native\UnixNativeSerial.cs" />
+        <file src="..\..\code\Native\WinNativeSerial.cs" target="src\Native\WinNativeSerial.cs" />
+        <file src="..\..\code\Properties\AssemblyInfo.cs" target="src\Properties\AssemblyInfo.cs" />
+        <file src="..\..\code\app.config" target="src\app.config" />
+        <file src="..\..\code\GlobalSuppressions.cs" target="src\GlobalSuppressions.cs" />
+        <file src="..\..\code\HandShake.cs" target="src\HandShake.cs" />
+        <file src="..\..\code\LocalAsyncResult.cs" target="src\LocalAsyncResult.cs" />
+        <file src="..\..\code\Parity.cs" target="src\Parity.cs" />
+        <file src="..\..\code\PortDescription.cs" target="src\PortDescription.cs" />
+        <file src="..\..\code\SerialData.cs" target="src\SerialData.cs" />
+        <file src="..\..\code\SerialDataEventArgs.cs" target="src\SerialDataEventArgs.cs" />
+        <file src="..\..\code\SerialError.cs" target="src\SerialError.cs" />
+        <file src="..\..\code\SerialErrorReceivedEventArgs.cs" target="src\SerialErrorReceivedEventArgs.cs" />
+        <file src="..\..\code\SerialPinChange.cs" target="src\SerialPinChange.cs" />
+        <file src="..\..\code\SerialPinChangedEventArgs.cs" target="src\SerialPinChangedEventArgs.cs" />
+        <file src="..\..\code\SerialPortStream.cs" target="src\SerialPortStream.cs" />
+        <file src="..\..\code\SerialPortStream.csproj" target="src\SerialPortStream.csproj" />
+        <file src="..\..\code\SerialTrace.cs" target="src\SerialTrace.cs" />
+        <file src="..\..\code\StopBits.cs" target="src\StopBits.cs" />
     </files>
 </package>
