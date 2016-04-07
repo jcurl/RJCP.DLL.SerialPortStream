@@ -2,7 +2,7 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.MonoBugs
+namespace RJCP.IO.Ports.FrameworkBugs
 {
     using System;
     using System.Text;

@@ -61,7 +61,7 @@
     <None Include="ReadToTest.cs" />
     <Compile Include="SerialPortStreamTest.cs" />
     <None Include="SerialUnixTest.cs" />
-    <Compile Include="MonoBugs.cs" />
+    <Compile Include="FrameworkBugs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\code\SerialPortStream.csproj">
