@@ -1,5 +1,6 @@
 /code/bin
 /code/obj
+/distribute
 /test/DatastructuresTest/bin
 /test/DatastructuresTest/obj
 /test/SerialPortStreamTest/bin
@@ -7,6 +8,7 @@
 /packages/NUnit.2.6.4
 /packages/Mono.Posix.4.0.0.0
 /.vs
+*.nupkg
 *.suo
 *.user
 *.userprefs
