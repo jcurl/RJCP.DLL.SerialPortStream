@@ -8,53 +8,6 @@ namespace RJCP.IO.Ports.Native
     using System.Text;
     using Datastructures;
 
-    internal static class DecoderBug
-    {
-        // This is one dirty hack due to a bug in the .NET (and MONO) framework.
-        //
-        // When two bytes are in a byte buffer and we want to read one character,
-        // that should take exactly one byte, we've seen in the .NET framework two
-        // bytes are consumed. This is clearly wrong.
-        //
-        // See https://bugzilla.xamarin.com/show_bug.cgi?id=40002
-
-        private static bool m_IsRun;
-        private static bool m_IsPresent;
-        private static object m_SyncLock = new object();
-
-        public static bool IsPresent
-        {
-            get
-            {
-                if (!m_IsRun) {
-                    lock (m_SyncLock) {
-                        if (!m_IsRun) {
-                            m_IsRun = true;
-                            m_IsPresent = DoTest();
-                        }
-                    }
-                }
-                return m_IsPresent;
-            }
-        }
-
-        private static bool DoTest()
-        {
-            Encoding encoding = Encoding.GetEncoding("UTF-8");
-            Decoder decoder = encoding.GetDecoder();
-
-            byte[] data = new byte[] { 0x61, 0xE2, 0x82, 0xAC, 0x40, 0x41 };
-            char[] oneChar = new char[2];
-
-            int bu;
-            int cu;
-            bool complete;
-            decoder.Convert(data, 0, 2, oneChar, 0, 1, false, out bu, out cu, out complete);
-            if (bu != 1) return true;
-            return false;
-        }
-    }
-
     internal class ReadToCache
     {
         // Buffers for reading characters. We reserve one "char" at the end for 2-byte UTF16 sequences, to guarantee
@@ -128,11 +81,6 @@ namespace RJCP.IO.Ports.Native
         /// </remarks>
         private bool PeekChar(SerialBuffer sbuffer)
         {
-            // Work around a MONO bug in Mono 4.2.3.4 (16/March/2016). When this is resolved, should kill this code and say
-            // which version of MONO is the minimum required.
-
-            if (DecoderBug.IsPresent) return PeekCharWorkaround(sbuffer);
-        
             // Once the bug from Mono is fixed, we just drop the code above.
             if (sbuffer == null) throw new ArgumentNullException("sbuffer");
             int readLen = sbuffer.Serial.ReadBuffer.Length;
@@ -150,60 +98,14 @@ namespace RJCP.IO.Ports.Native
                     // Some UTF8 sequences may result in two UTF16 characters being generated.
                     Decoder.Convert(sbuffer.Serial.ReadBuffer.Array,
                         sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
-                        sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset),
-                        oneChar, 0, 1, false, out bu, out cu, out complete);
+                        1, oneChar, 0, 1, false, out bu, out cu, out complete);
                 } catch (System.ArgumentException ex) {
                     if (!ex.ParamName.Equals("chars")) throw;
                     Decoder.Convert(sbuffer.Serial.ReadBuffer.Array,
                         sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
-                        sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset),
-                        oneChar, 0, 2, false, out bu, out cu, out complete);
+                        1, oneChar, 0, 2, false, out bu, out cu, out complete);
                 }
                 m_ReadOffset += bu;
-                SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "PeekChar: Decoder.Convert(out bu={0}, out cu={1}); m_ReadOffset={2}", bu, cu, m_ReadOffset);
-            }
-            if (cu == 0) return false;
-
-            m_ReadCache.Append(oneChar, 0, cu);
-            m_ReadOffsets.Append(m_ReadOffset - m_LastChar);
-            if (cu > 1) m_ReadOffsets.Append(0);
-            m_LastChar = m_ReadOffset;
-            return true;
-        }
-
-        private bool PeekCharWorkaround(SerialBuffer sbuffer)
-        {
-            if (sbuffer == null) throw new ArgumentNullException("sbuffer");
-            int readLen = sbuffer.Serial.ReadBuffer.Length;
-            SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                "PeekCharWorkaround: readlen={0}; m_ReadOffset={1}; m_ReadCache.Free={2}", readLen, m_ReadOffset, m_ReadCache.Free);
-            if (m_ReadOffset >= readLen) return false;
-
-            if (m_ReadCache.Free <= 1) Overflow();
-
-            char[] oneChar = new char[2];
-            int cu = 0;
-            while (cu == 0 && m_ReadOffset < readLen) {
-                int bu; bool complete;
-                try {
-                    // Some UTF8 sequences may result in two UTF16 characters being generated.
-
-                    // Mono 4.2.3.4: the byteCount is set to "1" and not "sbuffer.Serial.ReadBuffer.GetReadBlock(m_ReadOffset)"
-                    // as sometimes there is the bug that Mono consumes more bytes than it should. This may cause lost
-                    // data when mixing ReadByte() and ReadChar() in your program.
-                    //
-                    // See https://bugzilla.xamarin.com/show_bug.cgi?id=40002
-                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array, sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset), 1,
-                        oneChar, 0, 1, false, out bu, out cu, out complete);
-                } catch (System.ArgumentException ex) {
-                    if (!ex.ParamName.Equals("chars")) throw;
-                    Decoder.Convert(sbuffer.Serial.ReadBuffer.Array, sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset), 1,
-                        oneChar, 0, 2, false, out bu, out cu, out complete);
-                }
-                m_ReadOffset += bu;
-                SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "PeekCharMono: Decoder.Convert(out bu={0}, out cu={1}); m_ReadOffset={2}", bu, cu, m_ReadOffset);
             }
             if (cu == 0) return false;
 
