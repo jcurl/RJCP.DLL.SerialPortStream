@@ -365,7 +365,7 @@ Complete...
 
 Monitoring of pins CTS, DSR, RI and DCD is not 100% reliable for some chipsets
 and workarounds are in place. In particular, the chips PL2303H, PL2303RA do
-not aupport the ioctl(TIOCGICOUNT), so on a pin toggle, we cannot reliably
+not support the ioctl(TIOCGICOUNT), so on a pin toggle, we cannot reliably
 detect if they have changed if the pulse is too short. For 16550A and FTDI
 chips, this ioctl() does work and so we can always detect a change. To check
 if your driver supports the TIOCGICOUNT ioctl() call, run the small test
