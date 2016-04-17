@@ -1038,7 +1038,11 @@ namespace RJCP.IO.Ports
 
         private void InternalBlockingWrite(byte[] buffer, int offset, int count)
         {
-            if (!m_Buffer.Stream.WaitForWrite(count, m_WriteTimeout)) {
+            bool ready = m_Buffer.Stream.WaitForWrite(count, m_WriteTimeout);
+            if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
+            if (!IsOpen) throw new InvalidOperationException("SerialPortStream was closed during write operation");
+
+            if (!ready) {
                 throw new TimeoutException("Couldn't write into buffer");
             }
             InternalWrite(buffer, offset, count);
