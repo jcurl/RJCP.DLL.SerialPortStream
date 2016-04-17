@@ -84,7 +84,8 @@ See later in these notes for known issues and changes.
 
 You should use the latest version of Mono. Version 3.2.8 has significant bugs
 and will not work (Ubuntu 14.04 ships with this). Use the latest version of
-Mono that comes direct from Xamarin instead of your distribution where possible.
+Mono that comes direct from Xamarin instead of your distribution where
+possible.
 
 For instructions on how to install the latest Mono for your system, refer to
 [Install Mono On Linux](http://www.mono-project.com/docs/getting-started/install/linux/).
@@ -263,16 +264,17 @@ Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
   meaning that it's possible to open the same device twice, which on Windows
   raises an UnauthorizedAccessException().
 * ListPorts is not implemented on Mono and uses the SerialPort implementation.
-* Mono 4.2.3.4 (tested) has a minor bug in System.Text.Decoder as in the .NET references,
-  that in a special circumstance it will consume too many bytes. The PeekChar()
-  method is slower when this bug is detected. Please refer to the Xamarin bug
-  [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
-  Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP also.
+* Mono 4.2.3.4 (tested) has a minor bug in System.Text.Decoder as in the .NET
+  references, that in a special circumstance it will consume too many bytes.
+  The PeekChar() method is slower when this bug is detected. Please refer to
+  the Xamarin bug [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002).
+  Found against Mono 4.2.3.4 and later tested to be present since .NET 4.0 on
+  Windows XP also.
 
 ### Linux
 
-SerialPortStream was tested on Ubuntu 14.04 and Ubuntu 16.04. Feedback welcome for other
-distributions!
+SerialPortStream was tested on Ubuntu 14.04 and Ubuntu 16.04. Feedback welcome
+for other distributions!
 
 The main functionality on Linux is provided by a support C library. The
 issues are observed:
@@ -358,9 +360,9 @@ Complete...
 
 #### Monitoring Pins and Timing Resolution
 
-Monitoring of pins CTS, DSR, RI and DCD is not 100% reliable for some chip
-sets and workarounds are in place. In particular, the chips PL2303H, PL2303RA
-do not support the ioctl(TIOCGICOUNT), so on a pin toggle, we cannot reliably
+Monitoring of pins CTS, DSR, RI and DCD is not 100% reliable for some chipsets
+and workarounds are in place. In particular, the chips PL2303H, PL2303RA do
+not aupport the ioctl(TIOCGICOUNT), so on a pin toggle, we cannot reliably
 detect if they have changed if the pulse is too short. For 16550A and FTDI
 chips, this ioctl() does work and so we can always detect a change. To check
 if your driver supports the TIOCGICOUNT ioctl() call, run the small test
