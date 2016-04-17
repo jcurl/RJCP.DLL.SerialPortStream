@@ -786,7 +786,7 @@ namespace RJCP.IO.Ports.Native
                 m_CommState.RtsControl = RtsControl.Handshake;
             } else {
                 m_CommState.OutCtsFlow = false;
-                m_CommState.RtsControl = RtsControl.Enable;  // TODO: Should this be m_RtsControl ? RtsControl.Enable : RtsControl.Disable?
+                m_CommState.RtsControl = m_RtsEnable ? RtsControl.Enable : RtsControl.Disable;
             }
 
             if (immediate) {
@@ -804,7 +804,7 @@ namespace RJCP.IO.Ports.Native
             } else {
                 m_CommState.OutDsrFlow = false;
                 m_CommState.DsrSensitivity = false;
-                m_CommState.DtrControl = DtrControl.Enable;  // TODO: Should this be m_DtrControl ? DtrControl.Enable : DtrControl.Disable?
+                m_CommState.DtrControl = m_DtrEnable ? DtrControl.Enable : DtrControl.Disable;
             }
 
             if (immediate) {
