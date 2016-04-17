@@ -1608,5 +1608,78 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                     }, Throws.InstanceOf<InvalidOperationException>());
             }
         }
+
+
+        [Test]
+        [Category("SerialPortStream")]
+        [Timeout(4000)]
+        public void DisposedWhenReadBlocked()
+        {
+            byte[] buffer = new byte[1024];
+
+            using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                serialDest.Open();
+
+                new Thread(
+                    () => {
+                        Thread.Sleep(2000);
+                        Console.WriteLine("Disposing serialSource");
+
+                        // It appears that the MSDN .NET implementation blocks here, never
+                        // to return as we're blocked on another thread.
+                        disposedEvent.Set();
+                        serialSource.Dispose();
+                        Console.WriteLine("Disposed serialSource");
+                    }
+                ).Start();
+
+                Assert.That(
+                    () => {
+                        int bytes = serialSource.Read(buffer, 0, buffer.Length);
+                        Console.WriteLine("Read finished, returned {0} bytes", bytes);
+                        if (disposedEvent.WaitOne(0)) {
+                            Assert.Fail("Read returned after being disposed.");
+                        }
+                    }, Throws.InstanceOf<ObjectDisposedException>());
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        [Timeout(4000)]
+        public void ClosedWhenReadBlocked()
+        {
+            byte[] buffer = new byte[1024];
+
+            using (ManualResetEvent closedEvent = new ManualResetEvent(false))
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                serialDest.Open();
+
+                new Thread(
+                    () => {
+                        Thread.Sleep(2000);
+                        Console.WriteLine("Closing serialSource");
+
+                        // It appears that the MSDN .NET implementation blocks here, never
+                        // to return as we're blocked on another thread.
+                        closedEvent.Set();
+                        serialSource.Close();
+                        Console.WriteLine("Closed serialSource");
+                    }
+                ).Start();
+
+                int bytes = serialSource.Read(buffer, 0, buffer.Length);
+                Console.WriteLine("Read finished, returned {0} bytes", bytes);
+                if (!closedEvent.WaitOne(0)) {
+                    Assert.Fail("Read returned before being disposed.");
+                }
+                Assert.That(bytes, Is.EqualTo(0));
+            }
+        }
     }
 }

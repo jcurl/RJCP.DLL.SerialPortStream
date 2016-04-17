@@ -39,6 +39,7 @@ namespace RJCP.IO.Ports.Native
         private readonly ManualResetEvent m_TxEmptyEvent = new ManualResetEvent(true);
 
         private readonly AutoResetEvent m_AbortWriteEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent m_AbortReadEvent = new AutoResetEvent(false);
 
         private readonly bool m_Pinned;
 
@@ -229,7 +230,23 @@ namespace RJCP.IO.Ports.Native
             /// <returns><c>true</c> if data is available to read in time; <c>false</c> otherwise.</returns>
             public bool WaitForRead(int timeout)
             {
-                return m_SerialBuffer.m_ReadBufferNotEmptyEvent.WaitOne(timeout);
+                m_SerialBuffer.m_AbortReadEvent.Reset();
+                WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortReadEvent, m_SerialBuffer.m_ReadBufferNotEmptyEvent };
+                int triggered = WaitHandle.WaitAny(handles, timeout);
+                switch (triggered) {
+                case WaitHandle.WaitTimeout:
+                    Console.WriteLine("WaitForRead: Timeout");
+                    return false;
+                case 0:
+                    // Someone aborted the wait.
+                    Console.WriteLine("WaitForRead: Aborted");
+                    return false;
+                case 1:
+                    // Data is available to write
+                    Console.WriteLine("WaitForRead: Data");
+                    return true;
+                }
+                throw new ApplicationException("Unexpected code flow");
             }
 
             /// <summary>
@@ -245,13 +262,24 @@ namespace RJCP.IO.Ports.Native
                     if (count > m_SerialBuffer.m_ReadBuffer.Capacity) return false;
                 }
 
+                m_SerialBuffer.m_AbortReadEvent.Reset();
                 TimerExpiry timer = new TimerExpiry(timeout);
                 do {
                     lock (m_SerialBuffer.m_ReadLock) {
                         if (m_SerialBuffer.m_ReadBuffer.Length >= count) return true;
                         m_SerialBuffer.m_ReadEvent.Reset();
                     }
-                    if (m_SerialBuffer.m_ReadEvent.WaitOne(timer.RemainingTime())) {
+
+                    WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortReadEvent, m_SerialBuffer.m_ReadEvent };
+                    int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
+                    switch (triggered) {
+                    case WaitHandle.WaitTimeout:
+                        break;
+                    case 0:
+                        // Someone aborted the wait.
+                        return false;
+                    case 1:
+                        // Data is available to write
                         return true;
                     }
                 } while (!timer.Expired);
@@ -409,9 +437,10 @@ namespace RJCP.IO.Ports.Native
             /// <summary>
             /// Aborts the wait for write.
             /// </summary>
-            public void AbortWaitForWrite()
+            public void AbortWait()
             {
                 m_SerialBuffer.m_AbortWriteEvent.Set();
+                m_SerialBuffer.m_AbortReadEvent.Set();
             }
 
             /// <summary>
@@ -598,6 +627,7 @@ namespace RJCP.IO.Ports.Native
                 m_WriteBufferNotEmptyEvent.Dispose();
                 m_TxEmptyEvent.Dispose();
                 m_AbortWriteEvent.Dispose();
+                m_AbortReadEvent.Dispose();
                 m_ReadBuffer = null;
                 m_WriteBuffer = null;
             }

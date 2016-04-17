@@ -293,7 +293,7 @@ namespace RJCP.IO.Ports
         {
             lock (m_CloseLock) {
                 if (IsDisposed) return;
-                if (m_Buffer != null) m_Buffer.Stream.AbortWaitForWrite();
+                if (m_Buffer != null) m_Buffer.Stream.AbortWait();
                 m_NativeSerial.Close();
             }
         }
@@ -638,7 +638,9 @@ namespace RJCP.IO.Ports
         private int InternalBlockingRead(byte[] buffer, int offset, int count)
         {
             if (m_NativeSerial.IsRunning) {
-                if (!m_Buffer.Stream.WaitForRead(m_ReadTimeout)) return 0;
+                bool ready = m_Buffer.Stream.WaitForRead(m_ReadTimeout);
+                if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
+                if (!ready) return 0;
             }
             return InternalRead(buffer, offset, count);
         }
@@ -1869,7 +1871,7 @@ namespace RJCP.IO.Ports
                 if (eventRunning) m_EventProcessing.WaitOne();
                 m_EventProcessing.Dispose();
 
-                if (m_Buffer != null) m_Buffer.Stream.AbortWaitForWrite();
+                if (m_Buffer != null) m_Buffer.Stream.AbortWait();
 
                 m_NativeSerial.Dispose();
                 m_NativeSerial = null;
