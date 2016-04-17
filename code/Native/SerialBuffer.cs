@@ -461,6 +461,7 @@ namespace RJCP.IO.Ports.Native
             public bool Flush(int timeout)
             {
                 // This manual reset event is always set every time data is removed from the buffer
+                m_SerialBuffer.m_AbortWriteEvent.Reset();
                 WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortWriteEvent, m_SerialBuffer.m_TxEmptyEvent };
                 int triggered = WaitHandle.WaitAny(handles, timeout);
                 switch (triggered) {
