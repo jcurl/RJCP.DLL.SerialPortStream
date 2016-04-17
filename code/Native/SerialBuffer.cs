@@ -460,7 +460,20 @@ namespace RJCP.IO.Ports.Native
             /// <returns><c>true</c> if the data was flushed within the specified time out; <c>false</c> otherwise.</returns>
             public bool Flush(int timeout)
             {
-                return m_SerialBuffer.m_TxEmptyEvent.WaitOne(timeout);
+                // This manual reset event is always set every time data is removed from the buffer
+                WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortWriteEvent, m_SerialBuffer.m_TxEmptyEvent };
+                int triggered = WaitHandle.WaitAny(handles, timeout);
+                switch (triggered) {
+                case WaitHandle.WaitTimeout:
+                    return false;
+                case 0:
+                    // Someone aborted the wait.
+                    return false;
+                case 1:
+                    // Data is available to write
+                    return true;
+                }
+                throw new ApplicationException("Unexpected code flow");
             }
         }
 

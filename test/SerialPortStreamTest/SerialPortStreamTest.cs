@@ -1512,5 +1512,101 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                     }, Throws.InstanceOf<InvalidOperationException>());
             }
         }
+
+        [Test]
+        [Category("SerialPortStream")]
+        [Timeout(4000)]
+        public void DisposedWhenFlushBlocked()
+        {
+            byte[] buffer = new byte[8192];
+
+            using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialDest.ReadBufferSize = 8192;
+                serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
+                serialSource.Open();
+                serialDest.Open();
+
+                serialDest.RtsEnable = false;
+                Thread.Sleep(100);
+
+                new Thread(
+                    () => {
+                        Thread.Sleep(2000);
+                        Console.WriteLine("Disposing serialSource");
+
+                        // It appears that the MSDN .NET implementation blocks here, never
+                        // to return as we're blocked on another thread.
+                        disposedEvent.Set();
+                        serialSource.Dispose();
+                        Console.WriteLine("Disposed serialSource");
+                    }
+                ).Start();
+
+                Assert.That(
+                    () => {
+                        Console.WriteLine("DisposedWhenFlushBlocked Writing");
+                        serialSource.Write(buffer, 0, buffer.Length);
+                        Console.WriteLine("DisposedWhenFlushBlocked Flushing");
+                        serialSource.Flush();
+                        Console.WriteLine("DisposedWhenFlushBlocked Flushed");
+                        if (disposedEvent.WaitOne(0)) {
+                            Assert.Fail("Write returned after being disposed.");
+                        }
+                    }, Throws.InstanceOf<ObjectDisposedException>());
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        [Timeout(4000)]
+        public void ClosedWhenFlushBlocked()
+        {
+            byte[] buffer = new byte[8192];
+
+            using (ManualResetEvent closedEvent = new ManualResetEvent(false))
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialDest.ReadBufferSize = 8192;
+                serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
+                serialSource.Open();
+                serialDest.Open();
+
+                serialDest.RtsEnable = false;
+                Thread.Sleep(100);
+
+                new Thread(
+                    () => {
+                        Thread.Sleep(2000);
+                        Console.WriteLine("Closing serialSource");
+
+                        // It appears that the MSDN .NET implementation blocks here, never
+                        // to return as we're blocked on another thread.
+                        closedEvent.Set();
+                        serialSource.Close();
+                        Console.WriteLine("Closed serialSource");
+                    }
+                ).Start();
+
+                Assert.That(
+                    () => {
+                        Console.WriteLine("ClosedWhenFlushBlocked Writing");
+                        serialSource.Write(buffer, 0, buffer.Length);
+                        Console.WriteLine("ClosedWhenFlushBlocked Flushing");
+                        serialSource.Flush();
+                        Console.WriteLine("ClosedWhenFlushBlocked Flushed");
+                        if (closedEvent.WaitOne(0)) {
+                            Assert.Fail("Write returned after being closed.");
+                        }
+                    }, Throws.InstanceOf<InvalidOperationException>());
+            }
+        }
     }
 }

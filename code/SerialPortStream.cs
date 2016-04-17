@@ -981,11 +981,16 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <exception cref="System.ObjectDisposedException"/>
         /// <exception cref="System.TimeoutException">Flush write time out exceeded.</exception>
+        /// <exception cref="System.InvalidOperationException">Serial Port not opened; or was closed during write operation.</exception>
         public override void Flush()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (!IsOpen) throw new InvalidOperationException("Serial Port not opened");
-            if (!m_Buffer.Stream.Flush(m_WriteTimeout)) {
+
+            bool flushed = m_Buffer.Stream.Flush(m_WriteTimeout);
+            if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
+            if (!IsOpen) throw new InvalidOperationException("SerialPortStream was closed during write operation");
+            if (!flushed) {
                 throw new TimeoutException("Flush write time out exceeded");
             }
         }
@@ -1020,6 +1025,7 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentNullException">NULL buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">Serial port not open; or was closed during write operation.</exception>
         /// <remarks>
         /// Data is copied from the array provided into the local stream buffer. It does
         /// not guarantee that data will be sent over the serial port. So long as there is

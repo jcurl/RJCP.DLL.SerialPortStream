@@ -226,14 +226,29 @@ without losing functionality from v1.x.
 The following issues are known:
 * On some computers with Modems, the function GetPortNames might not find it,
   while GetPortDescriptions does.
-* This is not an issue, but when using the Com0Com for running unit tests, some
-  specific test cases for Parity will fail. That is because Com0Com doesn't
-  emulate data at a bit level.
-* .NET 4.0 to the currently tested .NET 4.6 has a minor bug in System.Text.Decoder
-  that in a special circumstance it will consume too many bytes. The PeekChar()
-  method is slower when this bug is detected. Please refer to the Xamarin bug
+* This is not an issue, but when using the Com0Com for running unit tests,
+  some specific test cases for Parity will fail. That is because Com0Com
+  doesn't emulate data at a bit level.
+* .NET 4.0 to the currently tested .NET 4.6 has a minor bug in
+  System.Text.Decoder that in a special circumstance it will consume too many
+  bytes. The PeekChar()
+  method is therefore a slower implementation than what it could be. Please
+  refer to the Xamarin bug
   [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
-  Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP also.
+  Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP
+  also.
+
+### Driver Specific Issues on Windows
+
+#### Flow Control
+
+Using the FTDI chipset on Windows 10 x64 (FTDI 2.12.16.0 dated 09/Mar/2016)
+flow control (RTS/CTS) doesn't work as expected. For writing small amounts of
+data (1024 bytes) with CTS off, the FTDI driver will still send data. See the
+test case ClosedWhenFlushBlocked, change the buffer from 8192 bytes to 1024
+and the test case now fails. This problem is not observable with com0com 3.0.
+You can see the effect in logs, there is a TX-EMPTY event that occurs, which
+should never be there if no data is ever sent.
   
 ## Mono on non-Windows Platforms
 
