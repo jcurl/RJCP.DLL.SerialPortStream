@@ -1429,10 +1429,12 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
                 serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
                 serialSource.Open();
                 serialDest.Open();
 
                 serialDest.RtsEnable = false;
+                Thread.Sleep(100);
 
                 new Thread(
                     () => {
@@ -1476,10 +1478,12 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
                 serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
                 serialSource.Open();
                 serialDest.Open();
 
                 serialDest.RtsEnable = false;
+                Thread.Sleep(100);
 
                 new Thread(
                     () => {
