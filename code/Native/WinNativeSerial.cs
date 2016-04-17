@@ -768,11 +768,11 @@ namespace RJCP.IO.Ports.Native
             if (m_CommState.DtrControl != DtrControl.Handshake) m_CommModemStatus.SetDtr(m_DtrEnable);
 
             try {
-	            if (m_BreakState) {
-	                m_CommModemStatus.SetCommBreak();
-	            } else {
-	                m_CommModemStatus.ClearCommBreak();
-	            }
+                if (m_BreakState) {
+                    m_CommModemStatus.SetCommBreak();
+                } else {
+                    m_CommModemStatus.ClearCommBreak();
+                }
             } catch (System.IO.IOException) {
                 // Ignore IOException. Not all serial port drivers support clearing the
                 // Break signal, so we ignore it when opening.
@@ -920,7 +920,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                if (m_IsDisposed) return false;
+                if (m_IsDisposed || !IsOpen) return false;
                 return m_CommOverlappedIo.IsRunning;
             }
         }
