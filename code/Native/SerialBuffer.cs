@@ -38,6 +38,8 @@ namespace RJCP.IO.Ports.Native
         private readonly ManualResetEvent m_WriteBufferNotEmptyEvent = new ManualResetEvent(false);
         private readonly ManualResetEvent m_TxEmptyEvent = new ManualResetEvent(true);
 
+        private readonly AutoResetEvent m_AbortWriteEvent = new AutoResetEvent(false);
+
         private readonly bool m_Pinned;
 
         /// <summary>
@@ -380,6 +382,7 @@ namespace RJCP.IO.Ports.Native
                     if (count > m_SerialBuffer.m_WriteBuffer.Capacity) return false;
                 }
 
+                m_SerialBuffer.m_AbortWriteEvent.Reset();
                 TimerExpiry timer = new TimerExpiry(timeout);
                 do {
                     lock (m_SerialBuffer.m_WriteLock) {
@@ -387,11 +390,28 @@ namespace RJCP.IO.Ports.Native
                         m_SerialBuffer.m_WriteBufferNotFullEvent.Reset();
                     }
                     // This manual reset event is always set every time data is removed from the buffer
-                    if (m_SerialBuffer.m_WriteBufferNotFullEvent.WaitOne(timer.RemainingTime())) {
+                    WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortWriteEvent, m_SerialBuffer.m_WriteBufferNotFullEvent };
+                    int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
+                    switch (triggered) {
+                    case WaitHandle.WaitTimeout:
+                        break;
+                    case 0:
+                        // Someone aborted the wait.
+                        return false;
+                    case 1:
+                        // Data is available to write
                         return true;
                     }
                 } while (!timer.Expired);
                 return false;
+            }
+
+            /// <summary>
+            /// Aborts the wait for write.
+            /// </summary>
+            public void AbortWaitForWrite()
+            {
+                m_SerialBuffer.m_AbortWriteEvent.Set();
             }
 
             /// <summary>
@@ -563,6 +583,7 @@ namespace RJCP.IO.Ports.Native
                 m_WriteBufferNotFullEvent.Dispose();
                 m_WriteBufferNotEmptyEvent.Dispose();
                 m_TxEmptyEvent.Dispose();
+                m_AbortWriteEvent.Dispose();
                 m_ReadBuffer = null;
                 m_WriteBuffer = null;
             }

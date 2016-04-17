@@ -273,10 +273,14 @@ namespace RJCP.IO.Ports
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-                return m_NativeSerial.IsOpen;
+                lock (m_CloseLock) {
+                    if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
+                    return m_NativeSerial.IsOpen;
+                }
             }
         }
+
+        private object m_CloseLock = new object();
 
         /// <summary>
         /// Closes the port connection, sets the IsOpen property to false. Does not dispose the object.
@@ -287,8 +291,11 @@ namespace RJCP.IO.Ports
         /// </remarks>
         public new void Close()
         {
-            if (IsDisposed) return;
-            m_NativeSerial.Close();
+            lock (m_CloseLock) {
+                if (IsDisposed) return;
+                if (m_Buffer != null) m_Buffer.Stream.AbortWaitForWrite();
+                m_NativeSerial.Close();
+            }
         }
         #endregion
 
@@ -1821,6 +1828,8 @@ namespace RJCP.IO.Ports
                 }
                 if (eventRunning) m_EventProcessing.WaitOne();
                 m_EventProcessing.Dispose();
+
+                if (m_Buffer != null) m_Buffer.Stream.AbortWaitForWrite();
 
                 m_NativeSerial.Dispose();
                 m_NativeSerial = null;

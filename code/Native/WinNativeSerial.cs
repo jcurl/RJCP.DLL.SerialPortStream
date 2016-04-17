@@ -628,9 +628,7 @@ namespace RJCP.IO.Ports.Native
             get
             {
                 if (m_IsDisposed) return false;
-                lock (m_CloseLock) {
-                    return m_ComPortHandle != null && !m_ComPortHandle.IsClosed && !m_ComPortHandle.IsInvalid;
-                }
+                return m_ComPortHandle != null && !m_ComPortHandle.IsClosed && !m_ComPortHandle.IsInvalid;
             }
         }
 
@@ -861,9 +859,6 @@ namespace RJCP.IO.Ports.Native
             RegisterEvents();
         }
 
-        // The close lock ensures that if IsOpen is called during Close, it is serialized.
-        private object m_CloseLock = new object();
-
         /// <summary>
         /// Closes the serial port.
         /// </summary>
@@ -876,16 +871,14 @@ namespace RJCP.IO.Ports.Native
         {
             if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
             if (IsOpen) {
-                lock (m_CloseLock) {
-                    m_CommOverlappedIo.Dispose();
-                    m_CommOverlappedIo = null;
-                    m_CommState = null;
-                    m_CommModemStatus = null;
-                    m_ComPortHandle.Close();
-                    m_ComPortHandle = null;
-                }
+                m_CommOverlappedIo.Dispose();
+                m_CommOverlappedIo = null;
+                m_CommState = null;
+                m_CommModemStatus = null;
+                m_ComPortHandle.Close();
+                m_ComPortHandle = null;
             }
-        }
+    }
 
         /// <summary>
         /// Creates the serial buffer suitable for monitoring.

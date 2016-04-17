@@ -498,11 +498,9 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                lock (m_CloseLock) {
-                    bool isOpen;
-                    if (m_Dll.serial_isopen(m_Handle, out isOpen) == -1) ThrowException();
-                    return isOpen;
-                }
+                bool isOpen;
+                if (m_Dll.serial_isopen(m_Handle, out isOpen) == -1) ThrowException();
+                return isOpen;
             }
         }
 
@@ -549,8 +547,6 @@ namespace RJCP.IO.Ports.Native
             if (m_Dll.serial_open(m_Handle) == -1) ThrowException();
         }
 
-        private object m_CloseLock = new object();
-
         /// <summary>
         /// Closes the serial port.
         /// </summary>
@@ -560,10 +556,8 @@ namespace RJCP.IO.Ports.Native
         /// </remarks>
         public void Close()
         {
-            lock (m_CloseLock) {
-                if (IsRunning) Stop();
-                if (m_Dll.serial_close(m_Handle) == -1) ThrowException();
-            }
+            if (IsRunning) Stop();
+            if (m_Dll.serial_close(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
