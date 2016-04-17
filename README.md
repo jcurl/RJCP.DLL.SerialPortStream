@@ -60,6 +60,9 @@ The SerialPortStream tries to solve the following issues observed:
   provided. If the data can't be sent, then you get a TimeoutException without
   any data being buffered at all. So you can implement reliable protocols and
   your code is simpler.
+* Disposing or Closing the serial port during a blocking write operation will
+  not abort the write operation. This implemention will abort with an
+  `System.IO.IOException` type.
 
 # System Requirements
 
