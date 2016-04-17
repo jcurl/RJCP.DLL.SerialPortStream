@@ -1401,5 +1401,18 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 Assert.That(dsr.WaitOne(500), Is.True);
             }
         }
+
+        [Test]
+        [Category("SerialPortStream")]
+        public void WriteWhenClosedException()
+        {
+            byte[] buffer = new byte[256];
+
+            using (SerialPortStream src = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                Assert.That(() => {
+                    src.Write(buffer, 0, buffer.Length);
+                }, Throws.TypeOf<InvalidOperationException>());
+            }
+        }
     }
 }

@@ -58,6 +58,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MsdnFrameworkTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="ReadToTest.cs" />
     <Compile Include="SerialConfiguration.cs" />
