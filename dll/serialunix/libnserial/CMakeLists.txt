@@ -38,7 +38,7 @@ add_library(nserial SHARED ${NSERIAL_SRCS})
 #
 # Unlike libtool, there is no "PATCH" version. CMake doesn't make more than
 # one symbolic link
-#  e.g. 
+#  e.g.
 #   libfoo.so -> libfoo.so.1
 #   libfoo.so.1 -> libfoo.so.1.0
 #   libfoo.so.1.0
@@ -47,7 +47,7 @@ add_library(nserial SHARED ${NSERIAL_SRCS})
 # in the file name (and a library can't link therefore to a specific patch
 # version). This also means, that the SOVERSION and the MAJOR version must be
 # the same to support incremental updates.
-set_target_properties(nserial PROPERTIES 
+set_target_properties(nserial PROPERTIES
   VERSION 1.0
   SOVERSION 1
   FRAMEWORK ON
