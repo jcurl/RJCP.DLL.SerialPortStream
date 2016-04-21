@@ -28,8 +28,8 @@ if(BUILD_DOCUMENTATION)
     set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.in)
     set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/doxyfile)
 
-    configure_file (${doxyfile_in} ${doxyfile} @ONLY)
-    add_custom_target(doc
+    configure_file(${doxyfile_in} ${doxyfile} @ONLY)
+    add_custom_target(doc ALL
       COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Generating API documentation with Doxygen"
