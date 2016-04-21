@@ -623,8 +623,8 @@ namespace RJCP.IO.Ports.Native
             if (!IsRunning) return;
 
             SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Stopping Thread", m_Name);
-            InterruptReadWriteLoop();
             m_StopRunning.Set();
+            InterruptReadWriteLoop();
 
             if (m_MonitorPins) {
                 int killcounter = 0;
