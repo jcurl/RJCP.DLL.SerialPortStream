@@ -1509,7 +1509,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                             bufferCount -= buffer.Length;
                             Console.WriteLine("{0}", bufferCount);
                         }
-                    }, Throws.InstanceOf<InvalidOperationException>());
+                    }, Throws.InstanceOf<System.IO.IOException>());
             }
         }
 
@@ -1605,7 +1605,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         if (closedEvent.WaitOne(0)) {
                             Assert.Fail("Write returned after being closed.");
                         }
-                    }, Throws.InstanceOf<InvalidOperationException>());
+                    }, Throws.InstanceOf<System.IO.IOException>());
             }
         }
 
