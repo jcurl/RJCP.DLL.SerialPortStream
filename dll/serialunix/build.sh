@@ -12,7 +12,7 @@ fi
 mkdir $PROJECTBUILD
 cd $PROJECTBUILD
 
-# In Ubuntu 14.04, installing 'libgtest-dev' installs the sources and the 
+# In Ubuntu 14.04, installing 'libgtest-dev' installs the sources and the
 # headers, but we have to build ourselves.
 if [ x$GTEST_ROOT = x"" ]; then
   if [ -e /usr/src/gtest ]; then
@@ -34,7 +34,6 @@ echo ======================================================================
 CFLAGS="-O0 -g -Wall" cmake .. && \
 make
 if test $? = 0; then
-  make doc
   make test CTEST_OUTPUT_ON_FAILURE=1
   make install DESTDIR=$PROJECTBIN
 fi
