@@ -402,6 +402,7 @@ NSERIAL_EXPORT int WINAPI serial_close(struct serialhandle *handle)
     handle->pwfd = -1;
   }
 
+  tcflush(handle->fd, TCIOFLUSH);
   close(handle->fd);
   handle->fd = -1;
   return 0;
