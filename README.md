@@ -401,3 +401,6 @@ The .NET Test Cases that show this behaviour are (blocking on write):
 * CloseWhenFlushBlocked
 * DisposeWhenBlocked
 * DisposeWhenFlushBlocked
+
+This issue is not reproducible with the 16550A UART when it is write blocked.
+In this case, the times for closing are usually not more than 20ms.
