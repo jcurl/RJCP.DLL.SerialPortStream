@@ -1417,7 +1417,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(4000)]
+        [Timeout(20000)]
         public void DisposedWhenBlocked()
         {
             byte[] buffer = new byte[1024];
@@ -1466,7 +1466,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(4000)]
+        [Timeout(20000)]
         public void ClosedWhenBlocked()
         {
             byte[] buffer = new byte[1024];
@@ -1515,7 +1515,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(4000)]
+        [Timeout(20000)]
         public void DisposedWhenFlushBlocked()
         {
             byte[] buffer = new byte[8192];
@@ -1563,7 +1563,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(4000)]
+        [Timeout(20000)]
         public void ClosedWhenFlushBlocked()
         {
             byte[] buffer = new byte[8192];
@@ -1612,7 +1612,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(4000)]
+        [Timeout(20000)]
         public void DisposedWhenReadBlocked()
         {
             byte[] buffer = new byte[1024];
@@ -1649,7 +1649,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream")]
-        [Timeout(4000)]
+        [Timeout(20000)]
         public void ClosedWhenReadBlocked()
         {
             byte[] buffer = new byte[1024];
