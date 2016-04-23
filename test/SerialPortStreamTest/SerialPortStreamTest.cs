@@ -1422,8 +1422,10 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         {
             byte[] buffer = new byte[1024];
             
+            SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One);
+            Thread testThread;
+
             using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
@@ -1436,7 +1438,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 serialDest.RtsEnable = false;
                 Thread.Sleep(100);
 
-                new Thread(
+                testThread = new Thread(
                     () => {
                         Thread.Sleep(2000);
                         Console.WriteLine("Disposing serialSource");
@@ -1447,7 +1449,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         serialSource.Dispose();
                         Console.WriteLine("Disposed serialSource");
                     }
-                ).Start();
+                );
+                testThread.Start();
 
                 Assert.That(
                     () => {
@@ -1462,6 +1465,9 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         }
                     }, Throws.InstanceOf<ObjectDisposedException>());
             }
+
+            testThread.Join(20000);
+            Console.WriteLine("Finished");
         }
 
         [Test]
@@ -1520,8 +1526,10 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         {
             byte[] buffer = new byte[8192];
 
+            SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One);
+            Thread testThread;
+
             using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
@@ -1534,7 +1542,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 serialDest.RtsEnable = false;
                 Thread.Sleep(100);
 
-                new Thread(
+                testThread = new Thread(
                     () => {
                         Thread.Sleep(2000);
                         Console.WriteLine("Disposing serialSource");
@@ -1545,7 +1553,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         serialSource.Dispose();
                         Console.WriteLine("Disposed serialSource");
                     }
-                ).Start();
+                );
+                testThread.Start();
 
                 Assert.That(
                     () => {
@@ -1559,6 +1568,9 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         }
                     }, Throws.InstanceOf<ObjectDisposedException>());
             }
+
+            testThread.Join(20000);
+            Console.WriteLine("Finished");
         }
 
         [Test]
@@ -1609,7 +1621,6 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             }
         }
 
-
         [Test]
         [Category("SerialPortStream")]
         [Timeout(20000)]
@@ -1617,13 +1628,15 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         {
             byte[] buffer = new byte[1024];
 
+            SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One);
+            Thread testThread;
+
             using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 
-                new Thread(
+                testThread = new Thread(
                     () => {
                         Thread.Sleep(2000);
                         Console.WriteLine("Disposing serialSource");
@@ -1634,7 +1647,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         serialSource.Dispose();
                         Console.WriteLine("Disposed serialSource");
                     }
-                ).Start();
+                );
+                testThread.Start();
 
                 Assert.That(
                     () => {
@@ -1645,6 +1659,9 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                         }
                     }, Throws.InstanceOf<ObjectDisposedException>());
             }
+
+            testThread.Join(20000);
+            Console.WriteLine("Finished");
         }
 
         [Test]

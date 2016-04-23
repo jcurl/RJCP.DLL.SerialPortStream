@@ -253,7 +253,7 @@ test case ClosedWhenFlushBlocked, change the buffer from 8192 bytes to 1024
 and the test case now fails. This problem is not observable with com0com 3.0.
 You can see the effect in logs, there is a TX-EMPTY event that occurs, which
 should never be there if no data is ever sent.
-  
+
 ## Mono on non-Windows Platforms
 
 Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
@@ -387,3 +387,17 @@ $ ./icount /dev/ttyUSB0
 Your driver doesn't support TIOCGICOUNT
   Error: 25 (Inappropriate ioctl for device)
 ```
+
+#### Close Times with Flow Control
+
+Some times closing the serial port may take a long time (observed from 5s to
+21s) if it is write blocked due to hardware flow control. In particular, the
+C-library function `serial_close()` appears to take an excessive time when
+calling `close(handle->fd)` on Ubuntu 16.04. This issue appears related to the
+Linux driver and not the MONO framework.
+
+The .NET Test Cases that show this behaviour are (blocking on write):
+* ClosedWhenBlocked
+* CloseWhenFlushBlocked
+* DisposeWhenBlocked
+* DisposeWhenFlushBlocked
