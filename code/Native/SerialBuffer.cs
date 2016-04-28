@@ -231,20 +231,20 @@ namespace RJCP.IO.Ports.Native
             public bool WaitForRead(int timeout)
             {
                 m_SerialBuffer.m_AbortReadEvent.Reset();
-                WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortReadEvent, m_SerialBuffer.m_ReadBufferNotEmptyEvent };
+                WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_ReadBufferNotEmptyEvent, m_SerialBuffer.m_AbortReadEvent };
                 int triggered = WaitHandle.WaitAny(handles, timeout);
                 switch (triggered) {
                 case WaitHandle.WaitTimeout:
                     Console.WriteLine("WaitForRead: Timeout");
                     return false;
                 case 0:
+                    // Data is available to read
+                    Console.WriteLine("WaitForRead: Data");
+                    return true;
+                case 1:
                     // Someone aborted the wait.
                     Console.WriteLine("WaitForRead: Aborted");
                     return false;
-                case 1:
-                    // Data is available to write
-                    Console.WriteLine("WaitForRead: Data");
-                    return true;
                 }
                 throw new ApplicationException("Unexpected code flow");
             }
