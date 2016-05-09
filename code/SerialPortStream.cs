@@ -1051,7 +1051,8 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
         /// <exception cref="System.TimeoutException">Flush write time out exceeded.</exception>
         /// <exception cref="System.InvalidOperationException">Serial Port not opened.</exception>
-        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation.</exception>
+        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// or there was a device error.</exception>
         public override void Flush()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -1060,7 +1061,7 @@ namespace RJCP.IO.Ports
             bool flushed = m_Buffer.Stream.Flush(m_WriteTimeout);
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (!IsOpen) throw new IOException("SerialPortStream was closed during write operation");
-            if (!m_NativeSerial.IsRunning) throw new IOException("Device Error");
+            WriteCheckDeviceError();
             if (!flushed) {
                 throw new TimeoutException("Flush write time out exceeded");
             }
@@ -1074,7 +1075,8 @@ namespace RJCP.IO.Ports
             if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
             if (count == 0) return false;
-            if (!m_NativeSerial.IsRunning) throw new InvalidOperationException("Serial I/O Thread not running");
+            if (!IsOpen) throw new InvalidOperationException("Serial Port is closed");
+            WriteCheckDeviceError();
 
             // Check that count is less than the total size of the buffer, else raise
             // an exception immediately that the local buffer is too small.
@@ -1082,6 +1084,15 @@ namespace RJCP.IO.Ports
                 throw new InvalidOperationException("Insufficient buffer for the data requested");
             }
             return true;
+        }
+
+        private void WriteCheckDeviceError()
+        {
+            if (m_Buffer != null) {
+                if (IsOpen && !m_NativeSerial.IsRunning) {
+                    throw new System.IO.IOException("Device Error");
+                }
+            }
         }
 
         /// <summary>
@@ -1097,7 +1108,8 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial port was closed during the write operation.</exception>
+        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// or there was a device error.</exception>
         /// <remarks>
         /// Data is copied from the array provided into the local stream buffer. It does
         /// not guarantee that data will be sent over the serial port. So long as there is
@@ -1128,9 +1140,11 @@ namespace RJCP.IO.Ports
             if (!IsOpen) throw new IOException("SerialPortStream was closed during write operation");
 
             if (!ready) {
+                WriteCheckDeviceError();
                 throw new TimeoutException("Couldn't write into buffer");
             }
             InternalWrite(buffer, offset, count);
+            WriteCheckDeviceError();
         }
 
         private void InternalWrite(byte[] buffer, int offset, int count)
@@ -1158,7 +1172,7 @@ namespace RJCP.IO.Ports
         {
             WriteCheck(buffer, offset, count);
 
-            if (count == 0 || m_Buffer.Stream.WaitForWrite(count, m_WriteTimeout)) {
+            if (count == 0 || m_Buffer.Stream.WaitForWrite(count, 0)) {
                 LocalAsync ar = new LocalAsync(state);
                 if (count > 0) {
                     InternalWrite(buffer, offset, count);
@@ -1180,7 +1194,8 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.TimeoutException">Not enough buffer space was made available
         /// before the time out expired.</exception>
         /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="System.IO.IOException">Serial port was closed during the write operation.</exception>
+        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// or there was a device error.</exception>
         /// <remarks>
         /// EndWrite must be called exactly once on every IAsyncResult from BeginWrite.
         /// </remarks>
@@ -1193,6 +1208,8 @@ namespace RJCP.IO.Ports
             } else {
                 AsyncResult ar = (AsyncResult)asyncResult;
                 WriteDelegate caller = (WriteDelegate)ar.AsyncDelegate;
+
+                // This will raise any exceptions from the method InternalBlockingWrite
                 caller.EndInvoke(asyncResult);
             }
         }
@@ -1210,7 +1227,8 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial port was closed during the write operation.</exception>
+        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// or there was a device error.</exception>
         public void Write(char[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -1237,7 +1255,8 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial port was closed during the write operation.</exception>
+        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// or there was a device error.</exception>
         public void Write(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -1261,7 +1280,8 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial port was closed during the write operation.</exception>
+        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// or there was a device error.</exception>
         public void WriteLine(string text)
         {
             Write(text + m_NewLine);

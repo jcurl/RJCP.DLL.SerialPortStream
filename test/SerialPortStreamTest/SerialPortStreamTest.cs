@@ -1941,5 +1941,107 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 serialSource.Close();
             }
         }
+
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnFlushBlocked()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialDest.ReadBufferSize = 8192;
+                serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
+                serialSource.Open();
+                serialDest.Open();
+
+                serialDest.RtsEnable = false;
+                Thread.Sleep(100);
+
+                Assert.That(
+                    () => {
+                        Console.WriteLine("DisconnectOnFlushBlocked Writing");
+                        serialSource.Write(buffer, 0, buffer.Length);
+                        Console.WriteLine("DisconnectOnFlushBlocked Flushing");
+                        serialSource.Flush();
+                        Console.WriteLine("DisconnectOnFlushBlocked Flushed");
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnWriteBlocked()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialDest.ReadBufferSize = 8192;
+                serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
+                serialSource.Open();
+                serialDest.Open();
+
+                serialDest.RtsEnable = false;
+                Thread.Sleep(100);
+
+                Assert.That(
+                    () => {
+                        while (true) {
+                            Console.WriteLine("DisconnectOnWriteBlocked Writing");
+                            serialSource.Write(buffer, 0, buffer.Length);
+                        }
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnWriteAsyncBlocked()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialDest.ReadBufferSize = 8192;
+                serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
+                serialSource.Open();
+                serialDest.Open();
+
+                serialDest.RtsEnable = false;
+                Thread.Sleep(100);
+
+                Assert.That(
+                    () => {
+                        while (true) {
+                            Console.WriteLine("DisconnectOnWriteAsyncBlocked BeginWrite");
+                            IAsyncResult ar = serialSource.BeginWrite(buffer, 0, buffer.Length, null, null);
+                            Console.WriteLine("DisconnectOnWriteAsyncBlocked EndWrite");
+                            serialSource.EndWrite(ar);
+                        }
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
     }
 }

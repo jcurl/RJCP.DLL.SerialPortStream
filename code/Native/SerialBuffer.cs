@@ -438,15 +438,22 @@ namespace RJCP.IO.Ports.Native
                         m_SerialBuffer.m_WriteBufferNotFullEvent.Reset();
                     }
                     // This manual reset event is always set every time data is removed from the buffer
-                    WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortWriteEvent, m_SerialBuffer.m_WriteBufferNotFullEvent };
+                    WaitHandle[] handles = new WaitHandle[] { 
+                        m_SerialBuffer.m_DeviceDead,
+                        m_SerialBuffer.m_AbortWriteEvent,
+                        m_SerialBuffer.m_WriteBufferNotFullEvent
+                    };
                     int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
                     switch (triggered) {
                     case WaitHandle.WaitTimeout:
                         break;
                     case 0:
-                        // Someone aborted the wait.
+                        // The internal thread died.
                         return false;
                     case 1:
+                        // Someone aborted the wait.
+                        return false;
+                    case 2:
                         // Data is available to write.
                         return true;
                     }
@@ -511,15 +518,22 @@ namespace RJCP.IO.Ports.Native
             {
                 // This manual reset event is always set every time data is removed from the buffer
                 m_SerialBuffer.m_AbortWriteEvent.Reset();
-                WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortWriteEvent, m_SerialBuffer.m_TxEmptyEvent };
+                WaitHandle[] handles = new WaitHandle[] {
+                    m_SerialBuffer.m_DeviceDead,
+                    m_SerialBuffer.m_AbortWriteEvent,
+                    m_SerialBuffer.m_TxEmptyEvent
+                };
                 int triggered = WaitHandle.WaitAny(handles, timeout);
                 switch (triggered) {
                 case WaitHandle.WaitTimeout:
                     return false;
                 case 0:
-                    // Someone aborted the wait.
+                    // The internal thread died.
                     return false;
                 case 1:
+                    // Someone aborted the wait.
+                    return false;
+                case 2:
                     // Data is available to write
                     return true;
                 }
