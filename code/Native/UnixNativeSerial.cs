@@ -556,7 +556,7 @@ namespace RJCP.IO.Ports.Native
         /// </remarks>
         public void Close()
         {
-            if (IsRunning) Stop();
+            if (IsOpen) Stop();
             if (m_Dll.serial_close(m_Handle) == -1) ThrowException();
         }
 
@@ -620,13 +620,11 @@ namespace RJCP.IO.Ports.Native
 
         private void Stop()
         {
-            if (!IsRunning) return;
-
             SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Stopping Thread", m_Name);
             m_StopRunning.Set();
             InterruptReadWriteLoop();
 
-            if (m_MonitorPins) {
+            if (m_MonitorPins && m_PinThread != null) {
                 int killcounter = 0;
 
                 SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Stopping Thread", m_Name);
@@ -638,16 +636,15 @@ namespace RJCP.IO.Ports.Native
                 }
                 SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Thread Stopped", m_Name);
                 m_PinThread = null;
+                m_MonitorPins = false;
             }
 
-            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Waiting for Thread", m_Name);
-            m_MonitorThread.Join();
-            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Thread Stopped", m_Name);
-            m_MonitorThread = null;
-
-            // Clear the write buffer. Anything that's still in the driver serial buffer will continue to write. The I/O was cancelled
-            // so no need to purge the actual driver itself.
-            m_Buffer.Serial.Purge();
+            if (m_MonitorThread != null) {
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Waiting for Thread", m_Name);
+                m_MonitorThread.Join();
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Thread Stopped", m_Name);
+                m_MonitorThread = null;
+            }
         }
 
         private unsafe void ReadWriteThread()
@@ -736,6 +733,13 @@ namespace RJCP.IO.Ports.Native
                 }
             }
             m_Buffer.WriteEvent -= SerialBufferWriteEvent;
+
+            // Clear the write buffer. Anything that's still in the driver serial buffer will continue to write. The I/O was cancelled
+            // so no need to purge the actual driver itself.
+            m_Buffer.Serial.Purge();
+
+            // We must notify the stream that any blocking waits should abort.
+            m_Buffer.Serial.DeviceDead();
         }
 
         private void SerialBufferWriteEvent(object sender, EventArgs e)

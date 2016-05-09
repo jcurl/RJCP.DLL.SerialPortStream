@@ -30,6 +30,7 @@ namespace RJCP.IO.Ports.Native
         private readonly ManualResetEvent m_ReadBufferNotEmptyEvent = new ManualResetEvent(false);
         private readonly ManualResetEvent m_ReadBufferNotFullEvent = new ManualResetEvent(true);
         private readonly ManualResetEvent m_ReadEvent = new ManualResetEvent(false);
+        private readonly AutoResetEvent m_AbortReadEvent = new AutoResetEvent(false);
 
         private CircularBuffer<byte> m_WriteBuffer;
         private readonly GCHandle m_WriteHandle;
@@ -37,9 +38,9 @@ namespace RJCP.IO.Ports.Native
         private readonly ManualResetEvent m_WriteBufferNotFullEvent = new ManualResetEvent(true);
         private readonly ManualResetEvent m_WriteBufferNotEmptyEvent = new ManualResetEvent(false);
         private readonly ManualResetEvent m_TxEmptyEvent = new ManualResetEvent(true);
-
         private readonly AutoResetEvent m_AbortWriteEvent = new AutoResetEvent(false);
-        private readonly AutoResetEvent m_AbortReadEvent = new AutoResetEvent(false);
+
+        private readonly ManualResetEvent m_DeviceDead = new ManualResetEvent(false);
 
         private readonly bool m_Pinned;
 
@@ -205,6 +206,14 @@ namespace RJCP.IO.Ports.Native
                     m_SerialBuffer.m_TxEmptyEvent.Set();
                 }
             }
+
+            /// <summary>
+            /// Indicates no read/write waits should occur, the device is dead.
+            /// </summary>
+            public void DeviceDead()
+            {
+                m_SerialBuffer.m_DeviceDead.Set();
+            }
         }
 
         /// <summary>
@@ -231,19 +240,23 @@ namespace RJCP.IO.Ports.Native
             public bool WaitForRead(int timeout)
             {
                 m_SerialBuffer.m_AbortReadEvent.Reset();
-                WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_ReadBufferNotEmptyEvent, m_SerialBuffer.m_AbortReadEvent };
+                WaitHandle[] handles = new WaitHandle[] { 
+                    m_SerialBuffer.m_ReadBufferNotEmptyEvent, 
+                    m_SerialBuffer.m_AbortReadEvent,
+                    m_SerialBuffer.m_DeviceDead
+                };
                 int triggered = WaitHandle.WaitAny(handles, timeout);
                 switch (triggered) {
                 case WaitHandle.WaitTimeout:
-                    Console.WriteLine("WaitForRead: Timeout");
                     return false;
                 case 0:
                     // Data is available to read
-                    Console.WriteLine("WaitForRead: Data");
                     return true;
                 case 1:
                     // Someone aborted the wait.
-                    Console.WriteLine("WaitForRead: Aborted");
+                    return false;
+                case 2:
+                    // Monitoring thread died. No point waiting any longer.
                     return false;
                 }
                 throw new ApplicationException("Unexpected code flow");
@@ -270,7 +283,11 @@ namespace RJCP.IO.Ports.Native
                         m_SerialBuffer.m_ReadEvent.Reset();
                     }
 
-                    WaitHandle[] handles = new WaitHandle[] { m_SerialBuffer.m_AbortReadEvent, m_SerialBuffer.m_ReadEvent };
+                    WaitHandle[] handles = new WaitHandle[] {
+                        m_SerialBuffer.m_AbortReadEvent,
+                        m_SerialBuffer.m_ReadEvent,
+                        m_SerialBuffer.m_DeviceDead,
+                    };
                     int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
                     switch (triggered) {
                     case WaitHandle.WaitTimeout:
@@ -279,8 +296,11 @@ namespace RJCP.IO.Ports.Native
                         // Someone aborted the wait.
                         return false;
                     case 1:
-                        // Data is available to write
+                        // Data is available to read.
                         return true;
+                    case 2:
+                        // Monitoring thread died. No point waiting any longer.
+                        return false;
                     }
                 } while (!timer.Expired);
                 return false;
@@ -427,7 +447,7 @@ namespace RJCP.IO.Ports.Native
                         // Someone aborted the wait.
                         return false;
                     case 1:
-                        // Data is available to write
+                        // Data is available to write.
                         return true;
                     }
                 } while (!timer.Expired);
@@ -504,6 +524,31 @@ namespace RJCP.IO.Ports.Native
                     return true;
                 }
                 throw new ApplicationException("Unexpected code flow");
+            }
+
+            /// <summary>
+            /// Reset the buffer to an initial state ready for a new connection.
+            /// </summary>
+            /// <param name="clearBuffer">Set to <c>true</c> to reset the contents of the buffers.</param>
+            /// <remarks>
+            /// This should only be closed when the serial port is closed.
+            /// </remarks>
+            public void Reset(bool clearBuffer)
+            {
+                if (clearBuffer) {
+                    m_SerialBuffer.m_ReadBuffer.Reset();
+                    m_SerialBuffer.m_WriteBuffer.Reset();
+                    m_SerialBuffer.m_ReadBufferNotEmptyEvent.Reset();
+                    m_SerialBuffer.m_ReadBufferNotFullEvent.Set();
+                    m_SerialBuffer.m_ReadEvent.Reset();
+                    m_SerialBuffer.m_AbortReadEvent.Reset();
+                    m_SerialBuffer.m_WriteBufferNotFullEvent.Set();
+                    m_SerialBuffer.m_WriteBufferNotEmptyEvent.Reset();
+                    m_SerialBuffer.m_AbortWriteEvent.Reset();
+                }
+
+                m_SerialBuffer.m_TxEmptyEvent.Set();
+                m_SerialBuffer.m_DeviceDead.Reset();
             }
         }
 
@@ -628,6 +673,7 @@ namespace RJCP.IO.Ports.Native
                 m_TxEmptyEvent.Dispose();
                 m_AbortWriteEvent.Dispose();
                 m_AbortReadEvent.Dispose();
+                m_DeviceDead.Dispose();
                 m_ReadBuffer = null;
                 m_WriteBuffer = null;
             }

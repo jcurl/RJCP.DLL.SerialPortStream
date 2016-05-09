@@ -1698,5 +1698,248 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 Assert.That(bytes, Is.EqualTo(0));
             }
         }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadBlocked()
+        {
+            byte[] buffer = new byte[1024];
+
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int bytes = serialSource.Read(buffer, 0, buffer.Length);
+                Console.WriteLine("{0} bytes read", bytes);
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadBlockedReadAgain()
+        {
+            byte[] buffer = new byte[1024];
+
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int bytes = serialSource.Read(buffer, 0, buffer.Length);
+                Console.WriteLine("{0} bytes read", bytes);
+
+                Assert.That(
+                    () => {
+                        bytes = serialSource.Read(buffer, 0, buffer.Length);
+                        Console.WriteLine("{0} bytes read again", bytes);
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadCharsBlocked()
+        {
+            char[] buffer = new char[1024];
+
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int bytes = serialSource.Read(buffer, 0, buffer.Length);
+                Console.WriteLine("{0} bytes read", bytes);
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadCharsBlockedReadAgain()
+        {
+            char[] buffer = new char[1024];
+
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int bytes = serialSource.Read(buffer, 0, buffer.Length);
+                Console.WriteLine("{0} bytes read", bytes);
+
+                Assert.That(
+                    () => {
+                        bytes = serialSource.Read(buffer, 0, buffer.Length);
+                        Console.WriteLine("{0} bytes read again", bytes);
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadByteBlocked()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int c = serialSource.ReadByte();
+                Console.WriteLine("{0} byte read", c);
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadByteBlockedReadAgain()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int c = serialSource.ReadByte();
+                Console.WriteLine("{0} byte read", c);
+
+                Assert.That(
+                    () => {
+                        c = serialSource.ReadByte();
+                        Console.WriteLine("{0} byte read again", c);
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadCharBlocked()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int c = serialSource.ReadChar();
+                Console.WriteLine("{0} char read", c);
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadCharBlockedReadAgain()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                int c = serialSource.ReadChar();
+                Console.WriteLine("{0} char read", c);
+
+                Assert.That(
+                    () => {
+                        c = serialSource.ReadChar();
+                        Console.WriteLine("{0} char read again", c);
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
+
+        /// <summary>
+        /// Put the serial port into a read blocked state.
+        /// </summary>
+        /// <remarks>>
+        /// This test can be used to check behaviour in case that the serial port is removed.
+        /// In case of the device no longer available, it should abort the read with an exception.
+        /// </remarks>
+        [Test]
+        //[Ignore("Manual Test")]
+        [Category("SerialPortStream.ManualTest")]
+        public void DisconnectOnReadLineBlocked()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+
+                Assert.That(
+                    () => {
+                        string l = serialSource.ReadLine();
+                        Console.WriteLine("line read length={0} ({1})", l == null ? -1 : l.Length, l == null ? "" : l);
+                    }, Throws.InstanceOf<System.IO.IOException>());
+
+                // Device should still be open.
+                Assert.That(serialSource.IsOpen, Is.True);
+                serialSource.Close();
+            }
+        }
     }
 }

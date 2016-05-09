@@ -240,6 +240,7 @@ namespace RJCP.IO.Ports
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (IsOpen) throw new InvalidOperationException("Serial Port already opened");
 
+            m_ReadCheckDeviceErrorNotified = false;
             m_NativeSerial.Open();
             try {
                 if (setCommState) {
@@ -251,6 +252,8 @@ namespace RJCP.IO.Ports
                 // Create threads and start working with local buffers
                 if (m_Buffer == null) {
                     m_Buffer = m_NativeSerial.CreateSerialBuffer(m_ReadBufferSize, m_WriteBufferSize);
+                } else {
+                    m_Buffer.Stream.Reset(true);
                 }
                 m_NativeSerial.StartMonitor(m_Buffer, PortName);
             } catch {
@@ -604,6 +607,35 @@ namespace RJCP.IO.Ports
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
         }
 
+        private bool m_ReadCheckDeviceErrorNotified;
+
+        private bool ReadCheckDeviceError()
+        {
+            return ReadCheckDeviceError(false);
+        }
+
+        private bool ReadCheckDeviceError(bool immediate)
+        {
+            if (m_Buffer != null) {
+                if (IsOpen && !m_NativeSerial.IsRunning && m_Buffer.Stream.BytesToRead == 0) {
+                    if (immediate || m_ReadCheckDeviceErrorNotified) {
+                        // This should only happen if the monitoring/buffering threads
+                        // have died without explicitly closing the serial port.
+                        throw new System.IO.IOException("Device Error");
+                    }
+
+                    // We don't want to raise an exception the first time the issue is detected,
+                    // to allow a Read to return zero for end-of-file conditions.
+                    m_ReadCheckDeviceErrorNotified = true;
+
+                    // Return true to indicate there was a device error. Next time this function
+                    // is called, we raise an exception.
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Reads a sequence of bytes from the current stream and advances the
         /// position within the stream by the number of bytes read.
@@ -622,6 +654,7 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentNullException">Null buffer provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset provided, or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
         /// <returns>
         /// The total number of bytes read into the buffer. This can be less than
         /// the number of bytes requested if that many bytes are not currently
@@ -631,6 +664,8 @@ namespace RJCP.IO.Ports
         {
             ReadCheck(buffer, offset, count);
             if (m_Buffer == null) return 0;
+            if (ReadCheckDeviceError()) return 0;
+
             if (count == 0) return 0;
             return InternalBlockingRead(buffer, offset, count);
         }
@@ -640,15 +675,21 @@ namespace RJCP.IO.Ports
             if (m_NativeSerial.IsRunning) {
                 bool ready = m_Buffer.Stream.WaitForRead(m_ReadTimeout);
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-                if (!ready) return 0;
+                if (!ready) {
+                    ReadCheckDeviceError();
+                    return 0;
+                }
             }
+
             return InternalRead(buffer, offset, count);
         }
 
         private int InternalRead(byte[] buffer, int offset, int count)
         {
             int bytes = m_Buffer.Stream.Read(buffer, offset, count);
-            if (bytes > 0) m_ReadTo.Reset(false);
+            if (bytes > 0) {
+                m_ReadTo.Reset(false);
+            }
             return bytes;
         }
 
@@ -691,6 +732,8 @@ namespace RJCP.IO.Ports
         /// Waits for the pending asynchronous read to complete.
         /// </summary>
         /// <param name="asyncResult">The reference to the pending asynchronous request to finish.</param>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
         /// <returns>The number of bytes read from the stream, between zero (0) and the number of bytes you requested.
         /// Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.</returns>
         public override int EndRead(IAsyncResult asyncResult)
@@ -699,6 +742,7 @@ namespace RJCP.IO.Ports
                 LocalAsync<int> ar = (LocalAsync<int>)asyncResult;
                 if (!ar.IsCompleted) ar.AsyncWaitHandle.WaitOne(-1);
                 ar.Dispose();
+                if (ar.Result == 0) ReadCheckDeviceError();
                 return ar.Result;
             } else {
                 AsyncResult ar = (AsyncResult)asyncResult;
@@ -711,12 +755,18 @@ namespace RJCP.IO.Ports
         /// Synchronously reads one byte from the SerialPort input buffer.
         /// </summary>
         /// <returns>The byte, cast to an Int32, or -1 if the end of the stream has been read.</returns>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
         public override int ReadByte()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (m_Buffer == null) return -1;
+            if (ReadCheckDeviceError()) return -1;
+
             if (m_NativeSerial.IsRunning) {
-                if (!m_Buffer.Stream.WaitForRead(m_ReadTimeout)) return -1;
+                if (!m_Buffer.Stream.WaitForRead(m_ReadTimeout)) {
+                    ReadCheckDeviceError();
+                    return -1;
+                }
             }
             int value = m_Buffer.Stream.ReadByte();
             if (value != -1) m_ReadTo.Reset(false);
@@ -727,20 +777,23 @@ namespace RJCP.IO.Ports
         /// Reads a number of characters from the SerialPortStream input buffer and writes
         /// them into an array of characters at a given offset.
         /// </summary>
+        /// <param name="buffer">The character array to write the input to.</param>
+        /// <param name="offset">Offset into the buffer where to start putting the data.</param>
+        /// <param name="count">Maximum number of bytes to read into the buffer.</param>
+        /// <returns>The actual number of bytes copied into the buffer, 0 if there was a time out.</returns>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
         /// <remarks>
         /// This function converts the data in the local buffer to characters based on the
         /// encoding defined by the encoding property. The encoder used may buffer data between
         /// calls if characters may require more than one byte of data for its interpretation
         /// as a character.
         /// </remarks>
-        /// <param name="buffer">The character array to write the input to.</param>
-        /// <param name="offset">Offset into the buffer where to start putting the data.</param>
-        /// <param name="count">Maximum number of bytes to read into the buffer.</param>
-        /// <returns>The actual number of bytes copied into the buffer, 0 if there was a time out.</returns>
         public int Read(char[] buffer, int offset, int count)
         {
             ReadCheck(buffer, offset, count);
             if (m_Buffer == null) return 0;
+            if (ReadCheckDeviceError()) return 0;
+
             if (count == 0) return 0;
 
             TimerExpiry te = new TimerExpiry(m_ReadTimeout);
@@ -748,8 +801,10 @@ namespace RJCP.IO.Ports
             do {
                 chars = m_ReadTo.Read(m_Buffer, buffer, offset, count);
                 if (chars == 0) {
-                    if (!m_NativeSerial.IsRunning) return 0;
-                    if (!m_Buffer.Stream.WaitForRead(te.Timeout)) return 0;
+                    if (!m_Buffer.Stream.WaitForRead(te.Timeout)) {
+                        ReadCheckDeviceError();
+                        return 0;
+                    }
                 }
             } while (chars == 0 && !te.Expired);
             return chars;
@@ -764,14 +819,17 @@ namespace RJCP.IO.Ports
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (m_Buffer == null) return -1;
+            if (ReadCheckDeviceError()) return -1;
 
             TimerExpiry te = new TimerExpiry(m_ReadTimeout);
             int chars;
             do {
                 chars = m_ReadTo.ReadChar(m_Buffer);
                 if (chars == -1) {
-                    if (!m_NativeSerial.IsRunning) return -1;
-                    if (!m_Buffer.Stream.WaitForRead(te.Timeout)) return -1;
+                    if (!m_Buffer.Stream.WaitForRead(te.Timeout)) {
+                        ReadCheckDeviceError();
+                        return -1;
+                    }
                 }
             } while (chars == -1 && !te.Expired);
             return chars;
@@ -782,6 +840,9 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <returns>The contents of the input buffer up to the first occurrence of
         /// a NewLine value.</returns>
+        /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="ObjectDisposedException"/>
         public string ReadLine()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -808,18 +869,21 @@ namespace RJCP.IO.Ports
         /// sequence is removed and replaced with the byte equivalent of the fall back
         /// character.</para>
         /// <para>This method is rather slow, because it tries to preserve the byte buffer
-        /// in case of failure. If your application works entirely by using character
-        /// sequences, you may get much better performance by using Read(char[], ...) and
-        /// searching for string sequences yourself, as Read(char[], ...) does a complete
-        /// conversion bytes to characters in as few steps as possible.</para>
+        /// in case of failure.</para>
+        /// <para>In case the data cannot be read, an exception is always thrown. So you may
+        /// assume that if this method returns, you have valid data.</para>
         /// </remarks>
         /// <param name="text">The text to indicate where the read operation stops.</param>
         /// <returns>The contents of the input buffer up to the specified <i>text</i>.</returns>
+        /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="ObjectDisposedException"/>
         public string ReadTo(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (string.IsNullOrEmpty(text)) throw new ArgumentException("Parameter text shall not be null or empty", "text");
             if (m_Buffer == null) return null;
+            if (ReadCheckDeviceError()) return null;
 
             TimerExpiry te = new TimerExpiry(m_ReadTimeout);
             bool dataAvailable = false;
@@ -830,6 +894,7 @@ namespace RJCP.IO.Ports
                     m_NativeSerial.IsRunning &&
                     m_ReadTo.ReadToWaitForNewData(m_Buffer, te.RemainingTime());
             } while (dataAvailable && !te.Expired);
+            if (!dataAvailable) ReadCheckDeviceError(true);
             throw new TimeoutException();
         }
 
@@ -854,6 +919,8 @@ namespace RJCP.IO.Ports
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (m_Buffer == null) return null;
+            if (ReadCheckDeviceError()) return null;
+
             return m_ReadTo.ReadExisting(m_Buffer);
         }
 
@@ -993,6 +1060,7 @@ namespace RJCP.IO.Ports
             bool flushed = m_Buffer.Stream.Flush(m_WriteTimeout);
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
             if (!IsOpen) throw new IOException("SerialPortStream was closed during write operation");
+            if (!m_NativeSerial.IsRunning) throw new IOException("Device Error");
             if (!flushed) {
                 throw new TimeoutException("Flush write time out exceeded");
             }

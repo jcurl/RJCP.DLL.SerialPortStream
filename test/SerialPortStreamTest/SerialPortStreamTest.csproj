@@ -22,6 +22,17 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
+    <UnitTestInformation>
+      <UnitTestInformation>
+        <Test Path="SerialPortStreamTest/SerialPortStreamTest/SerialPortStreamTest/SerialPortStreamTest/SerialPortStreamTest">
+          <Options EnableFilter="True" Exclude="True" ctype="NUnitCategoryOptions">
+            <Categories>
+              <Category>SerialPortStream.ManualTest</Category>
+            </Categories>
+          </Options>
+        </Test>
+      </UnitTestInformation>
+    </UnitTestInformation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
