@@ -22,7 +22,7 @@ namespace RJCP.IO.Ports.Native
     /// accessed only by one thread, the properties under StreamData are accessed only by one
     /// single (but may be different to SerialData) thread.</para>
     /// </remarks>
-    internal class SerialBuffer : IDisposable
+    internal class SerialBuffer : IDisposable, ISerialBufferSerialData, ISerialBufferStreamData
     {
         private CircularBuffer<byte> m_ReadBuffer;
         private readonly GCHandle m_ReadHandle;
@@ -44,489 +44,295 @@ namespace RJCP.IO.Ports.Native
 
         private readonly bool m_Pinned;
 
+        #region ISerialBufferSerialData
         /// <summary>
-        /// Container structure for properties and methods related to the Native Serial object.
+        /// Access to properties and methods specific to the native serial object.
         /// </summary>
-        public struct SerialData
+        /// <value>
+        /// Access to properties and methods specific to the native serial object.
+        /// </value>
+        public ISerialBufferSerialData Serial { get { return this as ISerialBufferSerialData; } }
+
+        CircularBuffer<byte> ISerialBufferSerialData.ReadBuffer { get { return m_ReadBuffer; } }
+
+        IntPtr ISerialBufferSerialData.ReadBufferOffsetEnd
         {
-            private readonly SerialBuffer m_SerialBuffer;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="SerialData"/> struct.
-            /// </summary>
-            /// <param name="parent">The parent.</param>
-            internal SerialData(SerialBuffer parent)
+            get
             {
-                m_SerialBuffer = parent;
+                return !m_Pinned ?
+                    IntPtr.Zero :
+                    m_ReadHandle.AddrOfPinnedObject() + m_ReadBuffer.End;
             }
+        }
 
-            /// <summary>
-            /// Access the read buffer directly.
-            /// </summary>
-            /// <value>
-            /// The read buffer.
-            /// </value>
-            public CircularBuffer<byte> ReadBuffer { get { return m_SerialBuffer.m_ReadBuffer; } }
+        CircularBuffer<byte> ISerialBufferSerialData.WriteBuffer { get { return m_WriteBuffer; } }
 
-            /// <summary>
-            /// Gets the read buffer offset end, used for giving to native API's.
-            /// </summary>
-            /// <value>
-            /// The read buffer offset end.
-            /// </value>
-            public IntPtr ReadBufferOffsetEnd
+        IntPtr ISerialBufferSerialData.WriteBufferOffsetStart
+        {
+            get
             {
-                get {
-                    return !m_SerialBuffer.m_Pinned ?
-                        IntPtr.Zero :
-                        m_SerialBuffer.m_ReadHandle.AddrOfPinnedObject() + m_SerialBuffer.m_ReadBuffer.End;
+                return !m_Pinned ?
+                    IntPtr.Zero :
+                    m_WriteHandle.AddrOfPinnedObject() + m_WriteBuffer.Start;
+            }
+        }
+
+        void ISerialBufferSerialData.ReadBufferProduce(int count)
+        {
+            lock (m_ReadLock) {
+                m_ReadBuffer.Produce(count);
+                m_ReadBufferNotEmptyEvent.Set();
+                m_ReadEvent.Set();
+                if (m_ReadBuffer.Free == 0) {
+                    m_ReadBufferNotFullEvent.Reset();
                 }
             }
+        }
 
-            /// <summary>
-            /// Access the write buffer directly.
-            /// </summary>
-            /// <value>
-            /// The write buffer.
-            /// </value>
-            public CircularBuffer<byte> WriteBuffer { get { return m_SerialBuffer.m_WriteBuffer; } }
-
-            /// <summary>
-            /// Gets the write buffer offset start, used for giving to native API's.
-            /// </summary>
-            /// <value>
-            /// The write buffer offset start.
-            /// </value>
-            public IntPtr WriteBufferOffsetStart
-            {
-                get
-                {
-                    return !m_SerialBuffer.m_Pinned ?
-                        IntPtr.Zero :
-                        m_SerialBuffer.m_WriteHandle.AddrOfPinnedObject() + m_SerialBuffer.m_WriteBuffer.Start;
+        void ISerialBufferSerialData.WriteBufferConsume(int count)
+        {
+            lock (m_WriteLock) {
+                m_WriteBuffer.Consume(count);
+                m_WriteBufferNotFullEvent.Set();
+                if (m_WriteBuffer.Length == 0) {
+                    m_WriteBufferNotEmptyEvent.Reset();
                 }
             }
+        }
 
-            /// <summary>
-            /// Update the read circular queue indicating data has been received, and is available to the stream object.
-            /// </summary>
-            /// <param name="count">The count.</param>
-            public void ReadBufferProduce(int count)
-            {
-                lock (m_SerialBuffer.m_ReadLock) {
-                    m_SerialBuffer.m_ReadBuffer.Produce(count);
-                    m_SerialBuffer.m_ReadBufferNotEmptyEvent.Set();
-                    m_SerialBuffer.m_ReadEvent.Set();
-                    if (m_SerialBuffer.m_ReadBuffer.Free == 0) {
-                        m_SerialBuffer.m_ReadBufferNotFullEvent.Reset();
-                    }
+        bool ISerialBufferSerialData.TxEmptyEvent()
+        {
+            lock (m_WriteLock) {
+                if (m_WriteBuffer.Length == 0) {
+                    m_TxEmptyEvent.Set();
+                    return true;
                 }
-            }
-
-            /// <summary>
-            /// Update the write circular queue indicating data has been written, freeing space for more data to write.
-            /// </summary>
-            /// <param name="count">The count.</param>
-            public void WriteBufferConsume(int count)
-            {
-                lock (m_SerialBuffer.m_WriteLock) {
-                    m_SerialBuffer.m_WriteBuffer.Consume(count);
-                    m_SerialBuffer.m_WriteBufferNotFullEvent.Set();
-                    if (m_SerialBuffer.m_WriteBuffer.Length == 0) {
-                        m_SerialBuffer.m_WriteBufferNotEmptyEvent.Reset();
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Indicates that the write buffer is now empty.
-            /// </summary>
-            /// <returns><c>true</c> if the write buffer is empty.</returns>
-            /// <remarks>
-            /// Systems that return immediately after a Write before the write has been sent over the wire
-            /// should call this method when the hardware indicates that data is flushed.
-            /// <para>Systems that only return from the Write when data is completely written, or that do not
-            /// receive events when the hardware buffer is empty, should call this method immediately after
-            /// the Write is done.</para><para>Typically Windows systems may return before the hardware buffer is completely empty,
-            /// where they notify later of an empty buffer with the EV_TXEMPTY event.</para>
-            /// </remarks>
-            public bool TxEmptyEvent()
-            {
-                lock (m_SerialBuffer.m_WriteLock) {
-                    if (m_SerialBuffer.m_WriteBuffer.Length == 0) {
-                        m_SerialBuffer.m_TxEmptyEvent.Set();
-                        return true;
-                    }
-                    return false;
-                }
-            }
-
-            /// <summary>
-            /// Gets a value indicating whether this instance uses a pinned buffer.
-            /// </summary>
-            /// <value>
-            /// <c>true</c> if this instance uses a pinned buffer; otherwise, <c>false</c>.
-            /// </value>
-            public bool IsPinnedBuffer
-            {
-                get { return m_SerialBuffer.m_Pinned; }
-            }
-
-            /// <summary>
-            /// Gets the event handle that is signalled when the read buffer is not full.
-            /// </summary>
-            /// <value>
-            /// The event handle that is signalled when the read buffer is not full.
-            /// </value>
-            public WaitHandle ReadBufferNotFull
-            {
-                get { return m_SerialBuffer.m_ReadBufferNotFullEvent; }
-            }
-
-            /// <summary>
-            /// Gets the event handle that is signalled when data is in the write buffer.
-            /// </summary>
-            /// <value>
-            /// The event handle that is signalled when data is in the write buffer.
-            /// </value>
-            public WaitHandle WriteBufferNotEmpty
-            {
-                get { return m_SerialBuffer.m_WriteBufferNotEmptyEvent; }
-            }
-
-            /// <summary>
-            /// Purges the write buffer.
-            /// </summary>
-            public void Purge()
-            {
-                lock (m_SerialBuffer.m_WriteLock) {
-                    m_SerialBuffer.m_WriteBuffer.Reset();
-                    m_SerialBuffer.m_WriteBufferNotEmptyEvent.Reset();
-                    m_SerialBuffer.m_WriteBufferNotFullEvent.Set();
-                    m_SerialBuffer.m_TxEmptyEvent.Set();
-                }
-            }
-
-            /// <summary>
-            /// Indicates no read/write waits should occur, the device is dead.
-            /// </summary>
-            public void DeviceDead()
-            {
-                m_SerialBuffer.m_DeviceDead.Set();
+                return false;
             }
         }
 
         /// <summary>
-        /// Container structure for properties and methods related to the Stream object.
+        /// Gets a value indicating whether this instance uses a pinned buffer.
         /// </summary>
-        public struct StreamData
+        /// <value>
+        /// <c>true</c> if this instance uses a pinned buffer; otherwise, <c>false</c>.
+        /// </value>
+        bool ISerialBufferSerialData.IsPinnedBuffer
         {
-            private readonly SerialBuffer m_SerialBuffer;
+            get { return m_Pinned; }
+        }
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="StreamData"/> struct.
-            /// </summary>
-            /// <param name="parent">The parent.</param>
-            internal StreamData(SerialBuffer parent)
-            {
-                m_SerialBuffer = parent;
+        /// <summary>
+        /// Gets the event handle that is signalled when the read buffer is not full.
+        /// </summary>
+        /// <value>
+        /// The event handle that is signalled when the read buffer is not full.
+        /// </value>
+        WaitHandle ISerialBufferSerialData.ReadBufferNotFull
+        {
+            get { return m_ReadBufferNotFullEvent; }
+        }
+
+        /// <summary>
+        /// Gets the event handle that is signalled when data is in the write buffer.
+        /// </summary>
+        /// <value>
+        /// The event handle that is signalled when data is in the write buffer.
+        /// </value>
+        WaitHandle ISerialBufferSerialData.WriteBufferNotEmpty
+        {
+            get { return m_WriteBufferNotEmptyEvent; }
+        }
+
+        /// <summary>
+        /// Purges the write buffer.
+        /// </summary>
+        void ISerialBufferSerialData.Purge()
+        {
+            lock (m_WriteLock) {
+                m_WriteBuffer.Reset();
+                m_WriteBufferNotEmptyEvent.Reset();
+                m_WriteBufferNotFullEvent.Set();
+                m_TxEmptyEvent.Set();
+            }
+        }
+
+        /// <summary>
+        /// Indicates no read/write waits should occur, the device is dead.
+        /// </summary>
+        void ISerialBufferSerialData.DeviceDead()
+        {
+            m_DeviceDead.Set();
+        }
+        #endregion
+
+        #region ISerialBufferStreamData
+        /// <summary>
+        /// Access to properties and methods specific to the native serial object.
+        /// </summary>
+        /// <value>
+        /// Access to properties and methods specific to the native serial object.
+        /// </value>
+        public ISerialBufferStreamData Stream { get { return this as ISerialBufferStreamData; } }
+
+        bool ISerialBufferStreamData.WaitForRead(int timeout)
+        {
+            m_AbortReadEvent.Reset();
+            WaitHandle[] handles = new WaitHandle[] {
+                    m_ReadBufferNotEmptyEvent,
+                    m_AbortReadEvent,
+                    m_DeviceDead
+                };
+            int triggered = WaitHandle.WaitAny(handles, timeout);
+            switch (triggered) {
+            case WaitHandle.WaitTimeout:
+                return false;
+            case 0:
+                // Data is available to read
+                return true;
+            case 1:
+                // Someone aborted the wait.
+                return false;
+            case 2:
+                // Monitoring thread died. No point waiting any longer.
+                return false;
+            }
+            throw new ApplicationException("Unexpected code flow");
+        }
+
+        bool ISerialBufferStreamData.WaitForRead(int count, int timeout)
+        {
+            if (count == 0) return true;
+            lock (m_ReadLock) {
+                if (count > m_ReadBuffer.Capacity) return false;
             }
 
-            /// <summary>
-            /// Waits up to a specified time out for data to be available to read.
-            /// </summary>
-            /// <param name="timeout">The time out in milliseconds.</param>
-            /// <returns><c>true</c> if data is available to read in time; <c>false</c> otherwise.</returns>
-            public bool WaitForRead(int timeout)
-            {
-                m_SerialBuffer.m_AbortReadEvent.Reset();
-                WaitHandle[] handles = new WaitHandle[] { 
-                    m_SerialBuffer.m_ReadBufferNotEmptyEvent, 
-                    m_SerialBuffer.m_AbortReadEvent,
-                    m_SerialBuffer.m_DeviceDead
-                };
-                int triggered = WaitHandle.WaitAny(handles, timeout);
+            m_AbortReadEvent.Reset();
+            TimerExpiry timer = new TimerExpiry(timeout);
+            do {
+                lock (m_ReadLock) {
+                    if (m_ReadBuffer.Length >= count) return true;
+                    m_ReadEvent.Reset();
+                }
+
+                WaitHandle[] handles = new WaitHandle[] {
+                        m_AbortReadEvent,
+                        m_ReadEvent,
+                        m_DeviceDead,
+                    };
+                int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
                 switch (triggered) {
                 case WaitHandle.WaitTimeout:
-                    return false;
+                    break;
                 case 0:
-                    // Data is available to read
-                    return true;
-                case 1:
                     // Someone aborted the wait.
                     return false;
+                case 1:
+                    // Data is available to read.
+                    return true;
                 case 2:
                     // Monitoring thread died. No point waiting any longer.
                     return false;
                 }
-                throw new ApplicationException("Unexpected code flow");
-            }
+            } while (!timer.Expired);
+            return false;
+        }
 
-            /// <summary>
-            /// Waits up to a specified time out for data to be available to read.
-            /// </summary>
-            /// <param name="count">The number of bytes that should be in the read buffer.</param>
-            /// <param name="timeout">The time out in milliseconds.</param>
-            /// <returns><c>true</c> if data is available to read in time; <c>false</c> otherwise.</returns>
-            public bool WaitForRead(int count, int timeout)
-            {
-                if (count == 0) return true;
-                lock (m_SerialBuffer.m_ReadLock) {
-                    if (count > m_SerialBuffer.m_ReadBuffer.Capacity) return false;
+        int ISerialBufferStreamData.Read(byte[] buffer, int offset, int count)
+        {
+            lock (m_ReadLock) {
+                int bytes = m_ReadBuffer.MoveTo(buffer, offset, count);
+                if (m_ReadBuffer.Length == 0) {
+                    m_ReadBufferNotEmptyEvent.Reset();
                 }
-
-                m_SerialBuffer.m_AbortReadEvent.Reset();
-                TimerExpiry timer = new TimerExpiry(timeout);
-                do {
-                    lock (m_SerialBuffer.m_ReadLock) {
-                        if (m_SerialBuffer.m_ReadBuffer.Length >= count) return true;
-                        m_SerialBuffer.m_ReadEvent.Reset();
-                    }
-
-                    WaitHandle[] handles = new WaitHandle[] {
-                        m_SerialBuffer.m_AbortReadEvent,
-                        m_SerialBuffer.m_ReadEvent,
-                        m_SerialBuffer.m_DeviceDead,
-                    };
-                    int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
-                    switch (triggered) {
-                    case WaitHandle.WaitTimeout:
-                        break;
-                    case 0:
-                        // Someone aborted the wait.
-                        return false;
-                    case 1:
-                        // Data is available to read.
-                        return true;
-                    case 2:
-                        // Monitoring thread died. No point waiting any longer.
-                        return false;
-                    }
-                } while (!timer.Expired);
-                return false;
+                m_ReadBufferNotFullEvent.Set();
+                return bytes;
             }
+        }
 
-            /// <summary>
-            /// Reads data received by the Serial object, copying it into a buffer and reducing the read buffer size.
-            /// </summary>
-            /// <param name="buffer">The buffer to copy data into.</param>
-            /// <param name="offset">The offset where to copy data into..</param>
-            /// <param name="count">The number of bytes to copy.</param>
-            /// <returns>Number of bytes actually read from the queue.</returns>
-            public int Read(byte[] buffer, int offset, int count)
-            {
-                lock (m_SerialBuffer.m_ReadLock) {
-                    int bytes = m_SerialBuffer.m_ReadBuffer.MoveTo(buffer, offset, count);
-                    if (m_SerialBuffer.m_ReadBuffer.Length == 0) {
-                        m_SerialBuffer.m_ReadBufferNotEmptyEvent.Reset();
-                    }
-                    m_SerialBuffer.m_ReadBufferNotFullEvent.Set();
-                    return bytes;
+        void ISerialBufferStreamData.ReadConsume(int count)
+        {
+            lock (m_ReadLock) {
+                m_ReadBuffer.Consume(count);
+                if (m_ReadBuffer.Length == 0) {
+                    m_ReadBufferNotEmptyEvent.Reset();
                 }
+                m_ReadBufferNotFullEvent.Set();
             }
+        }
 
-            /// <summary>
-            /// Consume bytes from the incoming buffer.
-            /// </summary>
-            /// <param name="count">The number of bytes to discard at the beginning of the read byte buffer.</param>
-            public void ReadConsume(int count)
+        int ISerialBufferStreamData.Read(char[] buffer, int offset, int count, Decoder decoder)
+        {
+            int bu;
+            int cu;
+            bool complete;
+            lock (m_ReadLock) {
+                decoder.Convert(m_ReadBuffer, buffer, offset, count, false, out bu, out cu, out complete);
+                if (m_ReadBuffer.Length == 0) {
+                    m_ReadBufferNotEmptyEvent.Reset();
+                }
+                m_ReadBufferNotFullEvent.Set();
+                return cu;
+            }
+        }
+
+        int ISerialBufferStreamData.ReadByte()
+        {
+            lock (m_ReadLock) {
+                if (m_ReadBuffer.Length == 0) return -1;
+                int v = m_ReadBuffer[0];
+                m_ReadBuffer.Consume(1);
+                if (m_ReadBuffer.Length == 0) {
+                    m_ReadBufferNotEmptyEvent.Reset();
+                }
+                m_ReadBufferNotFullEvent.Set();
+                return v;
+            }
+        }
+
+        int ISerialBufferStreamData.BytesToRead
+        {
+            get
             {
-                lock (m_SerialBuffer.m_ReadLock) {
-                    m_SerialBuffer.m_ReadBuffer.Consume(count);
-                    if (m_SerialBuffer.m_ReadBuffer.Length == 0) {
-                        m_SerialBuffer.m_ReadBufferNotEmptyEvent.Reset();
-                    }
-                    m_SerialBuffer.m_ReadBufferNotFullEvent.Set();
+                lock (m_ReadLock) {
+                    return m_ReadBuffer.Length;
                 }
             }
+        }
 
-            /// <summary>
-            /// Reads data received by the serial object, converted to characters using the specified decoder.
-            /// </summary>
-            /// <param name="buffer">The character buffer to read into.</param>
-            /// <param name="offset">The offset into <paramref name="buffer"/>.</param>
-            /// <param name="count">The number of characters to write into <paramref name="buffer"/>.</param>
-            /// <param name="decoder">The decoder to use for the conversion.</param>
-            /// <returns>The number of characters read.</returns>
-            /// <remarks>
-            /// This method has no input checks that it is internal
-            /// </remarks>
-            public int Read(char[] buffer, int offset, int count, Decoder decoder)
-            {
-                int bu;
-                int cu;
-                bool complete;
-                lock (m_SerialBuffer.m_ReadLock) {
-                    decoder.Convert(m_SerialBuffer.m_ReadBuffer, buffer, offset, count, false, out bu, out cu, out complete);
-                    if (m_SerialBuffer.m_ReadBuffer.Length == 0) {
-                        m_SerialBuffer.m_ReadBufferNotEmptyEvent.Reset();
-                    }
-                    m_SerialBuffer.m_ReadBufferNotFullEvent.Set();
-                    return cu;
+        void ISerialBufferStreamData.DiscardInBuffer()
+        {
+            lock (m_ReadLock) {
+                m_ReadBuffer.Consume(m_ReadBuffer.Length);
+                m_ReadBufferNotFullEvent.Set();
+                m_ReadBufferNotEmptyEvent.Reset();
+            }
+        }
+
+        bool ISerialBufferStreamData.WaitForWrite(int count, int timeout)
+        {
+            if (count == 0) return true;
+            lock (m_WriteLock) {
+                if (count > m_WriteBuffer.Capacity) return false;
+            }
+
+            m_AbortWriteEvent.Reset();
+            TimerExpiry timer = new TimerExpiry(timeout);
+            do {
+                lock (m_WriteLock) {
+                    if (m_WriteBuffer.Free >= count) return true;
+                    m_WriteBufferNotFullEvent.Reset();
                 }
-            }
-
-            /// <summary>
-            /// Reads a single byte from the input queue.
-            /// </summary>
-            /// <returns>The byte, cast to an Int32, or -1 if the end of the stream has been read.</returns>
-            public int ReadByte()
-            {
-                lock (m_SerialBuffer.m_ReadLock) {
-                    if (m_SerialBuffer.m_ReadBuffer.Length == 0) return -1;
-                    int v = m_SerialBuffer.m_ReadBuffer[0];
-                    m_SerialBuffer.m_ReadBuffer.Consume(1);
-                    if (m_SerialBuffer.m_ReadBuffer.Length == 0) {
-                        m_SerialBuffer.m_ReadBufferNotEmptyEvent.Reset();
-                    }
-                    m_SerialBuffer.m_ReadBufferNotFullEvent.Set();
-                    return v;
-                }
-            }
-
-            /// <summary>
-            /// Gets the number of bytes in the internal read buffer only.
-            /// </summary>
-            /// <remarks>
-            /// This value is independent of the actual number of bytes in the serial port
-            /// hardware buffer. It will only return that which is currently obtained by
-            /// the I/O thread.
-            /// </remarks>
-            public int BytesToRead
-            {
-                get
-                {
-                    lock (m_SerialBuffer.m_ReadLock) {
-                        return m_SerialBuffer.m_ReadBuffer.Length;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Discards data from the receive buffer.
-            /// </summary>
-            public void DiscardInBuffer()
-            {
-                lock (m_SerialBuffer.m_ReadLock) {
-                    m_SerialBuffer.m_ReadBuffer.Consume(m_SerialBuffer.m_ReadBuffer.Length);
-                    m_SerialBuffer.m_ReadBufferNotFullEvent.Set();
-                    m_SerialBuffer.m_ReadBufferNotEmptyEvent.Reset();
-                }
-            }
-
-            /// <summary>
-            /// Waits up to a specified time out for enough data to be free in the write buffer.
-            /// </summary>
-            /// <param name="count">The number of bytes required to be free.</param>
-            /// <param name="timeout">The time out in milliseconds.</param>
-            /// <returns><c>true</c> if <paramref name="count"/> bytes are available for writing to the buffer;
-            /// <c>false</c> if there is not enough buffer available within the <paramref name="timeout"/>
-            /// parameter. If <paramref name="count"/> is larger than the capacity of the buffer, <c>false</c>
-            /// is returned immediately.</returns>
-            public bool WaitForWrite(int count, int timeout)
-            {
-                if (count == 0) return true;
-                lock (m_SerialBuffer.m_WriteLock) {
-                    if (count > m_SerialBuffer.m_WriteBuffer.Capacity) return false;
-                }
-
-                m_SerialBuffer.m_AbortWriteEvent.Reset();
-                TimerExpiry timer = new TimerExpiry(timeout);
-                do {
-                    lock (m_SerialBuffer.m_WriteLock) {
-                        if (m_SerialBuffer.m_WriteBuffer.Free >= count) return true;
-                        m_SerialBuffer.m_WriteBufferNotFullEvent.Reset();
-                    }
-                    // This manual reset event is always set every time data is removed from the buffer
-                    WaitHandle[] handles = new WaitHandle[] { 
-                        m_SerialBuffer.m_DeviceDead,
-                        m_SerialBuffer.m_AbortWriteEvent,
-                        m_SerialBuffer.m_WriteBufferNotFullEvent
-                    };
-                    int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
-                    switch (triggered) {
-                    case WaitHandle.WaitTimeout:
-                        break;
-                    case 0:
-                        // The internal thread died.
-                        return false;
-                    case 1:
-                        // Someone aborted the wait.
-                        return false;
-                    case 2:
-                        // Data is available to write.
-                        return true;
-                    }
-                } while (!timer.Expired);
-                return false;
-            }
-
-            /// <summary>
-            /// Aborts the wait for write.
-            /// </summary>
-            public void AbortWait()
-            {
-                m_SerialBuffer.m_AbortWriteEvent.Set();
-                m_SerialBuffer.m_AbortReadEvent.Set();
-            }
-
-            /// <summary>
-            /// Puts data into the write buffer for the Serial object to send.
-            /// </summary>
-            /// <param name="buffer">The buffer to copy data from.</param>
-            /// <param name="offset">The offset where to copy the data from.</param>
-            /// <param name="count">The number of bytes to copy.</param>
-            /// <returns>Number of bytes actually written to the queue.</returns>
-            public int Write(byte[] buffer, int offset, int count)
-            {
-                lock (m_SerialBuffer.m_WriteLock) {
-                    int bytes = m_SerialBuffer.m_WriteBuffer.Append(buffer, offset, count);
-                    m_SerialBuffer.m_WriteBufferNotEmptyEvent.Set();
-                    m_SerialBuffer.m_TxEmptyEvent.Reset();
-                    if (m_SerialBuffer.m_WriteBuffer.Free == 0) {
-                        m_SerialBuffer.m_WriteBufferNotFullEvent.Reset();
-                    }
-                    m_SerialBuffer.OnWriteEvent(m_SerialBuffer, new EventArgs());
-                    return bytes;
-                }
-            }
-
-            /// <summary>
-            /// Gets the number of bytes in the internal write buffer only.
-            /// </summary>
-            /// <remarks>
-            /// This value is independent of the actual number of bytes in the serial port
-            /// hardware buffer. It will only return that which is currently not completely written
-            /// by the I/O thread.
-            /// </remarks>
-            public int BytesToWrite
-            {
-                get
-                {
-                    lock (m_SerialBuffer.m_WriteLock) {
-                        return m_SerialBuffer.m_WriteBuffer.Length;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Waits for all data in the write buffer to be written with notification also by the serial buffer.
-            /// </summary>
-            /// <param name="timeout">The time out in milliseconds.</param>
-            /// <returns><c>true</c> if the data was flushed within the specified time out; <c>false</c> otherwise.</returns>
-            public bool Flush(int timeout)
-            {
                 // This manual reset event is always set every time data is removed from the buffer
-                m_SerialBuffer.m_AbortWriteEvent.Reset();
                 WaitHandle[] handles = new WaitHandle[] {
-                    m_SerialBuffer.m_DeviceDead,
-                    m_SerialBuffer.m_AbortWriteEvent,
-                    m_SerialBuffer.m_TxEmptyEvent
-                };
-                int triggered = WaitHandle.WaitAny(handles, timeout);
+                        m_DeviceDead,
+                        m_AbortWriteEvent,
+                        m_WriteBufferNotFullEvent
+                    };
+                int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
                 switch (triggered) {
                 case WaitHandle.WaitTimeout:
-                    return false;
+                    break;
                 case 0:
                     // The internal thread died.
                     return false;
@@ -534,37 +340,87 @@ namespace RJCP.IO.Ports.Native
                     // Someone aborted the wait.
                     return false;
                 case 2:
-                    // Data is available to write
+                    // Data is available to write.
                     return true;
                 }
-                throw new ApplicationException("Unexpected code flow");
-            }
+            } while (!timer.Expired);
+            return false;
+        }
 
-            /// <summary>
-            /// Reset the buffer to an initial state ready for a new connection.
-            /// </summary>
-            /// <param name="clearBuffer">Set to <c>true</c> to reset the contents of the buffers.</param>
-            /// <remarks>
-            /// This should only be closed when the serial port is closed.
-            /// </remarks>
-            public void Reset(bool clearBuffer)
-            {
-                if (clearBuffer) {
-                    m_SerialBuffer.m_ReadBuffer.Reset();
-                    m_SerialBuffer.m_WriteBuffer.Reset();
-                    m_SerialBuffer.m_ReadBufferNotEmptyEvent.Reset();
-                    m_SerialBuffer.m_ReadBufferNotFullEvent.Set();
-                    m_SerialBuffer.m_ReadEvent.Reset();
-                    m_SerialBuffer.m_AbortReadEvent.Reset();
-                    m_SerialBuffer.m_WriteBufferNotFullEvent.Set();
-                    m_SerialBuffer.m_WriteBufferNotEmptyEvent.Reset();
-                    m_SerialBuffer.m_AbortWriteEvent.Reset();
+        void ISerialBufferStreamData.AbortWait()
+        {
+            m_AbortWriteEvent.Set();
+            m_AbortReadEvent.Set();
+        }
+
+        int ISerialBufferStreamData.Write(byte[] buffer, int offset, int count)
+        {
+            lock (m_WriteLock) {
+                int bytes = m_WriteBuffer.Append(buffer, offset, count);
+                m_WriteBufferNotEmptyEvent.Set();
+                m_TxEmptyEvent.Reset();
+                if (m_WriteBuffer.Free == 0) {
+                    m_WriteBufferNotFullEvent.Reset();
                 }
-
-                m_SerialBuffer.m_TxEmptyEvent.Set();
-                m_SerialBuffer.m_DeviceDead.Reset();
+                OnWriteEvent(this, new EventArgs());
+                return bytes;
             }
         }
+
+        int ISerialBufferStreamData.BytesToWrite
+        {
+            get
+            {
+                lock (m_WriteLock) {
+                    return m_WriteBuffer.Length;
+                }
+            }
+        }
+
+        bool ISerialBufferStreamData.Flush(int timeout)
+        {
+            // This manual reset event is always set every time data is removed from the buffer
+            m_AbortWriteEvent.Reset();
+            WaitHandle[] handles = new WaitHandle[] {
+                    m_DeviceDead,
+                    m_AbortWriteEvent,
+                    m_TxEmptyEvent
+                };
+            int triggered = WaitHandle.WaitAny(handles, timeout);
+            switch (triggered) {
+            case WaitHandle.WaitTimeout:
+                return false;
+            case 0:
+                // The internal thread died.
+                return false;
+            case 1:
+                // Someone aborted the wait.
+                return false;
+            case 2:
+                // Data is available to write
+                return true;
+            }
+            throw new ApplicationException("Unexpected code flow");
+        }
+
+        void ISerialBufferStreamData.Reset(bool clearBuffer)
+        {
+            if (clearBuffer) {
+                m_ReadBuffer.Reset();
+                m_WriteBuffer.Reset();
+                m_ReadBufferNotEmptyEvent.Reset();
+                m_ReadBufferNotFullEvent.Set();
+                m_ReadEvent.Reset();
+                m_AbortReadEvent.Reset();
+                m_WriteBufferNotFullEvent.Set();
+                m_WriteBufferNotEmptyEvent.Reset();
+                m_AbortWriteEvent.Reset();
+            }
+
+            m_TxEmptyEvent.Set();
+            m_DeviceDead.Reset();
+        }
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerialBuffer"/> class, where the buffer is not pinned.
@@ -605,26 +461,8 @@ namespace RJCP.IO.Ports.Native
                 m_WriteBuffer = new CircularBuffer<byte>(writeBuffer);
             }
             m_Pinned = pinned;
-
-            Serial = new SerialData(this);
-            Stream = new StreamData(this);
         }
 
-        /// <summary>
-        /// Access to properties and methods specific to the native serial object.
-        /// </summary>
-        /// <value>
-        /// Access to properties and methods specific to the native serial object.
-        /// </value>
-        public SerialData Serial { get; private set; }
-
-        /// <summary>
-        /// Access to properties and methods specific to the stream object.
-        /// </summary>
-        /// <value>
-        /// Access to properties and methods specific to the stream object.
-        /// </value>
-        public StreamData Stream { get; private set; }
 
         /// <summary>
         /// Object to use for locking access to the byte read buffer.
