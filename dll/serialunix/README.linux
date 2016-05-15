@@ -51,3 +51,11 @@ And in this case 0x44 was considered incorrect.
 0000030: 3031 3233 3435 3637 3839 3a3b 3c3d 3e3f  0123456789:;<=>?
 0000040: 4041 4243 ff00 4445 4647 4849 4a4b 4c4d  @ABC..DEFGHIJKLM
 0000050: 4e4f 5051 5253 5455 5657 5859 5a5b 5c5d  NOPQRSTUVWXYZ[\]
+
+Flow Control
+============
+
+If you close the serial port while blocked (e.g. due to flow control), calling
+the serial_close() method may take an excessive amount of time. Times measured
+have been from 5 seconds to more than 21 seconds. It appears to be an issue in
+the Linux kernel when calling the close() system call.
