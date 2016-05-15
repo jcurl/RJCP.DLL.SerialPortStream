@@ -15,6 +15,7 @@
 # indicating the lack of supporting tools. If the option BUILD_DOCUMENTATION is not defined, the
 # target 'doc' will not be made available.
 #
+include(GNUInstallDirs)
 
 find_package(Doxygen)
 option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" ${DOXYGEN_FOUND})
@@ -36,6 +37,6 @@ if(BUILD_DOCUMENTATION)
       DEPENDS ${doxyfile_in}
       VERBATIM)
 
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc/${PROJECT_NAME})
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION "${CMAKE_INSTALL_DOCDIR}")
   endif(NOT DOXYGEN_FOUND)
 endif(BUILD_DOCUMENTATION)

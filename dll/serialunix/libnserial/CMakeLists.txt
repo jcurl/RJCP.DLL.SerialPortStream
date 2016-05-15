@@ -1,6 +1,7 @@
 project(libnserial C CXX)
 include(${CMAKE_MODULE_PATH}/doxygen.cmake)
 include(${CMAKE_MODULE_PATH}/serial.cmake)
+include(GNUInstallDirs)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/config.h)
@@ -55,10 +56,10 @@ set_target_properties(nserial PROPERTIES
 
 # Define the headers that should be installed
 install(TARGETS nserial
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+  RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 add_subdirectory(unittest)
 add_subdirectory(comptest)
