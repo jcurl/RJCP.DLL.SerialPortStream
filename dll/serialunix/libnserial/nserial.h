@@ -97,7 +97,7 @@ NSERIAL_EXPORT void WINAPI serial_terminate(struct serialhandle *handle);
  * Set the string to use for the device name.
  *
  * \param handle The handle as returned by the serial_init() function.
- * \device A pointer to the string containing the device name.
+ * \param device A pointer to the string containing the device name.
  * \returns 0 if the operation was successful.
  * \returns -1 if there was was an error.
  * \exception EINVAL Invalid parameter given.
