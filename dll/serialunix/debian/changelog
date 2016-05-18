@@ -1,0 +1,5 @@
+libnserial (1.0.0-0ubuntu1~trusty1) trusty; urgency=low
+
+  * Initial release for Ubuntu 14.04.4 Trusty Tahr
+
+ -- Jason Curl <jcurl@arcor.de>  Wed, 18 May 2016 08:12:00 +0200
