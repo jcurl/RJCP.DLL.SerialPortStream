@@ -1,0 +1,4 @@
+# Use bzip2 compression instead of default xz
+compression = "bzip2"
+compression-level = 9
+
