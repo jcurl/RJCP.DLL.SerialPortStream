@@ -1,0 +1,5 @@
+libnserial (1.0.0-0ubuntu1~xenial1) xenial; urgency=low
+
+  * Initial release for Ubuntu 16.04 Xenial Xerus
+
+ -- Jason Curl <jcurl@arcor.de>  Wed, 18 May 2016 08:14:00 +0200
