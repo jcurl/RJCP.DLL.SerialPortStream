@@ -1,0 +1,5 @@
+libnserial (1.0.0-0ubuntu1~precise1) precise; urgency=low
+
+  * Initial release for Ubuntu 12.04 Precise Pangolin
+
+ -- Jason Curl <jcurl@arcor.de>  Wed, 18 June 2016 17:48:00 +0200
