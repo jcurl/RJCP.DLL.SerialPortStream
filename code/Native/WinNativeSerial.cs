@@ -119,8 +119,8 @@ namespace RJCP.IO.Ports.Native
                     while (enumerator.MoveNext()) {
                         ManagementObject current = (ManagementObject)enumerator.Current;
                         string k = current["DeviceID"].ToString();
-                        if (!list.ContainsKey(k)) {
-                            list.Add(k, new PortDescription(k, current["Name"].ToString()));
+                        if (list.ContainsKey(k)) {
+                            list[k].Description = current["Name"].ToString();
                         }
                     }
                 }
@@ -133,8 +133,8 @@ namespace RJCP.IO.Ports.Native
                     while (enumerator.MoveNext()) {
                         ManagementObject current = (ManagementObject)enumerator.Current;
                         string k = current["AttachedTo"].ToString();
-                        if (!list.ContainsKey(k)) {
-                            list.Add(k, new PortDescription(k, current["Name"].ToString()));
+                        if (list.ContainsKey(k)) {
+                            list[k].Description = current["Name"].ToString();
                         }
                     }
                 }
