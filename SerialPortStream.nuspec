@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>SerialPortStream</id>
+        <version>2.0.0.0</version>
+        <title>SerialPortStream</title>
+        <authors>Jason Curl</authors>
+        <owners>Jason Curl</owners>
+        <licenseUrl>https://github.com/jcurl/SerialPortStream/blob/v2.x/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/jcurl/serialportstream</projectUrl>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.</description>
+        <copyright>(C) 2012-2016, Jason Curl</copyright>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="distribute\lib\net40\RJCP.SerialPortStream.dll" target="lib\net40\RJCP.SerialPortStream.dll" />
+        <file src="distribute\lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40\RJCP.SerialPortStream.pdb" />
+        <file src="distribute\lib\net40\RJCP.SerialPortStream.XML" target="lib\net40\RJCP.SerialPortStream.XML" />
+        <file src="distribute\lib\net45\RJCP.SerialPortStream.dll" target="lib\net45\RJCP.SerialPortStream.dll" />
+        <file src="distribute\lib\net45\RJCP.SerialPortStream.pdb" target="lib\net45\RJCP.SerialPortStream.pdb" />
+        <file src="distribute\lib\net45\RJCP.SerialPortStream.XML" target="lib\net45\RJCP.SerialPortStream.XML" />
+        <file src="code\Datastructures\*.cs" target="src\Datastructures\" />
+        <file src="code\Native\Unix\*.cs" target="src\Native\Unix\" />
+        <file src="code\Native\Windows\*.cs" target="src\Native\Windows\" />
+        <file src="code\Native\*.cs" target="src\Native\" />
+        <file src="code\Properties\*.cs" target="src\Properties\" />
+        <file src="code\*.cs" target="src\" />
+		<file src="code\SerialPortStream.csproj" target="src\SerialPortStream.csproj" />
+    </files>
+</package>
