@@ -1,3 +1,9 @@
+libnserial (1.0.0-1ubuntu1~trusty1) trusty; urgency=low
+
+  * CMake FindPackage module added
+
+ -- Jason Curl <jcurl@arcor.de> Mon, 2 Jan 2017 19:00:09 +0100
+
 libnserial (1.0.0-0ubuntu1~trusty1) trusty; urgency=low
 
   * Initial release for Ubuntu 14.04.4 Trusty Tahr
