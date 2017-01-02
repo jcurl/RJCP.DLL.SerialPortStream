@@ -119,8 +119,8 @@ namespace RJCP.IO.Ports.Native
                     while (enumerator.MoveNext()) {
                         ManagementObject current = (ManagementObject)enumerator.Current;
                         string k = current["DeviceID"].ToString();
-                        if (!list.ContainsKey(k)) {
-                            list.Add(k, new PortDescription(k, current["Name"].ToString()));
+                        if (list.ContainsKey(k)) {
+                            list[k].Description = current["Name"].ToString();
                         }
                     }
                 }
@@ -133,8 +133,8 @@ namespace RJCP.IO.Ports.Native
                     while (enumerator.MoveNext()) {
                         ManagementObject current = (ManagementObject)enumerator.Current;
                         string k = current["AttachedTo"].ToString();
-                        if (!list.ContainsKey(k)) {
-                            list.Add(k, new PortDescription(k, current["Name"].ToString()));
+                        if (list.ContainsKey(k)) {
+                            list[k].Description = current["Name"].ToString();
                         }
                     }
                 }
@@ -528,7 +528,7 @@ namespace RJCP.IO.Ports.Native
 
         /// <summary>
         /// Gets the state of the Ring Indicator pin on the serial port.
-        /// </summary>C:\Users\jcurl\Documents\Programming\serialportstream\code\Native\INativeSerial.cs
+        /// </summary>
         /// <value>
         /// <c>true</c> if ring indicator state is active; otherwise, <c>false</c>.
         /// </value>
@@ -766,17 +766,6 @@ namespace RJCP.IO.Ports.Native
 
             if (m_CommState.RtsControl != RtsControl.Handshake) m_CommModemStatus.SetRts(m_RtsEnable);
             if (m_CommState.DtrControl != DtrControl.Handshake) m_CommModemStatus.SetDtr(m_DtrEnable);
-
-            try {
-                if (m_BreakState) {
-                    m_CommModemStatus.SetCommBreak();
-                } else {
-                    m_CommModemStatus.ClearCommBreak();
-                }
-            } catch (System.IO.IOException) {
-                // Ignore IOException. Not all serial port drivers support clearing the
-                // Break signal, so we ignore it when opening.
-            }
         }
 
         private void SetRtsPortSettings(bool immediate)

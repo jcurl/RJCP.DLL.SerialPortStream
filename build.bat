@@ -33,7 +33,7 @@ echo.
 echo ======================================================================
 echo == Building %~4 for .NET %~2 (Tools v%~1)
 echo ======================================================================
-call %MSBUILDDIR%\MSBUILD.EXE %~5 /t:Rebuild /toolsversion:%~1 /verbosity:minimal /p:TargetFrameworkVersion=%~2 /p:DefineConstants=SIGNED_RELEASE /p:SignAssembly=true /p:Configuration=Release /p:OutputPath="%CD%\distribute\%~3" /fl /flp:verbosity=normal /nologo
+call %MSBUILDDIR%\MSBUILD.EXE %~5 /t:Rebuild /toolsversion:%~1 /verbosity:minimal /p:TargetFrameworkVersion=%~2 /p:DefineConstants="SIGNED_RELEASE;TRACE" /p:SignAssembly=true /p:Configuration=Release /p:OutputPath="%CD%\distribute\%~3" /fl /flp:verbosity=normal /nologo
 copy msbuild.log "%CD%\distribute\msbuild-%~4-net-%~2-tools-%~1.log" > NUL
 del msbuild.log
 goto:eof

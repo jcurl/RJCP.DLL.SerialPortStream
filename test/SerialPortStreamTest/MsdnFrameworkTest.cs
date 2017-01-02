@@ -29,6 +29,7 @@
             }
         }
 
+        // NOTE: This test is expected to fail or block forever on Windows.
         [Test]
         [Timeout(4000)]
         public void SerialPortDisposedWhenBlocked()
@@ -63,6 +64,7 @@
             }
         }
 
+        // NOTE: This test is expected to fail or block forever on Windows.
         [Test]
         [Timeout(4000)]
         public void SerialPortClosedWhenBlocked()
@@ -97,6 +99,7 @@
             }
         }
 
+        // NOTE: This test is expected to fail on Windows and Mono.
         [Test]
         public void DecoderTooManyBytes()
         {
@@ -110,6 +113,10 @@
             int cu;
             bool complete;
             decoder.Convert(data, 0, 2, oneChar, 0, 1, false, out bu, out cu, out complete);
+
+            // One might expect that only one byte is used, but in .NET 4.0 and later (including Mono), we see
+            // that while 'cu' is 1, 'bu' is not 1. This had an impact during development that we couldn't optimise
+            // our byte to character decoder and expect them to be on MBCS character boundaries.
             Assert.That(bu, Is.EqualTo(1));
             Assert.That(cu, Is.EqualTo(1));
         }

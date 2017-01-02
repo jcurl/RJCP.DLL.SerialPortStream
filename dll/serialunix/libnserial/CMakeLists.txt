@@ -49,17 +49,59 @@ add_library(nserial SHARED ${NSERIAL_SRCS})
 # version). This also means, that the SOVERSION and the MAJOR version must be
 # the same to support incremental updates.
 set_target_properties(nserial PROPERTIES
-  VERSION 1.0
-  SOVERSION 1
+  VERSION ${VERSION_MAJOR}.${VERSION_MINOR}
+  SOVERSION ${VERSION_MAJOR}
   FRAMEWORK ON
   PUBLIC_HEADER ${NSERIAL_PUBLIC_HEADERS})
 
+# Add all targets to the build-tree export set
+export(TARGETS nserial
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/nserialTargets.cmake")
+ 
+# Export the package for use from the build-tree
+# (this registers the build-tree with a global CMake-registry)
+export(PACKAGE nserial)
+
 # Define the headers that should be installed
 install(TARGETS nserial
+  EXPORT nserialTargets
   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+# Calculate relative paths for installation
+function(relative relpath path1 path2)
+  if(NOT IS_ABSOLUTE ${path1})
+    set(path1 "${CMAKE_INSTALL_PREFIX}/${path1}")
+  endif()
+  if(NOT IS_ABSOLUTE ${path2})
+    set(path2 "${CMAKE_INSTALL_PREFIX}/${path2}")
+  endif()
+  file(RELATIVE_PATH CALCRELPATH ${path1} ${path2})
+  set(${relpath} ${CALCRELPATH} PARENT_SCOPE)
+endfunction(relative)
+
+set(CMAKE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/nserial-${PACKAGE_VERSION}" CACHE PATH "Installation directory for CMake files")
+
+# Create the nserialConfig.cmake and nserialConfigVersion.cmake
+relative(REL_INCLUDE_DIR "${CMAKE_INSTALL_CMAKEDIR}" "${CMAKE_INSTALL_INCLUDEDIR}")
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+configure_file(nserialConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/nserialConfig.cmake" @ONLY)
+# ... for the install tree (note, the file nserialConfig.cmake defines NSERIAL_CMAKE_DIR there)
+set(CONF_INCLUDE_DIRS "\${NSERIAL_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+configure_file(nserialConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/nserialConfig.cmake" @ONLY)
+# ... for both
+configure_file(nserialConfigVersion.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/nserialConfigVersion.cmake" @ONLY)
+
+# Install nserialConfig.cmake and nserialConfigVersion.cmake
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/nserialConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/nserialConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_CMAKEDIR}" COMPONENT dev)
+install(EXPORT nserialTargets DESTINATION
+  "${CMAKE_INSTALL_CMAKEDIR}" COMPONENT dev)
 
 add_subdirectory(unittest)
 add_subdirectory(comptest)

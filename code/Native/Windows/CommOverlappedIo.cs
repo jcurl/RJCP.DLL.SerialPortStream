@@ -349,7 +349,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 // PROLIFIC PL23030 WORKAROUND
                 // - - - - - - - - - - - - - - - - - - - - - - - - -
                 // If we have a read pending, we don't request events
-                // for reading data. To do so will result in errors. 
+                // for reading data. To do so will result in errors.
                 // Have no idea why.
                 if (readPending) {
                     UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskReadPending);
@@ -414,7 +414,7 @@ namespace RJCP.IO.Ports.Native.Windows
                         }
                         running = false;
                     } else if (whandles[ev] == m_SerialCommEvent) {
-                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref serialCommOverlapped, out bytes, false);
+                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref serialCommOverlapped, out bytes, true);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
@@ -425,7 +425,7 @@ namespace RJCP.IO.Ports.Native.Windows
                         ProcessWaitCommEvent(commEventMask);
                         serialCommPending = false;
                     } else if (whandles[ev] == m_ReadEvent) {
-                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref readOverlapped, out bytes, false);
+                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref readOverlapped, out bytes, true);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
@@ -449,7 +449,7 @@ namespace RJCP.IO.Ports.Native.Windows
                         // The read buffer is no longer full. We just loop back to the beginning to test if we
                         // should read or not.
                     } else if (whandles[ev] == m_WriteEvent) {
-                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref writeOverlapped, out bytes, false);
+                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref writeOverlapped, out bytes, true);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
@@ -663,7 +663,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 // MS Documentation for ReadFile() says that the 'bufRead' parameter should be NULL.
                 // However, in the case that the COMMTIMEOUTS is set up so that no wait is required
                 // (see COMMTIMEOUTS in Win32 API), this function will actually not perform an
-                // asynchronous I/O operation and return the number of bytes copied in bufRead. 
+                // asynchronous I/O operation and return the number of bytes copied in bufRead.
                 ProcessReadEvent(bufRead);
             }
             return !result;
@@ -807,7 +807,7 @@ namespace RJCP.IO.Ports.Native.Windows
             if (SerialTrace.TraceSer.Switch.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
             {
                 // args.EventType.ToString() is relatively expensive, so only do it if we're logging
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, 
+                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                     "{0}: CommErrorEvent: {1}", m_Name, args.EventType.ToString());
             }
 
