@@ -228,8 +228,6 @@ without losing functionality from v1.x.
 ## Windows
 
 The following issues are known:
-* On some computers with Modems, the function GetPortNames might not find it,
-  while GetPortDescriptions does.
 * This is not an issue, but when using the Com0Com for running unit tests,
   some specific test cases for Parity will fail. That is because Com0Com
   doesn't emulate data at a bit level.
