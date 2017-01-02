@@ -2004,14 +2004,39 @@ namespace RJCP.IO.Ports
             default: s = "?"; break;
             }
 
+            string dsrStatus;
+            try {
+                dsrStatus = Handshake.HasFlag(Handshake.Dtr) ? "hs" : (IsOpen ? (DsrHolding ? "on" : "off") : "-");
+            } catch (IOException) {
+                dsrStatus = "err";
+            }
+
+            string ctsStatus;
+            try {
+                ctsStatus = Handshake.HasFlag(Handshake.Rts) ? "hs" : (IsOpen ? (CtsHolding ? "on" : "off") : "-");
+            } catch (IOException) {
+                ctsStatus = "err";
+            }
+
+            string dtrStatus;
+            try {
+                dtrStatus = Handshake.HasFlag(Handshake.Dtr) ? "hs" : (IsOpen ? (DtrEnable ? "on" : "off") : "-");
+            } catch (IOException) {
+                dtrStatus = "err";
+            }
+
+            string rtsStatus;
+            try {
+                rtsStatus = Handshake.HasFlag(Handshake.Rts) ? "hs" : (IsOpen ? (RtsEnable ? "on" : "off") : "-");
+            } catch (IOException) {
+                rtsStatus = "err";
+            }
+
             return string.Format("{0}:{1},{2},{3},{4},to={5},xon={6},idsr={7},icts={8},odtr={9},orts={10}",
                 PortName, BaudRate, DataBits, p, s,
                 TxContinueOnXOff ? "on" : "off",
                 Handshake.HasFlag(Handshake.XOn) ? "on" : "off",
-                Handshake.HasFlag(Handshake.Dtr) ? "hs" : (IsOpen ? (DsrHolding ? "on" : "off") : "-"),
-                Handshake.HasFlag(Handshake.Rts) ? "hs" : (IsOpen ? (CtsHolding ? "on" : "off") : "-"),
-                Handshake.HasFlag(Handshake.Dtr) ? "hs" : (IsOpen ? (DtrEnable ? "on" : "off") : "-"),
-                Handshake.HasFlag(Handshake.Rts) ? "hs" : (IsOpen ? (RtsEnable ? "on" : "off") : "-"));
+                dsrStatus, ctsStatus, dtrStatus, rtsStatus);
         }
     }
 }
