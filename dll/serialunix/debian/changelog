@@ -1,3 +1,9 @@
+libnserial (1.0.0-1ubuntu1~precise1) precise; urgency=low
+
+  * CMake FindPackage module added
+
+ -- Jason Curl <jcurl@arcor.de>  Mon, 2 Jan 2016 19:05:17 +0100
+
 libnserial (1.0.0-0ubuntu1~precise1) precise; urgency=low
 
   * Initial release for Ubuntu 12.04 Precise Pangolin
