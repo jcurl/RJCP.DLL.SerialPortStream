@@ -11,19 +11,23 @@ namespace RJCP.IO.Ports.Native.Unix
     internal class SerialUnix : INativeSerialDll
     {
         [SuppressUnmanagedCodeSecurity]
-        private static class UnsafeNativeMethods
+        private static class SafeNativeMethods
         {
             [DllImport("libnserial.so.1")]
             internal static extern IntPtr serial_version();
+        }
 
+        [SuppressUnmanagedCodeSecurity]
+        private static class UnsafeNativeMethods
+        {
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern IntPtr serial_init();
 
             [DllImport("libnserial.so.1")]
             internal static extern void serial_terminate(IntPtr handle);
 
-            [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_setdevicename(IntPtr handle, string deviceName);
+            [DllImport("libnserial.so.1", SetLastError = true, ThrowOnUnmappableChar = true, BestFitMapping = false)]
+            internal static extern int serial_setdevicename(IntPtr handle, [MarshalAs(UnmanagedType.LPStr)] string deviceName);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern IntPtr serial_getdevicename(IntPtr handle);
@@ -53,10 +57,10 @@ namespace RJCP.IO.Ports.Native.Unix
             internal static extern int serial_getstopbits(IntPtr handle, out StopBits stopbits);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_setdiscardnull(IntPtr handle, bool discardnull);
+            internal static extern int serial_setdiscardnull(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] bool discardnull);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getdiscardnull(IntPtr handle, out bool discardnull);
+            internal static extern int serial_getdiscardnull(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool discardnull);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern int serial_setparityreplace(IntPtr handle, int parityReplace);
@@ -65,10 +69,10 @@ namespace RJCP.IO.Ports.Native.Unix
             internal static extern int serial_getparityreplace(IntPtr handle, out int parityReplace);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_settxcontinueonxoff(IntPtr handle, bool txContinueOnXOff);
+            internal static extern int serial_settxcontinueonxoff(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] bool txContinueOnXOff);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_gettxcontinueonxoff(IntPtr handle, out bool txContinueOnXOff);
+            internal static extern int serial_gettxcontinueonxoff(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool txContinueOnXOff);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern int serial_setxofflimit(IntPtr handle, int xoffLimit);
@@ -95,7 +99,7 @@ namespace RJCP.IO.Ports.Native.Unix
             internal static extern int serial_close(IntPtr handle);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_isopen(IntPtr handle, out bool isOpen);
+            internal static extern int serial_isopen(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool isOpen);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern int serial_setproperties(IntPtr handle);
@@ -104,34 +108,34 @@ namespace RJCP.IO.Ports.Native.Unix
             internal static extern int serial_getproperties(IntPtr handle);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getdcd(IntPtr handle, out bool dcd);
+            internal static extern int serial_getdcd(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool dcd);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getri(IntPtr handle, out bool ri);
+            internal static extern int serial_getri(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool ri);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getdsr(IntPtr handle, out bool dsr);
+            internal static extern int serial_getdsr(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool dsr);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getcts(IntPtr handle, out bool cts);
+            internal static extern int serial_getcts(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool cts);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_setdtr(IntPtr handle, bool dtr);
+            internal static extern int serial_setdtr(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] bool dtr);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getdtr(IntPtr handle, out bool dtr);
+            internal static extern int serial_getdtr(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool dtr);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_setrts(IntPtr handle, bool rts);
+            internal static extern int serial_setrts(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] bool rts);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getrts(IntPtr handle, out bool rts);
+            internal static extern int serial_getrts(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool rts);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_setbreak(IntPtr handle, bool breakState);
+            internal static extern int serial_setbreak(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] bool breakState);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
-            internal static extern int serial_getbreak(IntPtr handle, out bool breakState);
+            internal static extern int serial_getbreak(IntPtr handle, [MarshalAs(UnmanagedType.Bool)] out bool breakState);
 
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern IntPtr serial_error(IntPtr handle);
@@ -166,7 +170,7 @@ namespace RJCP.IO.Ports.Native.Unix
 
         public string serial_version()
         {
-            IntPtr version = UnsafeNativeMethods.serial_version();
+            IntPtr version = SafeNativeMethods.serial_version();
             return Marshal.PtrToStringAnsi(version);
         }
 
