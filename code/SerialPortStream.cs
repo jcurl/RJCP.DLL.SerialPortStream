@@ -738,12 +738,12 @@ namespace RJCP.IO.Ports
         /// Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.</returns>
         public override int EndRead(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync<int>) {
-                LocalAsync<int> ar = (LocalAsync<int>)asyncResult;
-                if (!ar.IsCompleted) ar.AsyncWaitHandle.WaitOne(-1);
-                ar.Dispose();
-                if (ar.Result == 0) ReadCheckDeviceError();
-                return ar.Result;
+            LocalAsync<int> localAsync = asyncResult as LocalAsync<int>;
+            if (localAsync != null) {
+                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(-1);
+                localAsync.Dispose();
+                if (localAsync.Result == 0) ReadCheckDeviceError();
+                return localAsync.Result;
             } else {
                 AsyncResult ar = (AsyncResult)asyncResult;
                 ReadDelegate caller = (ReadDelegate)ar.AsyncDelegate;
@@ -1201,10 +1201,10 @@ namespace RJCP.IO.Ports
         /// </remarks>
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync) {
-                LocalAsync ar = (LocalAsync)asyncResult;
-                if (!ar.IsCompleted) ar.AsyncWaitHandle.WaitOne(-1);
-                ar.Dispose();
+            LocalAsync localAsync = asyncResult as LocalAsync;
+            if (localAsync != null) {
+                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(-1);
+                localAsync.Dispose();
             } else {
                 AsyncResult ar = (AsyncResult)asyncResult;
                 WriteDelegate caller = (WriteDelegate)ar.AsyncDelegate;
