@@ -2047,5 +2047,95 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 serialSource.Close();
             }
         }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectThenClose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+                serialSource.Close();
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectThenDispose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectAndReadAgainThenClose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                int read = 0;
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+
+                try {
+                    read = serialSource.Read(buffer, 0, buffer.Length);
+                } catch (System.IO.IOException) {
+                    Console.WriteLine("IOException occurred");
+                }
+                Console.WriteLine("Second Read: {0}", read);
+                serialSource.Close();
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectAndReadAgainThenDispose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                int read = 0;
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+
+                try {
+                    read = serialSource.Read(buffer, 0, buffer.Length);
+                } catch (System.IO.IOException) {
+                    Console.WriteLine("IOException occurred");
+                }
+                Console.WriteLine("Second Read: {0}", read);
+            }
+        }
     }
 }
