@@ -115,7 +115,7 @@ namespace RJCP.IO.Ports.Native.Unix
             errno = Marshal.GetLastWin32Error();
             return result;
         }
-            
+
         [DllImport("libnserial.so.1", EntryPoint="serial_setstopbits", SetLastError=true)]
         private static extern int nserial_setstopbits(IntPtr handle, StopBits stopbits);
         public int serial_setstopbits(IntPtr handle, StopBits stopbits)
@@ -169,7 +169,7 @@ namespace RJCP.IO.Ports.Native.Unix
             errno = Marshal.GetLastWin32Error();
             return result;
         }
-            
+
         [DllImport("libnserial.so.1", EntryPoint="serial_settxcontinueonxoff", SetLastError=true)]
         private static extern int nserial_settxcontinueonxoff(IntPtr handle, bool txContinueOnXOff);
         public int serial_settxcontinueonxoff(IntPtr handle, bool txContinueOnXOff)

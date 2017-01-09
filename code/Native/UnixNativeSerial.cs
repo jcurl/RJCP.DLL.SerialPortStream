@@ -763,7 +763,7 @@ namespace RJCP.IO.Ports.Native
             }
         }
 
-        private const WaitForModemEvent c_ModemEvents = 
+        private const WaitForModemEvent c_ModemEvents =
             WaitForModemEvent.RingIndicator |
             WaitForModemEvent.ClearToSend |
             WaitForModemEvent.DataCarrierDetect |
