@@ -30,6 +30,12 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2215:Dispose methods should call base class dispose", Scope = "member", Target = "RJCP.IO.Ports.SerialPortStream.#Dispose(System.Boolean)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object[])", Scope = "member", Target = "RJCP.IO.Ports.SerialPortStream.#ToString()")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1717:OnlyFlagsEnumsShouldHavePluralNames", Scope = "type", Target = "RJCP.IO.Ports.StopBits")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "initialise", Scope = "member", Target = "RJCP.IO.Ports.Native.UnixNativeSerial.#.ctor()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "SerialPortStream", Scope = "member", Target = "RJCP.IO.Ports.SerialPortStream.#InternalBlockingWrite(System.Byte[],System.Int32,System.Int32)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "SerialPortStream", Scope = "member", Target = "RJCP.IO.Ports.SerialPortStream.#Flush()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "SerialPortStream", Scope = "member", Target = "RJCP.IO.Ports.SerialPortStream.#GetPortDescriptions()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "SerialPortStream", Scope = "member", Target = "RJCP.IO.Ports.SerialPortStream.#GetPortNames()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "SerialPortStream", Scope = "member", Target = "RJCP.IO.Ports.SerialPortStream.#.ctor()")]
 // This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project.
 // Project-level suppressions either have no target or are given
