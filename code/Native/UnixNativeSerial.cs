@@ -577,7 +577,7 @@ namespace RJCP.IO.Ports.Native
         private string m_Name;
         private volatile bool m_IsRunning;
         private volatile bool m_MonitorPins;
-        private readonly ManualResetEvent m_StopRunning = new ManualResetEvent(false);
+        private ManualResetEvent m_StopRunning = new ManualResetEvent(false);
 
         /// <summary>
         /// Start the monitor thread, that will watch over the serial port.
@@ -884,6 +884,8 @@ namespace RJCP.IO.Ports.Native
                     m_Handle = IntPtr.Zero;
                     m_Dll = null;
                 }
+                m_StopRunning.Dispose();
+                m_StopRunning = null;
                 m_IsDisposed = true;
             }
         }
