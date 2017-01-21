@@ -325,7 +325,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
                 using (SerialPortStream s2 = new SerialPortStream(c_SourcePort, 9600, 8, Parity.None, StopBits.One)) {
                     // The port is already open by src, and should be an exclusive resource.
-                    Assert.That(() => s2.Open(), Throws.Exception);
+                    Assert.That(() => s2.Open(), Throws.Exception.InstanceOf<UnauthorizedAccessException>());
                 }
             }
         }

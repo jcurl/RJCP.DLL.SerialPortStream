@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 #define NSERIAL_EXPORTS
@@ -44,9 +45,15 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
 
   handle->fd = open(handle->device, O_RDWR | O_NOCTTY | O_NONBLOCK);
   if (handle->fd == -1) {
+    if (errno == EBUSY || errno == EAGAIN) {
+      // Map EBUSY / EAGAIN to UnauthorizedAccessException
+      errno = EACCES;
+    }
     serial_seterror(handle, ERRMSG_CANTOPENSERIALPORT);
     return -1;
   }
+
+  ioctl(handle->fd, TIOCEXCL);
 
   int pipefd[2];
   if (pipe(pipefd) == -1) {
