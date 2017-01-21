@@ -160,7 +160,7 @@ namespace RJCP.IO.Ports.Native.Unix
         }
 
         [ThreadStatic]
-        private int m_ErrNo = 0;
+        private static int m_ErrNo = 0;
 
         public int errno
         {
