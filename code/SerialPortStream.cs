@@ -1933,10 +1933,16 @@ namespace RJCP.IO.Ports
         }
         #endregion
 
+        private volatile bool m_IsDisposed;
+
         /// <summary>
         /// Indicates if this object has already been disposed.
         /// </summary>
-        public bool IsDisposed { get; private set; }
+        public bool IsDisposed
+        {
+            get { return m_IsDisposed; }
+            set { m_IsDisposed = value; }
+        }
 
         /// <summary>
         /// Clean up all resources managed by this object.
