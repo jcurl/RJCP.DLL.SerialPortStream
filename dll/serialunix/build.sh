@@ -31,8 +31,9 @@ fi
 echo ======================================================================
 echo == Building Project
 echo ======================================================================
-CFLAGS="-O0 -g -Wall" cmake .. && \
-make
+#Enable this line instead of the other to build with logging
+#CFLAGS="-O0 -g -Wall" cmake -DCMAKE_BUILD_TYPE=Debug -DNSLOG_ENABLED=ON .. && make
+CFLAGS="-O0 -g -Wall" cmake -DCMAKE_BUILD_TYPE=Debug -DNSLOG_ENABLED=OFF .. && make
 if test $? = 0; then
   make test CTEST_OUTPUT_ON_FAILURE=1
   make install DESTDIR=$PROJECTBIN

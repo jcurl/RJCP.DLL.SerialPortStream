@@ -28,6 +28,7 @@ namespace RJCP.IO.Ports.Native
 
         private void ThrowException()
         {
+            if (m_Dll == null) return;
             Mono.Unix.Native.Errno errno = Mono.Unix.Native.NativeConvert.ToErrno(m_Dll.errno);
             string description = m_Dll.serial_error(m_Handle);
 
