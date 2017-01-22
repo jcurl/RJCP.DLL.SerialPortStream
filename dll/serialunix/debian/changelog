@@ -1,8 +1,14 @@
+libnserial (1.0.1-0ubuntu1~xenial1) xenial; urgency=low
+
+  * Force exclusive access of serial port for non-root processes.
+
+ -- Jason Curl <jcurl@arcor.de>  Sun, 22 Jan 2017 17:26:08 +0100
+
 libnserial (1.0.0-1ubuntu1~xenial1) xenial; urgency=low
 
   * CMake FindPackage module added
 
- -- Jason Curl <jcurl@arcor.de> Mon, 2 Jan 2017 18:52:47 +0100
+ -- Jason Curl <jcurl@arcor.de>  Mon, 2 Jan 2017 18:52:47 +0100
 
 libnserial (1.0.0-0ubuntu1~xenial1) xenial; urgency=low
 
