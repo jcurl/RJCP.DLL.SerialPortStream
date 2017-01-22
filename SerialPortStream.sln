@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 VisualStudioVersion = 14.0.24720.0
@@ -201,7 +201,7 @@ Global
 		$28.inheritsSet = VisualStudio
 		$28.inheritsScope = text/plain
 		$28.scope = text/plain
-		version = 2.0.2.0
+		version = 2.0.3.0
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
