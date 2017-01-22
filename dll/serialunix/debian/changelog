@@ -1,8 +1,14 @@
+libnserial (1.0.1-0ubuntu1~yakkety1) yakkety; urgency=low
+
+  * Force exclusive access of serial port for non-root processes.
+
+ -- Jason Curl <jcurl@arcor.de>  Sun, 22 Jan 2017 16:51:26 +0100
+
 libnserial (1.0.0-1ubuntu1~yakkety1) yakkety; urgency=low
 
   * CMake FindPackage module added
 
- -- Jason Curl <jcurl@arcor.de> Mon, 2 Jan 2017 18:44:59 +0100
+ -- Jason Curl <jcurl@arcor.de>  Mon, 2 Jan 2017 18:44:59 +0100
 
 libnserial (1.0.0-0ubuntu1~yakkety1) yakkety; urgency=low
 
