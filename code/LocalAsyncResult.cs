@@ -57,12 +57,12 @@ namespace RJCP.IO
                     ManualResetEvent mre = new ManualResetEvent(done);
                     if (Interlocked.CompareExchange(ref m_Handle,
                         mre, null) != null) {
-                        // Another thread created this object's event; dispose 
+                        // Another thread created this object's event; dispose
                         // the event we just created
                         mre.Close();
                     } else {
                         if (!done && IsCompleted) {
-                            // If the operation wasn't done when we created 
+                            // If the operation wasn't done when we created
                             // the event but now it is done, set the event
                             m_Handle.Set();
                         }
@@ -78,7 +78,7 @@ namespace RJCP.IO
         /// </summary>
         /// <returns>true if the asynchronous operation completed synchronously;
         /// otherwise, false.</returns>
-        
+
         public bool CompletedSynchronously { get; internal set; }
 
         private volatile bool m_IsCompleted;

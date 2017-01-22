@@ -81,7 +81,7 @@ namespace RJCP.IO.Ports
         /// The stream doesn't impose any arbitrary limits on setting the baud rate. It is passed
         /// directly to the driver and it is up to the driver to determine if the baud rate is
         /// settable or not. Normally, a driver will attempt to set a baud rate that is within 5%
-        /// of the requested baud rate (but not guaranteed). 
+        /// of the requested baud rate (but not guaranteed).
         /// </remarks>
         /// <param name="port">The name of the COM port, such as "COM1" or "COM33".</param>
         /// <param name="baud">The baud rate that is passed to the underlying driver.</param>
@@ -98,13 +98,13 @@ namespace RJCP.IO.Ports
         /// The stream doesn't impose any arbitrary limits on setting the baud rate. It is passed
         /// directly to the driver and it is up to the driver to determine if the baud rate is
         /// settable or not. Normally, a driver will attempt to set a baud rate that is within 5%
-        /// of the requested baud rate (but not guaranteed). 
+        /// of the requested baud rate (but not guaranteed).
         /// <para>Not all combinations are supported. The driver will interpret the data and indicate
         /// if configuration is possible or not.</para>
         /// </remarks>
         /// <param name="port">The name of the COM port, such as "COM1" or "COM33".</param>
         /// <param name="baud">The baud rate that is passed to the underlying driver.</param>
-        /// <param name="data">The number of data bits. This is checked that the driver 
+        /// <param name="data">The number of data bits. This is checked that the driver
         /// supports the data bits provided. The special type 16X is not supported.</param>
         /// <param name="parity">The parity for the data stream.</param>
         /// <param name="stopbits">Number of stop bits.</param>
@@ -382,7 +382,7 @@ namespace RJCP.IO.Ports
         /// Specify the driver In Queue at the time it is opened.
         /// </summary>
         /// <remarks>
-        /// This provides the driver a recommended internal input buffer, in bytes. 
+        /// This provides the driver a recommended internal input buffer, in bytes.
         /// </remarks>
         public int DriverInQueue
         {
@@ -403,7 +403,7 @@ namespace RJCP.IO.Ports
         /// Specify the driver Out Queue at the time it is opened.
         /// </summary>
         /// <remarks>
-        /// This provides the driver a recommended internal output buffer, in bytes. 
+        /// This provides the driver a recommended internal output buffer, in bytes.
         /// </remarks>
         public int DriverOutQueue
         {
@@ -654,7 +654,7 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentNullException">Null buffer provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset provided, or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <returns>
         /// The total number of bytes read into the buffer. This can be less than
         /// the number of bytes requested if that many bytes are not currently
@@ -733,17 +733,17 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <param name="asyncResult">The reference to the pending asynchronous request to finish.</param>
         /// <exception cref="ObjectDisposedException"/>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <returns>The number of bytes read from the stream, between zero (0) and the number of bytes you requested.
         /// Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.</returns>
         public override int EndRead(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync<int>) {
-                LocalAsync<int> ar = (LocalAsync<int>)asyncResult;
-                if (!ar.IsCompleted) ar.AsyncWaitHandle.WaitOne(-1);
-                ar.Dispose();
-                if (ar.Result == 0) ReadCheckDeviceError();
-                return ar.Result;
+            LocalAsync<int> localAsync = asyncResult as LocalAsync<int>;
+            if (localAsync != null) {
+                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(-1);
+                localAsync.Dispose();
+                if (localAsync.Result == 0) ReadCheckDeviceError();
+                return localAsync.Result;
             } else {
                 AsyncResult ar = (AsyncResult)asyncResult;
                 ReadDelegate caller = (ReadDelegate)ar.AsyncDelegate;
@@ -755,7 +755,7 @@ namespace RJCP.IO.Ports
         /// Synchronously reads one byte from the SerialPort input buffer.
         /// </summary>
         /// <returns>The byte, cast to an Int32, or -1 if the end of the stream has been read.</returns>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         public override int ReadByte()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -781,7 +781,7 @@ namespace RJCP.IO.Ports
         /// <param name="offset">Offset into the buffer where to start putting the data.</param>
         /// <param name="count">Maximum number of bytes to read into the buffer.</param>
         /// <returns>The actual number of bytes copied into the buffer, 0 if there was a time out.</returns>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <remarks>
         /// This function converts the data in the local buffer to characters based on the
         /// encoding defined by the encoding property. The encoder used may buffer data between
@@ -813,7 +813,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Synchronously reads one character from the SerialPortStream input buffer.
         /// </summary>
-        /// <returns>The character that was read. -1 indicates no data was available 
+        /// <returns>The character that was read. -1 indicates no data was available
         /// within the time out.</returns>
         public int ReadChar()
         {
@@ -841,7 +841,7 @@ namespace RJCP.IO.Ports
         /// <returns>The contents of the input buffer up to the first occurrence of
         /// a NewLine value.</returns>
         /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <exception cref="ObjectDisposedException"/>
         public string ReadLine()
         {
@@ -857,7 +857,7 @@ namespace RJCP.IO.Ports
         /// limit (1024 characters) when looking for the string <i>text</i>. If <i>text</i>
         /// is not found within this limit, data is thrown away and more data is read
         /// (effectively consuming the earlier bytes).
-        /// <para>This method is provided as compatibility with the Microsoft implementation. 
+        /// <para>This method is provided as compatibility with the Microsoft implementation.
         /// There are some important differences however. This method attempts to fix a minor
         /// pathological problem with the Microsoft implementation. If the string <i>text</i>
         /// is not found, the MS implementation may modify the internal state of the decoder.
@@ -876,7 +876,7 @@ namespace RJCP.IO.Ports
         /// <param name="text">The text to indicate where the read operation stops.</param>
         /// <returns>The contents of the input buffer up to the specified <i>text</i>.</returns>
         /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception> 
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <exception cref="ObjectDisposedException"/>
         public string ReadTo(string text)
         {
@@ -907,7 +907,7 @@ namespace RJCP.IO.Ports
         /// data, and if there is no data, then it waits for data based on the time outs. This
         /// method employs no time outs.
         /// <para>Because this method returns only the data that is currently in the cached
-        /// buffer and ignores the data that is actually buffered by the driver itself, 
+        /// buffer and ignores the data that is actually buffered by the driver itself,
         /// there may be a slight discrepancy between the value returned by BytesToRead and the
         /// actual length of the string returned.</para>
         /// <para>This method differs slightly from the Microsoft implementation in that this
@@ -990,11 +990,11 @@ namespace RJCP.IO.Ports
         private int m_WriteBufferSize = 131072;
 
         /// <summary>
-        /// Gets or sets the size of the serial port output buffer. 
+        /// Gets or sets the size of the serial port output buffer.
         /// </summary>
         /// <remarks>
         /// Defines the size of the buffered stream write buffer, used to send data
-        /// to the serial port. It does not affect the buffers in the serial port 
+        /// to the serial port. It does not affect the buffers in the serial port
         /// hardware itself.
         /// <para>The Microsoft implementation uses this to set the buffer size of the
         /// underlying driver. This implementation interprets the WriteBufferSize
@@ -1201,10 +1201,10 @@ namespace RJCP.IO.Ports
         /// </remarks>
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync) {
-                LocalAsync ar = (LocalAsync)asyncResult;
-                if (!ar.IsCompleted) ar.AsyncWaitHandle.WaitOne(-1);
-                ar.Dispose();
+            LocalAsync localAsync = asyncResult as LocalAsync;
+            if (localAsync != null) {
+                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(-1);
+                localAsync.Dispose();
             } else {
                 AsyncResult ar = (AsyncResult)asyncResult;
                 WriteDelegate caller = (WriteDelegate)ar.AsyncDelegate;
@@ -1384,7 +1384,7 @@ namespace RJCP.IO.Ports
         /// The stream doesn't impose any arbitrary limits on setting the baud rate. It is passed
         /// directly to the driver and it is up to the driver to determine if the baud rate is
         /// settable or not. Normally, a driver will attempt to set a baud rate that is within 5%
-        /// of the requested baud rate (but not guaranteed). 
+        /// of the requested baud rate (but not guaranteed).
         /// <para>If the serial driver doesn't support setting the baud rate, setting this property
         /// is silently ignored and the baud rate isn't updated.</para>
         /// </remarks>
@@ -1531,7 +1531,7 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <remarks>
         /// Data Terminal Ready (DTR) is typically enabled during XON/XOFF software handshaking and
-        /// Request to Send/Clear to Send (RTS/CTS) hardware handshaking, and modem communications. 
+        /// Request to Send/Clear to Send (RTS/CTS) hardware handshaking, and modem communications.
         /// </remarks>
         public bool DtrEnable
         {
@@ -1553,7 +1553,7 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <remarks>
         /// The Request to Transmit (RTS) signal is typically used in Request to Send/Clear
-        /// to Send (RTS/CTS) hardware handshaking. 
+        /// to Send (RTS/CTS) hardware handshaking.
         /// <para>Note, the windows feature RTS_CONTROL_TOGGLE is not supported by this class.</para>
         /// </remarks>
         public bool RtsEnable
@@ -1582,7 +1582,7 @@ namespace RJCP.IO.Ports
         /// property RtsEnable as appropriate. Although the Microsoft implementation doesn't support
         /// DSR/DTR at all, setting this property will also set the DTR line to enabled. You must
         /// set the property DtrEnable as appropriate.</para>
-        /// <para>When enabling DTR flow control, the DsrSensitivity flag is set, so the driver 
+        /// <para>When enabling DTR flow control, the DsrSensitivity flag is set, so the driver
         /// ignores any bytes received, unless the DSR modem input line is high. Otherwise, if DTR
         /// flow control is disabled, the DSR line is ignored. For more detailed information about
         /// how windows works with flow control, see the site:
@@ -1652,18 +1652,18 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <remarks>
         /// MSDN documentation states this flag as follows:
-        /// <para>If this member is TRUE, transmission continues after the input buffer 
-        /// has come within <see cref="XOffLimit"/> bytes of being full and the driver has transmitted 
-        /// the XoffChar character to stop receiving bytes. If this member is FALSE, 
-        /// transmission does not continue until the input buffer is within XonLim bytes 
-        /// of being empty and the driver has transmitted the XonChar character to 
+        /// <para>If this member is TRUE, transmission continues after the input buffer
+        /// has come within <see cref="XOffLimit"/> bytes of being full and the driver has transmitted
+        /// the XoffChar character to stop receiving bytes. If this member is FALSE,
+        /// transmission does not continue until the input buffer is within XonLim bytes
+        /// of being empty and the driver has transmitted the XonChar character to
         /// resume reception.</para>
         /// <para>When the driver buffer fills up and sends the XOFF character (and
         /// software flow control is active), this property defines if the driver should
         /// continue to send data over the serial port or not.</para>
         /// <para>The Microsoft SerialPort implementation doesn't provide this option
         /// (in fact, in .NET 4.0 it doesn't appear to control this at all).</para>
-        /// <para>Some DCE devices will resume sending after any character arrives. 
+        /// <para>Some DCE devices will resume sending after any character arrives.
         /// The <see cref="TxContinueOnXOff"/> member should be set to FALSE when communicating with
         /// a DCE device that resumes sending after any character arrives.</para>
         /// </remarks>
@@ -1933,15 +1933,21 @@ namespace RJCP.IO.Ports
         }
         #endregion
 
+        private volatile bool m_IsDisposed;
+
         /// <summary>
         /// Indicates if this object has already been disposed.
         /// </summary>
-        public bool IsDisposed { get; private set; }
+        public bool IsDisposed
+        {
+            get { return m_IsDisposed; }
+            set { m_IsDisposed = value; }
+        }
 
         /// <summary>
         /// Clean up all resources managed by this object.
         /// </summary>
-        /// <param name="disposing"><b>true</b> if the user is disposing this object, 
+        /// <param name="disposing"><b>true</b> if the user is disposing this object,
         /// <b>false</b> if being cleaned up by the finalizer.</param>
         protected override void Dispose(bool disposing)
         {

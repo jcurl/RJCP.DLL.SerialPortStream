@@ -147,8 +147,8 @@ namespace RJCP.IO.Ports.Native.Windows
             /// The caller can perform a wait operation on the object
             /// </summary>
             /// <remarks>
-            /// This enables a thread to wait until the object is in the signalled state. Some object 
-            /// types do not support this access right. 
+            /// This enables a thread to wait until the object is in the signalled state. Some object
+            /// types do not support this access right.
             /// </remarks>
             SYNCHRONIZE = 0x100000,
 
@@ -433,7 +433,7 @@ namespace RJCP.IO.Ports.Native.Windows
             /// it. This attribute is not honoured on directories. For more information,
             /// see "You cannot view or change the Read-only or the System attributes
             /// of folders in Windows Server 2003, in Windows XP, in Windows Vista or
-            /// in Windows 7". 
+            /// in Windows 7".
             /// </remarks>
             FILE_ATTRIBUTE_READONLY = 0x00000001,
 
@@ -554,7 +554,7 @@ namespace RJCP.IO.Ports.Native.Windows
             FILE_FLAG_OPEN_NO_RECALL = 0x00100000,
 
             /// <summary>
-            /// Normal reparse point processing will not occur. 
+            /// Normal reparse point processing will not occur.
             /// </summary>
             /// <remarks>
             /// CreateFile will attempt to open the reparse point. When a file is opened,
@@ -582,7 +582,7 @@ namespace RJCP.IO.Ports.Native.Windows
             /// <remarks>
             /// The system ensures that the calling process overrides file security
             /// checks when the process has SE_BACKUP_NAME and SE_RESTORE_NAME privileges.
-            /// For more information, see "Changing Privileges in a Token". 
+            /// For more information, see "Changing Privileges in a Token".
             /// </remarks>
             FILE_FLAG_BACKUP_SEMANTICS = 0x02000000,
 
@@ -605,7 +605,7 @@ namespace RJCP.IO.Ports.Native.Windows
             /// should not be used if read-behind (that is, reverse scans) will be used.
             /// This flag has no effect if the file system does not support cached I/O
             /// and FILE_FLAG_NO_BUFFERING. For more information, see the Caching Behaviour
-            /// section of CreateFile(). 
+            /// section of CreateFile().
             /// </remarks>
             FILE_FLAG_SEQUENTIAL_SCAN = 0x08000000,
 
@@ -628,7 +628,7 @@ namespace RJCP.IO.Ports.Native.Windows
             /// <remarks>
             /// There are strict requirements for successfully working with files opened
             /// with CreateFile using the FILE_FLAG_NO_BUFFERING flag, for details see
-            /// "File Buffering". 
+            /// "File Buffering".
             /// </remarks>
             FILE_FLAG_NO_BUFFERING = 0x20000000,
 
@@ -637,13 +637,13 @@ namespace RJCP.IO.Ports.Native.Windows
             /// </summary>
             /// <remarks>
             /// When subsequent I/O operations are completed on this handle, the event
-            /// specified in the OVERLAPPED structure will be set to the signalled state. 
+            /// specified in the OVERLAPPED structure will be set to the signalled state.
             /// If this flag is specified, the file can be used for simultaneous read
             /// and write operations. If this flag is not specified, then I/O operations
             /// are serialized, even if the calls to the read and write functions specify
             /// an OVERLAPPED structure. For information about considerations when using
             /// a file handle created with this flag, see the Synchronous and Asynchronous
-            /// I/O Handles section of CreateFile(). 
+            /// I/O Handles section of CreateFile().
             /// </remarks>
             FILE_FLAG_OVERLAPPED = 0x40000000,
 
@@ -1232,16 +1232,16 @@ namespace RJCP.IO.Ports.Native.Windows
             CLRDTR = 6,
 
             /// <summary>
-            /// Suspends character transmission and places the transmission line in a break 
-            /// state until the ClearCommBreak function is called (or EscapeCommFunction is 
-            /// called with the CLRBREAK extended function code). The SETBREAK extended 
-            /// function code is identical to the SetCommBreak function. Note that this 
+            /// Suspends character transmission and places the transmission line in a break
+            /// state until the ClearCommBreak function is called (or EscapeCommFunction is
+            /// called with the CLRBREAK extended function code). The SETBREAK extended
+            /// function code is identical to the SetCommBreak function. Note that this
             /// extended function does not flush data that has not been transmitted.
             /// </summary>
             SETBREAK = 8,
 
             /// <summary>
-            /// Restores character transmission and places the transmission line in a non-break 
+            /// Restores character transmission and places the transmission line in a non-break
             /// state. The CLRBREAK extended function code is identical to the ClearCommBreak function
             /// </summary>
             CLRBREAK = 9
@@ -1256,8 +1256,8 @@ namespace RJCP.IO.Ports.Native.Windows
             EV_RXCHAR = 0x0001,
 
             /// <summary>
-            /// The event character was received and placed in the input buffer. 
-            /// The event character is specified in the device's DCB structure, 
+            /// The event character was received and placed in the input buffer.
+            /// The event character is specified in the device's DCB structure,
             /// which is applied to a serial port by using the SetCommState function.
             /// </summary>
             EV_RXFLAG = 0x0002,

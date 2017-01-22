@@ -10,8 +10,8 @@ namespace RJCP.IO.Ports
     internal static class SerialTrace
     {
         private static object s_SyncRoot = new object();
-        private static TraceSource s_Trace;
-        private static TraceSource s_TraceRT;
+        private static volatile TraceSource s_Trace;
+        private static volatile TraceSource s_TraceRT;
 
         /// <summary>
         /// Gets the trace source object for serial port logging.

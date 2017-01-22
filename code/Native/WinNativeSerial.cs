@@ -673,7 +673,6 @@ namespace RJCP.IO.Ports.Native
             m_XOnLimit = m_CommState.XonLim;
             m_XOffLimit = m_CommState.XoffLim;
             m_DiscardNull = m_CommState.Null;
-            m_TxContinueOnXOff = m_CommState.TxContinueOnXOff;
 
             // Get the Error Char. Only if it is zero and parity is enabled, we change it to 126
             // This is because the interface can't provide for an error char of zero and active.
