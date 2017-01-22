@@ -83,7 +83,7 @@ namespace RJCP.Datastructures
         /// </summary>
         /// <remarks>
         /// The array is used as the storage for the circular buffer. No copy of the array
-        /// is made, only a reference. The initial index in the array is 0. The value 
+        /// is made, only a reference. The initial index in the array is 0. The value
         /// <c>count</c> sets the initial length of the array. So an initial <c>count</c>
         /// of zero would imply an empty circular buffer.
         /// </remarks>
@@ -107,7 +107,7 @@ namespace RJCP.Datastructures
         /// <remarks>
         /// The array is used as the storage for the circular buffer. No copy of the array
         /// is made, only a reference. The <c>offset</c> is defined to be the first entry in the
-        /// circular buffer. This may be any value from zero to the last index 
+        /// circular buffer. This may be any value from zero to the last index
         /// (<c>Array.Length - 1</c>). The value <c>count</c> is the amount of data in the
         /// array, and it may cause wrapping (so that by setting offset near the end, a value
         /// of count may be set so that data can be considered at the end and beginning of
@@ -188,7 +188,7 @@ namespace RJCP.Datastructures
         /// </summary>
         /// <remarks>
         /// This function is useful if you need to pass the array to another function that will
-        /// then fill the contents of the buffer. You would pass <see cref="End"/> as the offset for 
+        /// then fill the contents of the buffer. You would pass <see cref="End"/> as the offset for
         /// where writing the data should start, and <b>WriteLength</b> as the length of buffer
         /// space available until the end of the array buffer. After the read operation that
         /// writes in to your buffer, the array is completely full, or until the end of the array.
@@ -560,7 +560,7 @@ namespace RJCP.Datastructures
         /// <returns>The number of bytes that were copied.</returns>
         /// <remarks>
         /// Data is copied from the first element in the array, up to the length
-        /// of the array. The data from the Circular Buffer is <i>not</i> consumed. 
+        /// of the array. The data from the Circular Buffer is <i>not</i> consumed.
         /// You must do this yourself. Else use the MoveTo() method.
         /// </remarks>
         public int CopyTo(T[] array)
@@ -693,9 +693,9 @@ namespace RJCP.Datastructures
         /// converted input.</exception>
         /// <remarks>
         /// This method should behave the same as the decoder for an array of bytes of equal size.
-        /// <para>The <i>completed</i> output parameter indicates whether all the data in the input buffer 
-        /// was converted and stored in the output buffer. This parameter is set to <b>false</b> if the 
-        /// number of bytes specified by the <i>bytes.Length</i> parameter cannot be converted without 
+        /// <para>The <i>completed</i> output parameter indicates whether all the data in the input buffer
+        /// was converted and stored in the output buffer. This parameter is set to <b>false</b> if the
+        /// number of bytes specified by the <i>bytes.Length</i> parameter cannot be converted without
         /// exceeding the number of characters specified by the charCount parameter.</para>
         /// <para>The completed parameter can also be set to false, even though the all bytes were consumed.
         /// This situation occurs if there is still data in the Decoder object that has not been stored

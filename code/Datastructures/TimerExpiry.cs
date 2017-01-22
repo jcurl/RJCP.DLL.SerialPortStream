@@ -42,7 +42,7 @@ namespace RJCP.Datastructures
     ///     do {
     ///         elements += GetData(myExpiry.RemainingTime());
     ///     } while (elements &lt; 2 &amp;&amp; !myExpiry.Expired);
-    ///     
+    ///
     ///     if (elements &gt;=2) return true;
     ///     return false;
     /// }
