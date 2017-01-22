@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : openserial.c
 //
@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 #define NSERIAL_EXPORTS
@@ -27,6 +28,7 @@
 #include "errmsg.h"
 #include "openserial.h"
 #include "flush.h"
+#include "log.h"
 
 NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
 {
@@ -37,6 +39,7 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
 
   serial_seterror(handle, ERRMSG_OK);
   if (handle->fd != -1) {
+    nslog(handle, NSLOG_WARNING, "open: handle already opened");
     serial_seterror(handle, ERRMSG_SERIALPORTALREADYOPEN);
     errno = EINVAL;
     return -1;
@@ -44,12 +47,24 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
 
   handle->fd = open(handle->device, O_RDWR | O_NOCTTY | O_NONBLOCK);
   if (handle->fd == -1) {
+    if (errno == EBUSY || errno == EAGAIN) {
+      nslog(handle, NSLOG_WARNING, "open: port busy. Returning EACCES");
+      // Map EBUSY / EAGAIN to UnauthorizedAccessException
+      errno = EACCES;
+    } else {
+      nslog(handle, NSLOG_WARNING, "open: open failed: errno=%d", errno);
+    }
     serial_seterror(handle, ERRMSG_CANTOPENSERIALPORT);
     return -1;
   }
 
+  if (ioctl(handle->fd, TIOCEXCL)) {
+    nslog(handle, NSLOG_NOTICE, "open: error setting TIOCEXCL: errno=%d", errno);
+  }
+
   int pipefd[2];
   if (pipe(pipefd) == -1) {
+    nslog(handle, NSLOG_ERR, "open: error opening pipes: errno=%d", errno);
     serial_seterror(handle, ERRMSG_CANTOPENANONPIPE);
     close(handle->fd);
     handle->fd = -1;
@@ -60,6 +75,7 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
   handle->pwfd = pipefd[1];
   if (fcntl(handle->prfd, F_SETFL, O_NONBLOCK) == -1 ||
       fcntl(handle->pwfd, F_SETFL, O_NONBLOCK) == -1) {
+    nslog(handle, NSLOG_ERR, "open: couldn't set nonblock: errno=%d", errno);
     serial_seterror(handle, ERRMSG_CANTCONFIGUREANONPIPE);
     close(handle->fd);
     close(handle->prfd);
@@ -72,6 +88,7 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
 
   handle->abortpending = FALSE;
 
+  nslog(handle, NSLOG_INFO, "open: succeeded");
   return 0;
 }
 
@@ -187,7 +204,9 @@ NSERIAL_EXPORT int WINAPI serial_setproperties(struct serialhandle *handle)
   }
 
   struct termios newtio;
+  nslog(handle, NSLOG_DEBUG, "setproperties: getting attributes");
   if (tcgetattr(handle->fd, &newtio) == -1) {
+    nslog(handle, NSLOG_ERR, "setproperties: tcgetattr failed: errno=%d", errno);
     serial_seterror(handle, ERRMSG_SERIALTCGETATTR);
     return -1;
   }
@@ -349,10 +368,13 @@ NSERIAL_EXPORT int WINAPI serial_setproperties(struct serialhandle *handle)
 
   // Wait until all output written to fd has been transmitted. In case that
   // we've just initialised, there is no output, so is equivalent to TCSANOW.
+  nslog(handle, NSLOG_DEBUG, "setproperties: setting attributes");
   if (tcsetattr(handle->fd, TCSADRAIN, &newtio) < 0) {
+    nslog(handle, NSLOG_ERR, "setproperties: setting attributes failed: errno=%d", errno);
     serial_seterror(handle, ERRMSG_SERIALTCSETATTR);
     return -1;
   }
+  nslog(handle, NSLOG_DEBUG, "setproperties: setting attributes done");
 
   flushbuffer(handle);
 
@@ -360,6 +382,10 @@ NSERIAL_EXPORT int WINAPI serial_setproperties(struct serialhandle *handle)
   tcgetattr(handle->fd, &newtio);
   if (cfgetispeed(&newtio) != handle->cbaud ||
       cfgetospeed(&newtio) != handle->cbaud) {
+    nslog(handle, NSLOG_WARNING, "setproperties: baudrate mismatch. "
+	  "ispeed ret=%d set=%d; ospeed ret=%d set=%d",
+	  cfgetispeed(&newtio), handle->cbaud,
+	  cfgetospeed(&newtio), handle->cbaud);
     // For some reason the baudrate was not set to what we had asked.
     serial_seterror(handle, ERRMSG_UNEXPECTEDBAUDRATE);
     errno = EIO;
@@ -391,19 +417,27 @@ NSERIAL_EXPORT int WINAPI serial_close(struct serialhandle *handle)
   }
 
   if (handle->fd == -1) return 0;
+  nslog(handle, NSLOG_DEBUG, "close: flushing buffer");
   flushbuffer(handle);
 
+  nslog(handle, NSLOG_DEBUG, "close: closing pipe read fd");
   if (handle->prfd != -1) {
     close(handle->prfd);
     handle->prfd = -1;
   }
+  nslog(handle, NSLOG_DEBUG, "close: closing pipe write fd");
   if (handle->pwfd != -1) {
     close(handle->pwfd);
     handle->pwfd = -1;
   }
 
-  tcflush(handle->fd, TCIOFLUSH);
+  nslog(handle, NSLOG_DEBUG, "close: flushing with TCIOFLUSH");
+  if (tcflush(handle->fd, TCIOFLUSH)) {
+    nslog(handle, NSLOG_DEBUG, "close: TCIOFLUSH failed: errno=%d", errno);
+  }
+  nslog(handle, NSLOG_DEBUG, "close: closing serial port");
   close(handle->fd);
+  nslog(handle, NSLOG_DEBUG, "close: closed");
   handle->fd = -1;
   return 0;
 }
