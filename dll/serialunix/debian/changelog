@@ -1,3 +1,9 @@
+libnserial (1.0.1-0ubuntu1~precise1) precise; urgency=low
+
+  * Force exclusive access of serial port for non-root processes.
+
+ -- Jason Curl <jcurl@arcor.de>  Sun, 22 Jan 2017 17:33:33 +0100
+
 libnserial (1.0.0-1ubuntu1~precise1) precise; urgency=low
 
   * CMake FindPackage module added
