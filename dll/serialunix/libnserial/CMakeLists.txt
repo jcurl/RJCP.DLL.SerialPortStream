@@ -6,6 +6,12 @@ include(GNUInstallDirs)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
+option(NSLOG_ENABLED "Build the project to enable logging" OFF)
+if(NSLOG_ENABLED)
+  message(STATUS "Logging enabled")
+  add_definitions(-DNSLOG_ENABLED)
+endif(NSLOG_ENABLED)
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -23,7 +29,8 @@ set(NSERIAL_SRCS
   lowlevel.c
   break.c
   errmsg.c
-  threaddata.c)
+  threaddata.c
+  log.c)
 add_library(nserial SHARED ${NSERIAL_SRCS})
 
 # Version Details: This should specify the detail of the API. It is

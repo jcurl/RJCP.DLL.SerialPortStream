@@ -175,7 +175,7 @@ namespace RJCP.IO.Ports.Native
         /// Synchronously reads one character from the SerialPortStream input buffer.
         /// </summary>
         /// <param name="sbuffer">The byte buffer to read from.</param>
-        /// <returns>The character that was read. -1 indicates no data was available 
+        /// <returns>The character that was read. -1 indicates no data was available
         /// within the time out.</returns>
         public int ReadChar(SerialBuffer sbuffer)
         {
@@ -316,7 +316,7 @@ namespace RJCP.IO.Ports.Native
             m_ReadOffsets.Consume(chars);
             sbuffer.Stream.ReadConsume(bytesRead);
             SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadToConsume(chars={0}) = {1} bytes", chars, bytesRead);
-            SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, 
+            SerialTrace.TraceRT.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                 "ReadToConsume: m_ReadOffset={0}; m_ReadCache.Free={1}", m_ReadOffset, m_ReadCache.Free);
             return bytesRead;
         }

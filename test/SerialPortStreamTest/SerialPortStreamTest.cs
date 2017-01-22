@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2017
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -325,7 +325,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
                 using (SerialPortStream s2 = new SerialPortStream(c_SourcePort, 9600, 8, Parity.None, StopBits.One)) {
                     // The port is already open by src, and should be an exclusive resource.
-                    Assert.That(() => s2.Open(), Throws.Exception);
+                    Assert.That(() => s2.Open(), Throws.Exception.InstanceOf<UnauthorizedAccessException>());
                 }
             }
         }
@@ -1526,6 +1526,61 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         [Test]
         [Category("SerialPortStream")]
         [Timeout(20000)]
+        public void ClosedWhenBlockedResetHandshake()
+        {
+            byte[] buffer = new byte[1024];
+
+            using (ManualResetEvent closedEvent = new ManualResetEvent(false))
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialDest.ReadBufferSize = 8192;
+                serialDest.WriteBufferSize = 8192;
+                serialSource.Handshake = Handshake.Rts;
+                serialSource.Open();
+                serialDest.Open();
+
+                serialDest.RtsEnable = false;
+                Thread.Sleep(100);
+
+                new Thread(
+                    () => {
+                        Thread.Sleep(2000);
+                        Console.WriteLine("Closing serialSource but first setting handshake to NONE");
+
+                        // It appears that the MSDN .NET implementation blocks here, never
+                        // to return as we're blocked on another thread.
+                        closedEvent.Set();
+
+                        // In an attempt to "unblock" on MONO, we thought we could set the
+                        // handlshake to none. What happens instead, it blocks here which
+                        // is also an error, and so a new test case.
+                        serialSource.Handshake = Handshake.None;
+                        Console.WriteLine("Closing serialSource");
+                        serialSource.Close();
+                        Console.WriteLine("Closed serialSource");
+                    }
+                ).Start();
+
+                Assert.That(
+                    () => {
+                        int bufferCount = 1024 * 1024;
+                        while (bufferCount > 0) {
+                            serialSource.Write(buffer, 0, buffer.Length);
+                            if (closedEvent.WaitOne(0)) {
+                                Assert.Fail("Write returned after being closed.");
+                            }
+                            bufferCount -= buffer.Length;
+                            Console.WriteLine("{0}", bufferCount);
+                        }
+                    }, Throws.InstanceOf<System.IO.IOException>());
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream")]
+        [Timeout(20000)]
         public void DisposedWhenFlushBlocked()
         {
             byte[] buffer = new byte[8192];
@@ -2045,6 +2100,96 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 // Device should still be open.
                 Assert.That(serialSource.IsOpen, Is.True);
                 serialSource.Close();
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectThenClose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+                serialSource.Close();
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectThenDispose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectAndReadAgainThenClose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                int read = 0;
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+
+                try {
+                    read = serialSource.Read(buffer, 0, buffer.Length);
+                } catch (System.IO.IOException) {
+                    Console.WriteLine("IOException occurred");
+                }
+                Console.WriteLine("Second Read: {0}", read);
+                serialSource.Close();
+            }
+        }
+
+        [Test]
+        [Category("SerialPortStream.ManualTest")]
+        public void ReadUntilDisconnectAndReadAgainThenDispose()
+        {
+            byte[] buffer = new byte[8192];
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = 8192;
+                serialSource.WriteBufferSize = 8192;
+                serialSource.Open();
+                Thread.Sleep(100);
+
+                int read = 0;
+                while (serialSource.Read(buffer, 0, buffer.Length) > 0) {
+                    Console.WriteLine("In Read Loop");
+                    /* throw away the data */
+                }
+
+                try {
+                    read = serialSource.Read(buffer, 0, buffer.Length);
+                } catch (System.IO.IOException) {
+                    Console.WriteLine("IOException occurred");
+                }
+                Console.WriteLine("Second Read: {0}", read);
             }
         }
     }
