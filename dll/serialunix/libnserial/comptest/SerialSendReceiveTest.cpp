@@ -61,7 +61,7 @@ TEST(SerialBasicTest, Version)
 {
   const char *version;
   version = ::serial_version();
-  EXPECT_EQ(0, strcmp("1.0.0", version));
+  EXPECT_EQ(0, strcmp("1.0.1", version));
 }
 
 // Open the two serial ports using 115200,8,n,1, send data from the first and
