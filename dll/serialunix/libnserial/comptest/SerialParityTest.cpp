@@ -425,7 +425,7 @@ TEST_F(SerialParityTest, Parity7O1ReceiveErrorWithReplace)
     }
   }
   EXPECT_TRUE(comparison)
-    << "Unexpected byte received with Even Parity";
+    << "Unexpected byte received with Odd Parity";
 
   if (!comparison) {
     DumpBuffer(buffs, sendbuff->GetCapacity(), "Parity7O1ReceiveErrorWithReplace.out.bin");
