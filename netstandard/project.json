@@ -1,0 +1,37 @@
+{
+  "version": "2.1.0.0",
+  "name": "SerialPortStream",
+  "title": "SerialPortStream",
+  "description": "An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.",
+
+    "buildOptions": {
+        "allowUnsafe": true,
+        "define": [
+            "NETSTANDARD15"
+        ],
+        "compile": [
+            "../code/*.cs", 
+            "../code/DataStructures/*.cs", 
+            "../code/Native/*.cs",
+            "../code/Native/Unix/*.cs",
+            "../code/Native/Windows/*.cs" 
+        ]
+    },
+
+    "dependencies": {
+        "System.Threading.Overlapped": "*",
+        "System.Threading.Thread": "*",
+        "System.Collections.Specialized": "*",
+        "System.Diagnostics.FileVersionInfo": "*",
+        "System.Diagnostics.TraceSource": "*",
+        "System.Net.Requests":"4.3.0",
+        "System.Runtime.Handles": "*",
+        "System.Threading.ThreadPool": "*",
+        "Microsoft.Extensions.Logging":"1.1.0",
+        "Microsoft.Win32.Registry": "*",
+        "Newtonsoft.Json": "*"
+    },
+    "frameworks": {
+        "netstandard1.5": {}
+    }
+}
