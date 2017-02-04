@@ -740,40 +740,26 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             Dictionary<string, bool> ports1 = new Dictionary<string, bool>();
             Dictionary<string, bool> ports2 = new Dictionary<string, bool>();
 
-            foreach (PortDescription desc in SerialPortStream.GetPortDescriptions()) {
-                Trace.WriteLine("GetPortDescriptions: " + desc.Port + "; Description: " + desc.Description);
+            PortDescription[] portDescs = SerialPortStream.GetPortDescriptions();
+            foreach (PortDescription desc in portDescs) {
+                Console.WriteLine("GetPortDescriptions: " + desc.Port + "; Description: " + desc.Description);
                 ports1.Add(desc.Port, false);
                 ports2.Add(desc.Port, false);
             }
 
-            foreach (string c in SerialPortStream.GetPortNames()) {
-                Trace.WriteLine("GetPortNames: " + c);
+            string[] portNames = SerialPortStream.GetPortNames();
+            foreach (string c in portNames) {
+                Console.WriteLine("GetPortNames: " + c);
                 if (ports1.ContainsKey(c)) {
                     ports1[c] = true;
                 } else {
-                    Trace.WriteLine("GetPortNames() shows " + c + ", but not GetPortDescriptions()");
+                    Console.WriteLine("GetPortNames() shows " + c + ", but not GetPortDescriptions()");
                     result = false;
                 }
             }
             foreach (string c in ports1.Keys) {
                 if (ports1[c] == false) {
-                    Trace.WriteLine("GetPortDescriptions() shows " + c + ", but not GetPortnames()");
-                    result = false;
-                }
-            }
-
-            foreach (string c in System.IO.Ports.SerialPort.GetPortNames()) {
-                Trace.WriteLine("SerialPort.GetPortNames: " + c);
-                if (ports2.ContainsKey(c)) {
-                    ports2[c] = true;
-                } else {
-                    Trace.WriteLine("System.IO.Ports.SerialPort.GetPortNames() shows " + c + ", but not GetPortDescriptions()");
-                    result = false;
-                }
-            }
-            foreach (string c in ports1.Keys) {
-                if (ports2[c] == false) {
-                    Trace.WriteLine("GetPortDescriptions() shows " + c + ", but not System.IO.Ports.SerialPort.GetPortNames()");
+                    Console.WriteLine("GetPortDescriptions() shows " + c + ", but not GetPortnames()");
                     result = false;
                 }
             }

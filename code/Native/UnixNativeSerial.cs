@@ -1,4 +1,4 @@
-// Copyright © Jason Curl 2012-2016
+// Copyright © Jason Curl 2012-2017
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -79,7 +79,20 @@ namespace RJCP.IO.Ports.Native
         /// <returns>An array of serial port names for the current computer.</returns>
         public string[] GetPortNames()
         {
-            return System.IO.Ports.SerialPort.GetPortNames();
+            PortDescription[] ports;
+            try {
+                ports = m_Dll.serial_getports(m_Handle);
+            } catch (System.EntryPointNotFoundException) {
+                // libnserial is version < 1.1.0
+                ports = null;
+            }
+            if (ports == null) return System.IO.Ports.SerialPort.GetPortNames();
+
+            string[] portNames = new string[ports.Length];
+            for (int i = 0; i < ports.Length; i++) {
+                portNames[i] = ports[i].Port;
+            }
+            return portNames;
         }
 
         /// <summary>
@@ -95,7 +108,20 @@ namespace RJCP.IO.Ports.Native
         /// <returns>An array of serial ports for the current computer.</returns>
         public PortDescription[] GetPortDescriptions()
         {
-            string[] ports = GetPortNames();
+            PortDescription[] ports;
+            try {
+                ports = m_Dll.serial_getports(m_Handle);
+            } catch (System.EntryPointNotFoundException) {
+                ports = null;
+            }
+            if (ports == null) return GetRuntimePortDescriptions();
+
+            return ports;
+        }
+
+        private PortDescription[] GetRuntimePortDescriptions()
+        {
+            string[] ports = System.IO.Ports.SerialPort.GetPortNames();
             PortDescription[] portdescs = new PortDescription[ports.Length];
 
             for (int i = 0; i < ports.Length; i++) {
