@@ -5,11 +5,17 @@ The `project.json` file in this folder contains all the necessary directives for
 
 Some few operations are not supported for either Linux or Windows, determined by the definition constant `NETSTANDARD15`
 
-## How to build
+## Build with Visual Studio 2015 (Windows only)
+
+A `netstandard.xproj` has been generated based on the `project.json` file.
+
+It has been compiled succesfully with `Visual Studio 2015 Community - Update 3` with the .Net Core Tools extension.
+
+## Build with .Net Core CLI (cross platform)
 
 All the required dependencies are declared in `project.json` and will be automatically downloaded with the command: `dotnet restore`. 
 This command shall be run in the same folder where the project file is located.
 
-After that, the library can be build with the command: `dotnet build`
+After that, the library can be built with the command: `dotnet build`
 
 For generating a release version, use: `dotnet build --configuration Release`

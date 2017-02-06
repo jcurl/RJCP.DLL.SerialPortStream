@@ -304,7 +304,11 @@ namespace RJCP.IO.Ports
         /// This method will clean up the object so far as to close the port. Internal buffers remain
         /// active that the stream can continue to read. Writes will throw an exception.
         /// </remarks>
+#if !NETSTANDARD15
         public new void Close()
+#else
+        public void Close()
+#endif
         {
             lock (m_CloseLock) {
                 if (IsDisposed) return;

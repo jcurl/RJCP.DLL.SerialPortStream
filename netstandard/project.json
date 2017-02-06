@@ -6,6 +6,7 @@
 
     "buildOptions": {
         "allowUnsafe": true,
+        "xmlDoc": true,
         "define": [
             "NETSTANDARD15"
         ],
