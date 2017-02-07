@@ -8,7 +8,7 @@
         "allowUnsafe": true,
         "xmlDoc": true,
         "define": [
-            "NETSTANDARD15"
+          "NETSTANDARD15"
         ],
         "compile": [
             "../code/*.cs", 
@@ -19,20 +19,27 @@
         ]
     },
 
-    "dependencies": {
-        "System.Threading.Overlapped": "*",
-        "System.Threading.Thread": "*",
-        "System.Collections.Specialized": "*",
-        "System.Diagnostics.FileVersionInfo": "*",
-        "System.Diagnostics.TraceSource": "*",
-        "System.Net.Requests":"4.3.0",
-        "System.Runtime.Handles": "*",
-        "System.Threading.ThreadPool": "*",
-        "Microsoft.Extensions.Logging":"1.1.0",
-        "Microsoft.Win32.Registry": "*",
-        "Newtonsoft.Json": "*"
-    },
-    "frameworks": {
-        "netstandard1.5": {}
-    }
+  "dependencies": {
+    "System.Threading.Overlapped": "*",
+    "System.Threading.Thread": "*",
+    "System.Collections": "*",
+    "System.Collections.Specialized": "*",
+    "System.Diagnostics.Debug": "*",
+    "System.Diagnostics.FileVersionInfo": "*",
+    "System.Diagnostics.Tools": "*",
+    "System.Diagnostics.TraceSource": "*",
+    "System.IO": "*",
+    "System.IO.FileSystem": "*",
+    "System.Runtime.Extensions": "*",
+    "System.Runtime.InteropServices": "*",
+    "System.Runtime.InteropServices.RuntimeInformation": "*",
+    "System.Text.Encoding": "*",
+    "System.Runtime.Handles": "*",
+    "System.Threading": "*",
+    "System.Threading.ThreadPool": "*",
+    "Microsoft.Win32.Registry": "*"
+  },
+  "frameworks": {
+    "netstandard1.5": {}
+  }
 }
