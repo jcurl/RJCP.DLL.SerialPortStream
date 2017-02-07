@@ -8,11 +8,16 @@ namespace RJCP.IO.Ports.Native
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Management;
     using System.Runtime.InteropServices;
     using Microsoft.Win32;
     using Microsoft.Win32.SafeHandles;
     using Windows;
+
+#if !NETSTANDARD15
+    using System.Management;
+#else
+    using System.Reflection;
+#endif
 
     /// <summary>
     /// Windows implementation for a Native Serial connection.
@@ -39,7 +44,12 @@ namespace RJCP.IO.Ports.Native
             get
             {
                 if (m_Version != null) return m_Version;
+
+#if NETSTANDARD15
+                var assembly = typeof(WinNativeSerial).GetTypeInfo().Assembly;
+#else                
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+#endif
                 FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
                 m_Version = fvi.FileVersion;
                 return m_Version;
@@ -111,6 +121,7 @@ namespace RJCP.IO.Ports.Native
                 }
             }
 
+#if !NETSTANDARD15
             ManagementObjectCollection objects;
             // Look for standard serial ports
             using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_SerialPort")) {
@@ -139,6 +150,7 @@ namespace RJCP.IO.Ports.Native
                     }
                 }
             }
+#endif
 
             // Get the array and return it
             int i = 0;
@@ -748,7 +760,7 @@ namespace RJCP.IO.Ports.Native
                 }
                 break;
             default:
-                throw new ApplicationException("Unknown Parity");
+                throw new Exception("Unknown Parity");
             }
 
             SetRtsPortSettings(false);
@@ -832,7 +844,7 @@ namespace RJCP.IO.Ports.Native
 
             NativeMethods.FileType t = UnsafeNativeMethods.GetFileType(m_ComPortHandle);
             if (t != NativeMethods.FileType.FILE_TYPE_CHAR && t != NativeMethods.FileType.FILE_TYPE_UNKNOWN) {
-                m_ComPortHandle.Close();
+                m_ComPortHandle.Dispose();
                 m_ComPortHandle = null;
                 throw new IOException("Wrong file type: " + PortName);
             }
@@ -863,7 +875,7 @@ namespace RJCP.IO.Ports.Native
                 m_CommOverlappedIo = null;
                 m_CommState = null;
                 m_CommModemStatus = null;
-                m_ComPortHandle.Close();
+                m_ComPortHandle.Dispose();
                 m_ComPortHandle = null;
             }
     }
