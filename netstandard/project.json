@@ -1,8 +1,8 @@
 {
-  "version": "2.1.0.0",
-  "name": "SerialPortStream",
-  "title": "SerialPortStream",
-  "description": "An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.",
+    "version": "2.1.0.0",
+    "name": "SerialPortStream",
+    "title": "SerialPortStream",
+    "description": "An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.",
 
     "buildOptions": {
         "allowUnsafe": true,
@@ -22,16 +22,24 @@
     "dependencies": {
         "System.Threading.Overlapped": "*",
         "System.Threading.Thread": "*",
+        "System.Collections": "*",
         "System.Collections.Specialized": "*",
+        "System.Diagnostics.Debug": "*",
         "System.Diagnostics.FileVersionInfo": "*",
+        "System.Diagnostics.Tools": "*",
         "System.Diagnostics.TraceSource": "*",
-        "System.Net.Requests":"4.3.0",
+        "System.IO": "*",
+        "System.IO.FileSystem": "*",
+        "System.Runtime.Extensions": "*",
+        "System.Runtime.InteropServices": "*",
+        "System.Runtime.InteropServices.RuntimeInformation": "*",
+        "System.Text.Encoding": "*",
         "System.Runtime.Handles": "*",
+        "System.Threading": "*",
         "System.Threading.ThreadPool": "*",
-        "Microsoft.Extensions.Logging":"1.1.0",
-        "Microsoft.Win32.Registry": "*",
-        "Newtonsoft.Json": "*"
+        "Microsoft.Win32.Registry": "*"
     },
+
     "frameworks": {
         "netstandard1.5": {}
     }
