@@ -14,9 +14,14 @@ namespace RJCP.IO.Ports
     using System.Text;
     using System.IO;
     using System.Threading;
-    using System.Runtime.Remoting.Messaging;
     using Datastructures;
     using Native;
+
+#if !NETSTANDARD15
+    using System.Runtime.Remoting.Messaging;
+#else
+    using System.Runtime.InteropServices;
+#endif
 
     /// <summary>
     /// The SerialPortStream is a stream class to communicate with serial port based devices.
@@ -119,12 +124,19 @@ namespace RJCP.IO.Ports
 
         private static INativeSerial CreateNativeSerial()
         {
+#if NETSTANDARD15
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return new WinNativeSerial();
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return new UnixNativeSerial();
+#else
             int p = (int)Environment.OSVersion.Platform;
             if (p == (int)PlatformID.Win32NT) {
                 return new WinNativeSerial();
             } else if (p == 4 || p == 8 || p == 128) {
                 return new UnixNativeSerial();
             }
+#endif
             return null;
         }
 
@@ -292,7 +304,11 @@ namespace RJCP.IO.Ports
         /// This method will clean up the object so far as to close the port. Internal buffers remain
         /// active that the stream can continue to read. Writes will throw an exception.
         /// </remarks>
+#if !NETSTANDARD15
         public new void Close()
+#else
+        public void Close()
+#endif
         {
             lock (m_CloseLock) {
                 if (IsDisposed) return;
@@ -695,6 +711,7 @@ namespace RJCP.IO.Ports
 
         private delegate int ReadDelegate(byte[] buffer, int offset, int count);
 
+#if !NETSTANDARD15
         /// <summary>
         /// Begins an asynchronous read operation.
         /// </summary>
@@ -750,6 +767,7 @@ namespace RJCP.IO.Ports
                 return caller.EndInvoke(asyncResult);
             }
         }
+#endif
 
         /// <summary>
         /// Synchronously reads one byte from the SerialPort input buffer.
@@ -1154,6 +1172,8 @@ namespace RJCP.IO.Ports
 
         private delegate void WriteDelegate(byte[] buffer, int offset, int count);
 
+#if !NETSTANDARD15
+
         /// <summary>
         /// Begins an asynchronous write operation.
         /// </summary>
@@ -1213,6 +1233,7 @@ namespace RJCP.IO.Ports
                 caller.EndInvoke(asyncResult);
             }
         }
+#endif
 
         /// <summary>
         /// Writes a specified number of characters to the serial port using data from a buffer.

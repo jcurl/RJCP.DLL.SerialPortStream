@@ -28,7 +28,12 @@ namespace RJCP.IO.Ports.Native
 
         private void ThrowException()
         {
-            if (m_Dll == null) return;
+            if (m_Dll == null) 
+            return;
+
+#if NETSTANDARD15
+            throw new Exception(string.Format("Error {0}", m_Dll.errno));
+#else   
             Mono.Unix.Native.Errno errno = Mono.Unix.Native.NativeConvert.ToErrno(m_Dll.errno);
             string description = m_Dll.serial_error(m_Handle);
 
@@ -40,6 +45,7 @@ namespace RJCP.IO.Ports.Native
             default:
                 throw new InvalidOperationException(description);
             }
+#endif
         }
 
         /// <summary>
@@ -79,6 +85,9 @@ namespace RJCP.IO.Ports.Native
         /// <returns>An array of serial port names for the current computer.</returns>
         public string[] GetPortNames()
         {
+#if NETSTANDARD15
+            throw new NotImplementedException("GetPortNames");
+#else
             PortDescription[] ports;
             try {
                 ports = m_Dll.serial_getports(m_Handle);
@@ -93,6 +102,7 @@ namespace RJCP.IO.Ports.Native
                 portNames[i] = ports[i].Port;
             }
             return portNames;
+#endif
         }
 
         /// <summary>

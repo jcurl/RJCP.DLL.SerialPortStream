@@ -9,7 +9,9 @@ namespace RJCP.IO.Ports.Native.Windows
     using System.Security;
     using Microsoft.Win32.SafeHandles;
 
+#if !NETSTANDARD15
     [SuppressUnmanagedCodeSecurity]
+#endif
     internal static class UnsafeNativeMethods
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -22,13 +24,13 @@ namespace RJCP.IO.Ports.Native.Windows
             [MarshalAs(UnmanagedType.U4)] NativeMethods.FileAttributes dwFlagsAndAttributes,
             IntPtr hTemplateFile);
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool WriteFile(SafeFileHandle hFile, IntPtr lpBuffer,
             uint nNumberOfBytesToWrite, out uint lpNumberOfBytesWritten,
             [In] ref System.Threading.NativeOverlapped lpOverlapped);
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReadFile(SafeFileHandle hFile, [Out] IntPtr lpBuffer, uint nNumberOfBytesToRead,
             out uint lpNumberOfBytesRead, [In] ref System.Threading.NativeOverlapped lpOverlapped);

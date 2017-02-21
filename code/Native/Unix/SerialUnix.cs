@@ -10,14 +10,18 @@ namespace RJCP.IO.Ports.Native.Unix
 
     internal class SerialUnix : INativeSerialDll
     {
+#if !NETSTANDARD15        
         [SuppressUnmanagedCodeSecurity]
+#endif
         private static class SafeNativeMethods
         {
             [DllImport("libnserial.so.1")]
             internal static extern IntPtr serial_version();
         }
 
+#if !NETSTANDARD15
         [SuppressUnmanagedCodeSecurity]
+#endif
         private static class UnsafeNativeMethods
         {
             [DllImport("libnserial.so.1", SetLastError = true)]

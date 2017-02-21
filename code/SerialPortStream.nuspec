@@ -14,18 +14,21 @@
         <language>en-US</language>
     </metadata>
     <files>
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.dll" target="lib\net40\RJCP.SerialPortStream.dll" />
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40\RJCP.SerialPortStream.pdb" />
-        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.XML" target="lib\net40\RJCP.SerialPortStream.XML" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.dll" target="lib\net45\RJCP.SerialPortStream.dll" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.pdb" target="lib\net45\RJCP.SerialPortStream.pdb" />
-        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.XML" target="lib\net45\RJCP.SerialPortStream.XML" />
+        <file src="..\netstandard\bin\Debug\netstandard1.5\SerialPortStream.dll" target="lib\netstandard1.5" />
+        <file src="..\netstandard\bin\Debug\netstandard1.5\SerialPortStream.pdb" target="lib\netstandard1.5" />
+        <file src="..\netstandard\bin\Debug\netstandard1.5\SerialPortStream.xml" target="lib\netstandard1.5" />
+        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.dll" target="lib\net40" />
+        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40" />
+        <file src="..\distribute\lib\net40\RJCP.SerialPortStream.XML" target="lib\net40" />
+        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.dll" target="lib\net45" />
+        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.pdb" target="lib\net45" />
+        <file src="..\distribute\lib\net45\RJCP.SerialPortStream.XML" target="lib\net45" />
         <file src="Datastructures\*.cs" target="src\Datastructures\" />
         <file src="Native\Unix\*.cs" target="src\Native\Unix\" />
         <file src="Native\Windows\*.cs" target="src\Native\Windows\" />
         <file src="Native\*.cs" target="src\Native\" />
         <file src="Properties\*.cs" target="src\Properties\" />
         <file src="*.cs" target="src\" />
-		<file src="SerialPortStream.csproj" target="src\SerialPortStream.csproj" />
+        <file src="SerialPortStream.csproj" target="src\SerialPortStream.csproj" />
     </files>
 </package>
