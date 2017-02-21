@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2017
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -29,6 +29,10 @@ namespace RJCP.IO.Ports.Native.Unix
 
             [DllImport("libnserial.so.1")]
             internal static extern void serial_terminate(IntPtr handle);
+
+            // First available in version 1.1.0 of libnserial
+            [DllImport("libnserial.so.1")]
+            internal static extern IntPtr serial_getports(IntPtr handle);
 
             [DllImport("libnserial.so.1", SetLastError = true, ThrowOnUnmappableChar = true, BestFitMapping = false)]
             internal static extern int serial_setdevicename(IntPtr handle, [MarshalAs(UnmanagedType.LPStr)] string deviceName);
@@ -189,6 +193,39 @@ namespace RJCP.IO.Ports.Native.Unix
         {
             UnsafeNativeMethods.serial_terminate(handle);
             errno = Marshal.GetLastWin32Error();
+        }
+
+        public PortDescription[] serial_getports(IntPtr handle)
+        {
+            // The portdesc is an array of two string pointers, where the last element is zero
+            IntPtr portdesc = UnsafeNativeMethods.serial_getports(handle);
+            errno = Marshal.GetLastWin32Error();
+            if (portdesc.Equals(IntPtr.Zero)) return null;
+
+            // Get the number of ports in the system.
+            int portNum = 0;
+            IntPtr portName;
+            do {
+                portName = Marshal.ReadIntPtr(portdesc, portNum * 2 * IntPtr.Size);
+                if (portName != IntPtr.Zero) portNum++;
+            } while (portName != IntPtr.Zero);
+
+            // Copy them into our struct
+            PortDescription[] ports = new PortDescription[portNum];
+            for (int i = 0; i < portNum; i++) {
+                IntPtr portPtr = Marshal.ReadIntPtr(portdesc, i * 2 * IntPtr.Size);
+                string port = Marshal.PtrToStringAnsi(portPtr);
+                IntPtr descPtr = Marshal.ReadIntPtr(portdesc, i * 2 * IntPtr.Size + IntPtr.Size);
+                string desc;
+                if (descPtr.Equals(IntPtr.Zero)) {
+                    desc = string.Empty;
+                } else {
+                    desc = Marshal.PtrToStringAnsi(descPtr);
+                }
+                ports[i] = new PortDescription(port, desc);
+            }
+
+            return ports;
         }
 
         public int serial_setdevicename(IntPtr handle, string deviceName)

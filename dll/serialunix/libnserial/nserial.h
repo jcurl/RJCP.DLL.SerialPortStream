@@ -92,6 +92,31 @@ NSERIAL_EXPORT struct serialhandle *WINAPI serial_init();
  */
 NSERIAL_EXPORT void WINAPI serial_terminate(struct serialhandle *handle);
 
+/*! \brief A serial port device and a description of that device
+ *
+ * This structure is used in serial_getports() and describes a single entry for
+ * a serial port found on the current running system and a description for that
+ * device
+ */
+struct portdescription {
+  const char *device;        /*!< The device string which can be opened */
+  const char *description;   /*!< A description of the device */
+};
+
+/*! \brief Get a list of ports and their description
+ *
+ * Iterates over the system looking for available serial ports. This method will
+ * return am array of devices and their description. The memory used for this
+ * operation is cached by this library, so this function is non-reentrant (the
+ * buffer used for calling this method will be overwritten by the next call to
+ * this method).
+ *
+ * \param handle the handle as returned by the serial_init() function.
+ * \return An array of portdescription objects, where the last element has null
+ *    for the device field. If there was a problem, this method returns NULL.
+ */
+NSERIAL_EXPORT struct portdescription *WINAPI serial_getports(struct serialhandle *handle);
+
 /*! \brief Set the name of the device when opening the serial port
  *
  * Set the string to use for the device name.
