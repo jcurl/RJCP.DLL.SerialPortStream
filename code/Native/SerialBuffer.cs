@@ -197,7 +197,7 @@ namespace RJCP.IO.Ports.Native
                 // Monitoring thread died. No point waiting any longer.
                 return false;
             }
-            throw new ApplicationException("Unexpected code flow");
+            throw new InternalApplicationException("Unexpected code flow");
         }
 
         bool ISerialBufferStreamData.WaitForRead(int count, int timeout)
@@ -400,7 +400,7 @@ namespace RJCP.IO.Ports.Native
                 // Data is available to write
                 return true;
             }
-            throw new ApplicationException("Unexpected code flow");
+            throw new InternalApplicationException("Unexpected code flow");
         }
 
         void ISerialBufferStreamData.Reset(bool clearBuffer)

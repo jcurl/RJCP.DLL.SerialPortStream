@@ -56,9 +56,11 @@
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HandShake.cs" />
+    <Compile Include="InternalApplicationException.cs" />
     <Compile Include="Native\INativeSerial.cs" />
     <Compile Include="Native\ISerialBufferSerialData.cs" />
     <Compile Include="Native\ISerialBufferStreamData.cs" />
+    <Compile Include="Native\Platform.cs" />
     <Compile Include="Native\ReadToCache.cs" />
     <Compile Include="Native\Windows\CommErrorEventArgs.cs" />
     <Compile Include="Native\Windows\CommEventArgs.cs" />

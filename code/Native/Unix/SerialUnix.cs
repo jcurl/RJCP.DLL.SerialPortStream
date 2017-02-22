@@ -10,14 +10,18 @@ namespace RJCP.IO.Ports.Native.Unix
 
     internal class SerialUnix : INativeSerialDll
     {
+#if !NETSTANDARD15
         [SuppressUnmanagedCodeSecurity]
+#endif
         private static class SafeNativeMethods
         {
             [DllImport("libnserial.so.1")]
             internal static extern IntPtr serial_version();
         }
 
+#if !NETSTANDARD15
         [SuppressUnmanagedCodeSecurity]
+#endif
         private static class UnsafeNativeMethods
         {
             [DllImport("libnserial.so.1", SetLastError = true)]
@@ -194,7 +198,19 @@ namespace RJCP.IO.Ports.Native.Unix
         public PortDescription[] serial_getports(IntPtr handle)
         {
             // The portdesc is an array of two string pointers, where the last element is zero
-            IntPtr portdesc = UnsafeNativeMethods.serial_getports(handle);
+            IntPtr portdesc;
+#if !NETSTANDARD15
+            portdesc = UnsafeNativeMethods.serial_getports(handle);
+#else
+            try {
+                portdesc = UnsafeNativeMethods.serial_getports(handle);
+            } catch (Exception ex) {
+                // Ugly hack as .NET Standard doesn't have EntryPointNotFoundException, so if we
+                // get any exception, we raise this one instead. To remove if it ever becomes
+                // available.
+                throw new EntryPointNotFoundException(ex.Message, ex);
+            }
+#endif
             errno = Marshal.GetLastWin32Error();
             if (portdesc.Equals(IntPtr.Zero)) return null;
 

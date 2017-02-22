@@ -8,6 +8,8 @@ REM Note, that this project does not build for .NET 3.5. It uses features first 
 call:buildproj  4.0 v4.0    lib\net40   SerialPortStream  "code\SerialPortStream.csproj"
 call:buildproj  4.0 v4.5    lib\net45   SerialPortStream  "code\SerialPortStream.csproj"
 
+dotnet build --configuration Release code\netstandard\project.json
+
 echo.
 pause
 goto:eof

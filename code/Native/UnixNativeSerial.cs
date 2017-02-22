@@ -29,6 +29,24 @@ namespace RJCP.IO.Ports.Native
         private void ThrowException()
         {
             if (m_Dll == null) return;
+
+#if NETSTANDARD15
+            ThrowExceptionNetStandard();
+#else
+            ThrowExceptionMono();
+#endif
+        }
+
+#if NETSTANDARD15
+        private void ThrowExceptionNetStandard()
+        {
+            throw new Exception(string.Format("Error {0}", m_Dll.errno));
+        }
+#endif
+
+#if !NETSTANDARD15
+        private void ThrowExceptionMono()
+        {
             Mono.Unix.Native.Errno errno = Mono.Unix.Native.NativeConvert.ToErrno(m_Dll.errno);
             string description = m_Dll.serial_error(m_Handle);
 
@@ -41,6 +59,7 @@ namespace RJCP.IO.Ports.Native
                 throw new InvalidOperationException(description);
             }
         }
+#endif
 
         /// <summary>
         /// Gets the version of the implementation in use.

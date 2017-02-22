@@ -314,21 +314,30 @@ namespace RJCP.IO.Ports.Native.Windows
             bool serialCommPending = false;
             m_SerialCommEvent.Reset();
             NativeOverlapped serialCommOverlapped = new NativeOverlapped();
+#if NETSTANDARD15
+            serialCommOverlapped.EventHandle = m_SerialCommEvent.GetSafeWaitHandle().DangerousGetHandle();
+#else
             serialCommOverlapped.EventHandle = m_SerialCommEvent.SafeWaitHandle.DangerousGetHandle();
-
+#endif
             // ReadFile
             bool readPending = false;
             m_ReadEvent.Reset();
             NativeOverlapped readOverlapped = new NativeOverlapped();
+#if NETSTANDARD15
+            readOverlapped.EventHandle = m_ReadEvent.GetSafeWaitHandle().DangerousGetHandle();
+#else
             readOverlapped.EventHandle = m_ReadEvent.SafeWaitHandle.DangerousGetHandle();
-
+#endif
             // WriteFile
             bool writePending = false;
             m_WriteEvent.Reset();
             NativeOverlapped writeOverlapped = new NativeOverlapped();
             m_ReadByteAvailable = false;
+#if NETSTANDARD15
+            writeOverlapped.EventHandle = m_WriteEvent.GetSafeWaitHandle().DangerousGetHandle();
+#else
             writeOverlapped.EventHandle = m_WriteEvent.SafeWaitHandle.DangerousGetHandle();
-
+#endif
             // SEt up the types of serial events we want to see.
             UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
 

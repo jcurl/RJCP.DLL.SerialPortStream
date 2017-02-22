@@ -59,7 +59,7 @@ namespace RJCP.IO
                         mre, null) != null) {
                         // Another thread created this object's event; dispose
                         // the event we just created
-                        mre.Close();
+                        mre.Dispose();
                     } else {
                         if (!done && IsCompleted) {
                             // If the operation wasn't done when we created
