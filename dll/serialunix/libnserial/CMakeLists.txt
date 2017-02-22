@@ -31,7 +31,8 @@ set(NSERIAL_SRCS
   errmsg.c
   threaddata.c
   log.c
-  stringbuf.c)
+  stringbuf.c
+  netfx.c)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(NSERIAL_SRCS ${NSERIAL_SRCS}

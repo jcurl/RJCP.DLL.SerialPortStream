@@ -17,6 +17,14 @@ namespace RJCP.IO.Ports.Native.Unix
         {
             [DllImport("libnserial.so.1")]
             internal static extern IntPtr serial_version();
+
+            // First available in version 1.1.0 of libnserial
+            [DllImport("libnserial.so.1")]
+            internal static extern int netfx_errno(int errno);
+
+            // First available in version 1.1.0 of libnserial
+            [DllImport("libnserial.so.1")]
+            internal static extern IntPtr netfx_errstring(int errno);
         }
 
 #if !NETSTANDARD15
@@ -548,6 +556,40 @@ namespace RJCP.IO.Ports.Native.Unix
             int result = UnsafeNativeMethods.serial_abortwaitformodemevent(handle);
             errno = Marshal.GetLastWin32Error();
             return result;
+        }
+
+        public SysErrNo netfx_errno(int errno)
+        {
+#if !NETSTANDARD15
+            return (SysErrNo)SafeNativeMethods.netfx_errno(errno);
+#else
+            try {
+                return (SysErrNo)SafeNativeMethods.netfx_errno(errno);
+            } catch (Exception ex) {
+                // Ugly hack as .NET Standard doesn't have EntryPointNotFoundException, so if we
+                // get any exception, we raise this one instead. To remove if it ever becomes
+                // available.
+                throw new EntryPointNotFoundException(ex.Message, ex);
+            }
+#endif
+        }
+
+        public string netfx_errstring(int errno)
+        {
+#if !NETSTANDARD15
+            IntPtr strerror = SafeNativeMethods.netfx_errstring(errno);
+#else
+            IntPtr strerror;
+            try {
+                strerror = SafeNativeMethods.netfx_errstring(errno);
+            } catch (Exception ex) {
+                // Ugly hack as .NET Standard doesn't have EntryPointNotFoundException, so if we
+                // get any exception, we raise this one instead. To remove if it ever becomes
+                // available.
+                throw new EntryPointNotFoundException(ex.Message, ex);
+            }
+#endif
+            return Marshal.PtrToStringAnsi(strerror);
         }
     }
 }

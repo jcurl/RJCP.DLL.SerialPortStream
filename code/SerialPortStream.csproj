@@ -96,6 +96,7 @@
     <Compile Include="Native\Unix\SerialUnix.cs" />
     <Compile Include="Native\Unix\SerialReadWriteEvent.cs" />
     <Compile Include="Native\Unix\WaitForModemEvent.cs" />
+    <Compile Include="Native\Unix\SysErrNo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

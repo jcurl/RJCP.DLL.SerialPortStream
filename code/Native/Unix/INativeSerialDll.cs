@@ -60,6 +60,9 @@ namespace RJCP.IO.Ports.Native.Unix
         string serial_error(IntPtr handle);
         int errno { get; }
 
+        SysErrNo netfx_errno(int errno);
+        string netfx_errstring(int errno);
+
         WaitForModemEvent serial_waitformodemevent(IntPtr handle, WaitForModemEvent mevent);
         int serial_abortwaitformodemevent(IntPtr handle);
         SerialReadWriteEvent serial_waitforevent(IntPtr handle, SerialReadWriteEvent rwevent, int timeout);
