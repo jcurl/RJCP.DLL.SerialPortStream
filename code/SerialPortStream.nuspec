@@ -50,7 +50,7 @@
         <file src="Properties\**\*.cs" target="src\Properties\" />
         <file src="netstandard\System\**\*.cs" target="src\netstandard\System\" />
         <file src="*.cs" target="src\" />
-        <file src="SerialPortStream.csproj" target="src\SerialPortStream.csproj" />
+        <file src="*.csproj" target="src\" />
         <file src="netstandard\netstandard.xproj" target="src\netstandard\" />
         <file src="netstandard\project.json" target="src\netstandard\" />
     </files>
