@@ -1,10 +1,11 @@
-// Copyright © Jason Curl 2012-2016
+// Copyright © Jason Curl 2012-2017
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
 namespace RJCP.IO.Ports.Native
 {
     using System;
+    using System.IO;
     using System.Threading;
     using Unix;
 
@@ -24,14 +25,72 @@ namespace RJCP.IO.Ports.Native
             if (m_Handle.Equals(IntPtr.Zero)) {
                 throw new PlatformNotSupportedException("Can't initialise platform library");
             }
+
+            // On NetStandard 1.5, we must have proper exception handling
+            try {
+                // These methods were first added in libnserial 1.1
+                m_Dll.netfx_errno(0);
+            } catch (System.EntryPointNotFoundException) {
+                throw new PlatformNotSupportedException("Must have libnserial 1.1.0 or later on .NET Standard 1.5");
+            }
         }
 
         private void ThrowException()
         {
-            if (m_Dll == null) return;
+            if (m_Dll == null)
+                return;
+
+            SysErrNo managedErrNo;
+            string sysDescription;
+            try {
+                // These methods were first added in libnserial 1.1
+                managedErrNo = m_Dll.netfx_errno(m_Dll.errno);
+                sysDescription = m_Dll.netfx_errstring(m_Dll.errno);
+            } catch (System.EntryPointNotFoundException) {
+#if NETSTANDARD15
+                ThrowExceptionNetStandard();
+#else
+                ThrowExceptionMono();
+#endif
+                throw;
+            }
+            string libDescription = m_Dll.serial_error(m_Handle);
+
+            string description = string.Format("{0} ({1}; {2})",
+                libDescription, m_Dll.errno, sysDescription);
+
+            switch (managedErrNo) {
+            case SysErrNo.NETFX_OK:
+            case SysErrNo.NETFX_EINTR:
+            case SysErrNo.NETFX_EAGAIN:
+            case SysErrNo.NETFX_EWOULDBLOCK:
+				// We throw here in any case, as the methods that call ThrowException don't
+				// expect it to return. This would mean something that needs to be debugged
+				// and fixed (probably in the C Interop Code).
+                throw new InternalApplicationException(description);
+            case SysErrNo.NETFX_EINVAL:
+                throw new ArgumentException(description);
+            case SysErrNo.NETFX_EACCES:
+                throw new UnauthorizedAccessException(description);
+            case SysErrNo.NETFX_ENOMEM:
+                throw new OutOfMemoryException(description);
+            case SysErrNo.NETFX_EBADF:
+                throw new InvalidOperationException(description);
+            case SysErrNo.NETFX_ENOSYS:
+                throw new PlatformNotSupportedException(description);
+            case SysErrNo.NETFX_EIO:
+                throw new IOException(description);
+            default:
+                throw new InvalidOperationException(description);
+            }
+        }
+
+#if !NETSTANDARD15
+        // For compatibility with libnserial 1.0 only.
+        private void ThrowExceptionMono()
+        {
             Mono.Unix.Native.Errno errno = Mono.Unix.Native.NativeConvert.ToErrno(m_Dll.errno);
             string description = m_Dll.serial_error(m_Handle);
-
             switch (errno) {
             case Mono.Unix.Native.Errno.EINVAL:
                 throw new ArgumentException(description);
@@ -41,6 +100,16 @@ namespace RJCP.IO.Ports.Native
                 throw new InvalidOperationException(description);
             }
         }
+#endif
+
+#if NETSTANDARD15
+        // For compatibility with libnserial 1.0 only.
+        private void ThrowExceptionNetStandard()
+        {
+            string description = m_Dll.serial_error(m_Handle);
+            throw new Exception(string.Format("Error {0}: {1}", m_Dll.errno, description));
+        }
+#endif
 
         /// <summary>
         /// Gets the version of the implementation in use.
@@ -79,7 +148,20 @@ namespace RJCP.IO.Ports.Native
         /// <returns>An array of serial port names for the current computer.</returns>
         public string[] GetPortNames()
         {
-            return System.IO.Ports.SerialPort.GetPortNames();
+            PortDescription[] ports;
+            try {
+                ports = m_Dll.serial_getports(m_Handle);
+            } catch (System.EntryPointNotFoundException) {
+                // libnserial is version < 1.1.0
+                ports = null;
+            }
+            if (ports == null) return System.IO.Ports.SerialPort.GetPortNames();
+
+            string[] portNames = new string[ports.Length];
+            for (int i = 0; i < ports.Length; i++) {
+                portNames[i] = ports[i].Port;
+            }
+            return portNames;
         }
 
         /// <summary>
@@ -95,7 +177,20 @@ namespace RJCP.IO.Ports.Native
         /// <returns>An array of serial ports for the current computer.</returns>
         public PortDescription[] GetPortDescriptions()
         {
-            string[] ports = GetPortNames();
+            PortDescription[] ports;
+            try {
+                ports = m_Dll.serial_getports(m_Handle);
+            } catch (System.EntryPointNotFoundException) {
+                ports = null;
+            }
+            if (ports == null) return GetRuntimePortDescriptions();
+
+            return ports;
+        }
+
+        private PortDescription[] GetRuntimePortDescriptions()
+        {
+            string[] ports = System.IO.Ports.SerialPort.GetPortNames();
             PortDescription[] portdescs = new PortDescription[ports.Length];
 
             for (int i = 0; i < ports.Length; i++) {

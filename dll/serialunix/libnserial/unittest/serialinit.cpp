@@ -45,7 +45,7 @@ TEST(SerialBasicTest, Version)
 {
   const char *version;
   version = ::serial_version();
-  EXPECT_EQ(0, strcmp("1.0.0", version));
+  EXPECT_EQ(0, strcmp("1.1.0", version));
 }
 
 TEST_F(SerialInitTest, Init)
