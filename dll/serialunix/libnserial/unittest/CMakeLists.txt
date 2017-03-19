@@ -11,6 +11,7 @@ if(GTEST_FOUND)
   set(SERIALUNIX_GTEST_SRCS
     serialinit.cpp
     serialopen.cpp
+    serialerror.cpp
     main.cpp
     configuration.cpp)
   add_executable(nserialtest ${SERIALUNIX_GTEST_SRCS})
