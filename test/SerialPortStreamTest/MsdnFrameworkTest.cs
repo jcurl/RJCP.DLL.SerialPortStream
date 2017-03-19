@@ -1,4 +1,8 @@
-﻿namespace RJCP.IO.Ports.FrameworkTest
+﻿// Copyright © Jason Curl 2012-2017
+// Sources at https://github.com/jcurl/SerialPortStream
+// Licensed under the Microsoft Public License (Ms-PL)
+
+namespace RJCP.IO.Ports.FrameworkTest
 {
     using System;
     using System.IO.Ports;
@@ -7,7 +11,7 @@
     using NUnit.Framework;
     using SerialPortStreamTest;
 
-    [TestFixture]
+    [TestFixture(Category = "SerialPortStream.Framework")]
     public class MsdnFrameworkTest
     {
         private readonly string c_SourcePort;

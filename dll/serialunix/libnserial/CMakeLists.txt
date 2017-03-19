@@ -30,7 +30,19 @@ set(NSERIAL_SRCS
   break.c
   errmsg.c
   threaddata.c
-  log.c)
+  log.c
+  stringbuf.c
+  netfx.c)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(NSERIAL_SRCS ${NSERIAL_SRCS}
+    portlinux.c)
+else()
+  set(NSERIAL_SRCS ${NSERIAL_SRCS}
+    portnone.c)
+endif()
+
+
 add_library(nserial SHARED ${NSERIAL_SRCS})
 
 # Version Details: This should specify the detail of the API. It is

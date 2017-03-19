@@ -94,6 +94,13 @@ NSERIAL_EXPORT void WINAPI serial_terminate(struct serialhandle *handle)
     free(handle->device);
   }
 
+  if (handle->ports) {
+    free(handle->ports);
+  }
+  if (handle->portbuffer) {
+    free(handle->portbuffer);
+  }
+
   if (handle->tmpbuffer) {
     free(handle->tmpbuffer);
   }
