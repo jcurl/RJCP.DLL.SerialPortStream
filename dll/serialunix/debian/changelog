@@ -1,3 +1,11 @@
+libnserial (1.1.0-0ubuntu1~trusty1) trusty; urgency=low
+
+  * Support .NET Standard (first in 1.1.0), unify exception handling by mapping
+    without support of Mono.
+  * Smarter algorithm for getting the list of serial ports under Linux.
+
+ -- Jason Curl <jcurl@arcor.de>  Sun, 19 Mar 2017 23:06:08 +0100
+
 libnserial (1.0.1-0ubuntu1~trusty1) trusty; urgency=low
 
   * Force exclusive access of serial port for non-root processes.
