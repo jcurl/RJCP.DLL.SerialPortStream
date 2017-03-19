@@ -57,13 +57,6 @@ void SerialSendReceiveTest::TearDown()
   serial_terminate(m_readhandle);
 }
 
-TEST(SerialBasicTest, Version)
-{
-  const char *version;
-  version = ::serial_version();
-  EXPECT_EQ(0, strcmp("1.0.0", version));
-}
-
 // Open the two serial ports using 115200,8,n,1, send data from the first and
 // receive data in the second. Check the content of the data matches.
 //

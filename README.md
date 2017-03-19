@@ -61,7 +61,7 @@ The SerialPortStream tries to solve the following issues observed:
   any data being buffered at all. So you can implement reliable protocols and
   your code is simpler.
 * Disposing or Closing the serial port during a blocking write operation will
-  not abort the write operation. This implemention will abort with an
+  not abort the write operation. This implementation will abort with an
   `System.IO.IOException` type.
 
 # System Requirements
@@ -71,7 +71,7 @@ The SerialPortStream tries to solve the following issues observed:
 Software has been tested and developed using:
 * .NET 4.5 on Windows 7 x86 and x64.
 * .NET 4.5 on Windows 8 Pro x64 and Windows 8.1 Pro x64.
-* .NET 4.6 on Windows 10 Pro x64
+* .NET 4.6.x on Windows 10 Pro x64
 * Mono 4.2.3.4 from Xamarin on Ubuntu 14.04 (32-bit) and 16.04 (64-bit)
 
 I use this software for automation in another system (Windows) that runs for

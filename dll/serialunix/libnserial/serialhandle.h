@@ -34,6 +34,9 @@ struct modemstate {
   int                  serialerror;
 };
 
+// Maximum number of ports we have in the port descrip
+#define MAXPORTS    64
+
 struct serialhandle {
   char              *device;            // The device to open
   int                fd;                // File descriptor for the serial port
@@ -70,6 +73,10 @@ struct serialhandle {
   pthread_mutex_t    modemmutex;        // Managing modem events
   struct modemstate *modemstate;        // Are we waiting on a modem event?
   pthread_t          modemthread;       // Waiting on a modem event
+
+  struct portdescription *ports;        // List of available ports
+  char              *portbuffer;        // Space to write port description
+  size_t             portbuffoffset;    // Offset in portbuffer for next string
 };
 
 #endif

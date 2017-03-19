@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2017
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -12,6 +12,8 @@ namespace RJCP.IO.Ports.Native.Unix
 
         IntPtr serial_init();
         void serial_terminate(IntPtr handle);
+
+        PortDescription[] serial_getports(IntPtr handle);
 
         int serial_setdevicename(IntPtr handle, string deviceName);
         string serial_getdevicename(IntPtr handle);
@@ -57,6 +59,9 @@ namespace RJCP.IO.Ports.Native.Unix
 
         string serial_error(IntPtr handle);
         int errno { get; }
+
+        SysErrNo netfx_errno(int errno);
+        string netfx_errstring(int errno);
 
         WaitForModemEvent serial_waitformodemevent(IntPtr handle, WaitForModemEvent mevent);
         int serial_abortwaitformodemevent(IntPtr handle);
