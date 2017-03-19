@@ -1,3 +1,11 @@
+libnserial (1.1.0-0ubuntu1~xenial1) xenial; urgency=low
+
+  * Support .NET Standard (first in 1.1.0), unify exception handling by mapping
+    without support of Mono.
+  * Smarter algorithm for getting the list of serial ports under Linux.
+
+ -- Jason Curl <jcurl@arcor.de>  Sun, 19 Mar 2017 23:10:25 +0100
+
 libnserial (1.0.1-0ubuntu1~xenial1) xenial; urgency=low
 
   * Force exclusive access of serial port for non-root processes.
