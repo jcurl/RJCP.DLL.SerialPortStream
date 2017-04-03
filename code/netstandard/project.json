@@ -11,11 +11,11 @@
             "NETSTANDARD15"
         ],
         "compile": [
-            "../code/*.cs",
-            "../code/DataStructures/*.cs",
-            "../code/Native/*.cs",
-            "../code/Native/Unix/*.cs",
-            "../code/Native/Windows/*.cs"
+            "../*.cs",
+            "../DataStructures/*.cs",
+            "../Native/*.cs",
+            "../Native/Unix/*.cs",
+            "../Native/Windows/*.cs"
         ],
         "outputName": "RJCP.SerialPortStream"
     },
