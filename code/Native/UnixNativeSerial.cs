@@ -26,6 +26,7 @@ namespace RJCP.IO.Ports.Native
                 throw new PlatformNotSupportedException("Can't initialise platform library");
             }
 
+#if NETSTANDARD15
             // On NetStandard 1.5, we must have proper exception handling
             try {
                 // These methods were first added in libnserial 1.1
@@ -33,6 +34,7 @@ namespace RJCP.IO.Ports.Native
             } catch (System.EntryPointNotFoundException) {
                 throw new PlatformNotSupportedException("Must have libnserial 1.1.0 or later on .NET Standard 1.5");
             }
+#endif
         }
 
         private void ThrowException()
