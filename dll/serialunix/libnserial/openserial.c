@@ -30,6 +30,21 @@
 #include "flush.h"
 #include "log.h"
 
+static int closeserial(struct serialhandle *handle)
+{
+  int result;
+
+  nslog(handle, NSLOG_DEBUG, "close: closing serial port");
+  if (ioctl(handle->fd, TIOCNXCL)) {
+    nslog(handle, NSLOG_NOTICE, "close: error setting TIOCNXCL: errno=%d", errno);
+  }
+
+  result = close(handle->fd);
+  nslog(handle, NSLOG_DEBUG, "close: closed");
+  handle->fd = -1;
+  return result;
+}
+
 NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
 {
   if (handle == NULL) {
@@ -66,7 +81,7 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
   if (pipe(pipefd) == -1) {
     nslog(handle, NSLOG_ERR, "open: error opening pipes: errno=%d", errno);
     serial_seterror(handle, ERRMSG_CANTOPENANONPIPE);
-    close(handle->fd);
+    closeserial(handle);
     handle->fd = -1;
     return -1;
   }
@@ -77,7 +92,7 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
       fcntl(handle->pwfd, F_SETFL, O_NONBLOCK) == -1) {
     nslog(handle, NSLOG_ERR, "open: couldn't set nonblock: errno=%d", errno);
     serial_seterror(handle, ERRMSG_CANTCONFIGUREANONPIPE);
-    close(handle->fd);
+    closeserial(handle);
     close(handle->prfd);
     close(handle->pwfd);
     handle->fd = -1;
@@ -435,10 +450,8 @@ NSERIAL_EXPORT int WINAPI serial_close(struct serialhandle *handle)
   if (tcflush(handle->fd, TCIOFLUSH)) {
     nslog(handle, NSLOG_DEBUG, "close: TCIOFLUSH failed: errno=%d", errno);
   }
-  nslog(handle, NSLOG_DEBUG, "close: closing serial port");
-  close(handle->fd);
-  nslog(handle, NSLOG_DEBUG, "close: closed");
-  handle->fd = -1;
+
+  closeserial(handle);
   return 0;
 }
 
