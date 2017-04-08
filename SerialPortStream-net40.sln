@@ -188,7 +188,7 @@ Global
 		$28.inheritsSet = VisualStudio
 		$28.inheritsScope = text/plain
 		$28.scope = text/plain
-		version = 2.1.0.0
+		version = 2.1.1.0
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = SerialPortStream.vsmdi

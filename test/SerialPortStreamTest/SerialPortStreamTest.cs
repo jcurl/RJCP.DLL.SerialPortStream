@@ -261,6 +261,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// Check that Open() and Close() can be called multiple times.
         /// </summary>
         [Test]
+        [Repeat(100)]
         public void OpenClose()
         {
             SerialPortStream src;

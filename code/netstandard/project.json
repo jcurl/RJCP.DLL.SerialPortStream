@@ -1,5 +1,5 @@
 {
-    "version": "2.1.0.0",
+    "version": "2.1.1.0",
     "name": "SerialPortStream",
     "title": "SerialPortStream",
     "description": "An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.",
@@ -11,11 +11,11 @@
             "NETSTANDARD15"
         ],
         "compile": [
-            "../code/*.cs",
-            "../code/DataStructures/*.cs",
-            "../code/Native/*.cs",
-            "../code/Native/Unix/*.cs",
-            "../code/Native/Windows/*.cs"
+            "../*.cs",
+            "../DataStructures/*.cs",
+            "../Native/*.cs",
+            "../Native/Unix/*.cs",
+            "../Native/Windows/*.cs"
         ],
         "outputName": "RJCP.SerialPortStream"
     },
