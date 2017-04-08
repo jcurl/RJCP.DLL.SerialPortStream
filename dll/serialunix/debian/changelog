@@ -1,3 +1,9 @@
+libnserial (1.1.1-0ubuntu1~trusty1) trusty; urgency=low
+
+  * Allow a port to be reopened after it is closed on Linux
+
+ -- Jason Curl <jcurl@arcor.de>  Sat, 08 Apr 2017 15:30:32 +0200
+
 libnserial (1.1.0-0ubuntu1~trusty1) trusty; urgency=low
 
   * Support .NET Standard (first in 1.1.0), unify exception handling by mapping
