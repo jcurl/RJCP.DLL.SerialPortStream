@@ -177,16 +177,20 @@ NSERIAL_EXPORT int WINAPI serial_setbaud(struct serialhandle *handle, int baud)
     if (baud == baudrates[i].baud) {
       handle->baudrate = baudrates[i].baud;
       handle->cbaud = baudrates[i].cbaud;
-
+      handle->custombaud = 0;
       // TODO: Update the serial port baud rate if already opened.
       return 0;
     }
     i++;
   }
+  
+  // Nope? set custom baud config
+  // Derived from https://github.com/torvalds/linux/blob/master/drivers/usb/serial/ftdi_sio.c line 1262
+  handle->cbaud = B38400;
+  handle->baudrate = baud;
+  handle->custombaud = 1;
 
-  serial_seterror(handle, ERRMSG_UNSUPPORTEDBAUDRATE);
-  errno = EINVAL;
-  return -1;
+  return 0;
 }
 
 NSERIAL_EXPORT int WINAPI serial_getbaud(struct serialhandle *handle, int *baud)
