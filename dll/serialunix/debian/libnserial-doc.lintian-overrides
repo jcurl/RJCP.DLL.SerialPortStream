@@ -1,0 +1,4 @@
+# We don't execute this on the local machine, javascript here is only
+# needed on the client to view the documentation.
+libnserial-doc binary: embedded-javascript-library
+
