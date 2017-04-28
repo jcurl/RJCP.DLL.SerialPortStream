@@ -26,6 +26,7 @@
 #define NSERIAL_EXPORTS
 #include "nserial.h"
 #include "errmsg.h"
+#include "log.h"
 #include "serialhandle.h"
 
 static int getmodemsignal(int fd, int signal, int *outsignal)
@@ -377,6 +378,28 @@ static void *modemeventthread(void *ptr)
 }
 #endif
 
+static int entercritsection(struct serialhandle *handle)
+{
+  if (pthread_mutex_lock(&(handle->modemmutex)) == -1) {
+    nslog(handle, NSLOG_CRIT,
+	  "modem: lock mutex failed: errno=%d", errno);
+    serial_seterror(handle, ERRMSG_MUTEXLOCK);
+    return -1;
+  }
+  return 0;
+}
+
+static int exitcritsection(struct serialhandle *handle)
+{
+  if (pthread_mutex_unlock(&(handle->modemmutex)) == -1) {
+    nslog(handle, NSLOG_CRIT,
+	  "modem: unlock mutex failed: errno=%d", errno);
+    serial_seterror(handle, ERRMSG_MUTEXUNLOCK);
+    return -1;
+  }
+  return 0;
+}
+
 NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialhandle *handle, serialmodemevent_t event)
 {
   if (handle == NULL) {
@@ -391,14 +414,12 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
     return -1;
   }
 
-  if (pthread_mutex_lock(&(handle->modemmutex)) == -1) {
-    //serial_seterror(handle, XXXX);
-    return -1;
-  }
+  if (entercritsection(handle)) return -1;
 
   if (handle->modemstate) {
-    pthread_mutex_unlock(&(handle->modemmutex));
-    //serial_seterror(handle, XXXX);
+    exitcritsection(handle);
+    nslog(handle, NSLOG_WARNING, "waitformodemevent: already running");
+    serial_seterror(handle, ERRMSG_MODEMEVENT_RUNNING);
     errno = EINVAL;
     return -1;
   }
@@ -406,7 +427,7 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
   if ((event &
        (MODEMEVENT_DCD | MODEMEVENT_RI |
 	MODEMEVENT_DSR | MODEMEVENT_CTS)) == 0) {
-    pthread_mutex_unlock(&(handle->modemmutex));
+    if (exitcritsection(handle)) return -1;
     return MODEMEVENT_NONE;
   }
 
@@ -416,34 +437,47 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
   handle->modemstate = &mstate;
   mstate.handle = handle;
   mstate.waitevent = event;
-  pthread_mutex_unlock(&(handle->modemmutex));
+  if (exitcritsection(handle)) return -1;
 
   // We create the thread to wait on it afterwards, as we can
   // make that thread cancellable.
   result = pthread_create(&(handle->modemthread), NULL,
 			  modemeventthread, &mstate);
-  if (result == -1) {
-    handle->modemstate = NULL;
-    //serial_seterror(handle, XXXX);
-    return -1;
+  if (result) {
+    nslog(handle, NSLOG_CRIT,
+	  "waitformodemevent: pthread_create: errno=%d",
+	  errno);
   }
 
-  result = pthread_join(handle->modemthread, NULL);
-  if (result == -1) {
-    handle->modemstate = NULL;
-    //serial_seterror(handle, XXXX);
-    return -1;
+  if (!result) {
+    result = pthread_join(handle->modemthread, NULL);
+    if (result) {
+      nslog(handle, NSLOG_CRIT,
+	    "waitformodemevent: pthread_join: errno=%d",
+	    errno);
+    }
   }
 
-  if (mstate.serialerror != 0) {
-    errno = mstate.posixerrno;
-    serial_seterror(handle, mstate.serialerror);
-    handle->modemstate = NULL;
-    return -1;
+  if (!result) {
+    if (mstate.serialerror != 0) {
+      errno = mstate.posixerrno;
+      nslog(handle, NSLOG_CRIT,
+	    "waitformodemevent: error in modemeventthread: errno=%d",
+	    errno);
+      serial_seterror(handle, mstate.serialerror);
+      result = -1;
+    }
   }
 
+  if (entercritsection(handle)) result = -1;
   handle->modemstate = NULL;
-  return mstate.eventresult & event;
+  if (exitcritsection(handle)) result = -1;
+
+  if (!result) {
+    return mstate.eventresult & event;
+  } else {
+    return -1;
+  }
 #else
   serial_seterror(handle, ERRMSG_NOSYS);
   errno = ENOSYS;
@@ -464,11 +498,16 @@ NSERIAL_EXPORT int WINAPI serial_abortwaitformodemevent(struct serialhandle *han
     return -1;
   }
 
-  if (handle->modemstate == NULL) return 0;
+  int active;
+  if (entercritsection(handle)) return -1;
+  active = (handle->modemstate != NULL);
+  exitcritsection(handle);
+
+  if (!active) return 0;
 
   int result = pthread_cancel(handle->modemthread);
   if (result == -1) {
-    //serial_seterror(handle, XXXX);
+    serial_seterror(handle, ERRMSG_PTHREADCANCEL);
     return -1;
   }
 

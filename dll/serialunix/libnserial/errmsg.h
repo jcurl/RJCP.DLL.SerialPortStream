@@ -44,6 +44,12 @@ typedef enum serialerrmsg {
   ERRMSG_IOCTL,
   ERRMSG_IOCTL_ICOUNTER,
   ERRMSG_NOSYS,
+  ERRMSG_MODEMEVENT_RUNNING,
+  ERRMSG_MUTEXLOCK,
+  ERRMSG_MUTEXUNLOCK,
+  ERRMSG_PTHREADCREATE,
+  ERRMSG_PTHREADJOIN,
+  ERRMSG_PTHREADCANCEL,
 } serialerrmsg_t;
 
 int serial_seterror(struct serialhandle *handle, serialerrmsg_t error);
