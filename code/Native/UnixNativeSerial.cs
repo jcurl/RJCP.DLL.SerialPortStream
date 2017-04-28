@@ -711,6 +711,7 @@ namespace RJCP.IO.Ports.Native
                 m_PinThread.IsBackground = true;
                 m_PinThread.Start();
             } catch {
+                m_PinThread = null;
                 m_MonitorPins = false;
                 throw;
             }
@@ -722,11 +723,13 @@ namespace RJCP.IO.Ports.Native
             m_StopRunning.Set();
             InterruptReadWriteLoop();
 
-            if (m_MonitorPins && m_PinThread != null) {
+            if (m_PinThread != null) {
                 int killcounter = 0;
 
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Stopping Thread", m_Name);
-                m_Dll.serial_abortwaitformodemevent(m_Handle);
+                if (m_MonitorPins) {
+                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Stopping Thread", m_Name);
+                    m_Dll.serial_abortwaitformodemevent(m_Handle);
+                }
                 SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Waiting for Thread", m_Name);
                 while (killcounter < 3 && !m_PinThread.Join(100)) {
                     SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Waiting for Thread, counter={1}", m_Name, killcounter);
