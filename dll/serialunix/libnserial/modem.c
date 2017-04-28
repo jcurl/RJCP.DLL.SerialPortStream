@@ -292,7 +292,13 @@ static serialmodemevent_t waitformodemevent(struct modemstate *mstate)
     risignal = -1;
 
   if (ioctl(mstate->handle->fd, TIOCMIWAIT, signals) < 0) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+      return MODEMEVENT_NONE;
+    }
+
+    // Some USB drivers don't support modem signals.
     mstate->serialerror = ERRMSG_IOCTL;
+    mstate->posixerrno = errno;
     return -1;
   }
 
@@ -356,10 +362,17 @@ static void *modemeventthread(void *ptr)
 
   while (TRUE) {
     result = waitformodemevent(mstate);
-    if (result != MODEMEVENT_NONE && result != -1) {
+    if (result == -1) {
+      // We have a serious issue. We stop the thread. The error
+      // was already set by waitformodemevent.
+      mstate->eventresult = MODEMEVENT_NONE;
+      pthread_exit(NULL);
+    }
+    if (result != MODEMEVENT_NONE) {
       mstate->eventresult = result;
       pthread_exit(NULL);
     }
+    // else we just keep polling.
   }
 }
 #endif
@@ -403,9 +416,10 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
   handle->modemstate = &mstate;
   mstate.handle = handle;
   mstate.waitevent = event;
-  mstate.eventresult = 0;
   pthread_mutex_unlock(&(handle->modemmutex));
 
+  // We create the thread to wait on it afterwards, as we can
+  // make that thread cancellable.
   result = pthread_create(&(handle->modemthread), NULL,
 			  modemeventthread, &mstate);
   if (result == -1) {
@@ -418,6 +432,13 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
   if (result == -1) {
     handle->modemstate = NULL;
     //serial_seterror(handle, XXXX);
+    return -1;
+  }
+
+  if (mstate.serialerror != 0) {
+    errno = mstate.posixerrno;
+    serial_seterror(handle, mstate.serialerror);
+    handle->modemstate = NULL;
     return -1;
   }
 

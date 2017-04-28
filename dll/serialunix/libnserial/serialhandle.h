@@ -32,6 +32,7 @@ struct modemstate {
   serialmodemevent_t   waitevent;
   serialmodemevent_t   eventresult;
   int                  serialerror;
+  int                  posixerrno;
 };
 
 // Maximum number of ports we have in the port descrip
