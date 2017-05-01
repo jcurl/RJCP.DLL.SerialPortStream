@@ -1687,8 +1687,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadBlocked()
         {
             byte[] buffer = new byte[1024];
@@ -1712,8 +1712,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadBlockedReadAgain()
         {
             byte[] buffer = new byte[1024];
@@ -1743,8 +1743,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadCharsBlocked()
         {
             char[] buffer = new char[1024];
@@ -1768,8 +1768,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadCharsBlockedReadAgain()
         {
             char[] buffer = new char[1024];
@@ -1799,8 +1799,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadByteBlocked()
         {
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -1822,8 +1822,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadByteBlockedReadAgain()
         {
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -1851,8 +1851,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadCharBlocked()
         {
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -1874,8 +1874,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadCharBlockedReadAgain()
         {
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -1903,8 +1903,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         /// In case of the device no longer available, it should abort the read with an exception.
         /// </remarks>
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnReadLineBlocked()
         {
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -1923,8 +1923,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnFlushBlocked()
         {
             byte[] buffer = new byte[8192];
@@ -1957,8 +1957,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnWriteBlocked()
         {
             byte[] buffer = new byte[8192];
@@ -1990,8 +1990,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
-        //[Ignore("Manual Test")]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void DisconnectOnWriteAsyncBlocked()
         {
             byte[] buffer = new byte[8192];
@@ -2026,6 +2026,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void ReadUntilDisconnectThenClose()
         {
             byte[] buffer = new byte[8192];
@@ -2045,6 +2046,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void ReadUntilDisconnectThenDispose()
         {
             byte[] buffer = new byte[8192];
@@ -2063,6 +2065,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void ReadUntilDisconnectAndReadAgainThenClose()
         {
             byte[] buffer = new byte[8192];
@@ -2090,6 +2093,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
         [Test]
         [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
         public void ReadUntilDisconnectAndReadAgainThenDispose()
         {
             byte[] buffer = new byte[8192];
