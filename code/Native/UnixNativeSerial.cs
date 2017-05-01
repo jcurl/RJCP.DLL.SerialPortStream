@@ -795,7 +795,7 @@ namespace RJCP.IO.Ports.Native
                         byte* bo = b + m_Buffer.Serial.ReadBuffer.End;
                         int length = m_Buffer.Serial.ReadBuffer.WriteLength;
                         rresult = m_Dll.serial_read(m_Handle, (IntPtr)bo, length);
-                        if (rresult == -1) {
+                        if (rresult < 0) {
                             SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
                                 "{0}: ReadWriteThread: Error reading data; errno={1}; description={2}",
                                 m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
@@ -805,7 +805,7 @@ namespace RJCP.IO.Ports.Native
                             SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                                 "{0}: ReadWriteThread: serial_read({1}, {2}, {3}) == {4}",
                                 m_Name, m_Handle, (IntPtr)bo, length, rresult);
-                            m_Buffer.Serial.ReadBufferProduce(rresult);
+                            if (rresult > 0) m_Buffer.Serial.ReadBufferProduce(rresult);
                         }
                     }
                     if (rresult > 0) OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Chars));
@@ -817,7 +817,7 @@ namespace RJCP.IO.Ports.Native
                         byte* bo = b + m_Buffer.Serial.WriteBuffer.Start;
                         int length = m_Buffer.Serial.WriteBuffer.ReadLength;
                         wresult = m_Dll.serial_write(m_Handle, (IntPtr)bo, length);
-                        if (wresult == -1) {
+                        if (wresult < 0) {
                             SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
                                 "{0}: ReadWriteThread: Error writing data; errno={1}; description={2}",
                                 m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
@@ -827,8 +827,10 @@ namespace RJCP.IO.Ports.Native
                             SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                                 "{0}: ReadWriteThread: serial_write({1}, {2}, {3}) == {4}",
                                 m_Name, m_Handle, (IntPtr)bo, length, wresult);
-                            m_Buffer.Serial.WriteBufferConsume(wresult);
-                            m_Buffer.Serial.TxEmptyEvent();
+                            if (wresult > 0) {
+                                m_Buffer.Serial.WriteBufferConsume (wresult);
+                                m_Buffer.Serial.TxEmptyEvent ();
+                            }
                         }
                     }
                 }
