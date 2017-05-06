@@ -696,7 +696,7 @@ namespace RJCP.IO.Ports.Native
             try {
                 m_IsRunning = true;
                 m_MonitorThread = new Thread(new ThreadStart(ReadWriteThread));
-                m_MonitorThread.Name = "UnixNativeSerial::Monitor_" + m_Name;
+                m_MonitorThread.Name = "NSerMon_" + m_Name;
                 m_MonitorThread.IsBackground = true;
                 m_MonitorThread.Start();
             } catch {
@@ -707,7 +707,7 @@ namespace RJCP.IO.Ports.Native
             try {
                 m_MonitorPins = true;
                 m_PinThread = new Thread(new ThreadStart(PinChangeThread));
-                m_PinThread.Name = "UnixNativeSerial::Pin_" + m_Name;
+                m_PinThread.Name = "NSerPin_" + m_Name;
                 m_PinThread.IsBackground = true;
                 m_PinThread.Start();
             } catch {
