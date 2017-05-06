@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : modem.c
 //
@@ -254,6 +254,13 @@ NSERIAL_EXPORT int WINAPI serial_getrts(struct serialhandle *handle, int *rts)
 }
 
 #ifdef HAVE_LINUX_SERIAL_ICOUNTER_STRUCT
+// Please note, that this method by be aborted at any time with
+// "pthread_cancel" and the thread is set to be PTHREAD_CANCEL_ASYNCHRONOUS.
+// This means, it must by async cancel safe. You cannot allocate heap, or
+// call functions that are not async cancel safe.
+//
+// The only exception is "ioctl" as it appears that this is not implemented
+// to be a cancellation point in Linux.
 static serialmodemevent_t waitformodemevent(struct modemstate *mstate)
 {
   int icount;
@@ -358,8 +365,9 @@ static void *modemeventthread(void *ptr)
   // The IOCTL blocks until there is a change or a signal. There's no other
   // way to get out if you don't want a signal! So we have to ensure that we
   // can cancel the thread at any time and be careful about it.
-  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+  int oldstate, oldtype;
+  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldstate);
+  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
 
   while (TRUE) {
     result = waitformodemevent(mstate);
