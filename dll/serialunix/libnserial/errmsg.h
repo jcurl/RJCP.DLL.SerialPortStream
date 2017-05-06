@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : errmsg.h
 //
@@ -50,6 +50,7 @@ typedef enum serialerrmsg {
   ERRMSG_PTHREADCREATE,
   ERRMSG_PTHREADJOIN,
   ERRMSG_PTHREADCANCEL,
+  ERRMSG_SEMINIT
 } serialerrmsg_t;
 
 int serial_seterror(struct serialhandle *handle, serialerrmsg_t error);

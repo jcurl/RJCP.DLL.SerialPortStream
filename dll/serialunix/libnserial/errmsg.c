@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : errmsg.c
 //
@@ -113,6 +113,8 @@ const char *serial_geterrorstring(serialerrmsg_t errmsg)
     return "Error joining posix thread";
   case ERRMSG_PTHREADCANCEL:
     return "Error cancelling posix thread";
+  case ERRMSG_SEMINIT:
+    return "Error initializing semaphore";
 
   default:
     return "Unknown error";

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : serialhandle.h
 //
@@ -16,6 +16,7 @@
 #define NSERIAL_SERIALHANDLE_H
 
 #include <pthread.h>
+#include <semaphore.h>
 
 #define NSERIAL_EXPORTS
 #include "nserial.h"
@@ -33,6 +34,8 @@ struct modemstate {
   serialmodemevent_t   eventresult;
   int                  serialerror;
   int                  posixerrno;
+  sem_t                modemevent;
+  int                  modemeventabort;
 };
 
 // Maximum number of ports we have in the port descrip

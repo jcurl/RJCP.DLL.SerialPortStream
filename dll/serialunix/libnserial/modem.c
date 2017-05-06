@@ -369,20 +369,25 @@ static void *modemeventthread(void *ptr)
   pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldstate);
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
 
-  while (TRUE) {
+  int wait = TRUE;
+  while (wait) {
     result = waitformodemevent(mstate);
     if (result == -1) {
       // We have a serious issue. We stop the thread. The error
       // was already set by waitformodemevent.
       mstate->eventresult = MODEMEVENT_NONE;
-      pthread_exit(NULL);
+      wait = FALSE;
     }
     if (result != MODEMEVENT_NONE) {
       mstate->eventresult = result;
-      pthread_exit(NULL);
+      wait = FALSE;
     }
+
     // else we just keep polling.
   }
+
+  sem_post(&(mstate->modemevent));
+  pthread_exit(NULL);
 }
 #endif
 
@@ -448,10 +453,21 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
   int result;
 
   struct modemstate mstate = {0, };
-  handle->modemstate = &mstate;
   mstate.handle = handle;
   mstate.waitevent = event;
-  if (exitcritsection(handle)) return -1;
+  if (sem_init(&(mstate.modemevent), 0, 0) == -1) {
+    nslog(handle, NSLOG_CRIT,
+	  "waitformodemevent: seminit(modemevent): errno=%d", errno);
+    exitcritsection(handle);
+    serial_seterror(handle, ERRMSG_SEMINIT);
+    return -1;
+  }
+  handle->modemstate = &mstate;
+  if (exitcritsection(handle)) {
+    handle->modemstate = NULL;
+    sem_destroy(&(mstate.modemevent));
+    return -1;
+  }
 
   // We create the thread to wait on it afterwards, as we can
   // make that thread cancellable.
@@ -461,6 +477,31 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
     nslog(handle, NSLOG_CRIT,
 	  "waitformodemevent: pthread_create: errno=%d", result);
     errno = result;
+  }
+
+  // Wait for an abort, or that the thread is closed
+  if (!result) {
+    int wait = TRUE;
+    int semresult;
+    while (wait) {
+      semresult = sem_wait(&(mstate.modemevent));
+      if (semresult) {
+	if (errno == EINTR) {
+	  // Just an interrupt, we continue the loop
+	  semresult = 0;
+	} else {
+	  nslog(handle, NSLOG_CRIT,
+		"waitformodemevent: sem_wait: errno=%d", errno);
+	  wait = FALSE;
+	  result = -1;
+	}
+      } else {
+	if (mstate.modemeventabort) {
+	  result = pthread_cancel(handle->modemthread);
+	}
+	wait = FALSE;
+      }
+    }
   }
 
   if (!result) {
@@ -487,6 +528,13 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
   handle->modemstate = NULL;
   if (exitcritsection(handle)) result = -1;
 
+  result = sem_destroy(&(mstate.modemevent));
+  if (!result) {
+    nslog(handle, NSLOG_CRIT,
+	  "waitformodemevent: sem_destroy: errno=%d",
+	  errno);
+  }
+
   if (!result) {
     return mstate.eventresult & event;
   } else {
@@ -512,25 +560,24 @@ NSERIAL_EXPORT int WINAPI serial_abortwaitformodemevent(struct serialhandle *han
     return -1;
   }
 
-  int active;
+  int result = 0;
   if (entercritsection(handle)) return -1;
-  active = (handle->modemstate != NULL);
-  exitcritsection(handle);
-
-  if (!active) return 0;
-
-  int result = pthread_cancel(handle->modemthread);
-  if (result && result != ESRCH) {
-    // We ignore the error ESRCH, which indicates that the thread
-    // cannot be found.
-    nslog(handle, NSLOG_CRIT,
-	  "abortwaitformodemevent: pthread_cancel: errno=%d",
-	  result);
-    errno = result;
-    serial_seterror(handle, ERRMSG_PTHREADCANCEL);
-    return -1;
+  if (handle->modemstate != NULL) {
+    handle->modemstate->modemeventabort = TRUE;
+    result = sem_post(&(handle->modemstate->modemevent));
+    if (result == -1 && errno == EOVERFLOW) {
+      // The thread has already been closed and posted its event.
+      // Ignore it.
+      result = 0;
+      errno = 0;
+    } else {
+      nslog(handle, NSLOG_CRIT,
+	    "abortwaitformodemevent: sem_post: errno=%d",
+	    result);
+    }
   }
+  if (exitcritsection(handle)) result = -1;
 
+  if (result) return -1;
   return 0;
 }
-
