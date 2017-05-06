@@ -388,9 +388,12 @@ static void *modemeventthread(void *ptr)
 
 static int entercritsection(struct serialhandle *handle)
 {
-  if (pthread_mutex_lock(&(handle->modemmutex)) == -1) {
+  int result;
+  result = pthread_mutex_lock(&(handle->modemmutex));
+  if (result) {
     nslog(handle, NSLOG_CRIT,
-	  "modem: lock mutex failed: errno=%d", errno);
+	  "modem: lock mutex failed: errno=%d", result);
+    errno = result;
     serial_seterror(handle, ERRMSG_MUTEXLOCK);
     return -1;
   }
@@ -399,9 +402,12 @@ static int entercritsection(struct serialhandle *handle)
 
 static int exitcritsection(struct serialhandle *handle)
 {
-  if (pthread_mutex_unlock(&(handle->modemmutex)) == -1) {
+  int result;
+  result = pthread_mutex_unlock(&(handle->modemmutex));
+  if (result) {
     nslog(handle, NSLOG_CRIT,
-	  "modem: unlock mutex failed: errno=%d", errno);
+	  "modem: unlock mutex failed: errno=%d", result);
+    errno = result;
     serial_seterror(handle, ERRMSG_MUTEXUNLOCK);
     return -1;
   }
@@ -453,25 +459,25 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
 			  modemeventthread, &mstate);
   if (result) {
     nslog(handle, NSLOG_CRIT,
-	  "waitformodemevent: pthread_create: errno=%d",
-	  errno);
+	  "waitformodemevent: pthread_create: errno=%d", result);
+    errno = result;
   }
 
   if (!result) {
     result = pthread_join(handle->modemthread, NULL);
     if (result) {
       nslog(handle, NSLOG_CRIT,
-	    "waitformodemevent: pthread_join: errno=%d",
-	    errno);
+	    "waitformodemevent: pthread_join: errno=%d", result);
+      errno = result;
     }
   }
 
   if (!result) {
     if (mstate.serialerror != 0) {
-      errno = mstate.posixerrno;
       nslog(handle, NSLOG_CRIT,
 	    "waitformodemevent: error in modemeventthread: errno=%d",
-	    errno);
+	    mstate.posixerrno);
+      errno = mstate.posixerrno;
       serial_seterror(handle, mstate.serialerror);
       result = -1;
     }
@@ -514,7 +520,13 @@ NSERIAL_EXPORT int WINAPI serial_abortwaitformodemevent(struct serialhandle *han
   if (!active) return 0;
 
   int result = pthread_cancel(handle->modemthread);
-  if (result == -1) {
+  if (result && result != ESRCH) {
+    // We ignore the error ESRCH, which indicates that the thread
+    // cannot be found.
+    nslog(handle, NSLOG_CRIT,
+	  "abortwaitformodemevent: pthread_cancel: errno=%d",
+	  result);
+    errno = result;
     serial_seterror(handle, ERRMSG_PTHREADCANCEL);
     return -1;
   }

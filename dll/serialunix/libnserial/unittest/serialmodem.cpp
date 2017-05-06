@@ -55,10 +55,10 @@ void *waitforeventtest(void *ptr)
 
   int oldpthreadstate;
   int pscs = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldpthreadstate);
-  if (pscs == -1) {
+  if (pscs) {
     std::cout <<
       "pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, ...) failed." <<
-      "Error = " << errno << " (" << strerror(errno) << ")" << std::endl;
+      "Error = " << pscs << " (" << strerror(pscs) << ")" << std::endl;
     etest->result = (serialmodemevent_t)255;
     pthread_exit(NULL);
   }
@@ -111,5 +111,16 @@ TEST_F(SerialModemTest, EventAbort)
   ASSERT_EQ(0, sem_timedwait(&(test.eventsema), &timeout));
 
   ASSERT_EQ(0, test.result);
+  ASSERT_EQ(0, serial_close(handle));
+}
+
+TEST_F(SerialModemTest, EventAbortNotWaiting)
+{
+  ASSERT_EQ(0, serial_open(handle))
+    << "Message: " << serial_error(handle) << "; "
+    << "Error initialising: " << strerror(errno) << " (" << errno << ")";
+
+  ASSERT_EQ(0, serial_abortwaitformodemevent(handle));
+
   ASSERT_EQ(0, serial_close(handle));
 }
