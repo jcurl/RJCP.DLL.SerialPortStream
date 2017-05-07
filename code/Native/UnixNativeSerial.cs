@@ -16,13 +16,13 @@ namespace RJCP.IO.Ports.Native
     internal class UnixNativeSerial : INativeSerial
     {
         private INativeSerialDll m_Dll;
-        private IntPtr m_Handle;
+        private SafeSerialHandle m_Handle;
 
         public UnixNativeSerial()
         {
             m_Dll = new SerialUnix();
             m_Handle = m_Dll.serial_init();
-            if (m_Handle.Equals(IntPtr.Zero)) {
+            if (m_Handle.IsInvalid) {
                 throw new PlatformNotSupportedException("Can't initialise platform library");
             }
 
@@ -852,7 +852,7 @@ namespace RJCP.IO.Ports.Native
 
         private void InterruptReadWriteLoop()
         {
-            if (m_IsRunning && !m_Handle.Equals(IntPtr.Zero)) {
+            if (m_IsRunning && !m_Handle.IsInvalid) {
                 int result = m_Dll.serial_abortwaitforevent(m_Handle);
                 if (result == -1) {
                     SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
@@ -980,16 +980,12 @@ namespace RJCP.IO.Ports.Native
             if (!m_IsDisposed) {
                 if (disposing) {
                     if (IsOpen) Close();
-                }
-
-                if (!m_Handle.Equals(IntPtr.Zero)) {
-                    m_Dll.serial_terminate(m_Handle);
-                    m_Handle = IntPtr.Zero;
+                    m_Handle.Dispose();
                     m_Dll = null;
+                    m_StopRunning.Dispose();
+                    m_StopRunning = null;
+                    m_IsDisposed = true;
                 }
-                m_StopRunning.Dispose();
-                m_StopRunning = null;
-                m_IsDisposed = true;
             }
         }
         #endregion

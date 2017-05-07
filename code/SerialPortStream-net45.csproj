@@ -111,6 +111,9 @@
     <Compile Include="Native\Unix\SerialReadWriteEvent.cs" />
     <Compile Include="Native\Unix\WaitForModemEvent.cs" />
     <Compile Include="Native\Unix\SysErrNo.cs" />
+    <Compile Include="Native\Unix\SafeSerialHandle.cs" />
+    <Compile Include="Native\Unix\SafeNativeMethods.cs" />
+    <Compile Include="Native\Unix\UnsafeNativeMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.SerialPortStream-net45.config" />
