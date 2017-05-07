@@ -1348,6 +1348,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.Linux.ManualTest")]
         [Timeout(20000)]
         public void DisposedWhenBlocked()
         {
@@ -1402,6 +1403,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.Linux.ManualTest")]
         [Timeout(20000)]
         public void ClosedWhenBlocked()
         {
@@ -1450,6 +1452,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.Linux.ManualTest")]
         [Timeout(20000)]
         public void ClosedWhenBlockedResetHandshake()
         {
@@ -1504,6 +1507,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.Linux.ManualTest")]
         [Timeout(20000)]
         public void DisposedWhenFlushBlocked()
         {
@@ -1557,6 +1561,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.Linux.ManualTest")]
         [Timeout(20000)]
         public void ClosedWhenFlushBlocked()
         {
@@ -1604,6 +1609,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.Linux.ManualTest")]
         [Timeout(20000)]
         public void DisposedWhenReadBlocked()
         {
@@ -1646,6 +1652,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.Linux.ManualTest")]
         [Timeout(20000)]
         public void ClosedWhenReadBlocked()
         {
