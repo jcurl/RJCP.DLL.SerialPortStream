@@ -173,6 +173,12 @@ namespace RJCP.IO.Ports.Native.Unix
 
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern int serial_abortwaitformodemevent(IntPtr handle);
+
+            [DllImport("libnserial.so.1", SetLastError = true)]
+            internal static extern int serial_discardinbuffer(IntPtr handle);
+
+            [DllImport("libnserial.so.1", SetLastError = true)]
+            internal static extern int serial_discardoutbuffer(IntPtr handle);
         }
 
         [ThreadStatic]
@@ -554,6 +560,20 @@ namespace RJCP.IO.Ports.Native.Unix
         public int serial_abortwaitformodemevent(IntPtr handle)
         {
             int result = UnsafeNativeMethods.serial_abortwaitformodemevent(handle);
+            errno = Marshal.GetLastWin32Error();
+            return result;
+        }
+
+        public int serial_discardinbuffer(IntPtr handle)
+        {
+            int result = UnsafeNativeMethods.serial_discardinbuffer(handle);
+            errno = Marshal.GetLastWin32Error();
+            return result;
+        }
+
+        public int serial_discardoutbuffer(IntPtr handle)
+        {
+            int result = UnsafeNativeMethods.serial_discardoutbuffer(handle);
             errno = Marshal.GetLastWin32Error();
             return result;
         }

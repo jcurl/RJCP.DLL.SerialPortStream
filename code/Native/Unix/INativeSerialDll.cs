@@ -69,5 +69,7 @@ namespace RJCP.IO.Ports.Native.Unix
         int serial_abortwaitforevent(IntPtr handle);
         int serial_read(IntPtr handle, IntPtr data, int length);
         int serial_write(IntPtr handle, IntPtr data, int length);
+        int serial_discardinbuffer(IntPtr handle);
+        int serial_discardoutbuffer(IntPtr handle);
     }
 }

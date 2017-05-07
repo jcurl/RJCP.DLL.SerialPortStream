@@ -607,7 +607,7 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         public void DiscardInBuffer()
         {
-            throw new NotImplementedException();
+            if (m_Dll.serial_discardinbuffer(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
@@ -615,7 +615,7 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         public void DiscardOutBuffer()
         {
-            throw new NotImplementedException();
+            if (m_Dll.serial_discardoutbuffer(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>

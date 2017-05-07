@@ -2117,5 +2117,23 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 Console.WriteLine("Second Read: {0}", read);
             }
         }
+
+        [Test]
+        public void DiscardInBuffer()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                serialSource.DiscardInBuffer();
+            }
+        }
+
+        [Test]
+        public void DiscardOutBuffer()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                serialSource.DiscardOutBuffer();
+            }
+        }
     }
 }
