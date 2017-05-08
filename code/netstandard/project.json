@@ -1,5 +1,5 @@
 {
-    "version": "2.1.1.0",
+    "version": "2.1.2.0",
     "name": "SerialPortStream",
     "title": "SerialPortStream",
     "description": "An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.",
