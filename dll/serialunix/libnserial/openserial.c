@@ -35,9 +35,11 @@ static int closeserial(struct serialhandle *handle)
   int result;
 
   nslog(handle, NSLOG_DEBUG, "close: closing serial port");
+#if defined HAVE_TERMIOS_EXCLUSIVE
   if (ioctl(handle->fd, TIOCNXCL)) {
     nslog(handle, NSLOG_NOTICE, "close: error setting TIOCNXCL: errno=%d", errno);
   }
+#endif
 
   result = close(handle->fd);
   nslog(handle, NSLOG_DEBUG, "close: closed");
@@ -73,9 +75,11 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
     return -1;
   }
 
+#if defined HAVE_TERMIOS_EXCLUSIVE
   if (ioctl(handle->fd, TIOCEXCL)) {
     nslog(handle, NSLOG_NOTICE, "open: error setting TIOCEXCL: errno=%d", errno);
   }
+#endif
 
   int pipefd[2];
   if (pipe(pipefd) == -1) {
