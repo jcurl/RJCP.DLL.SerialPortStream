@@ -1,3 +1,12 @@
+libnserial (1.1.2-0ubuntu1~precise1) precise; urgency=medium
+
+  * Abort pin monitoring for devices that don't support it
+  * Fix race condition when checking/aborting modem events
+  * Properly handle errors from pthreads
+  * Treat EINTR as a non-fatal interrupt
+
+ -- Jason Curl <jcurl@arcor.de>  Sun, 04 Jun 2017 20:25:59 +0200
+
 libnserial (1.1.1-0ubuntu1~precise1) precise; urgency=low
 
   * Allow a port to be reopened after it is closed on Linux
