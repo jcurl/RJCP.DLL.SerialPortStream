@@ -917,6 +917,7 @@ NSERIAL_EXPORT int WINAPI serial_getrts(struct serialhandle *handle, int *rts);
  * The kinds of modem events to wait for.
  */
 typedef enum serialmodemevent {
+  MODEMEVENT_ERROR = -1, /*!< Error occurred */
   MODEMEVENT_NONE = 0,   /*!< No modem event returned */
   MODEMEVENT_DCD = 1,    /*!< Wait for DCD event */
   MODEMEVENT_RI = 2,     /*!< Wait for RI event */
