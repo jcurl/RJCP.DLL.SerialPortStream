@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : nserial.c
 //
@@ -29,6 +29,7 @@
 #include "errmsg.h"
 #include "threaddata.h"
 #include "baudrate.h"
+#include "log.h"
 
 NSERIAL_EXPORT const char *WINAPI serial_version()
 {
@@ -105,8 +106,14 @@ NSERIAL_EXPORT void WINAPI serial_terminate(struct serialhandle *handle)
     free(handle->tmpbuffer);
   }
 
-  pthread_mutex_destroy(&(handle->abortmutex));
-  pthread_mutex_destroy(&(handle->modemmutex));
+  if ((errno = pthread_mutex_destroy(&(handle->abortmutex)))) {
+    nslog(handle, NSLOG_CRIT,
+	  "modem: pthread_mutex_destroy(abortmutex): errno=%d", errno);
+  }
+  if ((errno = pthread_mutex_destroy(&(handle->modemmutex)))) {
+    nslog(handle, NSLOG_CRIT,
+	  "modem: pthread_mutex_destroy(modemmutex): errno=%d", errno);
+  }
   free(handle);
 }
 

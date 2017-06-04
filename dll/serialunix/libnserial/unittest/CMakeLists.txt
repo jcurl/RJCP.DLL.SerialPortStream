@@ -12,6 +12,7 @@ if(GTEST_FOUND)
     serialinit.cpp
     serialopen.cpp
     serialerror.cpp
+    serialmodem.cpp
     main.cpp
     configuration.cpp)
   add_executable(nserialtest ${SERIALUNIX_GTEST_SRCS})

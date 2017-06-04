@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : events.c
 //
@@ -277,7 +277,7 @@ static ssize_t internal_read(struct serialhandle *handle, char *buf, size_t coun
     errno = EIO;
     return -1;
   } else if (readbytes < 0) {
-    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
       return 0;
     }
     serial_seterror(handle, ERRMSG_SERIALREAD);
@@ -315,7 +315,7 @@ NSERIAL_EXPORT ssize_t WINAPI serial_write(struct serialhandle *handle, const ch
   ssize_t writebytes;
   writebytes = write(handle->fd, buffer, length);
   if (writebytes < 0) {
-    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
       return 0;
     }
     serial_seterror(handle, ERRMSG_SERIALWRITE);
