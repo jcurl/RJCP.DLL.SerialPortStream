@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : errmsg.c
 //
@@ -101,6 +101,20 @@ const char *serial_geterrorstring(serialerrmsg_t errmsg)
     return "ioctl(TIOCGICOUNT) error";
   case ERRMSG_NOSYS:
     return "Unsupported feature for this platform";
+  case ERRMSG_MODEMEVENT_RUNNING:
+    return "Function serial_waitformodemevent allowed to run only once";
+  case ERRMSG_MUTEXLOCK:
+    return "Error locking mutex";
+  case ERRMSG_MUTEXUNLOCK:
+    return "Error unlocking mutex";
+  case ERRMSG_PTHREADCREATE:
+    return "Error creating posix thread";
+  case ERRMSG_PTHREADJOIN:
+    return "Error joining posix thread";
+  case ERRMSG_PTHREADCANCEL:
+    return "Error cancelling posix thread";
+  case ERRMSG_SEMINIT:
+    return "Error initializing semaphore";
 
   default:
     return "Unknown error";

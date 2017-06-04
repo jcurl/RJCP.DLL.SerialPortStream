@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016.
+//  (C) Jason Curl, 2016-2017.
 //
 // FILE : threaddata.c
 //
@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <pthread.h>
+#include <errno.h>
 
 #define NSERIAL_EXPORTS
 #include "threaddata.h"
@@ -34,10 +35,9 @@ static void makethreadstate()
 
 int threaddata_init()
 {
-  int result;
-
-  result = pthread_once(&threaddatakeycreate, makethreadstate);
-  if (result == -1 || pthreaderr == -1) {
+  pthread_once(&threaddatakeycreate, makethreadstate);
+  if (pthreaderr) {
+    errno = pthreaderr;
     return -1;
   }
   return 0;
@@ -54,7 +54,12 @@ struct threadstate *getthreaddata()
   data = (struct threadstate *)pthread_getspecific(threaddatakey);
   if (data == NULL) {
     data = malloc(sizeof(struct threadstate));
-    pthread_setspecific(threaddatakey, data);
+    if (data != NULL) {
+      if (pthread_setspecific(threaddatakey, data)) {
+	free(data);
+	data = NULL;
+      }
+    }
   }
   return data;
 }

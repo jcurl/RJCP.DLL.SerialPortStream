@@ -31,6 +31,14 @@
             </Categories>
           </Options>
         </Test>
+        <Test Path="">
+          <Options EnableFilter="True" Exclude="True" ctype="NUnitCategoryOptions">
+            <Categories>
+              <Category>SerialPortStream.Linux.ManualTest</Category>
+              <Category>SerialPortStream.ManualTest</Category>
+            </Categories>
+          </Options>
+        </Test>
       </UnitTestInformation>
     </UnitTestInformation>
   </PropertyGroup>
@@ -78,11 +86,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\code\SerialPortStream-net40.csproj">
       <Project>{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}</Project>
-      <Name>SerialPortStream</Name>
+      <Name>SerialPortStream-net40</Name>
     </ProjectReference>
     <ProjectReference Include="..\DatastructuresTest\DatastructuresTest-net40.csproj">
       <Project>{0FC877B6-A140-4687-B67E-EF41BB2C8604}</Project>
-      <Name>DatastructuresTest</Name>
+      <Name>DatastructuresTest-net40</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
