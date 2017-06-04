@@ -64,6 +64,8 @@ check_symbol_exists(TIOCCBRK "sys/ioctl.h" HAVE_TERMIOS_TIOCCBRK)
 check_symbol_exists(TIOCINQ  "sys/ioctl.h" HAVE_TERMIOS_TIOCINQ)
 check_symbol_exists(FIONREAD "sys/ioctl.h" HAVE_TERMIOS_FIONREAD)
 check_symbol_exists(TIOCOUTQ "sys/ioctl.h" HAVE_TERMIOS_TIOCOUTQ)
+check_symbol_exists(TIOCNXCL "sys/ioctl.h" HAVE_TERMIOS_TIOCNXCL)
+check_symbol_exists(TIOCEXCL "sys/ioctl.h" HAVE_TERMIOS_TIOCEXCL)
 
 check_symbol_exists(TIOCGICOUNT "sys/ioctl.h" HAVE_TERMIOS_TIOCGICOUNT)
 check_symbol_exists(TIOCMIWAIT  "sys/ioctl.h" HAVE_TERMIOS_TIOCMIWAIT)

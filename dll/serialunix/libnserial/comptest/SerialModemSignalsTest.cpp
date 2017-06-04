@@ -114,18 +114,21 @@ TEST_F(SerialModemSignalsTest, RtsCts)
   EXPECT_NE(-1, serial_setrts(m_writehandle, 1)) << "serial_setrts" << PrintError(m_writehandle);
   EXPECT_NE(-1, serial_getrts(m_writehandle, &rts)) << "serial_getrts" << PrintError(m_writehandle);
   EXPECT_NE(0, rts);
+  usleep(10000);
   EXPECT_NE(-1, serial_getcts(m_readhandle, &cts)) << "serial_getcts" << PrintError(m_readhandle);
   EXPECT_NE(0, cts);
 
   EXPECT_NE(-1, serial_setrts(m_writehandle, 0)) << "serial_setrts" << PrintError(m_writehandle);
   EXPECT_NE(-1, serial_getrts(m_writehandle, &rts)) << "serial_getrts" << PrintError(m_writehandle);
   EXPECT_EQ(0, rts);
+  usleep(10000);
   EXPECT_NE(-1, serial_getcts(m_readhandle, &cts)) << "serial_getcts" << PrintError(m_readhandle);
   EXPECT_EQ(0, cts);
 
   EXPECT_NE(-1, serial_setrts(m_writehandle, 1)) << "serial_setrts" << PrintError(m_writehandle);
   EXPECT_NE(-1, serial_getrts(m_writehandle, &rts)) << "serial_getrts" << PrintError(m_writehandle);
   EXPECT_NE(0, rts);
+  usleep(10000);
   EXPECT_NE(-1, serial_getcts(m_readhandle, &cts)) << "serial_getcts" << PrintError(m_readhandle);
   EXPECT_NE(0, cts);
 }
@@ -156,18 +159,21 @@ TEST_F(SerialModemSignalsTest, DtrDts)
   EXPECT_NE(-1, serial_setdtr(m_writehandle, 1)) << "serial_setdtr" << PrintError(m_writehandle);
   EXPECT_NE(-1, serial_getdtr(m_writehandle, &dtr)) << "serial_getdtr" << PrintError(m_writehandle);
   EXPECT_NE(0, dtr);
+  usleep(10000);
   EXPECT_NE(-1, serial_getdsr(m_readhandle, &dsr)) << "serial_getdsr" << PrintError(m_readhandle);
   EXPECT_NE(0, dsr);
 
   EXPECT_NE(-1, serial_setdtr(m_writehandle, 0)) << "serial_setdtr" << PrintError(m_writehandle);
   EXPECT_NE(-1, serial_getdtr(m_writehandle, &dtr)) << "serial_getdtr" << PrintError(m_writehandle);
   EXPECT_EQ(0, dtr);
+  usleep(10000);
   EXPECT_NE(-1, serial_getdsr(m_readhandle, &dsr)) << "serial_getdsr" << PrintError(m_readhandle);
   EXPECT_EQ(0, dsr);
 
   EXPECT_NE(-1, serial_setdtr(m_writehandle, 1)) << "serial_setdtr" << PrintError(m_writehandle);
   EXPECT_NE(-1, serial_getdtr(m_writehandle, &dtr)) << "serial_getdtr" << PrintError(m_writehandle);
   EXPECT_NE(0, dtr);
+  usleep(10000);
   EXPECT_NE(-1, serial_getdsr(m_readhandle, &dsr)) << "serial_getdsr" << PrintError(m_readhandle);
   EXPECT_NE(0, dsr);
 }
