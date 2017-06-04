@@ -312,6 +312,7 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             // WaitCommEvent
             bool serialCommPending = false;
+            bool serialCommError = false;
             m_SerialCommEvent.Reset();
             NativeOverlapped serialCommOverlapped = new NativeOverlapped();
 #if NETSTANDARD15
@@ -381,8 +382,23 @@ namespace RJCP.IO.Ports.Native.Windows
 #endif
 
                 // commEventMask is on the stack, and is therefore fixed
-                if (!serialCommPending) serialCommPending = DoWaitCommEvent(out commEventMask, ref serialCommOverlapped);
-                if (serialCommPending) handles.Add(m_SerialCommEvent);
+                if (!serialCommError) {
+                    try {
+                        if (!serialCommPending)
+                            serialCommPending = DoWaitCommEvent(out commEventMask, ref serialCommOverlapped);
+                        if (serialCommPending)
+                            handles.Add(m_SerialCommEvent);
+                    } catch (System.IO.IOException) {
+                        // Some devices, such as the Arduino Uno with a CH340 on board don't support an overlapped
+                        // WaitCommEvent. So if that occurs, we remember it and don't use it again. The Windows error
+                        // returned was 87 (ERROR_INVALID_PARAMETER) was returned in that case. GetReceiveStats() did
+                        // work, so we can still know of data pending by polling. But we won't get any other events,
+                        // such as TX_EMPTY.
+                        SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0,
+                            "{0}: SerialThread: Not processing WaitCommEvent events", m_Name);
+                        serialCommError = true;
+                    }
+                }
 
                 if (!readPending) {
                     if (!m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) {
@@ -554,7 +570,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 if (w32err != WinError.ERROR_IO_PENDING) {
                     SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
                         "{0}: SerialThread: DoWaitCommEvent: Result: {1}", m_Name, w32err);
-                    Marshal.ThrowExceptionForHR(hr);
+                    throw new System.IO.IOException("WaitCommEvent overlapped exception", hr);
                 }
             } else {
                 ProcessWaitCommEvent(mask);
@@ -779,6 +795,12 @@ namespace RJCP.IO.Ports.Native.Windows
                     lock (m_Buffer.WriteLock) {
                         m_Buffer.Serial.WriteBufferConsume((int)bytes);
                         if (m_Buffer.Serial.TxEmptyEvent()) {
+                            // We set the TxEmptyEvent always in v2.x. In release 1.x we only set it
+                            // if we received a TX_EMPTY. If we ever change this code to check for TX_EMPTY
+                            // first, ensure to check the variable SerialCommError in the main loop, as
+                            // that will tell us if we ever expect to get a TX_EMPTY. Given some weird
+                            // behaviour of serial ports, not checking is probably the safest, even if not
+                            // 100% correct.
                             SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                                 "{0}: SerialThread: ProcessWriteEvent: TX-BUFFER empty", m_Name);
                         }
