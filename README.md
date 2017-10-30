@@ -157,7 +157,7 @@ and then run your Mono program from there.
 Or you can build and install in your system:
 
 ```
-$ cd serialportstream/
+$ cd SerialPortStream/dll/serialunix
 $ mkdir mybuild
 $ cd mybuild
 $ cmake .. && make
