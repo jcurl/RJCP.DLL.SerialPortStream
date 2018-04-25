@@ -1889,10 +1889,7 @@ namespace RJCP.IO.Ports
                 if (handleEvent) {
                     SerialTrace.TraceSer.TraceEvent(TraceEventType.Verbose, 0, "{0}: HandleEvent: {1}; {2}; {3};", m_NativeSerial.PortName, serialDataFlags, serialErrorFlags, serialPinChange);
                     // Received Data
-                    bool aboveThreshold;
-                    lock (m_EventLock) {
-                        aboveThreshold = m_Buffer.Stream.BytesToRead >= m_RxThreshold;
-                    }
+                    bool aboveThreshold = m_Buffer.Stream.BytesToRead >= m_RxThreshold;
                     if (aboveThreshold) {
                         OnDataReceived(this, new SerialDataReceivedEventArgs(serialDataFlags));
                     } else if (serialDataFlags.HasFlag(SerialData.Eof)) {
