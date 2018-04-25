@@ -194,7 +194,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 }
             } else {
                 m_WriteClearEvent.Set();
-                m_WriteClearDoneEvent.WaitOne(-1);
+                m_WriteClearDoneEvent.WaitOne(Timeout.Infinite);
             }
         }
         #endregion
@@ -219,7 +219,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 timeouts.ReadTotalTimeoutMultiplier = 0;
 #else
                 // Non-asynchronous behaviour
-                timeouts.ReadIntervalTimeout = -1;
+                timeouts.ReadIntervalTimeout = System.Threading.Timeout.Infinite;
                 timeouts.ReadTotalTimeoutConstant = 0;
                 timeouts.ReadTotalTimeoutMultiplier = 0;
 #endif

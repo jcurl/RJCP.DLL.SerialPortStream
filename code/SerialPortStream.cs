@@ -44,7 +44,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Indicates that no time out should occur.
         /// </summary>
-        public const int InfiniteTimeout = -1;
+        public const int InfiniteTimeout = Timeout.Infinite;
         #endregion
 
         #region Constructor, Port Name, Open
@@ -444,7 +444,7 @@ namespace RJCP.IO.Ports
             get { return !IsDisposed; }
         }
 
-        private int m_ReadTimeout = -1;
+        private int m_ReadTimeout = InfiniteTimeout;
 
         /// <summary>
         /// Define the time out when reading data from the stream.
@@ -455,7 +455,7 @@ namespace RJCP.IO.Ports
         /// application.
         /// <para>Should the user perform a read operation and no data is available
         /// to copy in the buffer, a time out will occur.</para>
-        /// <para>Set this property to -1 for an infinite time out.</para>
+        /// <para>Set this property to <see cref="InfiniteTimeout"/> for an infinite time out.</para>
         /// </remarks>
         public override int ReadTimeout
         {
@@ -464,7 +464,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
                 if (value < 0) {
-                    m_ReadTimeout = -1;
+                    m_ReadTimeout = InfiniteTimeout;
                 } else {
                     m_ReadTimeout = value;
                 }
@@ -746,7 +746,7 @@ namespace RJCP.IO.Ports
         {
             LocalAsync<int> localAsync = asyncResult as LocalAsync<int>;
             if (localAsync != null) {
-                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(-1);
+                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
                 if (localAsync.Result == 0) ReadCheckDeviceError();
                 return localAsync.Result;
@@ -961,7 +961,7 @@ namespace RJCP.IO.Ports
             get { return !IsDisposed && IsOpen && m_NativeSerial.IsRunning; }
         }
 
-        private int m_WriteTimeout = -1;
+        private int m_WriteTimeout = InfiniteTimeout;
 
         /// <summary>
         /// Define the time out when writing data to the local buffer.
@@ -987,7 +987,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
                 if (value < 0) {
-                    m_WriteTimeout = -1;
+                    m_WriteTimeout = InfiniteTimeout;
                 } else {
                     m_WriteTimeout = value;
                 }
@@ -1211,7 +1211,7 @@ namespace RJCP.IO.Ports
         {
             LocalAsync localAsync = asyncResult as LocalAsync;
             if (localAsync != null) {
-                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(-1);
+                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
             } else {
                 AsyncResult ar = (AsyncResult)asyncResult;
