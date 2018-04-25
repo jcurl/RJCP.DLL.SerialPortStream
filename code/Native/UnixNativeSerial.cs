@@ -66,9 +66,9 @@ namespace RJCP.IO.Ports.Native
             case SysErrNo.NETFX_EINTR:
             case SysErrNo.NETFX_EAGAIN:
             case SysErrNo.NETFX_EWOULDBLOCK:
-				// We throw here in any case, as the methods that call ThrowException don't
-				// expect it to return. This would mean something that needs to be debugged
-				// and fixed (probably in the C Interop Code).
+                // We throw here in any case, as the methods that call ThrowException don't
+                // expect it to return. This would mean something that needs to be debugged
+                // and fixed (probably in the C Interop Code).
                 throw new InternalApplicationException(description);
             case SysErrNo.NETFX_EINVAL:
                 throw new ArgumentException(description);
@@ -968,6 +968,7 @@ namespace RJCP.IO.Ports.Native
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -977,15 +978,15 @@ namespace RJCP.IO.Ports.Native
         /// <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!m_IsDisposed) {
-                if (disposing) {
-                    if (IsOpen) Close();
-                    m_Handle.Dispose();
-                    m_Dll = null;
-                    m_StopRunning.Dispose();
-                    m_StopRunning = null;
-                    m_IsDisposed = true;
-                }
+            if (m_IsDisposed) return;
+
+            if (disposing) {
+                if (IsOpen) Close();
+                m_Handle.Dispose();
+                m_Dll = null;
+                m_StopRunning.Dispose();
+                m_StopRunning = null;
+                m_IsDisposed = true;
             }
         }
         #endregion

@@ -1950,7 +1950,7 @@ namespace RJCP.IO.Ports
         public bool IsDisposed
         {
             get { return m_IsDisposed; }
-            set { m_IsDisposed = value; }
+            private set { m_IsDisposed = value; }
         }
 
         /// <summary>

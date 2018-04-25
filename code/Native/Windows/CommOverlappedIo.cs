@@ -856,25 +856,25 @@ namespace RJCP.IO.Ports.Native.Windows
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!m_IsDisposed) {
-                if (disposing) {
-                    Stop();
-                    m_StopRunning.Dispose();
-                    m_SerialCommEvent.Dispose();
-                    m_ReadEvent.Dispose();
-                    m_WriteEvent.Dispose();
-                    m_WriteClearEvent.Dispose();
-                    m_WriteClearDoneEvent.Dispose();
-                    CommErrorEvent = null;
-                    CommEvent = null;
-                }
+            if (m_IsDisposed) return;
 
-                m_IsDisposed = true;
+            if (disposing) {
+                Stop();
+                m_StopRunning.Dispose();
+                m_SerialCommEvent.Dispose();
+                m_ReadEvent.Dispose();
+                m_WriteEvent.Dispose();
+                m_WriteClearEvent.Dispose();
+                m_WriteClearDoneEvent.Dispose();
+                CommErrorEvent = null;
+                CommEvent = null;
             }
+            m_IsDisposed = true;
         }
         #endregion
     }

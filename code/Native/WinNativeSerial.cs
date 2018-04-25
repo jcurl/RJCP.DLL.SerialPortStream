@@ -1056,6 +1056,7 @@ namespace RJCP.IO.Ports.Native
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -1065,16 +1066,16 @@ namespace RJCP.IO.Ports.Native
         /// <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!m_IsDisposed) {
-                if (disposing) {
-                    if (IsOpen) Close();
-                }
+            if (m_IsDisposed) return;
 
-                // Note: the SafeFileHandle will close the object itself when finalising, so
-                // we don't need to do it here. It would be different if we managed the handle
-                // with an IntPtr however.
-                m_IsDisposed = true;
+            if (disposing) {
+                if (IsOpen) Close();
             }
+
+            // Note: the SafeFileHandle will close the object itself when finalising, so
+            // we don't need to do it here. It would be different if we managed the handle
+            // with an IntPtr however.
+            m_IsDisposed = true;
         }
         #endregion
     }
