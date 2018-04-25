@@ -701,6 +701,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Timeout(30000)]
         public void ListPorts()
         {
             bool result = true;
