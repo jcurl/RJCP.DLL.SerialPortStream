@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.</Description>
     <AssemblyTitle>SerialPortStream</AssemblyTitle>
-    <VersionPrefix>2.1.2.0</VersionPrefix>
+    <VersionPrefix>2.1.3.0</VersionPrefix>
     <TargetFramework>netstandard1.5</TargetFramework>
     <DefineConstants>$(DefineConstants);NETSTANDARD15</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
