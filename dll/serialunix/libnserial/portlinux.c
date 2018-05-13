@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016-2017.
+//  (C) Jason Curl, 2016-2018.
 //
 // FILE : portlinux.c
 //
@@ -26,6 +26,7 @@
 
 #include "config.h"
 #include <sys/types.h>
+#include <sys/sysmacros.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
