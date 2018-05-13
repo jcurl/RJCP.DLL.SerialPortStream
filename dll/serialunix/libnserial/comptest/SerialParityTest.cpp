@@ -53,7 +53,7 @@ void SerialParityTest::TearDown()
   serial_terminate(m_readhandle);
 }
 
-static char parityeven[128] = {
+static unsigned char parityeven[128] = {
   0x00, 0x81, 0x82, 0x03, 0x84, 0x05, 0x06, 0x87, 0x88, 0x09, 0x0A, 0x8B, 0x0C, 0x8D, 0x8E, 0x0F,
   0x90, 0x11, 0x12, 0x93, 0x14, 0x95, 0x96, 0x17, 0x18, 0x99, 0x9A, 0x1B, 0x9C, 0x1D, 0x1E, 0x9F,
   0xA0, 0x21, 0x22, 0xA3, 0x24, 0xA5, 0xA6, 0x27, 0x28, 0xA9, 0xAA, 0x2B, 0xAC, 0x2D, 0x2E, 0xAF,
@@ -64,7 +64,7 @@ static char parityeven[128] = {
   0xF0, 0x71, 0x72, 0xF3, 0x74, 0xF5, 0xF6, 0x77, 0x78, 0xF9, 0xFA, 0x7B, 0xFC, 0x7D, 0x7E, 0xFF,
 };
 
-static char parityodd[128] = {
+static unsigned char parityodd[128] = {
   0x80, 0x01, 0x02, 0x83, 0x04, 0x85, 0x86, 0x07, 0x08, 0x89, 0x8A, 0x0B, 0x8C, 0x0D, 0x0E, 0x8F,
   0x10, 0x91, 0x92, 0x13, 0x94, 0x15, 0x16, 0x97, 0x98, 0x19, 0x1A, 0x9B, 0x1C, 0x9D, 0x9E, 0x1F,
   0x20, 0xA1, 0xA2, 0x23, 0xA4, 0x25, 0x26, 0xA7, 0xA8, 0x29, 0x2A, 0xAB, 0x2C, 0xAD, 0xAE, 0x2F,
@@ -97,14 +97,14 @@ TEST_F(SerialParityTest, Parity7E1Receive)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(128));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(128));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = parityeven[i];
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -146,14 +146,14 @@ TEST_F(SerialParityTest, Parity7E1Send)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(128));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(128));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = i;
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -195,7 +195,7 @@ TEST_F(SerialParityTest, Parity7E1ReceiveError)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(128));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(128));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = parityeven[i];
@@ -203,7 +203,7 @@ TEST_F(SerialParityTest, Parity7E1ReceiveError)
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -249,14 +249,14 @@ TEST_F(SerialParityTest, Parity7O1Receive)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(128));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(128));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = parityodd[i];
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -298,14 +298,14 @@ TEST_F(SerialParityTest, Parity7O1Send)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(128));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(128));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = i;
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 128));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -347,7 +347,7 @@ TEST_F(SerialParityTest, Parity7O1ReceiveError)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(128));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(128));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = parityodd[i];
@@ -355,7 +355,7 @@ TEST_F(SerialParityTest, Parity7O1ReceiveError)
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -401,7 +401,7 @@ TEST_F(SerialParityTest, Parity7O1ReceiveErrorWithReplace)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(128));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(128));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = parityodd[i];
@@ -409,7 +409,7 @@ TEST_F(SerialParityTest, Parity7O1ReceiveErrorWithReplace)
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
