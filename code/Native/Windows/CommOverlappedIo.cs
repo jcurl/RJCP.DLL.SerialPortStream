@@ -349,7 +349,16 @@ namespace RJCP.IO.Ports.Native.Windows
             uint bytes;
             List<WaitHandle> handles = new List<WaitHandle>(10);
 
-            while (running) {
+
+			// TODO: review
+			WaitHandle[][] handleArrays = new WaitHandle[10][];
+
+			for (int i = 0; i < handleArrays.Length; i++)
+				handleArrays[i] = new WaitHandle[i + 1];
+			// ------
+
+
+			while (running) {
                 handles.Clear();
                 handles.Add(m_StopRunning);
                 handles.Add(m_WriteClearEvent);
@@ -419,12 +428,20 @@ namespace RJCP.IO.Ports.Native.Windows
                 }
                 if (writePending) handles.Add(m_WriteEvent);
 
-                // We wait up to 100ms, in case we're not actually pending on anything. Normally, we should always be
-                // pending on a Comm event. Just in case this is not so (and is a theoretical possibility), we will
-                // slip out of this WaitAny() after 100ms and then restart the loop, effectively polling every 100ms in
-                // worst case.
-                WaitHandle[] whandles = handles.ToArray();
-                int ev = WaitHandle.WaitAny(whandles, 100);
+				// We wait up to 100ms, in case we're not actually pending on anything. Normally, we should always be
+				// pending on a Comm event. Just in case this is not so (and is a theoretical possibility), we will
+				// slip out of this WaitAny() after 100ms and then restart the loop, effectively polling every 100ms in
+				// worst case.
+
+				// TODO: review
+				//WaitHandle[] whandles = handles.ToArray();
+
+				var whandles = handleArrays[handles.Count-1];
+				for (int i = 0; i < handles.Count; i++)
+					whandles[i] = handles[i];
+				// -------
+
+				int ev = WaitHandle.WaitAny(whandles, 100);
 
                 if (ev != WaitHandle.WaitTimeout) {
                     if (whandles[ev] == m_StopRunning) {
