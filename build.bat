@@ -16,7 +16,7 @@ echo ======================================================================
 echo == Building SerialPortStream for netstandard1.5
 echo ======================================================================
 dotnet restore SerialPortStream-netstandard15.sln
-dotnet build --configuration Release SerialPortStream-netstandard15.sln
+dotnet build --configuration Signed_Release SerialPortStream-netstandard15.sln
 
 echo.
 pause
