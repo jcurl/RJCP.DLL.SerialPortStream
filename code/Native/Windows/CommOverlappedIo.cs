@@ -350,7 +350,7 @@ namespace RJCP.IO.Ports.Native.Windows
             List<WaitHandle> handles = new List<WaitHandle>(10);
 
             // Set up an array of re-usable WaitHandle[] to reduce memory allocations
-            WaitHandle[][] handleArrays = new WaitHandle[10][];
+            WaitHandle[][] handleArrays = new WaitHandle[10][];		// a max. of 7 wait handles are currently used
             for (int i = 0; i < handleArrays.Length; i++)
                 handleArrays[i] = new WaitHandle[i];
 
@@ -439,7 +439,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     whandles[i] = handles[i];
 
 
-				int ev = WaitHandle.WaitAny(whandles, 100);
+                int ev = WaitHandle.WaitAny(whandles, 100);
 
                 if (ev != WaitHandle.WaitTimeout) {
                     if (whandles[ev] == m_StopRunning) {
