@@ -11,6 +11,13 @@
     <AssemblyName>RJCP.SerialPortStream</AssemblyName>
     <PackageId>netstandard</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net46</PackageTargetFallback>
+    <Configurations>Debug;Release;Signed_Release</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Signed_Release|AnyCPU' ">
+    <AssemblyOriginatorKeyFile>rjcp_serialportstream.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>

@@ -36,9 +36,9 @@
         </dependencies>
     </metadata>
     <files>
-        <file src="..\code\bin\Release\netstandard1.5\RJCP.SerialPortStream.dll" target="lib\netstandard1.5" />
-        <file src="..\code\bin\Release\netstandard1.5\RJCP.SerialPortStream.pdb" target="lib\netstandard1.5" />
-        <file src="..\code\bin\Release\netstandard1.5\RJCP.SerialPortStream.xml" target="lib\netstandard1.5" />
+        <file src="..\code\bin\Signed_Release\netstandard1.5\RJCP.SerialPortStream.dll" target="lib\netstandard1.5" />
+        <file src="..\code\bin\Signed_Release\netstandard1.5\RJCP.SerialPortStream.pdb" target="lib\netstandard1.5" />
+        <file src="..\code\bin\Signed_Release\netstandard1.5\RJCP.SerialPortStream.xml" target="lib\netstandard1.5" />
         <file src="..\distribute\lib\net40\RJCP.SerialPortStream.dll" target="lib\net40" />
         <file src="..\distribute\lib\net40\RJCP.SerialPortStream.pdb" target="lib\net40" />
         <file src="..\distribute\lib\net40\RJCP.SerialPortStream.XML" target="lib\net40" />
