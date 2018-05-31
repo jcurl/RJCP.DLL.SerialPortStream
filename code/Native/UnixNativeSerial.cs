@@ -1,4 +1,4 @@
-// Copyright © Jason Curl 2012-2017
+// Copyright © Jason Curl 2012-2018
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -7,6 +7,7 @@ namespace RJCP.IO.Ports.Native
     using System;
     using System.IO;
     using System.Threading;
+    using Trace;
     using Unix;
 
     /// <summary>
@@ -719,7 +720,8 @@ namespace RJCP.IO.Ports.Native
 
         private void Stop()
         {
-            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Stopping Thread", m_Name);
+            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Stopping Thread", m_Name);
             m_StopRunning.Set();
             InterruptReadWriteLoop();
 
@@ -727,23 +729,29 @@ namespace RJCP.IO.Ports.Native
                 int killcounter = 0;
 
                 if (m_MonitorPins) {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Stopping Thread", m_Name);
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Stopping Thread", m_Name);
                     m_Dll.serial_abortwaitformodemevent(m_Handle);
                 }
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Waiting for Thread", m_Name);
+                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Waiting for Thread", m_Name);
                 while (killcounter < 3 && !m_PinThread.Join(100)) {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Waiting for Thread, counter={1}", m_Name, killcounter);
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Waiting for Thread, counter={1}", m_Name, killcounter);
                     killcounter++;
                 }
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Thread Stopped", m_Name);
+                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: PinChangeThread: Thread Stopped", m_Name);
                 m_PinThread = null;
                 m_MonitorPins = false;
             }
 
             if (m_MonitorThread != null) {
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Waiting for Thread", m_Name);
+                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Waiting for Thread", m_Name);
                 m_MonitorThread.Join();
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Thread Stopped", m_Name);
+                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: ReadWriteThread: Thread Stopped", m_Name);
                 m_MonitorThread = null;
             }
         }
@@ -778,13 +786,14 @@ namespace RJCP.IO.Ports.Native
 
                 SerialReadWriteEvent result = m_Dll.serial_waitforevent(m_Handle, rwevent, 500);
                 if (result == SerialReadWriteEvent.Error) {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                        "{0}: ReadWriteThread: Error waiting for event; errno={1}; description={2}",
-                        m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                            "{0}: ReadWriteThread: Error waiting for event; errno={1}; description={2}",
+                            m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
                     m_IsRunning = false;
                     continue;
-                } else {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                } else if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                         "{0}: ReadWriteThread: serial_waitforevent({1}, {2}) == {3}",
                         m_Name, m_Handle, rwevent, result);
                 }
@@ -796,15 +805,17 @@ namespace RJCP.IO.Ports.Native
                         int length = m_Buffer.Serial.ReadBuffer.WriteLength;
                         rresult = m_Dll.serial_read(m_Handle, (IntPtr)bo, length);
                         if (rresult < 0) {
-                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                                "{0}: ReadWriteThread: Error reading data; errno={1}; description={2}",
-                                m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
+                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
+                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                    "{0}: ReadWriteThread: Error reading data; errno={1}; description={2}",
+                                    m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
                             m_IsRunning = false;
                             continue;
                         } else {
-                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                "{0}: ReadWriteThread: serial_read({1}, {2}, {3}) == {4}",
-                                m_Name, m_Handle, (IntPtr)bo, length, rresult);
+                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                                    "{0}: ReadWriteThread: serial_read({1}, {2}, {3}) == {4}",
+                                    m_Name, m_Handle, (IntPtr)bo, length, rresult);
                             if (rresult > 0) m_Buffer.Serial.ReadBufferProduce(rresult);
                         }
                     }
@@ -818,15 +829,17 @@ namespace RJCP.IO.Ports.Native
                         int length = m_Buffer.Serial.WriteBuffer.ReadLength;
                         wresult = m_Dll.serial_write(m_Handle, (IntPtr)bo, length);
                         if (wresult < 0) {
-                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                                "{0}: ReadWriteThread: Error writing data; errno={1}; description={2}",
-                                m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
+                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
+                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                                    "{0}: ReadWriteThread: Error writing data; errno={1}; description={2}",
+                                    m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
                             m_IsRunning = false;
                             continue;
                         } else {
-                            SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                "{0}: ReadWriteThread: serial_write({1}, {2}, {3}) == {4}",
-                                m_Name, m_Handle, (IntPtr)bo, length, wresult);
+                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                                    "{0}: ReadWriteThread: serial_write({1}, {2}, {3}) == {4}",
+                                    m_Name, m_Handle, (IntPtr)bo, length, wresult);
                             if (wresult > 0) {
                                 m_Buffer.Serial.WriteBufferConsume (wresult);
                                 m_Buffer.Serial.TxEmptyEvent ();
@@ -855,13 +868,15 @@ namespace RJCP.IO.Ports.Native
             if (m_IsRunning && !m_Handle.IsInvalid) {
                 int result = m_Dll.serial_abortwaitforevent(m_Handle);
                 if (result == -1) {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                        "{0}: ReadWriteThread: Error aborting event; errno={1}; description={2}",
-                        m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                            "{0}: ReadWriteThread: Error aborting event; errno={1}; description={2}",
+                            m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
                 } else {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "{0}: ReadWriteThread: serial_abortwaitforevent({1}) = {2}",
-                        m_Name, m_Handle, result);
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                            "{0}: ReadWriteThread: serial_abortwaitforevent({1}) = {2}",
+                            m_Name, m_Handle, result);
                 }
             }
         }
@@ -880,13 +895,15 @@ namespace RJCP.IO.Ports.Native
                     continue;
                 }
 
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "{0}: PinChangeThread: Waiting", m_Name);
+                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                        "{0}: PinChangeThread: Waiting", m_Name);
                 WaitForModemEvent mevent = m_Dll.serial_waitformodemevent(m_Handle, c_ModemEvents);
                 if (mevent == WaitForModemEvent.Error) {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                        "{0}: PinChangeThread: Error aborting event; errno={1}; description={2}",
-                        m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
+                            "{0}: PinChangeThread: Error aborting event; errno={1}; description={2}",
+                            m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
                     m_MonitorPins = false;
                     return;
                 }
@@ -899,8 +916,9 @@ namespace RJCP.IO.Ports.Native
                     if (mevent.HasFlag(WaitForModemEvent.RingIndicator)) pins |= SerialPinChange.Ring;
                     // TODO: Break not implemented
 
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "{0}: PinChangeThread: Event Received: {1}", m_Name, mevent);
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                            "{0}: PinChangeThread: Event Received: {1}", m_Name, mevent);
                     OnPinChanged(this, new SerialPinChangedEventArgs(pins));
                 }
             }

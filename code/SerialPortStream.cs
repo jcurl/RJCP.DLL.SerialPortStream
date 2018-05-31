@@ -16,6 +16,7 @@ namespace RJCP.IO.Ports
     using System.Threading;
     using Datastructures;
     using Native;
+    using Trace;
 
 #if !NETSTANDARD15
     using System.Runtime.Remoting.Messaging;
@@ -62,7 +63,7 @@ namespace RJCP.IO.Ports
                 throw new NotSupportedException("SerialPortStream is not supported on this platform");
 
             InitialiseEvents();
-            SerialTrace.AddRef();
+            Log.Open();
         }
 
         /// <summary>
@@ -1887,7 +1888,9 @@ namespace RJCP.IO.Ports
                 }
 
                 if (handleEvent) {
-                    SerialTrace.TraceSer.TraceEvent(TraceEventType.Verbose, 0, "{0}: HandleEvent: {1}; {2}; {3};", m_NativeSerial.PortName, serialDataFlags, serialErrorFlags, serialPinChange);
+                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                        Log.Serial.TraceEvent(TraceEventType.Verbose, 0, "{0}: HandleEvent: {1}; {2}; {3};", m_NativeSerial.PortName, serialDataFlags, serialErrorFlags, serialPinChange);
+
                     // Received Data
                     bool aboveThreshold = m_Buffer.Stream.BytesToRead >= m_RxThreshold;
                     if (aboveThreshold) {
@@ -1982,7 +1985,7 @@ namespace RJCP.IO.Ports
                     m_ReadTo = null;
                 }
 
-                SerialTrace.Close();
+                Log.Close();
             }
             base.Dispose(disposing);
         }

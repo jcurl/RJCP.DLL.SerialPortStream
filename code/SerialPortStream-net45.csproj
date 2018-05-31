@@ -102,7 +102,7 @@
     <Compile Include="Native\Windows\CommState.cs" />
     <Compile Include="Native\Windows\CommProperties.cs" />
     <Compile Include="Native\Windows\CommModemStatus.cs" />
-    <Compile Include="SerialTrace.cs" />
+    <Compile Include="Trace\Log.cs" />
     <Compile Include="Native\Windows\WinError.cs" />
     <Compile Include="StopBits.cs" />
     <Compile Include="Native\UnixNativeSerial.cs" />
@@ -114,6 +114,7 @@
     <Compile Include="Native\Unix\SafeSerialHandle.cs" />
     <Compile Include="Native\Unix\SafeNativeMethods.cs" />
     <Compile Include="Native\Unix\UnsafeNativeMethods.cs" />
+    <Compile Include="Trace\LogSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.SerialPortStream-net45.config" />
