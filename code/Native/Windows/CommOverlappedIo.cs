@@ -13,6 +13,7 @@ namespace RJCP.IO.Ports.Native.Windows
     using System.Threading;
     using System.Runtime.InteropServices;
     using Microsoft.Win32.SafeHandles;
+    using Datastructures;
     using Trace;
 
     internal class CommOverlappedIo : IDisposable
@@ -353,7 +354,7 @@ namespace RJCP.IO.Ports.Native.Windows
 
             bool running = true;
             uint bytes;
-            List<WaitHandle> handles = new List<WaitHandle>(10);
+            ReusableList<WaitHandle> handles = new ReusableList<WaitHandle>(2, 7);
 
             while (running) {
                 handles.Clear();

@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Datastructures\ReusableList.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HandShake.cs" />
     <Compile Include="InternalApplicationException.cs" />
