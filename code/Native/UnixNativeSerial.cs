@@ -798,7 +798,7 @@ namespace RJCP.IO.Ports.Native
                         m_Name, m_Handle, rwevent, result);
                 }
 
-                if (result.HasFlag(SerialReadWriteEvent.ReadEvent)) {
+                if ((result & SerialReadWriteEvent.ReadEvent) != 0) {
                     int rresult;
                     fixed (byte* b = m_Buffer.Serial.ReadBuffer.Array) {
                         byte* bo = b + m_Buffer.Serial.ReadBuffer.End;
@@ -822,7 +822,7 @@ namespace RJCP.IO.Ports.Native
                     if (rresult > 0) OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Chars));
                 }
 
-                if (result.HasFlag(SerialReadWriteEvent.WriteEvent)) {
+                if ((result & SerialReadWriteEvent.WriteEvent) != 0) {
                     int wresult;
                     fixed (byte * b = m_Buffer.Serial.WriteBuffer.Array) {
                         byte* bo = b + m_Buffer.Serial.WriteBuffer.Start;
@@ -910,10 +910,10 @@ namespace RJCP.IO.Ports.Native
 
                 if (mevent != WaitForModemEvent.None) {
                     SerialPinChange pins = SerialPinChange.NoChange;
-                    if (mevent.HasFlag(WaitForModemEvent.ClearToSend)) pins |= SerialPinChange.CtsChanged;
-                    if (mevent.HasFlag(WaitForModemEvent.DataCarrierDetect)) pins |= SerialPinChange.CDChanged;
-                    if (mevent.HasFlag(WaitForModemEvent.DataSetReady)) pins |= SerialPinChange.DsrChanged;
-                    if (mevent.HasFlag(WaitForModemEvent.RingIndicator)) pins |= SerialPinChange.Ring;
+                    if ((mevent & WaitForModemEvent.ClearToSend) != 0) pins |= SerialPinChange.CtsChanged;
+                    if ((mevent & WaitForModemEvent.DataCarrierDetect) != 0) pins |= SerialPinChange.CDChanged;
+                    if ((mevent & WaitForModemEvent.DataSetReady) != 0) pins |= SerialPinChange.DsrChanged;
+                    if ((mevent & WaitForModemEvent.RingIndicator) != 0) pins |= SerialPinChange.Ring;
                     // TODO: Break not implemented
 
                     if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))

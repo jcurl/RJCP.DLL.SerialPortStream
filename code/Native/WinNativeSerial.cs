@@ -577,7 +577,7 @@ namespace RJCP.IO.Ports.Native
             {
                 if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
                 m_DtrEnable = value;
-                if (IsOpen && !m_Handshake.HasFlag(Handshake.Dtr)) SetDtrPortSettings(true);
+                if (IsOpen && (m_Handshake & Handshake.Dtr) == 0) SetDtrPortSettings(true);
             }
         }
 
@@ -602,7 +602,7 @@ namespace RJCP.IO.Ports.Native
             {
                 if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
                 m_RtsEnable = value;
-                if (IsOpen && !m_Handshake.HasFlag(Handshake.Rts)) SetRtsPortSettings(true);
+                if (IsOpen && (m_Handshake & Handshake.Rts) == 0) SetRtsPortSettings(true);
             }
         }
 
@@ -765,7 +765,7 @@ namespace RJCP.IO.Ports.Native
 
             SetRtsPortSettings(false);
             SetDtrPortSettings(false);
-            if (m_Handshake.HasFlag(Handshake.XOn)) {
+            if ((m_Handshake & Handshake.XOn) != 0) {
                 m_CommState.InX = true;
                 m_CommState.OutX = true;
             } else {
@@ -781,7 +781,7 @@ namespace RJCP.IO.Ports.Native
 
         private void SetRtsPortSettings(bool immediate)
         {
-            if (m_Handshake.HasFlag(Handshake.Rts)) {
+            if ((m_Handshake & Handshake.Rts) != 0) {
                 m_CommState.OutCtsFlow = true;
                 m_CommState.RtsControl = RtsControl.Handshake;
             } else {
@@ -797,7 +797,7 @@ namespace RJCP.IO.Ports.Native
 
         private void SetDtrPortSettings(bool immediate)
         {
-            if (m_Handshake.HasFlag(Handshake.Dtr)) {
+            if ((m_Handshake & Handshake.Dtr) != 0) {
                 m_CommState.OutDsrFlow = true;
                 m_CommState.DsrSensitivity = true;
                 m_CommState.DtrControl = DtrControl.Handshake;

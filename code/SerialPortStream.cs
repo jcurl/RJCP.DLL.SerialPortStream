@@ -1895,41 +1895,41 @@ namespace RJCP.IO.Ports
                     bool aboveThreshold = m_Buffer.Stream.BytesToRead >= m_RxThreshold;
                     if (aboveThreshold) {
                         OnDataReceived(this, new SerialDataReceivedEventArgs(serialDataFlags));
-                    } else if (serialDataFlags.HasFlag(SerialData.Eof)) {
+                    } else if ((serialDataFlags & SerialData.Eof) != 0) {
                         OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Eof));
                     }
 
                     // Modem Pin States
-                    if (serialPinChange.HasFlag(SerialPinChange.CtsChanged)) {
+                    if ((serialPinChange & SerialPinChange.CtsChanged) != 0) {
                         OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
                     }
-                    if (serialPinChange.HasFlag(SerialPinChange.Ring)) {
+                    if ((serialPinChange & SerialPinChange.Ring) != 0) {
                         OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Ring));
                     }
-                    if (serialPinChange.HasFlag(SerialPinChange.CDChanged)) {
+                    if ((serialPinChange & SerialPinChange.CDChanged) != 0) {
                         OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
                     }
-                    if (serialPinChange.HasFlag(SerialPinChange.DsrChanged)) {
+                    if ((serialPinChange & SerialPinChange.DsrChanged) != 0) {
                         OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
                     }
-                    if (serialPinChange.HasFlag(SerialPinChange.Break)) {
+                    if ((serialPinChange & SerialPinChange.Break) != 0) {
                         OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Break));
                     }
 
                     // Error States
-                    if (serialErrorFlags.HasFlag(SerialError.TXFull)) {
+                    if ((serialErrorFlags & SerialError.TXFull) != 0) {
                         OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.TXFull));
                     }
-                    if (serialErrorFlags.HasFlag(SerialError.Frame)) {
+                    if ((serialErrorFlags & SerialError.Frame) != 0) {
                         OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Frame));
                     }
-                    if (serialErrorFlags.HasFlag(SerialError.RXParity)) {
+                    if ((serialErrorFlags & SerialError.RXParity) != 0) {
                         OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXParity));
                     }
-                    if (serialErrorFlags.HasFlag(SerialError.Overrun)) {
+                    if ((serialErrorFlags & SerialError.Overrun) != 0) {
                         OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Overrun));
                     }
-                    if (serialErrorFlags.HasFlag(SerialError.RXOver)) {
+                    if ((serialErrorFlags & SerialError.RXOver) != 0) {
                         OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXOver));
                     }
                 }
@@ -2021,28 +2021,32 @@ namespace RJCP.IO.Ports
 
             string dsrStatus;
             try {
-                dsrStatus = Handshake.HasFlag(Handshake.Dtr) ? "hs" : (IsOpen ? (DsrHolding ? "on" : "off") : "-");
+                dsrStatus = ((Handshake & Handshake.Dtr) != 0) ?
+                    "hs" : (IsOpen ? (DsrHolding ? "on" : "off") : "-");
             } catch (IOException) {
                 dsrStatus = "err";
             }
 
             string ctsStatus;
             try {
-                ctsStatus = Handshake.HasFlag(Handshake.Rts) ? "hs" : (IsOpen ? (CtsHolding ? "on" : "off") : "-");
+                ctsStatus = ((Handshake & Handshake.Rts) != 0) ?
+                    "hs" : (IsOpen ? (CtsHolding ? "on" : "off") : "-");
             } catch (IOException) {
                 ctsStatus = "err";
             }
 
             string dtrStatus;
             try {
-                dtrStatus = Handshake.HasFlag(Handshake.Dtr) ? "hs" : (IsOpen ? (DtrEnable ? "on" : "off") : "-");
+                dtrStatus = ((Handshake & Handshake.Dtr) != 0) ?
+                    "hs" : (IsOpen ? (DtrEnable ? "on" : "off") : "-");
             } catch (IOException) {
                 dtrStatus = "err";
             }
 
             string rtsStatus;
             try {
-                rtsStatus = Handshake.HasFlag(Handshake.Rts) ? "hs" : (IsOpen ? (RtsEnable ? "on" : "off") : "-");
+                rtsStatus = ((Handshake & Handshake.Rts) != 0) ?
+                    "hs" : (IsOpen ? (RtsEnable ? "on" : "off") : "-");
             } catch (IOException) {
                 rtsStatus = "err";
             }
@@ -2050,7 +2054,7 @@ namespace RJCP.IO.Ports
             return string.Format("{0}:{1},{2},{3},{4},to={5},xon={6},idsr={7},icts={8},odtr={9},orts={10}",
                 PortName, BaudRate, DataBits, p, s,
                 TxContinueOnXOff ? "on" : "off",
-                Handshake.HasFlag(Handshake.XOn) ? "on" : "off",
+                ((Handshake & Handshake.XOn) != 0) ? "on" : "off",
                 dsrStatus, ctsStatus, dtrStatus, rtsStatus);
         }
     }
