@@ -307,7 +307,7 @@ static serialmodemevent_t waitformodemevent(struct modemstate *mstate)
     // Some USB drivers don't support modem signals.
     mstate->serialerror = ERRMSG_IOCTL;
     mstate->posixerrno = errno;
-    return -1;
+    return MODEMEVENT_ERROR;
   }
 
   struct serial_icounter_struct ocounter = {0, };
@@ -354,12 +354,12 @@ static serialmodemevent_t waitformodemevent(struct modemstate *mstate)
       rsignals |= (rrisignal != risignal) ? MODEMEVENT_RI : MODEMEVENT_NONE;
   }
 
-  return rsignals & mstate->waitevent;
+  return (serialmodemevent_t)(rsignals & mstate->waitevent);
 }
 
 static void *modemeventthread(void *ptr)
 {
-  struct modemstate *mstate = ptr;
+  struct modemstate *mstate = (struct modemstate *)ptr;
   serialmodemevent_t result;
 
   // The IOCTL blocks until there is a change or a signal. There's no other
@@ -423,30 +423,30 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
 {
   if (handle == NULL) {
     errno = EINVAL;
-    return -1;
+    return MODEMEVENT_ERROR;
   }
 
 #ifdef HAVE_TIOCMIWAIT
   if (handle->fd == -1) {
     serial_seterror(handle, ERRMSG_SERIALPORTNOTOPEN);
     errno = EBADF;
-    return -1;
+    return MODEMEVENT_ERROR;
   }
 
-  if (entercritsection(handle)) return -1;
+  if (entercritsection(handle)) return MODEMEVENT_ERROR;
 
   if (handle->modemstate) {
     exitcritsection(handle);
     nslog(handle, NSLOG_WARNING, "waitformodemevent: already running");
     serial_seterror(handle, ERRMSG_MODEMEVENT_RUNNING);
     errno = EINVAL;
-    return -1;
+    return MODEMEVENT_ERROR;
   }
 
   if ((event &
        (MODEMEVENT_DCD | MODEMEVENT_RI |
 	MODEMEVENT_DSR | MODEMEVENT_CTS)) == 0) {
-    if (exitcritsection(handle)) return -1;
+    if (exitcritsection(handle)) return MODEMEVENT_ERROR;
     return MODEMEVENT_NONE;
   }
 
@@ -460,13 +460,13 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
 	  "waitformodemevent: seminit(modemevent): errno=%d", errno);
     exitcritsection(handle);
     serial_seterror(handle, ERRMSG_SEMINIT);
-    return -1;
+    return MODEMEVENT_ERROR;
   }
   handle->modemstate = &mstate;
   if (exitcritsection(handle)) {
     handle->modemstate = NULL;
     sem_destroy(&(mstate.modemevent));
-    return -1;
+    return MODEMEVENT_ERROR;
   }
 
   // We create the thread to wait on it afterwards, as we can
@@ -538,12 +538,12 @@ NSERIAL_EXPORT serialmodemevent_t WINAPI serial_waitformodemevent(struct serialh
   if (!result) {
     return mstate.eventresult & event;
   } else {
-    return -1;
+    return MODEMEVENT_ERROR;
   }
 #else
   serial_seterror(handle, ERRMSG_NOSYS);
   errno = ENOSYS;
-  return -1;
+  return MODEMEVENT_ERROR;
 #endif
 }
 
