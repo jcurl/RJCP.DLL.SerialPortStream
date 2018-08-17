@@ -2183,5 +2183,93 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 Assert.That(finished.WaitOne(20000), Is.True);
             }
         }
+
+        [Test]
+        public void RtsEnableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    RtsEnable = true,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.RtsEnable, Is.True);
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        public void RtsDisableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    RtsEnable = false,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.RtsEnable, Is.False);
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        public void DtrEnableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    DtrEnable = true,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.DtrEnable, Is.True);
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        public void DtrDisableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    DtrEnable = false,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.DtrEnable, Is.False);
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
     }
 }

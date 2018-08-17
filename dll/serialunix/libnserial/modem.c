@@ -28,6 +28,7 @@
 #include "errmsg.h"
 #include "log.h"
 #include "serialhandle.h"
+#include "modem.h"
 
 static int getmodemsignal(int fd, int signal, int *outsignal)
 {
@@ -154,14 +155,16 @@ NSERIAL_EXPORT int WINAPI serial_setdtr(struct serialhandle *handle, int dtr)
     return -1;
   }
 
-  if (handle->fd == -1) {
-    serial_seterror(handle, ERRMSG_SERIALPORTNOTOPEN);
-    errno = EBADF;
-    return -1;
-  }
+  handle->modembits.dtr = (dtr == 0) ? 0 : 1;
+  if (handle->fd == -1) return 0;
 
+  return serial_setdtrinternal(handle);
+}
+
+int serial_setdtrinternal(struct serialhandle *handle)
+{
   int serial = TIOCM_DTR;
-  int cmd = dtr ? TIOCMBIS : TIOCMBIC;
+  int cmd = handle->modembits.dtr ? TIOCMBIS : TIOCMBIC;
   if (ioctl(handle->fd, cmd, &serial) == -1) {
     serial_seterror(handle, ERRMSG_IOCTL);
     return -1;
@@ -185,9 +188,8 @@ NSERIAL_EXPORT int WINAPI serial_getdtr(struct serialhandle *handle, int *dtr)
   }
 
   if (handle->fd == -1) {
-    serial_seterror(handle, ERRMSG_SERIALPORTNOTOPEN);
-    errno = EBADF;
-    return -1;
+    *dtr = handle->modembits.dtr;
+    return 0;
   }
 
   int serial;
@@ -207,14 +209,16 @@ NSERIAL_EXPORT int WINAPI serial_setrts(struct serialhandle *handle, int rts)
     return -1;
   }
 
-  if (handle->fd == -1) {
-    serial_seterror(handle, ERRMSG_SERIALPORTNOTOPEN);
-    errno = EBADF;
-    return -1;
-  }
+  handle->modembits.rts = (rts == 0) ? 0 : 1;
+  if (handle->fd == -1) return 0;
 
+  return serial_setrtsinternal(handle);
+}
+
+int serial_setrtsinternal(struct serialhandle *handle)
+{
   int serial = TIOCM_RTS;
-  int cmd = rts ? TIOCMBIS : TIOCMBIC;
+  int cmd = handle->modembits.rts ? TIOCMBIS : TIOCMBIC;
   if (ioctl(handle->fd, cmd, &serial) == -1) {
     serial_seterror(handle, ERRMSG_IOCTL);
     return -1;
@@ -238,9 +242,8 @@ NSERIAL_EXPORT int WINAPI serial_getrts(struct serialhandle *handle, int *rts)
   }
 
   if (handle->fd == -1) {
-    serial_seterror(handle, ERRMSG_SERIALPORTNOTOPEN);
-    errno = EBADF;
-    return -1;
+    *rts = handle->modembits.rts;
+    return 0;
   }
 
   int serial;
