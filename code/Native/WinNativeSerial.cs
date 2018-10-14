@@ -843,10 +843,27 @@ namespace RJCP.IO.Ports.Native
             if (m_ComPortHandle.IsInvalid) WinIOError();
 
             NativeMethods.FileType t = UnsafeNativeMethods.GetFileType(m_ComPortHandle);
+            bool validOverride = false;
             if (t != NativeMethods.FileType.FILE_TYPE_CHAR && t != NativeMethods.FileType.FILE_TYPE_UNKNOWN) {
-                m_ComPortHandle.Dispose();
-                m_ComPortHandle = null;
-                throw new IOException("Wrong file type: " + PortName);
+                foreach (string port in GetPortNames()) {
+#if NETSTANDARD15
+                    if (port.Equals(PortName, StringComparison.OrdinalIgnoreCase)) {
+                        validOverride = true;
+                        break;
+                    }
+#else
+                    if (port.Equals(PortName, StringComparison.InvariantCultureIgnoreCase)) {
+                        validOverride = true;
+                        break;
+                    }
+#endif
+                }
+
+                if (!validOverride) {
+                    m_ComPortHandle.Dispose();
+                    m_ComPortHandle = null;
+                    throw new IOException("Wrong file type: " + PortName);
+                }
             }
 
             // Set the default parameters
