@@ -35,7 +35,7 @@ namespace RJCP.IO.Ports
     /// http://msdn.microsoft.com/en-us/library/ms810467.aspx</para>
     /// <para>When instantiating.</para>
     /// </remarks>
-    public partial class SerialPortStream : Stream
+    public partial class SerialPortStream : Stream, ISerialPortStream
     {
         private INativeSerial m_NativeSerial;
         private SerialBuffer m_Buffer;
