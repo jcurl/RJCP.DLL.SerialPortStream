@@ -72,6 +72,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HandShake.cs" />
     <Compile Include="InternalApplicationException.cs" />
+    <Compile Include="ISerialPortStream.cs" />
     <Compile Include="Native\INativeSerial.cs" />
     <Compile Include="Native\ISerialBufferSerialData.cs" />
     <Compile Include="Native\ISerialBufferStreamData.cs" />
