@@ -51,7 +51,7 @@
 #define MAXINTPORTS 256
 #define PORTBUFLEN (MAXPORTS * 256)
 
-static const char *checkdevices = {
+static const char *checkdevices[] = {
   "platform:serial8250"
 };
 
@@ -135,7 +135,7 @@ static int mustcheck(const char *type)
   int i;
   int l = SIZEOF_ARRAY(checkdevices);
   for (i = 0; i < l; i++) {
-    if (strcmp(type, checkdevices + i) == 0) {
+    if (strcmp(type, checkdevices[i]) == 0) {
       return TRUE;
     }
   }
