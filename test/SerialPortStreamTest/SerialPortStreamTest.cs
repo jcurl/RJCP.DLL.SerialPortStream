@@ -2168,7 +2168,9 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         [Timeout(60000)]
         public void ReadDataEvent()
         {
-            const int testTotalBytes = 2048 * 1024;  // 2MB of data
+            const int testTotalBytes = 342 * 1024;  // 342kB of data = 30s (342*1024*10/115200 =~ 30s)
+
+            int startTick = Environment.TickCount;
 
             using (ManualResetEvent finished = new ManualResetEvent(false))
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -2185,23 +2187,28 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 serialDest.DataReceived += (s, e) => {
                     int bytes = serialDest.Read(readBuffer, 0, readBuffer.Length);
                     totalBytes += bytes;
-                    Console.WriteLine("===> EventType: {0}, bytes read = {1}, total read = {2}", e.EventType, bytes, totalBytes);
+                    Console.WriteLine("===> {0}: EventType: {1}, bytes read = {2}, total read = {3}",
+                        Environment.TickCount - startTick, e.EventType, bytes, totalBytes);
                     if (totalBytes >= testTotalBytes) finished.Set();
                 };
                 serialDest.ErrorReceived += (s, e) => {
-                    Console.WriteLine("===> EventType: {0}", e.EventType);
+                    Console.WriteLine("===> {0}: EventType: {1}", Environment.TickCount - startTick, e.EventType);
                 };
 
                 serialSource.Open();
                 serialDest.Open();
 
                 int writeBytes = 0;
-                while (writeBytes < testTotalBytes) {    // 2MByte data
+                while (writeBytes < testTotalBytes) {
                     serialSource.Write(writeBuffer, 0, writeBuffer.Length);
                     writeBytes += writeBuffer.Length;
+                    Console.WriteLine("===> {0}: Write {1} bytes; Written {2}; Total {3}",
+                        Environment.TickCount - startTick, writeBuffer.Length, writeBytes, testTotalBytes);
                 }
                 serialSource.Flush();
-                Assert.That(finished.WaitOne(20000), Is.True);
+
+                // Should only need enough time to wait for the last 8192 bytes to be written.
+                Assert.That(finished.WaitOne(10000), Is.True);
             }
         }
 
