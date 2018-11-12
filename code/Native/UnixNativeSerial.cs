@@ -18,6 +18,7 @@ namespace RJCP.IO.Ports.Native
     {
         private INativeSerialDll m_Dll;
         private SafeSerialHandle m_Handle;
+        private IntPtr m_HandlePtr;
 
         public UnixNativeSerial()
         {
@@ -26,6 +27,7 @@ namespace RJCP.IO.Ports.Native
             if (m_Handle.IsInvalid) {
                 throw new PlatformNotSupportedException("Can't initialise platform library");
             }
+            m_HandlePtr = m_Handle.DangerousGetHandle();
 
 #if NETSTANDARD15
             // On NetStandard 1.5, we must have proper exception handling
@@ -795,7 +797,7 @@ namespace RJCP.IO.Ports.Native
                 } else if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose)) {
                     Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                         "{0}: ReadWriteThread: serial_waitforevent({1}, {2}) == {3}",
-                        m_Name, m_Handle, rwevent, result);
+                        m_Name, m_HandlePtr, rwevent, result);
                 }
 
                 if ((result & SerialReadWriteEvent.ReadEvent) != 0) {
@@ -815,7 +817,7 @@ namespace RJCP.IO.Ports.Native
                             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
                                 Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                                     "{0}: ReadWriteThread: serial_read({1}, {2}, {3}) == {4}",
-                                    m_Name, m_Handle, (IntPtr)bo, length, rresult);
+                                    m_Name, m_HandlePtr, (IntPtr)bo, length, rresult);
                             if (rresult > 0) m_Buffer.Serial.ReadBufferProduce(rresult);
                         }
                     }
@@ -839,7 +841,7 @@ namespace RJCP.IO.Ports.Native
                             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
                                 Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                                     "{0}: ReadWriteThread: serial_write({1}, {2}, {3}) == {4}",
-                                    m_Name, m_Handle, (IntPtr)bo, length, wresult);
+                                    m_Name, m_HandlePtr, (IntPtr)bo, length, wresult);
                             if (wresult > 0) {
                                 m_Buffer.Serial.WriteBufferConsume (wresult);
                                 m_Buffer.Serial.TxEmptyEvent ();
@@ -876,7 +878,7 @@ namespace RJCP.IO.Ports.Native
                     if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
                         Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
                             "{0}: ReadWriteThread: serial_abortwaitforevent({1}) = {2}",
-                            m_Name, m_Handle, result);
+                            m_Name, m_HandlePtr, result);
                 }
             }
         }
