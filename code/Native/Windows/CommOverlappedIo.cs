@@ -148,7 +148,7 @@ namespace RJCP.IO.Ports.Native.Windows
             lock (m_Buffer.ReadLock) {
                 NativeMethods.ComStatErrors cErr;
                 NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, out comStat);
+                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, ref comStat);
                 if (!result) {
                     int w32err = Marshal.GetLastWin32Error();
                     int hr = Marshal.GetHRForLastWin32Error();
@@ -177,7 +177,7 @@ namespace RJCP.IO.Ports.Native.Windows
             {
                 NativeMethods.ComStatErrors cErr;
                 NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, out comStat);
+                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, ref comStat);
                 if (result) return (int)comStat.cbOutQue;
                 return 0;
             }
