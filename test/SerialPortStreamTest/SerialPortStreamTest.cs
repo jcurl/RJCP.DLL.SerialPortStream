@@ -2126,6 +2126,27 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
+        public void WriteByteUntilDisconnected()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                serialDest.Open();
+
+                while (serialSource.IsOpen) {
+                    try {
+                        serialSource.WriteByte(0xAA);
+                    } catch (Exception ex) {
+                        Console.WriteLine("\n** Exception: {0}\n{1}\n\n", ex.Message, ex.ToString());
+                    }
+                    Thread.Sleep(100);
+                }
+            }
+        }
+
+        [Test]
         public void DiscardInBuffer()
         {
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
