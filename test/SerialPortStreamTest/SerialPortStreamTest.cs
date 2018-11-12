@@ -726,7 +726,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 }
             }
             foreach (string c in ports1.Keys) {
-                if (ports1[c] == false) {
+                if (!ports1[c]) {
                     Console.WriteLine("GetPortDescriptions() shows " + c + ", but not GetPortnames()");
                     result = false;
                 }

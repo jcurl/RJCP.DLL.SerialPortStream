@@ -600,8 +600,9 @@ namespace RJCP.IO.Ports.Native.Windows
         private void ProcessWaitCommEvent(NativeMethods.SerialEventMask mask)
         {
             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose)) {
-                if (mask != (int)0) {
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessWaitCommEvent: {1}", m_Name, mask);
+                if (mask != 0) {
+                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                        "{0}: SerialThread: ProcessWaitCommEvent: {1}", m_Name, mask);
                 }
             }
 
@@ -622,7 +623,8 @@ namespace RJCP.IO.Ports.Native.Windows
                 lock (m_Buffer.WriteLock) {
                     if (m_Buffer.Serial.TxEmptyEvent()) {
                         if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty", m_Name);
+                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                                "{0}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty", m_Name);
                     }
                 }
             }
@@ -733,10 +735,9 @@ namespace RJCP.IO.Ports.Native.Windows
             } else {
                 lock (m_Buffer.ReadLock) {
                     if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose)) {
-                        if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                "{0}: SerialThread: ProcessReadEvent: End={1}; Bytes={2}", m_Name,
-                                m_Buffer.Serial.ReadBuffer.End, bytes);
+                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                            "{0}: SerialThread: ProcessReadEvent: End={1}; Bytes={2}", m_Name,
+                            m_Buffer.Serial.ReadBuffer.End, bytes);
                     }
                     m_Buffer.Serial.ReadBufferProduce((int)bytes);
                 }

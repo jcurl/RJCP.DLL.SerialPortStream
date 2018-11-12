@@ -421,7 +421,7 @@ namespace RJCP.IO.Ports.Native
         public int DriverInQueue
         {
             get { return -1; }
-            set { }
+            set { /* Not supported, just ignore */ }
         }
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace RJCP.IO.Ports.Native
         public int DriverOutQueue
         {
             get { return -1; }
-            set { }
+            set { /* Not supported, just ignore */ }
         }
 
         /// <summary>
@@ -836,7 +836,6 @@ namespace RJCP.IO.Ports.Native
                                     "{0}: ReadWriteThread: Error writing data; errno={1}; description={2}",
                                     m_Name, m_Dll.errno, m_Dll.serial_error(m_Handle));
                             m_IsRunning = false;
-                            continue;
                         } else {
                             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
                                 Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,

@@ -285,7 +285,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-        private object m_CloseLock = new object();
+        private readonly object m_CloseLock = new object();
 
         /// <summary>
         /// Closes the port connection, sets the IsOpen property to false. Does not dispose the object.
@@ -1770,7 +1770,7 @@ namespace RJCP.IO.Ports
         #endregion
 
         #region Event Handling and Abstraction
-        private object m_EventLock = new object();
+        private readonly object m_EventLock = new object();
         private ManualResetEvent m_EventProcessing = new ManualResetEvent(false);
         private SerialData m_SerialDataFlags = SerialData.NoData;
         private SerialError m_SerialErrorFlags = SerialError.NoError;
@@ -1938,7 +1938,7 @@ namespace RJCP.IO.Ports
             lock (m_EventLock) {
                 if (IsDisposed) return;
                 m_EventProcessing.Reset();
-            };
+            }
         }
         #endregion
 
