@@ -2168,20 +2168,21 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         [Timeout(60000)]
         public void ReadDataEvent()
         {
-            const int testTotalBytes = 342 * 1024;  // 342kB of data = 30s (342*1024*10/115200 =~ 30s)
+            const int blockSize = 8192;
+            const int testTotalBytes = 344 * 1024;  // 344kB of data = 30s (344*1024*10/115200 =~ 30.6s)
 
             int startTick = Environment.TickCount;
 
             using (ManualResetEvent finished = new ManualResetEvent(false))
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
-                serialSource.ReadBufferSize = 8192;
-                serialSource.WriteBufferSize = 8192;
-                serialDest.ReadBufferSize = 8192;
-                serialDest.WriteBufferSize = 8192;
+                serialSource.ReadBufferSize = blockSize;
+                serialSource.WriteBufferSize = blockSize;
+                serialDest.ReadBufferSize = blockSize;
+                serialDest.WriteBufferSize = blockSize;
 
-                byte[] readBuffer = new byte[8192];
-                byte[] writeBuffer = new byte[8192];
+                byte[] readBuffer = new byte[blockSize];
+                byte[] writeBuffer = new byte[blockSize];
 
                 int totalBytes = 0;
                 serialDest.DataReceived += (s, e) => {

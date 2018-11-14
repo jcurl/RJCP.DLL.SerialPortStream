@@ -329,8 +329,8 @@ namespace RJCP.IO.Ports.Native
                     // Someone aborted the wait.
                     return false;
                 case 2:
-                    // Data is available to write.
-                    return true;
+                    // Data is available to write. Loop to the beginning to see if there is now enough data to write.
+                    break;
                 }
             } while (!timer.Expired);
             return false;
