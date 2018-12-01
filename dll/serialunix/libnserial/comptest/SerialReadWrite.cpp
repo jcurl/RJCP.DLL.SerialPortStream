@@ -38,9 +38,6 @@ int SerialReadWrite::DoTransfer(Buffer *sendBuffer)
 
   m_writebuff = sendBuffer;
 
-  char *rbuff = m_readbuff->GetBuffer();
-  char *wbuff = m_writebuff->GetBuffer();
-
   int error = 0;
 
   bool writefinished;
@@ -50,7 +47,6 @@ int SerialReadWrite::DoTransfer(Buffer *sendBuffer)
   // Read all data from the serial port.
   writefinished = false;
   readfinished = false;
-  char tmpbuff[256];
 
   serial_reset(m_writehandle);
   serial_reset(m_readhandle);
