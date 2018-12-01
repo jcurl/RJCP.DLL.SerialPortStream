@@ -67,7 +67,7 @@ namespace RJCP.Datastructures
         }
 
         /// <summary>
-        /// The time for expiry on the next reset. -1 indicates no expiry.
+        /// The time for expiry on the next reset. <see cref="System.Threading.Timeout.Infinite"/> indicates no expiry.
         /// </summary>
         public int Timeout
         {
@@ -76,7 +76,7 @@ namespace RJCP.Datastructures
             {
                 m_StopWatch.Reset();
                 if (value < 0) {
-                    m_Milliseconds = -1;
+                    m_Milliseconds = System.Threading.Timeout.Infinite;
                 } else {
                     m_Milliseconds = value;
                     if (value > 0) m_StopWatch.Start();
@@ -91,7 +91,7 @@ namespace RJCP.Datastructures
         /// <returns>The time to expiry in milliseconds.</returns>
         public int RemainingTime()
         {
-            if (m_Milliseconds < 0) return -1;
+            if (m_Milliseconds < 0) return System.Threading.Timeout.Infinite;
 
             long elapsed = m_StopWatch.ElapsedMilliseconds;
             if (elapsed >= m_Milliseconds) return 0;

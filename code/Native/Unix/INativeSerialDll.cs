@@ -29,13 +29,13 @@ namespace RJCP.IO.Ports.Native.Unix
         int serial_setdiscardnull(SafeSerialHandle handle, bool discardNull);
         int serial_getdiscardnull(SafeSerialHandle handle, out bool discardNull);
         int serial_setparityreplace(SafeSerialHandle handle, int parityReplace);
-        int serial_getparityreplace(SafeSerialHandle handle, out int parityreplace);
+        int serial_getparityreplace(SafeSerialHandle handle, out int parityReplace);
         int serial_settxcontinueonxoff(SafeSerialHandle handle, bool txContinueOnXOff);
         int serial_gettxcontinueonxoff(SafeSerialHandle handle, out bool txContinueOnXOff);
-        int serial_setxofflimit(SafeSerialHandle handle, int xofflimit);
-        int serial_getxofflimit(SafeSerialHandle handle, out int xofflimit);
-        int serial_setxonlimit(SafeSerialHandle handle, int xonlimit);
-        int serial_getxonlimit(SafeSerialHandle handle, out int xonlimit);
+        int serial_setxofflimit(SafeSerialHandle handle, int xoffLimit);
+        int serial_getxofflimit(SafeSerialHandle handle, out int xoffLimit);
+        int serial_setxonlimit(SafeSerialHandle handle, int xonLimit);
+        int serial_getxonlimit(SafeSerialHandle handle, out int xonLimit);
         int serial_sethandshake(SafeSerialHandle handle, Handshake handshake);
         int serial_gethandshake(SafeSerialHandle handle, out Handshake handshake);
 

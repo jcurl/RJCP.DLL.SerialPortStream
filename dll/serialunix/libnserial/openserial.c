@@ -26,6 +26,7 @@
 #include "serialhandle.h"
 #include "baudrate.h"
 #include "errmsg.h"
+#include "modem.h"
 #include "openserial.h"
 #include "flush.h"
 #include "log.h"
@@ -107,6 +108,8 @@ NSERIAL_EXPORT int WINAPI serial_open(struct serialhandle *handle)
 
   handle->abortpending = FALSE;
 
+  serial_setrtsinternal(handle);
+  serial_setdtrinternal(handle);
   nslog(handle, NSLOG_INFO, "open: succeeded");
   return 0;
 }
