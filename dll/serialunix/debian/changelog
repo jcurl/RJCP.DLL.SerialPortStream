@@ -1,3 +1,11 @@
+libnserial (1.1.4-0ubuntu1~trusty1) trusty; urgency=medium
+
+  * Fix warnings by VSCode
+  * Allow RTS/DTR to be set before serial port is open on UNIX
+  * Fix port detection on Linux
+
+ -- Jason Curl <jcurl@arcor.de>  Sat, 01 Dec 2018 13:53:28 +0100
+
 libnserial (1.1.2-0ubuntu1~trusty1) trusty; urgency=medium
 
   * Abort pin monitoring for devices that don't support it
