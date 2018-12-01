@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~artful1) artful; urgency=low
+
+  * Initial release for Ubuntu 17.10 Artful Aardvark
+
+ -- Jason Curl <jcurl@arcor.de>  Sat, 01 Dec 2018 14:24:00 +0100
