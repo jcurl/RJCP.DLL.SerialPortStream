@@ -175,15 +175,13 @@ namespace RJCP.IO.Ports.Native
         /// </value>
         public ISerialBufferStreamData Stream { get { return this as ISerialBufferStreamData; } }
 
+        private readonly WaitHandle[] m_BufferStreamWaitForReadHandles;
+        private readonly WaitHandle[] m_BufferStreamWaitForReadCountHandles;
+
         bool ISerialBufferStreamData.WaitForRead(int timeout)
         {
             m_AbortReadEvent.Reset();
-            WaitHandle[] handles = new WaitHandle[] {
-                    m_ReadBufferNotEmptyEvent,
-                    m_AbortReadEvent,
-                    m_DeviceDead
-                };
-            int triggered = WaitHandle.WaitAny(handles, timeout);
+            int triggered = WaitHandle.WaitAny(m_BufferStreamWaitForReadHandles, timeout);
             switch (triggered) {
             case WaitHandle.WaitTimeout:
                 return false;
@@ -215,12 +213,7 @@ namespace RJCP.IO.Ports.Native
                     m_ReadEvent.Reset();
                 }
 
-                WaitHandle[] handles = new WaitHandle[] {
-                        m_AbortReadEvent,
-                        m_ReadEvent,
-                        m_DeviceDead,
-                    };
-                int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
+                int triggered = WaitHandle.WaitAny(m_BufferStreamWaitForReadCountHandles, timer.RemainingTime());
                 switch (triggered) {
                 case WaitHandle.WaitTimeout:
                     break;
@@ -309,6 +302,8 @@ namespace RJCP.IO.Ports.Native
             }
         }
 
+        private WaitHandle[] m_BufferStreamWaitForWriteCountHandles;
+
         bool ISerialBufferStreamData.WaitForWrite(int count, int timeout)
         {
             if (count == 0) return true;
@@ -323,13 +318,7 @@ namespace RJCP.IO.Ports.Native
                     if (m_WriteBuffer.Free >= count) return true;
                     m_WriteBufferNotFullEvent.Reset();
                 }
-                // This manual reset event is always set every time data is removed from the buffer
-                WaitHandle[] handles = new WaitHandle[] {
-                        m_DeviceDead,
-                        m_AbortWriteEvent,
-                        m_WriteBufferNotFullEvent
-                    };
-                int triggered = WaitHandle.WaitAny(handles, timer.RemainingTime());
+                int triggered = WaitHandle.WaitAny(m_BufferStreamWaitForWriteCountHandles, timer.RemainingTime());
                 switch (triggered) {
                 case WaitHandle.WaitTimeout:
                     break;
@@ -340,8 +329,8 @@ namespace RJCP.IO.Ports.Native
                     // Someone aborted the wait.
                     return false;
                 case 2:
-                    // Data is available to write.
-                    return true;
+                    // Data is available to write. Loop to the beginning to see if there is now enough data to write.
+                    break;
                 }
             } while (!timer.Expired);
             return false;
@@ -377,16 +366,13 @@ namespace RJCP.IO.Ports.Native
             }
         }
 
+        private WaitHandle[] m_BufferStreamFlushHandles;
+
         bool ISerialBufferStreamData.Flush(int timeout)
         {
             // This manual reset event is always set every time data is removed from the buffer
             m_AbortWriteEvent.Reset();
-            WaitHandle[] handles = new WaitHandle[] {
-                    m_DeviceDead,
-                    m_AbortWriteEvent,
-                    m_TxEmptyEvent
-                };
-            int triggered = WaitHandle.WaitAny(handles, timeout);
+            int triggered = WaitHandle.WaitAny(m_BufferStreamFlushHandles, timeout);
             switch (triggered) {
             case WaitHandle.WaitTimeout:
                 return false;
@@ -461,6 +447,32 @@ namespace RJCP.IO.Ports.Native
                 m_WriteBuffer = new CircularBuffer<byte>(writeBuffer);
             }
             m_Pinned = pinned;
+
+            // Allocate these conditions once, to reduce the load on the GC
+
+            m_BufferStreamWaitForReadHandles = new WaitHandle[] {
+                m_ReadBufferNotEmptyEvent,
+                m_AbortReadEvent,
+                m_DeviceDead
+            };
+
+            m_BufferStreamWaitForReadCountHandles = new WaitHandle[] {
+                m_AbortReadEvent,
+                m_ReadEvent,
+                m_DeviceDead,
+            };
+
+            m_BufferStreamWaitForWriteCountHandles = new WaitHandle[] {
+                m_DeviceDead,
+                m_AbortWriteEvent,
+                m_WriteBufferNotFullEvent
+            };
+
+            m_BufferStreamFlushHandles = new WaitHandle[] {
+                m_DeviceDead,
+                m_AbortWriteEvent,
+                m_TxEmptyEvent
+            };
         }
 
 
@@ -500,7 +512,7 @@ namespace RJCP.IO.Ports.Native
         public void Dispose()
         {
             Dispose(true);
-            //GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
