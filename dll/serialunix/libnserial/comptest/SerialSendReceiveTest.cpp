@@ -87,14 +87,14 @@ TEST_F(SerialSendReceiveTest, SendReceiveSmallBuffer)
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
   // Define the two buffers and the data set to send/receive
-  std::auto_ptr<Buffer> sendbuff(new Buffer(1024));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(1024));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = i % 256;
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -137,14 +137,14 @@ TEST_F(SerialSendReceiveTest, SendReceiveLargeBuffer)
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
   // Define the two buffers and the data set to send/receive
-  std::auto_ptr<Buffer> sendbuff(new Buffer(256000));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(256000));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = i % 256;
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256000));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 256000));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -187,14 +187,14 @@ TEST_F(SerialSendReceiveTest, SendReceiveOpenCloseOpenClose)
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
   // Define the two buffers and the data set to send/receive
-  std::auto_ptr<Buffer> sendbuff(new Buffer(8192));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(8192));
   char *buffs = sendbuff->GetBuffer();
   for (int i = 0; i < sendbuff->GetCapacity(); i++) {
     buffs[i] = i % 256;
   }
   sendbuff->Produce(sendbuff->GetCapacity());
 
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
   readwrite->DoTransfer(sendbuff.get());
 
@@ -263,9 +263,9 @@ TEST_F(SerialSendReceiveTest, DiscardNullFirstBytes)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(256));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(256));
   char *buffs = sendbuff->GetBuffer();
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
 
   // First byte contains NUL that should be discarded
@@ -313,9 +313,9 @@ TEST_F(SerialSendReceiveTest, DiscardNullEverySecondBytes)
   ASSERT_NE(-1, serial_open(m_readhandle)) << "serial_open" << PrintError(m_readhandle);
   ASSERT_NE(-1, serial_setproperties(m_readhandle)) << "serial_setproperties" << PrintError(m_readhandle);
 
-  std::auto_ptr<Buffer> sendbuff(new Buffer(256));
+  std::unique_ptr<Buffer> sendbuff(new Buffer(256));
   char *buffs = sendbuff->GetBuffer();
-  std::auto_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
+  std::unique_ptr<SerialReadWrite> readwrite(new SerialReadWrite(m_writehandle, m_readhandle, 1024));
   char *buffr = readwrite->GetReceiveBuffer()->GetBuffer();
 
   // First byte contains NUL that should be discarded

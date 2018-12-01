@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2017
+﻿// Copyright © Jason Curl 2012-2018
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -6,7 +6,6 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Threading;
     using NUnit.Framework;
 
@@ -701,6 +700,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Timeout(30000)]
         public void ListPorts()
         {
             bool result = true;
@@ -726,7 +726,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 }
             }
             foreach (string c in ports1.Keys) {
-                if (ports1[c] == false) {
+                if (!ports1[c]) {
                     Console.WriteLine("GetPortDescriptions() shows " + c + ", but not GetPortnames()");
                     result = false;
                 }
@@ -2126,6 +2126,27 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Category("SerialPortStream.ManualTest")]
+        [Explicit("Manual Test")]
+        public void WriteByteUntilDisconnected()
+        {
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                serialDest.Open();
+
+                while (serialSource.IsOpen) {
+                    try {
+                        serialSource.WriteByte(0xAA);
+                    } catch (Exception ex) {
+                        Console.WriteLine("\n** Exception: {0}\n{1}\n\n", ex.Message, ex.ToString());
+                    }
+                    Thread.Sleep(100);
+                }
+            }
+        }
+
+        [Test]
         public void DiscardInBuffer()
         {
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
@@ -2140,6 +2161,143 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialSource.DiscardOutBuffer();
+            }
+        }
+
+        [Test]
+        [Timeout(60000)]
+        public void ReadDataEvent()
+        {
+            const int blockSize = 8192;
+            const int testTotalBytes = 344 * 1024;  // 344kB of data = 30s (344*1024*10/115200 =~ 30.6s)
+
+            int startTick = Environment.TickCount;
+
+            using (ManualResetEvent finished = new ManualResetEvent(false))
+            using (SerialPortStream serialSource = new SerialPortStream(c_SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new SerialPortStream(c_DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.ReadBufferSize = blockSize;
+                serialSource.WriteBufferSize = blockSize;
+                serialDest.ReadBufferSize = blockSize;
+                serialDest.WriteBufferSize = blockSize;
+
+                byte[] readBuffer = new byte[blockSize];
+                byte[] writeBuffer = new byte[blockSize];
+
+                int totalBytes = 0;
+                serialDest.DataReceived += (s, e) => {
+                    int bytes = serialDest.Read(readBuffer, 0, readBuffer.Length);
+                    totalBytes += bytes;
+                    Console.WriteLine("===> {0}: EventType: {1}, bytes read = {2}, total read = {3}",
+                        Environment.TickCount - startTick, e.EventType, bytes, totalBytes);
+                    if (totalBytes >= testTotalBytes) finished.Set();
+                };
+                serialDest.ErrorReceived += (s, e) => {
+                    Console.WriteLine("===> {0}: EventType: {1}", Environment.TickCount - startTick, e.EventType);
+                };
+
+                serialSource.Open();
+                serialDest.Open();
+
+                int writeBytes = 0;
+                while (writeBytes < testTotalBytes) {
+                    serialSource.Write(writeBuffer, 0, writeBuffer.Length);
+                    writeBytes += writeBuffer.Length;
+                    Console.WriteLine("===> {0}: Write {1} bytes; Written {2}; Total {3}",
+                        Environment.TickCount - startTick, writeBuffer.Length, writeBytes, testTotalBytes);
+                }
+                serialSource.Flush();
+
+                // Should only need enough time to wait for the last 8192 bytes to be written.
+                Assert.That(finished.WaitOne(10000), Is.True);
+            }
+        }
+
+        [Test]
+        public void RtsEnableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    RtsEnable = true,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.RtsEnable, Is.True);
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        public void RtsDisableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    RtsEnable = false,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.RtsEnable, Is.False);
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        public void DtrEnableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    DtrEnable = true,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.DtrEnable, Is.True);
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        public void DtrDisableBeforeOpen()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(c_SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    DtrEnable = false,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+                Assert.That(serial.DtrEnable, Is.False);
+            } finally {
+                if (serial != null) serial.Dispose();
             }
         }
     }

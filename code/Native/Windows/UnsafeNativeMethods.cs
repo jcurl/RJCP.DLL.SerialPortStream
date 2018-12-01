@@ -82,7 +82,7 @@ namespace RJCP.IO.Ports.Native.Windows
         public static extern bool ClearCommError(
             [In] SafeFileHandle hFile,
             [MarshalAs(UnmanagedType.U4)] out NativeMethods.ComStatErrors lpErrors,
-            [Out] out NativeMethods.COMSTAT lpStat
+            [In, Out] ref NativeMethods.COMSTAT lpStat
         );
 
         [DllImport("kernel32.dll", SetLastError = true)]

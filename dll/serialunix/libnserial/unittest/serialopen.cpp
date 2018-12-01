@@ -430,3 +430,19 @@ TEST_F(SerialOpenTest, SerialBreak)
   EXPECT_EQ(0, serial_getbreak(handle, &breakstate));
   EXPECT_EQ(0, breakstate);
 }
+
+TEST_F(SerialOpenTest, SerialPortList)
+{
+  ASSERT_EQ(0, serial_open(handle));
+
+  struct portdescription *ports;
+  ports = serial_getports(handle);
+
+  ASSERT_NE((struct portdescription *)0, ports);
+
+  int i = 0;
+  while (ports[i].device != 0) {
+    std::cout << "Port: " << ports[i].device << " - " << ports[i].description << std::endl;
+    i++;
+  }
+}

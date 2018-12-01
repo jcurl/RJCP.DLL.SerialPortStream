@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // PROJECT : libnserial
-//  (C) Jason Curl, 2016-2017.
+//  (C) Jason Curl, 2016-2018.
 //
 // FILE : portlinux.c
 //
@@ -26,6 +26,7 @@
 
 #include "config.h"
 #include <sys/types.h>
+#include <sys/sysmacros.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -50,7 +51,7 @@
 #define MAXINTPORTS 256
 #define PORTBUFLEN (MAXPORTS * 256)
 
-static const char *checkdevices = {
+static const char *checkdevices[] = {
   "platform:serial8250"
 };
 
@@ -134,7 +135,7 @@ static int mustcheck(const char *type)
   int i;
   int l = SIZEOF_ARRAY(checkdevices);
   for (i = 0; i < l; i++) {
-    if (strcmp(type, checkdevices + i) == 0) {
+    if (strcmp(type, checkdevices[i]) == 0) {
       return TRUE;
     }
   }
