@@ -1,0 +1,59 @@
+Source: libnserial
+Priority: optional
+Maintainer: Jason Curl <jcurl@arcor.de>
+Build-Depends: debhelper (>=9), cmake (>=2.8.5), doxygen (>= 1.7.6.1)
+Standards-Version: 3.9.7
+Section: libs
+Homepage: https://github.com/jcurl/serialportstream
+
+Package: libnserial-dev
+Section: libdevel
+Architecture: any
+Depends: libnserial (= ${binary:Version}), ${misc:Depends}
+Description: Provide development environment for compiling with libnserial.
+ The library is a small implementation in C that abstracts the usage
+ of the serial port. It makes it considerably easiers for other languages
+ like Mono to then use the serial port without directly depending on
+ the C library or special macros common when dealing with devices and
+ files.
+ .
+ This package contains the library for developers in C.
+
+Package: libnserial-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends: libnserial (= ${binary:Version}), ${misc:Depends}
+Description: Debugging symbols for libnserial
+ The library is a small implementation in C that abstracts the usage
+ of the serial port. It makes it considerably easiers for other languages
+ like Mono to then use the serial port without directly depending on
+ the C library or special macros common when dealing with devices and
+ files.
+ .
+ This package contains the debugging symbols for libnserial.
+
+Package: libnserial-doc
+Architecture: all
+Section: doc
+Priority: extra
+Depends:
+Recommends: libnserial-dev (= ${binary:Version})
+Description: Documentation for libnserial API
+ The library is a small implementation in C that abstracts the usage
+ of the serial port. It makes it considerably easiers for other languages
+ like Mono to then use the serial port without directly depending on
+ the C library or special macros common when dealing with devices and
+ files.
+ .
+ This package contains the doxygen'erated API in HTML format.
+
+Package: libnserial
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Abstraction of the Serial port for higher level languages.
+ The library is a small implementation in C that abstracts the usage
+ of the serial port. It makes it considerably easiers for other languages
+ like Mono to then use the serial port without directly depending on
+ the C library or special macros common when dealing with devices and
+ files.

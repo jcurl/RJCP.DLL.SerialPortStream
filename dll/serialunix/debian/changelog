@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~bionic1) bionic; urgency=low
+
+  * Initial release for Ubuntu 18.04.1 Bionic Beaver
+
+ -- Jason Curl <jcurl@arcor.de>  Sat, 01 Dec 2018 14:49:00 +0100
