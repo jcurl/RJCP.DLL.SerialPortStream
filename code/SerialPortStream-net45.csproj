@@ -11,7 +11,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-    <ReleaseVersion>2.1.2.0</ReleaseVersion>
+    <ReleaseVersion>2.2.0.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,7 +55,7 @@
     </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>rjcp_serialportstream.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>rjcp_serialportstream.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,9 +68,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Datastructures\ReusableList.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HandShake.cs" />
     <Compile Include="InternalApplicationException.cs" />
+    <Compile Include="ISerialPortStream.cs" />
     <Compile Include="Native\INativeSerial.cs" />
     <Compile Include="Native\ISerialBufferSerialData.cs" />
     <Compile Include="Native\ISerialBufferStreamData.cs" />
@@ -102,7 +104,7 @@
     <Compile Include="Native\Windows\CommState.cs" />
     <Compile Include="Native\Windows\CommProperties.cs" />
     <Compile Include="Native\Windows\CommModemStatus.cs" />
-    <Compile Include="SerialTrace.cs" />
+    <Compile Include="Trace\Log.cs" />
     <Compile Include="Native\Windows\WinError.cs" />
     <Compile Include="StopBits.cs" />
     <Compile Include="Native\UnixNativeSerial.cs" />
@@ -114,10 +116,11 @@
     <Compile Include="Native\Unix\SafeSerialHandle.cs" />
     <Compile Include="Native\Unix\SafeNativeMethods.cs" />
     <Compile Include="Native\Unix\UnsafeNativeMethods.cs" />
+    <Compile Include="Trace\LogSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.SerialPortStream-net45.config" />
-    <None Include="rjcp_serialportstream.pfx" />
+    <None Include="rjcp_serialportstream.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

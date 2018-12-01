@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.</Description>
+    <AssemblyTitle>SerialPortStream</AssemblyTitle>
+    <VersionPrefix>2.2.0.0</VersionPrefix>
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <DefineConstants>$(DefineConstants);NETSTANDARD15</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>RJCP.SerialPortStream</AssemblyName>
+    <PackageId>netstandard</PackageId>
+    <PackageTargetFallback>$(PackageTargetFallback);portable-net46</PackageTargetFallback>
+    <Configurations>Debug;Release;Signed_Release</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Signed_Release|AnyCPU' ">
+    <AssemblyOriginatorKeyFile>rjcp_serialportstream.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="code\*.cs;code\DataStructures\*.cs;code\Native\*.cs;code\Native\Unix\*.cs;code\Native\Windows\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="netstandard\readme.md" />
+    <None Remove="packages.SerialPortStream-net40.config" />
+    <None Remove="packages.SerialPortStream-net45.config" />
+    <None Remove="SerialPortStream.nuspec" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Overlapped" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Tools" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.IO" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+    <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>

@@ -140,8 +140,7 @@ After cloning the repository, execute the following:
 
 ```
 $ git clone https://github.com/jcurl/serialportstream.git
-$ cd serialportstream/
-$ cd dll/serialunix/
+$ cd serialportstream/dll/serialunix
 $ ./build.sh
 ```
 
@@ -157,7 +156,7 @@ and then run your Mono program from there.
 Or you can build and install in your system:
 
 ```
-$ cd serialportstream/
+$ cd serialportstream/dll/serialunix
 $ mkdir mybuild
 $ cd mybuild
 $ cmake .. && make

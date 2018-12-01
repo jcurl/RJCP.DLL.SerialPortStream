@@ -41,6 +41,11 @@ struct modemstate {
 // Maximum number of ports we have in the port descrip
 #define MAXPORTS    64
 
+struct serialmodembits {
+  int rts : 1;
+  int dtr : 1;
+};
+
 struct serialhandle {
   char              *device;            // The device to open
   int                fd;                // File descriptor for the serial port
@@ -57,6 +62,7 @@ struct serialhandle {
   int                parityreplace;     // ParityReplace byte
   parityrepmode_t    parityrepactive;   // ParityReplace is active on open?
   int                breakstate;        // Current break state.
+  struct serialmodembits modembits;     // Modem bits, until port is opened.
 
   char              *tmpbuffer;         // Temporary buffer
   int                tmpstart;          // Offset where last read starts

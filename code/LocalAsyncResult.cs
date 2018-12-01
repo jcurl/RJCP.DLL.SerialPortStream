@@ -92,7 +92,7 @@ namespace RJCP.IO
             get { return m_IsCompleted; }
             set
             {
-                if (value == true) {
+                if (value) {
                     m_IsCompleted = true;
                     if (m_Handle != null) m_Handle.Set();
                 }
@@ -116,11 +116,11 @@ namespace RJCP.IO
         /// <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing) {
-                if (m_Handle != null) {
-                    m_Handle.Dispose();
-                    m_Handle = null;
-                }
+            if (!disposing) return;
+
+            if (m_Handle != null) {
+                m_Handle.Dispose();
+                m_Handle = null;
             }
         }
     }

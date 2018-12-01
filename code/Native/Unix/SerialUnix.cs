@@ -154,9 +154,9 @@ namespace RJCP.IO.Ports.Native.Unix
             return result;
         }
 
-        public int serial_setdiscardnull(SafeSerialHandle handle, bool discardnull)
+        public int serial_setdiscardnull(SafeSerialHandle handle, bool discardNull)
         {
-            int result = UnsafeNativeMethods.serial_setdiscardnull(handle, discardnull);
+            int result = UnsafeNativeMethods.serial_setdiscardnull(handle, discardNull);
             errno = Marshal.GetLastWin32Error();
             return result;
         }
@@ -365,16 +365,16 @@ namespace RJCP.IO.Ports.Native.Unix
             return result;
         }
 
-        public int serial_read(SafeSerialHandle handle, IntPtr buffer, int length)
+        public int serial_read(SafeSerialHandle handle, IntPtr data, int length)
         {
-            int result = UnsafeNativeMethods.serial_read(handle, buffer, length);
+            int result = UnsafeNativeMethods.serial_read(handle, data, length);
             errno = Marshal.GetLastWin32Error();
             return result;
         }
 
-        public int serial_write(SafeSerialHandle handle, IntPtr buffer, int length)
+        public int serial_write(SafeSerialHandle handle, IntPtr data, int length)
         {
-            int result = UnsafeNativeMethods.serial_write(handle, buffer, length);
+            int result = UnsafeNativeMethods.serial_write(handle, data, length);
             errno = Marshal.GetLastWin32Error();
             return result;
         }
