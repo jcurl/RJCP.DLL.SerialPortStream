@@ -1,4 +1,4 @@
-﻿namespace RJCP.IO.Ports.Native.Unix
+namespace RJCP.IO.Ports.Native.Unix
 {
     using System;
     using System.Runtime.InteropServices;

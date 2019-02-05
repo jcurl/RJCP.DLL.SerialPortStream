@@ -130,7 +130,7 @@ on Ubuntu and similar components.
 On Windows, just reference the assembly in your project as you did with
 version 1.x.
 
-### Linux
+### Linux and OSX
 
 You first need to compile the support library `libnserial.so` for your
 platform. To do that, you'll need a compiler (e.g. GCC 4.8 or later) and
@@ -142,6 +142,12 @@ After cloning the repository, execute the following:
 $ git clone https://github.com/jcurl/serialportstream.git
 $ cd serialportstream/dll/serialunix
 $ ./build.sh
+```
+
+for __OSX__ you must rename your library
+
+```
+$ ln -s $(pwd)/bin/usr/local/lib/libnserial.dylib $(pwd)/bin/usr/local/lib/libnserial.so.1.dylib
 ```
 
 Binaries are built and put in the `bin` folder from where you ran the build
@@ -161,6 +167,12 @@ $ mkdir mybuild
 $ cd mybuild
 $ cmake .. && make
 $ sudo make install
+```
+
+for __OSX__ you must rename your library
+
+```
+$ ln -s /usr/local/lib/libnserial.dylib /usr/local/lib/libnserial.so.1.dylib
 ```
 
 # Extra Features

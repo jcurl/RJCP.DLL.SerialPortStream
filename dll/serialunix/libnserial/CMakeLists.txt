@@ -70,7 +70,11 @@ add_library(nserial SHARED ${NSERIAL_SRCS})
 set_target_properties(nserial PROPERTIES
   VERSION ${VERSION_MAJOR}.${VERSION_MINOR}
   SOVERSION ${VERSION_MAJOR}
-  FRAMEWORK ON
+  if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")  
+    FRAMEWORK OFF 
+  else  
+    FRAMEWORK ON 
+  endif()
   PUBLIC_HEADER ${NSERIAL_PUBLIC_HEADERS})
 
 # Add all targets to the build-tree export set
