@@ -7,6 +7,8 @@ Bugfixes
 * DOTNET-180: Allow compilation of libnserial on Ubuntu 16.04.5.
 * [Issue #104](https://github.com/jcurl/SerialPortStream/issues/104): Fix buffer
   handling. `Write()` would sometimes corrupt data.
+* [Issue #90](https://github.com/jcurl/SerialPortStream/issues/90): `IsOpen()`
+  might return `NullReferenceException` as it's not threadsafe with `Close()`.
 
 Features:
 
