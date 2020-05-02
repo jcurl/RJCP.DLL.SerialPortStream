@@ -8,12 +8,11 @@
 namespace RJCP.IO.Ports.Native.Windows
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Threading;
     using System.Runtime.InteropServices;
-    using Microsoft.Win32.SafeHandles;
+    using System.Threading;
     using Datastructures;
+    using Microsoft.Win32.SafeHandles;
     using Trace;
 
     internal class CommOverlappedIo : IDisposable
@@ -121,9 +120,7 @@ namespace RJCP.IO.Ports.Native.Windows
             {
                 if (!IsRunning) return 0;
 
-                uint bytesInRecvQueue;
-                bool eofReceived;
-                if (GetReceiveStats(out bytesInRecvQueue, out eofReceived)) {
+                if (GetReceiveStats(out uint bytesInRecvQueue, out _)) {
                     return (int)bytesInRecvQueue;
                 }
                 return 0;
@@ -146,9 +143,8 @@ namespace RJCP.IO.Ports.Native.Windows
             bytesInRecvQueue = 0;
             eofReceived = false;
             lock (m_Buffer.ReadLock) {
-                NativeMethods.ComStatErrors cErr;
                 NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, ref comStat);
+                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out NativeMethods.ComStatErrors cErr, ref comStat);
                 if (!result) {
                     int w32err = Marshal.GetLastWin32Error();
                     int hr = Marshal.GetHRForLastWin32Error();
@@ -175,9 +171,8 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             get
             {
-                NativeMethods.ComStatErrors cErr;
                 NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out cErr, ref comStat);
+                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out _, ref comStat);
                 if (result) return (int)comStat.cbOutQue;
                 return 0;
             }
@@ -213,29 +208,31 @@ namespace RJCP.IO.Ports.Native.Windows
             m_IsRunning = true;
             try {
                 // Set the time outs
-                NativeMethods.COMMTIMEOUTS timeouts = new NativeMethods.COMMTIMEOUTS();
-                // We read only the data that is buffered
+                NativeMethods.COMMTIMEOUTS timeouts = new NativeMethods.COMMTIMEOUTS() {
+                    // We read only the data that is buffered
 #if PL2303_WORKAROUNDS
-                // Time out if data hasn't arrived in 10ms, or if the read takes longer than 100ms in total
-                timeouts.ReadIntervalTimeout = 10;
-                timeouts.ReadTotalTimeoutConstant = 100;
-                timeouts.ReadTotalTimeoutMultiplier = 0;
+                    // Time out if data hasn't arrived in 10ms, or if the read takes longer than 100ms in total
+                    ReadIntervalTimeout = 10,
+                    ReadTotalTimeoutConstant = 100,
+                    ReadTotalTimeoutMultiplier = 0,
 #else
-                // Non-asynchronous behaviour
-                timeouts.ReadIntervalTimeout = System.Threading.Timeout.Infinite;
-                timeouts.ReadTotalTimeoutConstant = 0;
-                timeouts.ReadTotalTimeoutMultiplier = 0;
+                    // Non-asynchronous behaviour
+                    ReadIntervalTimeout = System.Threading.Timeout.Infinite,
+                    ReadTotalTimeoutConstant = 0,
+                    ReadTotalTimeoutMultiplier = 0,
 #endif
-                // We have no time outs when writing
-                timeouts.WriteTotalTimeoutMultiplier = 0;
-                timeouts.WriteTotalTimeoutConstant = 500;
+                    // We have no time outs when writing
+                    WriteTotalTimeoutMultiplier = 0,
+                    WriteTotalTimeoutConstant = 500
+                };
 
                 bool result = UnsafeNativeMethods.SetCommTimeouts(m_ComPortHandle, ref timeouts);
                 if (!result) throw new IOException("Couldn't set CommTimeouts", Marshal.GetLastWin32Error());
 
-                m_Thread = new Thread(new ThreadStart(OverlappedIoThread));
-                m_Thread.Name = "SerialPortStream_" + m_Name;
-                m_Thread.IsBackground = true;
+                m_Thread = new Thread(new ThreadStart(OverlappedIoThread)) {
+                    Name = "SerialPortStream_" + m_Name,
+                    IsBackground = true
+                };
                 m_Thread.Start();
             } catch {
                 m_IsRunning = false;
@@ -376,9 +373,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     // While the comm event mask was set to ignore read events, data could have been written
                     // to the input queue. Check for that and if there are bytes waiting or EOF was received,
                     // set the appropriate flags.
-                    uint bytesInQueue;
-                    bool eofReceived;
-                    if (GetReceiveStats(out bytesInQueue, out eofReceived) && (bytesInQueue > 0 || eofReceived)) {
+                    if (GetReceiveStats(out uint bytesInQueue, out bool eofReceived) && (bytesInQueue > 0 || eofReceived)) {
                         // Tell DoReadEvent that there is data pending
                         m_ReadByteAvailable = true;
                         m_ReadByteEof |= eofReceived;
@@ -630,8 +625,7 @@ namespace RJCP.IO.Ports.Native.Windows
             }
 
             if ((mask & (NativeMethods.SerialEventMask.EV_RXCHAR | NativeMethods.SerialEventMask.EV_ERR)) != 0) {
-                NativeMethods.ComStatErrors comErr;
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out comErr, IntPtr.Zero);
+                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out NativeMethods.ComStatErrors comErr, IntPtr.Zero);
                 if (!result) {
                     int w32err = Marshal.GetLastWin32Error();
                     int hr = Marshal.GetHRForLastWin32Error();
@@ -682,8 +676,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 bufLen = (uint)m_Buffer.Serial.ReadBuffer.WriteLength;
             }
 
-            uint bufRead;
-            bool result = UnsafeNativeMethods.ReadFile(m_ComPortHandle, bufPtr, bufLen, out bufRead, ref overlap);
+            bool result = UnsafeNativeMethods.ReadFile(m_ComPortHandle, bufPtr, bufLen, out uint bufRead, ref overlap);
             int w32err = Marshal.GetLastWin32Error();
             int hr = Marshal.GetHRForLastWin32Error();
             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
@@ -769,8 +762,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 bufLen = (uint)m_Buffer.Serial.WriteBuffer.ReadLength;
             }
 
-            uint bufWrite;
-            bool result = UnsafeNativeMethods.WriteFile(m_ComPortHandle, bufPtr, bufLen, out bufWrite, ref overlap);
+            bool result = UnsafeNativeMethods.WriteFile(m_ComPortHandle, bufPtr, bufLen, out uint bufWrite, ref overlap);
             int win32err = Marshal.GetLastWin32Error();
             int hr = Marshal.GetHRForLastWin32Error();
             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))

@@ -9,7 +9,6 @@ namespace RJCP.IO.Ports.Native
     /// <summary>
     /// Interface for accessing serial based streams.
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
     internal interface INativeSerial : IDisposable
     {
         /// <summary>

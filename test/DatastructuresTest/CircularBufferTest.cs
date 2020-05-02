@@ -6,7 +6,6 @@ namespace RJCP.Datastructures.CircularBufferTest
 {
     using System;
     using System.Text;
-    //using Datastructures;
     using NUnit.Framework;
 
     [TestFixture(Category = "Datastructures/CircularBuffer")]
@@ -16,89 +15,89 @@ namespace RJCP.Datastructures.CircularBufferTest
         public void CircularBuffer_ProduceConsume()
         {
             CircularBuffer<byte> cb = new CircularBuffer<byte>(50);
-            Assert.AreEqual(50, cb.Capacity);
+            Assert.That(cb.Capacity, Is.EqualTo(50));
 
             // Initial state
-            Assert.AreEqual(0, cb.Start);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(0, cb.ReadLength);
-            Assert.AreEqual(0, cb.End);
-            Assert.AreEqual(50, cb.Free);
-            Assert.AreEqual(50, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(0));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cb.ReadLength, Is.EqualTo(0));
+            Assert.That(cb.End, Is.EqualTo(0));
+            Assert.That(cb.Free, Is.EqualTo(50));
+            Assert.That(cb.WriteLength, Is.EqualTo(50));
 
             // Test 1: Allocate 50 bytes
             cb.Produce(50);
-            Assert.AreEqual(0, cb.Start);
-            Assert.AreEqual(50, cb.Length);
-            Assert.AreEqual(50, cb.ReadLength);
-            Assert.AreEqual(0, cb.End);
-            Assert.AreEqual(0, cb.Free);
-            Assert.AreEqual(0, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(0));
+            Assert.That(cb.Length, Is.EqualTo(50));
+            Assert.That(cb.ReadLength, Is.EqualTo(50));
+            Assert.That(cb.End, Is.EqualTo(0));
+            Assert.That(cb.Free, Is.EqualTo(0));
+            Assert.That(cb.WriteLength, Is.EqualTo(0));
 
             // Test 2: Free 50 bytes
             cb.Consume(50);
-            Assert.AreEqual(0, cb.Start);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(0, cb.ReadLength);
-            Assert.AreEqual(0, cb.End);
-            Assert.AreEqual(50, cb.Free);
-            Assert.AreEqual(50, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(0));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cb.ReadLength, Is.EqualTo(0));
+            Assert.That(cb.End, Is.EqualTo(0));
+            Assert.That(cb.Free, Is.EqualTo(50));
+            Assert.That(cb.WriteLength, Is.EqualTo(50));
 
             // Test 3: Allocate 25 bytes
             cb.Produce(25);
-            Assert.AreEqual(0, cb.Start);
-            Assert.AreEqual(25, cb.Length);
-            Assert.AreEqual(25, cb.ReadLength);
-            Assert.AreEqual(25, cb.End);
-            Assert.AreEqual(25, cb.Free);
-            Assert.AreEqual(25, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(0));
+            Assert.That(cb.Length, Is.EqualTo(25));
+            Assert.That(cb.ReadLength, Is.EqualTo(25));
+            Assert.That(cb.End, Is.EqualTo(25));
+            Assert.That(cb.Free, Is.EqualTo(25));
+            Assert.That(cb.WriteLength, Is.EqualTo(25));
 
             // Test 4: Free 24 bytes
             cb.Consume(24);
-            Assert.AreEqual(24, cb.Start);
-            Assert.AreEqual(1, cb.Length);
-            Assert.AreEqual(1, cb.ReadLength);
-            Assert.AreEqual(25, cb.End);
-            Assert.AreEqual(49, cb.Free);
-            Assert.AreEqual(25, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(24));
+            Assert.That(cb.Length, Is.EqualTo(1));
+            Assert.That(cb.ReadLength, Is.EqualTo(1));
+            Assert.That(cb.End, Is.EqualTo(25));
+            Assert.That(cb.Free, Is.EqualTo(49));
+            Assert.That(cb.WriteLength, Is.EqualTo(25));
 
             // Test 5: Allocate 49 bytes
             cb.Produce(49);
-            Assert.AreEqual(24, cb.Start);
-            Assert.AreEqual(50, cb.Length);
-            Assert.AreEqual(26, cb.ReadLength);
-            Assert.AreEqual(24, cb.End);
-            Assert.AreEqual(0, cb.Free);
-            Assert.AreEqual(0, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(24));
+            Assert.That(cb.Length, Is.EqualTo(50));
+            Assert.That(cb.ReadLength, Is.EqualTo(26));
+            Assert.That(cb.End, Is.EqualTo(24));
+            Assert.That(cb.Free, Is.EqualTo(0));
+            Assert.That(cb.WriteLength, Is.EqualTo(0));
 
             // Test 6: Reset
             cb.Reset();
-            Assert.AreEqual(0, cb.Start);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(0, cb.ReadLength);
-            Assert.AreEqual(0, cb.End);
-            Assert.AreEqual(50, cb.Free);
-            Assert.AreEqual(50, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(0));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cb.ReadLength, Is.EqualTo(0));
+            Assert.That(cb.End, Is.EqualTo(0));
+            Assert.That(cb.Free, Is.EqualTo(50));
+            Assert.That(cb.WriteLength, Is.EqualTo(50));
 
             // Test 7: Test full wrapping around
             cb.Produce(25);
             cb.Consume(25);
             cb.Produce(50);
-            Assert.AreEqual(25, cb.Start);
-            Assert.AreEqual(50, cb.Length);
-            Assert.AreEqual(25, cb.ReadLength);
-            Assert.AreEqual(25, cb.End);
-            Assert.AreEqual(0, cb.Free);
-            Assert.AreEqual(0, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(25));
+            Assert.That(cb.Length, Is.EqualTo(50));
+            Assert.That(cb.ReadLength, Is.EqualTo(25));
+            Assert.That(cb.End, Is.EqualTo(25));
+            Assert.That(cb.Free, Is.EqualTo(0));
+            Assert.That(cb.WriteLength, Is.EqualTo(0));
 
             // Test 8: Free all data
             cb.Consume(50);
-            Assert.AreEqual(25, cb.Start);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(0, cb.ReadLength);
-            Assert.AreEqual(25, cb.End);
-            Assert.AreEqual(50, cb.Free);
-            Assert.AreEqual(25, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(25));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cb.ReadLength, Is.EqualTo(0));
+            Assert.That(cb.End, Is.EqualTo(25));
+            Assert.That(cb.Free, Is.EqualTo(50));
+            Assert.That(cb.WriteLength, Is.EqualTo(25));
         }
 
         [Test]
@@ -111,26 +110,26 @@ namespace RJCP.Datastructures.CircularBufferTest
                 cb.Array[i] = (byte)i;
             }
             cb.Produce(50);
-            Assert.AreEqual(50, cb.Length);
-            Assert.AreEqual(0, cb.Start);
+            Assert.That(cb.Length, Is.EqualTo(50));
+            Assert.That(cb.Start, Is.EqualTo(0));
 
             // Access the array using the indexer
             for (int i = 0; i < cb.Length; i++) {
-                Assert.AreEqual(i, cb[i]);
+                Assert.That(cb[i], Is.EqualTo(i));
             }
 
             cb.Consume(25);
             cb.Produce(25);
 
             // Now the start is in the middle
-            Assert.AreEqual(25, cb.Start);
-            Assert.AreEqual(50, cb.Length);
+            Assert.That(cb.Start, Is.EqualTo(25));
+            Assert.That(cb.Length, Is.EqualTo(50));
             for (int i = 0; i < cb.Length; i++) {
-                Assert.AreEqual((i + 25) % 50, cb[i], "Index " + i.ToString());
+                Assert.That(cb[i], Is.EqualTo((i + 25) % 50), "Index {0}", i);
             }
 
             for (int i = 0; i < cb.Length; i++) {
-                Assert.AreEqual((i + 25) % 50, cb.Array[cb.ToArrayIndex(i)], "Index " + i.ToString());
+                Assert.That(cb.Array[cb.ToArrayIndex(i)], Is.EqualTo((i + 25) % 50), "Index {0}", i);
             }
         }
 
@@ -147,14 +146,14 @@ namespace RJCP.Datastructures.CircularBufferTest
             cb.Produce(25);
             cb.Produce(25);
 
-            Assert.AreEqual(25, cb.ReadLength);
-            Assert.AreEqual(25, cb.GetReadBlock(0));
-            Assert.AreEqual(20, cb.GetReadBlock(5));
-            Assert.AreEqual(1, cb.GetReadBlock(24));
-            Assert.AreEqual(25, cb.GetReadBlock(25));
-            Assert.AreEqual(20, cb.GetReadBlock(30));
-            Assert.AreEqual(1, cb.GetReadBlock(49));
-            Assert.AreEqual(0, cb.GetReadBlock(50));
+            Assert.That(cb.ReadLength, Is.EqualTo(25));
+            Assert.That(cb.GetReadBlock(0), Is.EqualTo(25));
+            Assert.That(cb.GetReadBlock(5), Is.EqualTo(20));
+            Assert.That(cb.GetReadBlock(24), Is.EqualTo(1));
+            Assert.That(cb.GetReadBlock(25), Is.EqualTo(25));
+            Assert.That(cb.GetReadBlock(30), Is.EqualTo(20));
+            Assert.That(cb.GetReadBlock(49), Is.EqualTo(1));
+            Assert.That(cb.GetReadBlock(50), Is.EqualTo(0));
         }
 
         [Test]
@@ -170,28 +169,28 @@ namespace RJCP.Datastructures.CircularBufferTest
             cb.Produce(25);
             cb.Produce(25);
 
-            Assert.AreEqual(25, cb.Start);
-            Assert.AreEqual(25, cb.ReadLength);
-            Assert.AreEqual(25, cb.End);
-            Assert.AreEqual(0, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(25));
+            Assert.That(cb.ReadLength, Is.EqualTo(25));
+            Assert.That(cb.End, Is.EqualTo(25));
+            Assert.That(cb.WriteLength, Is.EqualTo(0));
 
             cb.Revert(5);
-            Assert.AreEqual(25, cb.Start);
-            Assert.AreEqual(25, cb.ReadLength);
-            Assert.AreEqual(20, cb.End);
-            Assert.AreEqual(5, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(25));
+            Assert.That(cb.ReadLength, Is.EqualTo(25));
+            Assert.That(cb.End, Is.EqualTo(20));
+            Assert.That(cb.WriteLength, Is.EqualTo(5));
 
             cb.Revert(20);
-            Assert.AreEqual(25, cb.Start);
-            Assert.AreEqual(25, cb.ReadLength);
-            Assert.AreEqual(0, cb.End);
-            Assert.AreEqual(25, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(25));
+            Assert.That(cb.ReadLength, Is.EqualTo(25));
+            Assert.That(cb.End, Is.EqualTo(0));
+            Assert.That(cb.WriteLength, Is.EqualTo(25));
 
             cb.Revert(20);
-            Assert.AreEqual(25, cb.Start);
-            Assert.AreEqual(5, cb.ReadLength);
-            Assert.AreEqual(30, cb.End);
-            Assert.AreEqual(20, cb.WriteLength);
+            Assert.That(cb.Start, Is.EqualTo(25));
+            Assert.That(cb.ReadLength, Is.EqualTo(5));
+            Assert.That(cb.End, Is.EqualTo(30));
+            Assert.That(cb.WriteLength, Is.EqualTo(20));
         }
 
         [Test]
@@ -211,7 +210,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             }
 
             for (int i = 0; i < rd.Length; i++) {
-                Assert.AreEqual(rd[i], cb[i], "Index " + i.ToString() + " doesn't match");
+                Assert.That(cb[i], Is.EqualTo(rd[i]), "Index {0} doesn't match", i);
             }
         }
 
@@ -220,20 +219,20 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             CircularBuffer<char> cb = new CircularBuffer<char>(15);
             for (int i = 0; i < cb.Capacity; i++) {
-                cb.Array[i] = (char)((int)'A' + i);
+                cb.Array[i] = (char)('A' + i);
             }
 
             cb.Produce(10);
-            Assert.AreEqual("ABCDEFGHIJ", cb.GetString());
+            Assert.That(cb.GetString(), Is.EqualTo("ABCDEFGHIJ"));
             cb.Consume(5);
-            Assert.AreEqual("FGHIJ", cb.GetString());
+            Assert.That(cb.GetString(), Is.EqualTo("FGHIJ"));
             cb.Produce(8);
-            Assert.AreEqual("FGHIJKLMNOABC", cb.GetString());
+            Assert.That(cb.GetString(), Is.EqualTo("FGHIJKLMNOABC"));
             cb.Consume(13);
-            Assert.AreEqual("", cb.GetString());
+            Assert.That(cb.GetString(), Is.EqualTo(""));
 
             cb = null;
-            Assert.IsNull(cb.GetString());
+            Assert.That(cb.GetString(), Is.Null);
         }
 
         [Test]
@@ -241,35 +240,35 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             CircularBuffer<char> cb = new CircularBuffer<char>(15);
             for (int i = 0; i < cb.Capacity; i++) {
-                cb.Array[i] = (char)((int)'A' + i);
+                cb.Array[i] = (char)('A' + i);
             }
 
             cb.Produce(10);
-            Assert.AreEqual("ABCDEFGHIJ", cb.GetString(10));
-            Assert.AreEqual("ABCDEFGHIJ", cb.GetString(20));
-            Assert.AreEqual("ABCDE", cb.GetString(5));
-            Assert.AreEqual("A", cb.GetString(1));
-            Assert.AreEqual("", cb.GetString(0));
+            Assert.That(cb.GetString(10), Is.EqualTo("ABCDEFGHIJ"));
+            Assert.That(cb.GetString(20), Is.EqualTo("ABCDEFGHIJ"));
+            Assert.That(cb.GetString(5), Is.EqualTo("ABCDE"));
+            Assert.That(cb.GetString(1), Is.EqualTo("A"));
+            Assert.That(cb.GetString(0), Is.EqualTo(""));
             cb.Consume(5);
-            Assert.AreEqual("FGHIJ", cb.GetString(10));
-            Assert.AreEqual("FGHIJ", cb.GetString(5));
-            Assert.AreEqual("FGH", cb.GetString(3));
-            Assert.AreEqual("", cb.GetString(0));
+            Assert.That(cb.GetString(10), Is.EqualTo("FGHIJ"));
+            Assert.That(cb.GetString(5), Is.EqualTo("FGHIJ"));
+            Assert.That(cb.GetString(3), Is.EqualTo("FGH"));
+            Assert.That(cb.GetString(0), Is.EqualTo(""));
             cb.Produce(8);
-            Assert.AreEqual("FGHIJKLMNOABC", cb.GetString(13));
-            Assert.AreEqual("FGHIJ", cb.GetString(5));
-            Assert.AreEqual("F", cb.GetString(1));
-            Assert.AreEqual("", cb.GetString(0));
+            Assert.That(cb.GetString(13), Is.EqualTo("FGHIJKLMNOABC"));
+            Assert.That(cb.GetString(5), Is.EqualTo("FGHIJ"));
+            Assert.That(cb.GetString(1), Is.EqualTo("F"));
+            Assert.That(cb.GetString(0), Is.EqualTo(""));
             cb.Consume(13);
-            Assert.AreEqual("", cb.GetString(0));
-            Assert.AreEqual("", cb.GetString(15));
-            Assert.AreEqual("", cb.GetString(20));
+            Assert.That(cb.GetString(0), Is.EqualTo(""));
+            Assert.That(cb.GetString(15), Is.EqualTo(""));
+            Assert.That(cb.GetString(20), Is.EqualTo(""));
 
             cb = null;
-            Assert.IsNull(cb.GetString(5));
-            Assert.IsNull(cb.GetString(0));
-            Assert.IsNull(cb.GetString(15));
-            Assert.IsNull(cb.GetString(20));
+            Assert.That(cb.GetString(5), Is.Null);
+            Assert.That(cb.GetString(0), Is.Null);
+            Assert.That(cb.GetString(15), Is.Null);
+            Assert.That(cb.GetString(20), Is.Null);
         }
 
         [Test]
@@ -277,41 +276,41 @@ namespace RJCP.Datastructures.CircularBufferTest
         {
             CircularBuffer<char> cb = new CircularBuffer<char>(15);
             for (int i = 0; i < cb.Capacity; i++) {
-                cb.Array[i] = (char)((int)'A' + i);
+                cb.Array[i] = (char)('A' + i);
             }
 
             cb.Produce(10);
-            Assert.AreEqual("ABCDEFGHIJ", cb.GetString(0, 10));
-            Assert.AreEqual("ABCDEFGHIJ", cb.GetString(0, 20));
-            Assert.AreEqual("", cb.GetString(0, 0));
-            Assert.AreEqual("FGHIJ", cb.GetString(5, 5));
-            Assert.AreEqual("BCDEFGHIJ", cb.GetString(1, 9));
-            Assert.AreEqual("BCDEFGH", cb.GetString(1, 7));
-            Assert.AreEqual("", cb.GetString(5, 0));
+            Assert.That(cb.GetString(0, 10), Is.EqualTo("ABCDEFGHIJ"));
+            Assert.That(cb.GetString(0, 20), Is.EqualTo("ABCDEFGHIJ"));
+            Assert.That(cb.GetString(0, 0), Is.EqualTo(""));
+            Assert.That(cb.GetString(5, 5), Is.EqualTo("FGHIJ"));
+            Assert.That(cb.GetString(1, 9), Is.EqualTo("BCDEFGHIJ"));
+            Assert.That(cb.GetString(1, 7), Is.EqualTo("BCDEFGH"));
+            Assert.That(cb.GetString(5, 0), Is.EqualTo(""));
             cb.Consume(5);
-            Assert.AreEqual("FGHIJ", cb.GetString(0, 10));
-            Assert.AreEqual("FGHIJ", cb.GetString(0, 5));
-            Assert.AreEqual("HIJ", cb.GetString(2, 3));
-            Assert.AreEqual("", cb.GetString(5, 0));
-            Assert.AreEqual("", cb.GetString(5, 1));
+            Assert.That(cb.GetString(0, 10), Is.EqualTo("FGHIJ"));
+            Assert.That(cb.GetString(0, 5), Is.EqualTo("FGHIJ"));
+            Assert.That(cb.GetString(2, 3), Is.EqualTo("HIJ"));
+            Assert.That(cb.GetString(5, 0), Is.EqualTo(""));
+            Assert.That(cb.GetString(5, 1), Is.EqualTo(""));
             cb.Produce(8);
-            Assert.AreEqual("FGHIJKLMNOABC", cb.GetString(0, 13));
-            Assert.AreEqual("FGHIJ", cb.GetString(0, 5));
-            Assert.AreEqual("KLMNOABC", cb.GetString(5, 13));
-            Assert.AreEqual("KLMNOABC", cb.GetString(5, 8));
-            Assert.AreEqual("KLMNO", cb.GetString(5, 5));
-            Assert.AreEqual("ABC", cb.GetString(10, 3));
+            Assert.That(cb.GetString(0, 13), Is.EqualTo("FGHIJKLMNOABC"));
+            Assert.That(cb.GetString(0, 5), Is.EqualTo("FGHIJ"));
+            Assert.That(cb.GetString(5, 13), Is.EqualTo("KLMNOABC"));
+            Assert.That(cb.GetString(5, 8), Is.EqualTo("KLMNOABC"));
+            Assert.That(cb.GetString(5, 5), Is.EqualTo("KLMNO"));
+            Assert.That(cb.GetString(10, 3), Is.EqualTo("ABC"));
             cb.Consume(13);
-            Assert.AreEqual("", cb.GetString(0, 0));
-            Assert.AreEqual("", cb.GetString(5, 15));
-            Assert.AreEqual("", cb.GetString(10, 20));
-            Assert.AreEqual("", cb.GetString(10, 1));
+            Assert.That(cb.GetString(0, 0), Is.EqualTo(""));
+            Assert.That(cb.GetString(5, 15), Is.EqualTo(""));
+            Assert.That(cb.GetString(10, 20), Is.EqualTo(""));
+            Assert.That(cb.GetString(10, 1), Is.EqualTo(""));
 
             cb = null;
-            Assert.IsNull(cb.GetString(0, 5));
-            Assert.IsNull(cb.GetString(10, 0));
-            Assert.IsNull(cb.GetString(5, 15));
-            Assert.IsNull(cb.GetString(2, 20));
+            Assert.That(cb.GetString(0, 5), Is.Null);
+            Assert.That(cb.GetString(10, 0), Is.Null);
+            Assert.That(cb.GetString(5, 15), Is.Null);
+            Assert.That(cb.GetString(2, 20), Is.Null);
         }
 
         [Test]
@@ -321,22 +320,22 @@ namespace RJCP.Datastructures.CircularBufferTest
             cb.Produce(10);
             cb.Consume(9);
 
-            Assert.AreEqual(1, cb.Length);
-            Assert.AreEqual(19, cb.Free);
+            Assert.That(cb.Length, Is.EqualTo(1));
+            Assert.That(cb.Free, Is.EqualTo(19));
 
             cb.Append("ABCDEFGHIJKLMN".ToCharArray(), 0, 14);
-            Assert.AreEqual(15, cb.Length);
-            Assert.AreEqual(5, cb.Free);
+            Assert.That(cb.Length, Is.EqualTo(15));
+            Assert.That(cb.Free, Is.EqualTo(5));
 
-            Assert.AreEqual("ABCDEFGHIJKLMN", cb.GetString(1, 14));
+            Assert.That(cb.GetString(1, 14), Is.EqualTo("ABCDEFGHIJKLMN"));
             cb.Consume(15);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(20, cb.Free);
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cb.Free, Is.EqualTo(20));
 
             cb.Append("12345678901234567890".ToCharArray());
-            Assert.AreEqual(0, cb.Free);
-            Assert.AreEqual(20, cb.Length);
-            Assert.AreEqual("12345678901234567890", cb.GetString());
+            Assert.That(cb.Free, Is.EqualTo(0));
+            Assert.That(cb.Length, Is.EqualTo(20));
+            Assert.That(cb.GetString(), Is.EqualTo("12345678901234567890"));
         }
 
         [Test]
@@ -351,9 +350,9 @@ namespace RJCP.Datastructures.CircularBufferTest
             cb2.Consume(3);
 
             cb1.Append(cb2);
-            Assert.AreEqual(15, cb1.Length);
-            Assert.AreEqual(5, cb1.Free);
-            Assert.AreEqual("123456789012345", cb1.GetString());
+            Assert.That(cb1.Length, Is.EqualTo(15));
+            Assert.That(cb1.Free, Is.EqualTo(5));
+            Assert.That(cb1.GetString(), Is.EqualTo("123456789012345"));
 
             // Write is one chunk, but read is two chunks
             cb1.Reset();
@@ -364,9 +363,9 @@ namespace RJCP.Datastructures.CircularBufferTest
             cb2.Consume(1);
 
             cb1.Append(cb2);
-            Assert.AreEqual(15, cb1.Length);
-            Assert.AreEqual(5, cb1.Free);
-            Assert.AreEqual("123456789012345", cb1.GetString());
+            Assert.That(cb1.Length, Is.EqualTo(15));
+            Assert.That(cb1.Free, Is.EqualTo(5));
+            Assert.That(cb1.GetString(), Is.EqualTo("123456789012345"));
 
             // Write is two chunks, read is one chunk
             cb1.Reset();
@@ -377,9 +376,9 @@ namespace RJCP.Datastructures.CircularBufferTest
 
             cb1.Append(cb2);
             cb1.Consume(1);
-            Assert.AreEqual(15, cb1.Length);
-            Assert.AreEqual(5, cb1.Free);
-            Assert.AreEqual("123456789012345", cb1.GetString());
+            Assert.That(cb1.Length, Is.EqualTo(15));
+            Assert.That(cb1.Free, Is.EqualTo(5));
+            Assert.That(cb1.GetString(), Is.EqualTo("123456789012345"));
 
             // Write is two chunks, read is two chunks, readlength < writelength
             cb1.Reset();
@@ -393,9 +392,9 @@ namespace RJCP.Datastructures.CircularBufferTest
 
             cb1.Append(cb2);
             cb1.Consume(1);
-            Assert.AreEqual(15, cb1.Length);
-            Assert.AreEqual(5, cb1.Free);
-            Assert.AreEqual("123456789012345", cb1.GetString());
+            Assert.That(cb1.Length, Is.EqualTo(15));
+            Assert.That(cb1.Free, Is.EqualTo(5));
+            Assert.That(cb1.GetString(), Is.EqualTo("123456789012345"));
 
             // Write is two chunks, read is two chunks, readlength > writelength
             cb1.Reset();
@@ -409,9 +408,9 @@ namespace RJCP.Datastructures.CircularBufferTest
 
             cb1.Append(cb2);
             cb1.Consume(1);
-            Assert.AreEqual(15, cb1.Length);
-            Assert.AreEqual(5, cb1.Free);
-            Assert.AreEqual("123456789012345", cb1.GetString());
+            Assert.That(cb1.Length, Is.EqualTo(15));
+            Assert.That(cb1.Free, Is.EqualTo(5));
+            Assert.That(cb1.GetString(), Is.EqualTo("123456789012345"));
         }
 
         [Test]
@@ -443,37 +442,34 @@ namespace RJCP.Datastructures.CircularBufferTest
                 0xA6, 0x73 };
 
             CircularBuffer<byte> cb1 = new CircularBuffer<byte>(m);
-            Assert.AreEqual(m.Length, cb1.Length);
-            Assert.AreEqual(0, cb1.Free);
-            Assert.AreEqual(0, cb1.Start);
-            Assert.AreEqual(0x80, cb1[0]);
+            Assert.That(cb1.Length, Is.EqualTo(m.Length));
+            Assert.That(cb1.Free, Is.EqualTo(0));
+            Assert.That(cb1.Start, Is.EqualTo(0));
+            Assert.That(cb1[0], Is.EqualTo(0x80));
 
             CircularBuffer<byte> cb2 = new CircularBuffer<byte>(m, 10);
-            Assert.AreEqual(10, cb2.Length);
-            Assert.AreEqual(m.Length - 10, cb2.Free);
-            Assert.AreEqual(0, cb2.Start);
-            Assert.AreEqual(0x80, cb2[0]);
+            Assert.That(cb2.Length, Is.EqualTo(10));
+            Assert.That(cb2.Free, Is.EqualTo(m.Length - 10));
+            Assert.That(cb2.Start, Is.EqualTo(0));
+            Assert.That(cb2[0], Is.EqualTo(0x80));
 
             CircularBuffer<byte> cb3 = new CircularBuffer<byte>(m, 15, 10);
-            Assert.AreEqual(10, cb3.Length);
-            Assert.AreEqual(m.Length - 10, cb3.Free);
-            Assert.AreEqual(15, cb3.Start);
-            Assert.AreEqual(0x02, cb3[0]);
+            Assert.That(cb3.Length, Is.EqualTo(10));
+            Assert.That(cb3.Free, Is.EqualTo(m.Length - 10));
+            Assert.That(cb3.Start, Is.EqualTo(15));
+            Assert.That(cb3[0], Is.EqualTo(0x02));
         }
 
         /// <summary>
-        /// Check converting a byte array to a char array with convert works
+        /// Check converting a byte array to a char array with convert works.
         /// </summary>
         /// <remarks>
-        /// This test places one byte of the Euro symbol at the end of the byte array
-        /// that wraps around, to ensure multibyte arrays are handled correctly.
+        /// This test places one byte of the Euro symbol at the end of the byte array that wraps around, to ensure
+        /// multibyte arrays are handled correctly.
         /// </remarks>
         [Test]
         public void CircularBufferExt_DecoderConvert1_Boundaries()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -481,34 +477,28 @@ namespace RJCP.Datastructures.CircularBufferTest
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82
             };
             char[] c = new char[28];
-
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
-            int bu;
-            int cu;
-            bool complete;
 
             // Based on the test "Decoder_Boundaries1"
-            d.Convert(cb, c, 0, c.Length, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(m.Length, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(c.Length, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", new string(c));
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, c, 0, c.Length, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(m.Length));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(c.Length));
+            Assert.That(new string(c), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         /// <summary>
-        /// Check converting a byte array to a char array with convert works
+        /// Check converting a byte array to a char array with convert works.
         /// </summary>
         /// <remarks>
-        /// This test places one byte of the Euro symbol at the end of the byte array
-        /// that wraps around, to ensure multibyte arrays are handled correctly.
+        /// This test places one byte of the Euro symbol at the end of the byte array that wraps around, to ensure
+        /// multibyte arrays are handled correctly.
         /// </remarks>
         [Test]
         public void CircularBufferExt_DecoderConvert1_BoundariesFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -518,34 +508,26 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[28];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Boundaries2"
-            d.Convert(cb, c, 0, c.Length, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(m.Length, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(c.Length, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", new string(c));
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, c, 0, c.Length, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(m.Length));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(c.Length));
+            Assert.That(new string(c), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         /// <summary>
-        /// Check converting a byte array to a char array with convert works
+        /// Check converting a byte array to a char array with convert works.
         /// </summary>
         /// <remarks>
-        /// The test places the Euro symbol at the end of the byte array and
-        /// wraps over to the beginning. There is insufficient bytes in the
-        /// char array to convert everything, but enough to convert the Euro
-        /// symbol
+        /// The test places the Euro symbol at the end of the byte array and wraps over to the beginning. There is
+        /// insufficient bytes in the char array to convert everything, but enough to convert the Euro symbol.
         /// </remarks>
         [Test]
         public void CircularBufferExt_DecoderConvert1_InsufficientCharSpace()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -553,28 +535,21 @@ namespace RJCP.Datastructures.CircularBufferTest
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82
             };
             char[] c = new char[20];
-
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpace"
-            d.Convert(cb, c, 0, c.Length, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(22, bu);
-            Assert.AreEqual(8, cb.Length);
-            Assert.AreEqual(c.Length, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", new string(c));
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, c, 0, c.Length, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(22));
+            Assert.That(cb.Length, Is.EqualTo(8));
+            Assert.That(cu, Is.EqualTo(c.Length));
+            Assert.That(new string(c), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEF"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_InsufficientCharSpaceFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -582,28 +557,21 @@ namespace RJCP.Datastructures.CircularBufferTest
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82
             };
             char[] c = new char[20];
-
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpaceFlush"
-            d.Convert(cb, c, 0, c.Length, true, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(22, bu);
-            Assert.AreEqual(8, cb.Length);
-            Assert.AreEqual(c.Length, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", new string(c));
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, c, 0, c.Length, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(22));
+            Assert.That(cb.Length, Is.EqualTo(8));
+            Assert.That(cu, Is.EqualTo(c.Length));
+            Assert.That(new string(c), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEF"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_InsufficientCharSpaceMbcs1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -613,25 +581,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[13];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpaceMbcs1"
-            d.Convert(cb, c, 0, c.Length, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(15, bu);
-            Assert.AreEqual(15, cb.Length);
-            Assert.AreEqual(c.Length, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€", new string(c));
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, c, 0, c.Length, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(15));
+            Assert.That(cb.Length, Is.EqualTo(15));
+            Assert.That(cu, Is.EqualTo(c.Length));
+            Assert.That(new string(c), Is.EqualTo("OPQRSTUVWXYZ€"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_IncompleteBuff()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -641,32 +603,27 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[30];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 13);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuff"
-            d.Convert(cb, c, 0, c.Length, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(13, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ", new string(c, 0, cu));
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, c, 0, c.Length, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(13));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(new string(c, 0, cu), Is.EqualTo("OPQRSTUVWXYZ"));
 
             cb.Produce(17);
             d.Convert(cb, c, 0, c.Length, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(17, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(16, cu);
-            Assert.AreEqual("€@ABCDEFGHIJKLMN", new string(c, 0, 16));
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(17));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(16));
+            Assert.That(new string(c, 0, 16), Is.EqualTo("€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_IncompleteBuffFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -676,154 +633,122 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[30];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 14);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuffFlush"
-            d.Convert(cb, c, 0, c.Length, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(14, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(13, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ.", new string(c, 0, 13));
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            d.Convert(cb, c, 0, c.Length, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(14));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(13));
+            Assert.That(new string(c, 0, 13), Is.EqualTo("OPQRSTUVWXYZ."));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_IncompleteBuffFlush2()
         {
-            int bu;
-            int cu;
-            bool complete;
-            char[] c = new char[30];
-
-            // Test the decoder on the circular buffer
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82
             };
+            char[] c = new char[30];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 14);
 
             // Based on the test "Decoder_IncompleteBuffFlush2"
-            d.Convert(cb, c, 0, 12, true, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ", new string(c, 0, 12));
-            Assert.AreEqual(2, cb.Length);
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            d.Convert(cb, c, 0, 12, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(12));
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(new string(c, 0, 12), Is.EqualTo("OPQRSTUVWXYZ"));
+            Assert.That(cb.Length, Is.EqualTo(2));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars1()
         {
-            int bu;
-            int cu;
-            bool complete;
-            char[] c = new char[30];
-
-            // Test the decoder on the circular buffer
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0
             };
+            char[] c = new char[30];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 16);
 
             // Based on the test "Decoder_Utf16Chars1"
-            d.Convert(cb, c, 0, 14, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(16, bu);
-            Assert.AreEqual(14, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ\uDB40\uDC84", new string(c, 0, 14));
-            Assert.AreEqual(0, cb.Length);
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, c, 0, 14, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(16));
+            Assert.That(cu, Is.EqualTo(14));
+            Assert.That(new string(c, 0, 14), Is.EqualTo("OPQRSTUVWXYZ\uDB40\uDC84"));
+            Assert.That(cb.Length, Is.EqualTo(0));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars2()
         {
-            int bu;
-            int cu;
-            bool complete;
-            char[] c = new char[30];
-
-            // Test the decoder on the circular buffer
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
+            Decoder d = Encoding.UTF8.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0
             };
+            char[] c = new char[30];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 16);
 
             // Based on the test "Decoder_Utf16Chars2"
-            d.Convert(cb, c, 0, 13, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            //Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ", new string(c, 0, 12));
-            //Assert.AreEqual(4, cb.Length);
+            d.Convert(cb, c, 0, 13, false, out _, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(new string(c, 0, 12), Is.EqualTo("OPQRSTUVWXYZ"));
 
-            // This particular test is hard. The decoder consumes 12 bytes, but our function
-            // consumes more (because the 4-bytes cross a boundary). The decoder needs to see
-            // all four bytes to decide not to convert it. There is nothing in the documentation
-            // to say that the decoder should behave this way. So we can't simulate the original
-            // behaviour in this case.
+            // This particular test is hard. The decoder consumes 12 bytes, but our function consumes more (because the
+            // 4-bytes cross a boundary). The decoder needs to see all four bytes to decide not to convert it. There is
+            // nothing in the documentation to say that the decoder should behave this way. So we can't simulate the
+            // original behaviour in this case.
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars3()
         {
-            int bu;
-            int cu;
-            bool complete;
-            char[] c = new char[30];
-
-            // Test the decoder on the circular buffer
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
+            Decoder d = Encoding.UTF8.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0
             };
+            char[] c = new char[30];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 28, 4);
-            bool exception;
 
             // Based on the test "Decoder_Utf16Chars3"
 
-            // The behaviour isn't the same due to non-documented behaviour. MS documentation
-            // doesn't say if an exception should occur or not and it has slightly inconsistent
-            // behaviour if we sent 3 bytes (of 4), or 4 bytes at once.
+            // The behaviour isn't the same due to non-documented behaviour. MS documentation doesn't say if an
+            // exception should occur or not and it has slightly inconsistent behaviour if we sent 3 bytes (of 4), or 4
+            // bytes at once.
 
-            exception = false;
+            int bu;
+            int cu;
+            bool complete;
+            bool exception = false;
             try {
                 d.Convert(cb, c, 0, 1, false, out bu, out cu, out complete);
-            } catch (System.ArgumentException e) {
+            } catch (ArgumentException e) {
                 if (!e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
-            //Assert.IsTrue(exception);
             if (!exception) {
-                Assert.AreEqual(0, cu);
-                try {
+                Assert.That(cu, Is.EqualTo(0));
+                Assert.That(() => {
                     d.Convert(cb, c, 0, 1, false, out bu, out cu, out complete);
-                } catch (System.ArgumentException e) {
-                    if (!e.ParamName.Equals("chars")) throw;
-                    exception = true;
-                    cu = -1;
-                }
-                Assert.IsTrue(exception);
+                }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
             cb = new CircularBuffer<byte>(m, 28, 4);
@@ -831,35 +756,26 @@ namespace RJCP.Datastructures.CircularBufferTest
             exception = false;
             try {
                 d.Convert(cb, c, 0, 1, true, out bu, out cu, out complete);
-            } catch (System.ArgumentException e) {
+            } catch (ArgumentException e) {
                 if (!e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
-            //Assert.IsTrue(exception);
             if (!exception) {
-                Assert.AreEqual(0, cu);
-                try {
+                Assert.That(cu, Is.EqualTo(0));
+                Assert.That(() => {
                     d.Convert(cb, c, 0, 1, false, out bu, out cu, out complete);
-                } catch (System.ArgumentException e) {
-                    if (!e.ParamName.Equals("chars")) throw;
-                    exception = true;
-                    cu = -1;
-                }
-                Assert.IsTrue(exception);
+                }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
             d.Convert(cb, c, 0, 2, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            //Assert.AreEqual(4, bu);
-            Assert.AreEqual(2, cu);
+            Assert.That(complete, Is.True);
+            Assert.That(cu, Is.EqualTo(2));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_Boundaries()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -870,23 +786,18 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Boundaries"
-            d.Convert(cb, cc, cc.Free, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(m.Length, bu);
-            Assert.AreEqual(cc.Capacity, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Free, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(m.Length));
+            Assert.That(cu, Is.EqualTo(cc.Capacity));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_BoundariesFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -897,23 +808,18 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Boundaries"
-            d.Convert(cb, cc, cc.Free, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(m.Length, bu);
-            Assert.AreEqual(cc.Capacity, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Free, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(m.Length));
+            Assert.That(cu, Is.EqualTo(cc.Capacity));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_InsufficientCharSpace()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -924,24 +830,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpace"
-            d.Convert(cb, cc, cc.Free, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(22, bu);
-            Assert.AreEqual(cc.Capacity, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", cc.GetString());
-            Assert.AreEqual(8, cb.Length);
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Free, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(22));
+            Assert.That(cu, Is.EqualTo(cc.Capacity));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEF"));
+            Assert.That(cb.Length, Is.EqualTo(8));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_InsufficientCharSpaceFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -952,24 +853,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpaceFlush"
-            d.Convert(cb, cc, cc.Free, true, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(22, bu);
-            Assert.AreEqual(cc.Capacity, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", cc.GetString());
-            Assert.AreEqual(8, cb.Length);
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Free, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(22));
+            Assert.That(cu, Is.EqualTo(cc.Capacity));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEF"));
+            Assert.That(cb.Length, Is.EqualTo(8));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_InsufficientCharSpaceMbcs1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -980,23 +876,18 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, m.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpaceMbcs1"
-            d.Convert(cb, cc, cc.Free, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(15, bu);
-            Assert.AreEqual(cc.Capacity, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Free, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(15));
+            Assert.That(cu, Is.EqualTo(cc.Capacity));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_IncompleteBuff()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -1007,33 +898,28 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 13);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuff"
-            d.Convert(cb, cc, cc.Free, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(13, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Free, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(13));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ"));
             cc.Consume(cu);
 
             cb.Produce(17);
             d.Convert(cb, cc, cc.Free, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(17, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(16, cu);
-            Assert.AreEqual("€@ABCDEFGHIJKLMN", cc.GetString());
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(17));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(16));
+            Assert.That(cc.GetString(), Is.EqualTo("€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_IncompleteBuffFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -1044,24 +930,20 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 14);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuffFlush"
-            d.Convert(cb, cc, cc.Free, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(14, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(13, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ.", cc.GetString());
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            d.Convert(cb, cc, cc.Free, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(14));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(13));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ."));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_IncompleteBuffFlush2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -1072,24 +954,20 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 14);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuffFlush2"
-            d.Convert(cb, cc, 12, true, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
-            Assert.AreEqual(2, cb.Length);
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            d.Convert(cb, cc, 12, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(12));
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ"));
+            Assert.That(cb.Length, Is.EqualTo(2));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars1a()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -1100,24 +978,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 16);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Utf16Chars1"
-            d.Convert(cb, cc, 14, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(16, bu);
-            Assert.AreEqual(14, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ\uDB40\uDC84", cc.GetString());
-            Assert.AreEqual(0, cb.Length);
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, 14, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(16));
+            Assert.That(cu, Is.EqualTo(14));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ\uDB40\uDC84"));
+            Assert.That(cb.Length, Is.EqualTo(0));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars1b()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -1128,25 +1001,20 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 16);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 17, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Utf16Chars1"
             // - We force the 2 chars to wrap
-            d.Convert(cb, cc, 14, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(16, bu);
-            Assert.AreEqual(14, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ\uDB40\uDC84", cc.GetString());
-            Assert.AreEqual(0, cb.Length);
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, 14, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(16));
+            Assert.That(cu, Is.EqualTo(14));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ\uDB40\uDC84"));
+            Assert.That(cb.Length, Is.EqualTo(0));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -1157,30 +1025,22 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 16);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Utf16Chars2"
-            d.Convert(cb, cc, 13, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            //Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
-            //Assert.AreEqual(4, cb.Length);
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, 13, false, out _, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ"));
 
-            // This particular test is hard. The decoder consumes 12 bytes, but our function
-            // consumes more (because the 4-bytes cross a boundary). The decoder needs to see
-            // all four bytes to decide not to convert it. There is nothing in the documentation
-            // to say that the decoder should behave this way. So we can't simulate the original
-            // behaviour in this case.
+            // This particular test is hard. The decoder consumes 12 bytes, but our function consumes more (because the
+            // 4-bytes cross a boundary). The decoder needs to see all four bytes to decide not to convert it. There is
+            // nothing in the documentation to say that the decoder should behave this way. So we can't simulate the
+            // original behaviour in this case.
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_Utf16Chars3()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -1191,36 +1051,29 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 28, 4);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
-            bool exception;
+            // Based on the test "Decoder_Utf16Chars3"
+
+            // The behaviour isn't the same due to non-documented behaviour. MS documentation doesn't say if an
+            // exception should occur or not and it has slightly inconsistent behaviour if we sent 3 bytes (of 4), or 4
+            // bytes at once.
+
             int bu;
             int cu;
             bool complete;
-
-            // Based on the test "Decoder_Utf16Chars3"
-
-            // The behaviour isn't the same due to non-documented behaviour. MS documentation
-            // doesn't say if an exception should occur or not and it has slightly inconsistent
-            // behaviour if we sent 3 bytes (of 4), or 4 bytes at once.
-
-            exception = false;
+            bool exception = false;
+            Decoder d = Encoding.UTF8.GetDecoder();
             try {
                 d.Convert(cb, cc, 1, false, out bu, out cu, out complete);
-            } catch (System.ArgumentException e) {
+            } catch (ArgumentException e) {
                 if (!e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
-            //Assert.IsTrue(exception);
             if (!exception) {
-                Assert.AreEqual(0, cu);
-                try {
+                Assert.That(cu, Is.EqualTo(0));
+                Assert.That(() => {
                     d.Convert(cb, cc, 1, false, out bu, out cu, out complete);
-                } catch (System.ArgumentException e) {
-                    if (!e.ParamName.Equals("chars")) throw;
-                    exception = true;
-                    cu = -1;
-                }
-                Assert.IsTrue(exception);
+                }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
             cb = new CircularBuffer<byte>(m, 28, 4);
@@ -1228,110 +1081,85 @@ namespace RJCP.Datastructures.CircularBufferTest
             exception = false;
             try {
                 d.Convert(cb, cc, 1, true, out bu, out cu, out complete);
-            } catch (System.ArgumentException e) {
+            } catch (ArgumentException e) {
                 if (!e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
-            //Assert.IsTrue(exception);
             if (!exception) {
-                Assert.AreEqual(0, cu);
-                try {
+                Assert.That(cu, Is.EqualTo(0));
+                Assert.That(() => {
                     d.Convert(cb, cc, 1, false, out bu, out cu, out complete);
-                } catch (System.ArgumentException e) {
-                    if (!e.ParamName.Equals("chars")) throw;
-                    exception = true;
-                    cu = -1;
-                }
-                Assert.IsTrue(exception);
+                }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
             d.Convert(cb, cc, 2, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            //Assert.AreEqual(4, bu);
-            Assert.AreEqual(2, cu);
+            Assert.That(complete, Is.True);
+            Assert.That(cu, Is.EqualTo(2));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_CircularFull()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] b = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82
             };
-            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 16, b.Length);
-
             char[] c = new char[30];
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 16, b.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 28, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-            d.Convert(cb, cc, cc.Capacity, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(b.Length, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(28, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Capacity, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(b.Length));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(28));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_MultiChar1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] b = {
                 0xF3, 0xA0, 0x82, 0x84, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41,
                 0x42, 0x43, 0x44, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55
             };
-            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 0, b.Length);
-
             char[] c = new char[30];
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 0, b.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 29, 0);
-            int bu;
-            int cu;
-            bool complete;
-            d.Convert(cb, cc, cc.Capacity, false, out bu, out cu, out complete);
 
-            //Assert.IsFalse(complete);
-            Assert.AreEqual(30, cu);
-            Assert.AreEqual(32, bu);
-            Assert.AreEqual(0, cc.Free);
-            Assert.AreEqual("\uDB40\uDC840123456789@ABCDIJKLMNOPQRSTU", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Capacity, false, out int bu, out int cu, out _);
+            Assert.That(cu, Is.EqualTo(30));
+            Assert.That(bu, Is.EqualTo(32));
+            Assert.That(cc.Free, Is.EqualTo(0));
+            Assert.That(cc.GetString(), Is.EqualTo("\uDB40\uDC840123456789@ABCDIJKLMNOPQRSTU"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert2_MultiChar2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] b = {
                 0xF3, 0xA0, 0x82, 0x84, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41,
                 0x42, 0x43, 0x44, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55
             };
-            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 4, b.Length);
-
             char[] c = new char[29];
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 4, b.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 0, 0);
-            int bu;
-            int cu;
-            bool complete;
-            d.Convert(cb, cc, cc.Capacity, false, out bu, out cu, out complete);
 
-            // The character buffer doesn't contain enough space to capture the last two-byte character. Just like
-            // the real decoder, it should capture as much as possible and return without an error.
-            Assert.IsFalse(complete);
-            Assert.AreEqual(28, cu);
-            Assert.AreEqual(28, bu);
-            Assert.AreEqual(1, cc.Free);
-            Assert.AreEqual("0123456789@ABCDIJKLMNOPQRSTU", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, cc.Capacity, false, out int bu, out int cu, out bool complete);
+
+            // The character buffer doesn't contain enough space to capture the last two-byte character. Just like the
+            // real decoder, it should capture as much as possible and return without an error.
+            Assert.That(complete, Is.False);
+            Assert.That(cu, Is.EqualTo(28));
+            Assert.That(bu, Is.EqualTo(28));
+            Assert.That(cc.Free, Is.EqualTo(1));
+            Assert.That(cc.GetString(), Is.EqualTo("0123456789@ABCDIJKLMNOPQRSTU"));
 
             // There are no bytes to convert, an exception should be raised like the real decoder in a char[].
             try {
@@ -1343,26 +1171,21 @@ namespace RJCP.Datastructures.CircularBufferTest
         [Test]
         public void CircularBufferExt_DecoderConvert3_BoundariesWithFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
+            Decoder d = Encoding.UTF8.GetDecoder();
             byte[] m = { 0x41, 0xE2, 0x82, 0xAC };
             CircularBuffer<byte> cb;
             CircularBuffer<char> cc;
-            int bu;
-            int cu;
-            bool complete;
 
             cb = new CircularBuffer<byte>(m, 0, 3);
             cc = new CircularBuffer<char>(20);
-            d.Convert(cb, cc, true, out bu, out cu, out complete);
-            Assert.AreEqual(3, bu);
-            Assert.AreEqual(2, cu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(2, cc.Length);
-            Assert.AreEqual('A', cc[0]);
-            Assert.AreEqual((char)0xFFFD, cc[1]);
-            Assert.IsTrue(complete);
+            d.Convert(cb, cc, true, out int bu, out int cu, out bool complete);
+            Assert.That(bu, Is.EqualTo(3));
+            Assert.That(cu, Is.EqualTo(2));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cc.Length, Is.EqualTo(2));
+            Assert.That(cc[0], Is.EqualTo('A'));
+            Assert.That(cc[1], Is.EqualTo((char)0xFFFD));
+            Assert.That(complete, Is.True);
 
             cb = new CircularBuffer<byte>(m, 0, 3);
             cc = new CircularBuffer<char>(20);
@@ -1370,48 +1193,40 @@ namespace RJCP.Datastructures.CircularBufferTest
             cc.Consume(18);
             d.Convert(cb, cc, true, out bu, out cu, out complete);
             cc.Consume(1);
-            Assert.AreEqual(3, bu);
-            Assert.AreEqual(2, cu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(2, cc.Length);
-            Assert.AreEqual('A', cc[0]);
-            Assert.AreEqual((char)0xFFFD, cc[1]);
-            Assert.IsTrue(complete);
+            Assert.That(bu, Is.EqualTo(3));
+            Assert.That(cu, Is.EqualTo(2));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cc.Length, Is.EqualTo(2));
+            Assert.That(cc[0], Is.EqualTo('A'));
+            Assert.That(cc[1], Is.EqualTo((char)0xFFFD));
+            Assert.That(complete, Is.True);
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert3_CircularFull2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
-
             byte[] b = {
                 0xAC, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82
             };
-            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 16, b.Length);
-
             char[] c = new char[30];
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(b, 16, b.Length);
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 28, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-            d.Convert(cb, cc, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(b.Length, bu);
-            Assert.AreEqual(0, cb.Length);
-            Assert.AreEqual(28, cu);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(cb, cc, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(b.Length));
+            Assert.That(cb.Length, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(28));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_Boundaries1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
@@ -1420,24 +1235,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             };
             CircularBuffer<char> cc = new CircularBuffer<char>(28);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Boundaries"
-            d.Convert(m, 0, m.Length, cc, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(m.Length, bu);
-            Assert.AreEqual(28, cu);
-            Assert.AreEqual(28, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, m.Length, cc, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(m.Length));
+            Assert.That(cu, Is.EqualTo(28));
+            Assert.That(cc.Length, Is.EqualTo(28));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_Boundaries2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
@@ -1447,24 +1257,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[28];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Boundaries"
-            d.Convert(m, 0, m.Length, cc, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(m.Length, bu);
-            Assert.AreEqual(28, cu);
-            Assert.AreEqual(28, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, m.Length, cc, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(m.Length));
+            Assert.That(cu, Is.EqualTo(28));
+            Assert.That(cc.Length, Is.EqualTo(28));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_BoundariesFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
@@ -1474,24 +1279,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[28];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_BoundariesFlush"
-            d.Convert(m, 0, m.Length, cc, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(m.Length, bu);
-            Assert.AreEqual(28, cu);
-            Assert.AreEqual(28, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, m.Length, cc, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(m.Length));
+            Assert.That(cu, Is.EqualTo(28));
+            Assert.That(cc.Length, Is.EqualTo(28));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_InsufficientCharSpace()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
@@ -1501,24 +1301,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[20];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 15, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpace"
-            d.Convert(m, 0, m.Length, cc, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(22, bu);
-            Assert.AreEqual(20, cu);
-            Assert.AreEqual(20, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, m.Length, cc, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(22));
+            Assert.That(cu, Is.EqualTo(20));
+            Assert.That(cc.Length, Is.EqualTo(20));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEF"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_InsufficientCharSpaceFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
@@ -1528,24 +1323,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[20];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 15, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpaceFlush"
-            d.Convert(m, 0, m.Length, cc, true, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(22, bu);
-            Assert.AreEqual(20, cu);
-            Assert.AreEqual(20, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ€@ABCDEF", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, m.Length, cc, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(22));
+            Assert.That(cu, Is.EqualTo(20));
+            Assert.That(cc.Length, Is.EqualTo(20));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€@ABCDEF"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_InsufficientCharSpaceMbcs1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
@@ -1555,24 +1345,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[13];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 4, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_InsufficientCharSpaceMbcs1"
-            d.Convert(m, 0, m.Length, cc, true, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(15, bu);
-            Assert.AreEqual(13, cu);
-            Assert.AreEqual(13, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ€", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, m.Length, cc, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(15));
+            Assert.That(cu, Is.EqualTo(13));
+            Assert.That(cc.Length, Is.EqualTo(13));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ€"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_IncompleteBuff()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82,
@@ -1582,31 +1367,26 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[30];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuff"
-            d.Convert(m, 0, 13, cc, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(13, bu);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual(12, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, 13, cc, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(13));
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(cc.Length, Is.EqualTo(12));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ"));
             cc.Consume(12);
 
             d.Convert(m, 13, 17, cc, false, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(17, bu);
-            Assert.AreEqual(16, cu);
-            Assert.AreEqual("€@ABCDEFGHIJKLMN", cc.GetString());
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(17));
+            Assert.That(cu, Is.EqualTo(16));
+            Assert.That(cc.GetString(), Is.EqualTo("€@ABCDEFGHIJKLMN"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_IncompleteBuffFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82, 0xAC, 0x40,
@@ -1616,24 +1396,20 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[30];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 20, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuffFlush"
-            d.Convert(m, 0, 14, cc, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(14, bu);
-            Assert.AreEqual(13, cu);
-            Assert.AreEqual(13, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ.", cc.GetString());
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            d.Convert(m, 0, 14, cc, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(14));
+            Assert.That(cu, Is.EqualTo(13));
+            Assert.That(cc.Length, Is.EqualTo(13));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ."));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_IncompleteBuffFlush2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xE2, 0x82, 0xAC, 0x40,
@@ -1643,24 +1419,20 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[12];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 11, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_IncompleteBuffFlush2"
-            d.Convert(m, 0, 14, cc, true, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual(12, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            d.Convert(m, 0, 14, cc, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(12));
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(cc.Length, Is.EqualTo(12));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_Utf16Chars1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0, 0x82, 0x84,
@@ -1670,24 +1442,19 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[14];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 11, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Utf16Chars1"
-            d.Convert(m, 0, 16, cc, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(16, bu);
-            Assert.AreEqual(14, cu);
-            Assert.AreEqual(14, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ\uDB40\uDC84", cc.GetString());
+            Decoder d = Encoding.UTF8.GetDecoder();
+            d.Convert(m, 0, 16, cc, true, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(16));
+            Assert.That(cu, Is.EqualTo(14));
+            Assert.That(cc.Length, Is.EqualTo(14));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ\uDB40\uDC84"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_Utf16Chars2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0, 0x82, 0x84,
@@ -1697,24 +1464,20 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[13];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 11, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Decoder_Utf16Chars2"
-            d.Convert(m, 0, 16, cc, false, out bu, out cu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
-            Assert.AreEqual(12, cc.Length);
-            Assert.AreEqual("OPQRSTUVWXYZ", cc.GetString());
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            d.Convert(m, 0, 16, cc, false, out int bu, out int cu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(12));
+            Assert.That(cu, Is.EqualTo(12));
+            Assert.That(cc.Length, Is.EqualTo(12));
+            Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ"));
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert4_Utf16Chars3()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
-            Decoder d = enc.GetDecoder();
             byte[] m = {
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0, 0x82, 0x84,
@@ -1724,475 +1487,353 @@ namespace RJCP.Datastructures.CircularBufferTest
             char[] c = new char[1];
             CircularBuffer<char> cc = new CircularBuffer<char>(c, 0, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-            bool exception;
-
             // Based on the test "Decoder_Utf16Chars3"
 
             // We expect this to fail, as a two-char Unicode character doesn't fit in one byte
-            exception = false;
-            try {
+            Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
+            Decoder d = enc.GetDecoder();
+            int bu;
+            int cu;
+            bool complete;
+            Assert.That(() => {
                 d.Convert(m, 12, 10, cc, false, out bu, out cu, out complete);
-            } catch (System.ArgumentException e) {
-                if (!e.ParamName.Equals("chars")) throw;
-                exception = true;
-            }
-            Assert.IsTrue(exception);
+            }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
 
             // We expect this to fail, as a two-char Unicode character doesn't fit in one byte
-            exception = false;
-            try {
+            Assert.That(() => {
                 d.Convert(m, 12, 10, cc, true, out bu, out cu, out complete);
-            } catch (System.ArgumentException e) {
-                if (!e.ParamName.Equals("chars")) throw;
-                exception = true;
-            }
-            Assert.IsTrue(exception);
+            }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
 
             c = new char[2];
             cc = new CircularBuffer<char>(c, 1, 0);
             d.Convert(m, 12, 4, cc, true, out bu, out cu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(4, bu);
-            Assert.AreEqual(2, cu);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(4));
+            Assert.That(cu, Is.EqualTo(2));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
-
             char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
-            int bu;
-            int cu;
-            bool complete;
 
-            e.Convert(c, 0, 3, cb, false, out cu, out bu, out complete);
-            Assert.AreEqual(3, cu);
-            Assert.AreEqual(5, bu);
-            Assert.AreEqual(5, cb.Length);
-            Assert.IsTrue(complete);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, 3, cb, false, out int cu, out int bu, out bool complete);
+            Assert.That(cu, Is.EqualTo(3));
+            Assert.That(bu, Is.EqualTo(5));
+            Assert.That(cb.Length, Is.EqualTo(5));
+            Assert.That(complete, Is.True);
 
             e.Reset();
             cb.Reset();
             cb.Produce(17);
             cb.Consume(17);
             e.Convert(c, 0, 4, cb, false, out cu, out bu, out complete);
-            Assert.AreEqual(4, cu);
-            Assert.AreEqual(6, bu);
-            Assert.AreEqual(6, cb.Length);
-            Assert.IsTrue(complete);
+            Assert.That(cu, Is.EqualTo(4));
+            Assert.That(bu, Is.EqualTo(6));
+            Assert.That(cb.Length, Is.EqualTo(6));
+            Assert.That(complete, Is.True);
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Full1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
-
             char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
-            int bu;
-            int cu;
-            bool complete;
 
             cb.Produce(17);
             cb.Consume(3);
-            e.Convert(c, 0, 4, cb, false, out cu, out bu, out complete);
-            Assert.AreEqual(4, cu);
-            Assert.AreEqual(6, bu);
-            Assert.AreEqual(20, cb.Length);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(0x41, cb[14]);
-            Assert.AreEqual(0x42, cb[15]);
-            Assert.AreEqual(0xE2, cb[16]);
-            Assert.AreEqual(0x82, cb[17]);
-            Assert.AreEqual(0xAC, cb[18]);
-            Assert.AreEqual(0x43, cb[19]);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, 4, cb, false, out int cu, out int bu, out bool complete);
+            Assert.That(cu, Is.EqualTo(4));
+            Assert.That(bu, Is.EqualTo(6));
+            Assert.That(cb.Length, Is.EqualTo(20));
+            Assert.That(complete, Is.True);
+            Assert.That(cb[14], Is.EqualTo(0x41));
+            Assert.That(cb[15], Is.EqualTo(0x42));
+            Assert.That(cb[16], Is.EqualTo(0xE2));
+            Assert.That(cb[17], Is.EqualTo(0x82));
+            Assert.That(cb[18], Is.EqualTo(0xAC));
+            Assert.That(cb[19], Is.EqualTo(0x43));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Full2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
-
             char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
-            int bu;
-            int cu;
-            bool complete;
 
             cb.Produce(14);
-            e.Convert(c, 0, 4, cb, false, out cu, out bu, out complete);
-            Assert.AreEqual(4, cu);
-            Assert.AreEqual(6, bu);
-            Assert.AreEqual(20, cb.Length);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(0x41, cb[14]);
-            Assert.AreEqual(0x42, cb[15]);
-            Assert.AreEqual(0xE2, cb[16]);
-            Assert.AreEqual(0x82, cb[17]);
-            Assert.AreEqual(0xAC, cb[18]);
-            Assert.AreEqual(0x43, cb[19]);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, 4, cb, false, out int cu, out int bu, out bool complete);
+            Assert.That(cu, Is.EqualTo(4));
+            Assert.That(bu, Is.EqualTo(6));
+            Assert.That(cb.Length, Is.EqualTo(20));
+            Assert.That(complete, Is.True);
+            Assert.That(cb[14], Is.EqualTo(0x41));
+            Assert.That(cb[15], Is.EqualTo(0x42));
+            Assert.That(cb[16], Is.EqualTo(0xE2));
+            Assert.That(cb[17], Is.EqualTo(0x82));
+            Assert.That(cb[18], Is.EqualTo(0xAC));
+            Assert.That(cb[19], Is.EqualTo(0x43));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Overfill()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
-
+            Encoder e = Encoding.UTF8.GetEncoder();
             char[] c = { 'A', 'B', '€', 'C' };
             CircularBuffer<byte> cb = new CircularBuffer<byte>(20);
-            int bu;
-            int cu;
-            bool complete;
 
             for (int i = 15; i < 20; i++) {
-                System.Diagnostics.Trace.WriteLine("With " + (20 - i).ToString() + " bytes free");
+                Console.WriteLine("With {0} bytes free", 20 - i);
                 e.Reset();
                 cb.Reset();
                 cb.Produce(i);
-                e.Convert(c, 0, 4, cb, false, out cu, out bu, out complete);
-                System.Diagnostics.Trace.WriteLine("  cu=" + cu.ToString() + "; bu=" + bu.ToString());
-                Assert.IsFalse(complete);
-                Assert.IsTrue(bu <= 20 - i);
+                e.Convert(c, 0, 4, cb, false, out int cu, out int bu, out bool complete);
+                Console.WriteLine("  cu={0}; bu={1}", cu, bu);
+                Assert.That(complete, Is.False);
+                Assert.That(bu <= 20 - i, Is.True);
             }
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Boundaries()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[24];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 0, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_Boundaries"
-            e.Convert(c, 0, c.Length, cb, false, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(24, bu);
-            Assert.AreEqual(22, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, false, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(24));
+            Assert.That(cu, Is.EqualTo(22));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Boundaries2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[24];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 12, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_Boundaries", but ensures the MBCS character is properly wrapped
-            e.Convert(c, 0, c.Length, cb, false, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(24, bu);
-            Assert.AreEqual(22, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, false, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(24));
+            Assert.That(cu, Is.EqualTo(22));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_BoundariesFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[24];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 0, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(24, bu);
-            Assert.AreEqual(22, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(24));
+            Assert.That(cu, Is.EqualTo(22));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Boundaries2Flush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[24];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 12, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush", but ensures the MBCS character is properly wrapped
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(24, bu);
-            Assert.AreEqual(22, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(24));
+            Assert.That(cu, Is.EqualTo(22));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpace()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[20];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 10, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, false, out cu, out bu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(20, bu);
-            Assert.AreEqual(18, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, false, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(20));
+            Assert.That(cu, Is.EqualTo(18));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpaceFlush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[20];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 10, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(20, bu);
-            Assert.AreEqual(18, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(20));
+            Assert.That(cu, Is.EqualTo(18));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpace2()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[16];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 10, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, false, out cu, out bu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(15, bu);
-            Assert.AreEqual(15, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, false, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(15));
+            Assert.That(cu, Is.EqualTo(15));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_InsufficientByteSpace2Flush()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "This is a test €100.99".ToCharArray();
             byte[] m = new byte[16];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 10, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(15, bu);
-            Assert.AreEqual(15, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(15));
+            Assert.That(cu, Is.EqualTo(15));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars1()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[16];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 0, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(16, bu);
-            Assert.AreEqual(14, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(16));
+            Assert.That(cu, Is.EqualTo(14));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars1a()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[16];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 3, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(16, bu);
-            Assert.AreEqual(14, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(16));
+            Assert.That(cu, Is.EqualTo(14));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars2a()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[15];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 0, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(12));
+            Assert.That(cu, Is.EqualTo(12));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars2b()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[15];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 2, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 0, c.Length, cb, true, out cu, out bu, out complete);
-            Assert.IsFalse(complete);
-            Assert.AreEqual(12, bu);
-            Assert.AreEqual(12, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 0, c.Length, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.False);
+            Assert.That(bu, Is.EqualTo(12));
+            Assert.That(cu, Is.EqualTo(12));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars3a()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[4];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 0, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 12, 2, cb, true, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(4, bu);
-            Assert.AreEqual(2, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 12, 2, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(4));
+            Assert.That(cu, Is.EqualTo(2));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars3b()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[4];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 2, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-
             // Based on the test "Encoder_BoundariesFlush"
-            e.Convert(c, 12, 2, cb, true, out cu, out bu, out complete);
-            Assert.IsTrue(complete);
-            Assert.AreEqual(4, bu);
-            Assert.AreEqual(2, cu);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            e.Convert(c, 12, 2, cb, true, out int cu, out int bu, out bool complete);
+            Assert.That(complete, Is.True);
+            Assert.That(bu, Is.EqualTo(4));
+            Assert.That(cu, Is.EqualTo(2));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars4a()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[3];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 0, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-            bool exception;
-
             // Based on the test "Encoder_BoundariesFlush"
-            exception = false;
-            try {
-                e.Convert(c, 12, 2, cb, true, out cu, out bu, out complete);
-            } catch (System.ArgumentException ex) {
-                if (!ex.ParamName.Equals("bytes")) throw;
-                exception = true;
-            }
-            Assert.IsTrue(exception);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            Assert.That(() => {
+                e.Convert(c, 12, 2, cb, true, out _, out _, out _);
+            }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("bytes"));
         }
 
         [Test]
         public void CircularBufferExt_EncoderConvert_Utf16Chars4b()
         {
-            Encoding enc = Encoding.GetEncoding("UTF-8");
-            Encoder e = enc.GetEncoder();
             char[] c = "OPQRSTUVWXYZ\uDB40\uDC84".ToCharArray();
             byte[] m = new byte[3];
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 1, 0);
 
-            int bu;
-            int cu;
-            bool complete;
-            bool exception;
-
             // Based on the test "Encoder_BoundariesFlush"
-            exception = false;
-            try {
-                e.Convert(c, 12, 2, cb, true, out cu, out bu, out complete);
-            } catch (System.ArgumentException ex) {
-                if (!ex.ParamName.Equals("bytes")) throw;
-                exception = true;
-            }
-            Assert.IsTrue(exception);
+            Encoder e = Encoding.UTF8.GetEncoder();
+            Assert.That(() => {
+                e.Convert(c, 12, 2, cb, true, out _, out _, out _);
+            }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("bytes"));
         }
     }
 }

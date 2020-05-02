@@ -4,8 +4,6 @@
 
 namespace RJCP.IO.Ports
 {
-    using System;
-
     /// <summary>
     /// A class containing information about a serial port.
     /// </summary>

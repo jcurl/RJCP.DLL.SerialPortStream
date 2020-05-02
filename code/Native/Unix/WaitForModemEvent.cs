@@ -7,6 +7,8 @@ namespace RJCP.IO.Ports.Native.Unix
     using System;
 
     [Flags]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4070:Non-flags enums should not be marked with \"FlagsAttribute\"",
+        Justification = "P/Invoke")]
     internal enum WaitForModemEvent
     {
         Error = -1,

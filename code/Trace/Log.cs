@@ -4,9 +4,7 @@
 
 namespace RJCP.IO.Ports.Trace
 {
-    using System;
     using System.Diagnostics;
-    using System.Threading;
 
     internal static class Log
     {

@@ -13,7 +13,6 @@ namespace RJCP.IO.Ports.Native
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
-    /// <seealso cref="RJCP.IO.Ports.Native.INativeSerial" />
     internal class UnixNativeSerial : INativeSerial
     {
         private INativeSerialDll m_Dll;
@@ -40,6 +39,8 @@ namespace RJCP.IO.Ports.Native
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown",
+            Justification = "P/Invoke")]
         private void ThrowException()
         {
             if (m_Dll == null)
@@ -109,6 +110,8 @@ namespace RJCP.IO.Ports.Native
 
 #if NETSTANDARD15
         // For compatibility with libnserial 1.0 only.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown",
+            Justification = "Compatibility")]
         private void ThrowExceptionNetStandard()
         {
             string description = m_Dll.serial_error(m_Handle);
@@ -214,8 +217,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                int baud;
-                if (m_Dll.serial_getbaud(m_Handle, out baud) == -1) ThrowException();
+                if (m_Dll.serial_getbaud(m_Handle, out int baud) == -1) ThrowException();
                 return baud;
             }
             set
@@ -234,8 +236,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                int databits;
-                if (m_Dll.serial_getdatabits(m_Handle, out databits) == -1) ThrowException();
+                if (m_Dll.serial_getdatabits(m_Handle, out int databits) == -1) ThrowException();
                 return databits;
             }
             set
@@ -254,8 +255,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                Parity parity;
-                if (m_Dll.serial_getparity(m_Handle, out parity) == -1) ThrowException();
+                if (m_Dll.serial_getparity(m_Handle, out Parity parity) == -1) ThrowException();
                 return parity;
             }
             set
@@ -274,8 +274,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                StopBits stopbits;
-                if (m_Dll.serial_getstopbits(m_Handle, out stopbits) == -1) ThrowException();
+                if (m_Dll.serial_getstopbits(m_Handle, out StopBits stopbits) == -1) ThrowException();
                 return stopbits;
             }
             set
@@ -294,8 +293,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool discardNull;
-                if (m_Dll.serial_getdiscardnull(m_Handle, out discardNull) == -1) ThrowException();
+                if (m_Dll.serial_getdiscardnull(m_Handle, out bool discardNull) == -1) ThrowException();
                 return discardNull;
             }
             set
@@ -314,8 +312,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                int parityReplace;
-                if (m_Dll.serial_getparityreplace(m_Handle, out parityReplace) == -1) ThrowException();
+                if (m_Dll.serial_getparityreplace(m_Handle, out int parityReplace) == -1) ThrowException();
                 return (byte)parityReplace;
             }
             set
@@ -339,8 +336,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool txContinueOnXOff;
-                if (m_Dll.serial_gettxcontinueonxoff(m_Handle, out txContinueOnXOff) == -1) ThrowException();
+                if (m_Dll.serial_gettxcontinueonxoff(m_Handle, out bool txContinueOnXOff) == -1) ThrowException();
                 return txContinueOnXOff;
             }
             set
@@ -359,8 +355,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                int xoffLimit;
-                if (m_Dll.serial_getxofflimit(m_Handle, out xoffLimit) == -1) ThrowException();
+                if (m_Dll.serial_getxofflimit(m_Handle, out int xoffLimit) == -1) ThrowException();
                 return xoffLimit;
             }
             set
@@ -379,8 +374,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                int xonLimit;
-                if (m_Dll.serial_getxonlimit(m_Handle, out xonLimit) == -1) ThrowException();
+                if (m_Dll.serial_getxonlimit(m_Handle, out int xonLimit) == -1) ThrowException();
                 return xonLimit;
             }
             set
@@ -399,8 +393,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool breakState;
-                if (m_Dll.serial_getbreak(m_Handle, out breakState) == -1) ThrowException();
+                if (m_Dll.serial_getbreak(m_Handle, out bool breakState) == -1) ThrowException();
                 return breakState;
             }
             set
@@ -465,8 +458,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool cdHolding;
-                if (m_Dll.serial_getdcd(m_Handle, out cdHolding) == -1) ThrowException();
+                if (m_Dll.serial_getdcd(m_Handle, out bool cdHolding) == -1) ThrowException();
                 return cdHolding;
             }
         }
@@ -481,8 +473,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool ctsHolding;
-                if (m_Dll.serial_getcts(m_Handle, out ctsHolding) == -1) ThrowException();
+                if (m_Dll.serial_getcts(m_Handle, out bool ctsHolding) == -1) ThrowException();
                 return ctsHolding;
             }
         }
@@ -497,8 +488,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool dsrHolding;
-                if (m_Dll.serial_getdsr(m_Handle, out dsrHolding) == -1) ThrowException();
+                if (m_Dll.serial_getdsr(m_Handle, out bool dsrHolding) == -1) ThrowException();
                 return dsrHolding;
             }
         }
@@ -513,8 +503,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool ringHolding;
-                if (m_Dll.serial_getri(m_Handle, out ringHolding) == -1) ThrowException();
+                if (m_Dll.serial_getri(m_Handle, out bool ringHolding) == -1) ThrowException();
                 return ringHolding;
             }
         }
@@ -532,8 +521,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool dtrEnable;
-                if (m_Dll.serial_getdtr(m_Handle, out dtrEnable) == -1) ThrowException();
+                if (m_Dll.serial_getdtr(m_Handle, out bool dtrEnable) == -1) ThrowException();
                 return dtrEnable;
             }
             set
@@ -555,8 +543,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool rtsEnable;
-                if (m_Dll.serial_getrts(m_Handle, out rtsEnable) == -1) ThrowException();
+                if (m_Dll.serial_getrts(m_Handle, out bool rtsEnable) == -1) ThrowException();
                 return rtsEnable;
             }
             set
@@ -575,8 +562,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                Handshake handshake;
-                if (m_Dll.serial_gethandshake(m_Handle, out handshake) == -1) ThrowException();
+                if (m_Dll.serial_gethandshake(m_Handle, out Handshake handshake) == -1) ThrowException();
                 return handshake;
             }
             set
@@ -599,8 +585,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                bool isOpen;
-                if (m_Dll.serial_isopen(m_Handle, out isOpen) == -1) ThrowException();
+                if (m_Dll.serial_isopen(m_Handle, out bool isOpen) == -1) ThrowException();
                 return isOpen;
             }
         }
@@ -698,9 +683,10 @@ namespace RJCP.IO.Ports.Native
 
             try {
                 m_IsRunning = true;
-                m_MonitorThread = new Thread(new ThreadStart(ReadWriteThread));
-                m_MonitorThread.Name = "NSerMon_" + m_Name;
-                m_MonitorThread.IsBackground = true;
+                m_MonitorThread = new Thread(new ThreadStart(ReadWriteThread)) {
+                    Name = "NSerMon_" + m_Name,
+                    IsBackground = true
+                };
                 m_MonitorThread.Start();
             } catch {
                 m_IsRunning = false;
@@ -709,9 +695,10 @@ namespace RJCP.IO.Ports.Native
 
             try {
                 m_MonitorPins = true;
-                m_PinThread = new Thread(new ThreadStart(PinChangeThread));
-                m_PinThread.Name = "NSerPin_" + m_Name;
-                m_PinThread.IsBackground = true;
+                m_PinThread = new Thread(new ThreadStart(PinChangeThread)) {
+                    Name = "NSerPin_" + m_Name,
+                    IsBackground = true
+                };
                 m_PinThread.Start();
             } catch {
                 m_PinThread = null;

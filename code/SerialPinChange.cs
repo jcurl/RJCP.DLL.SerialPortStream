@@ -9,7 +9,8 @@ namespace RJCP.IO.Ports
     /// <summary>
     /// Event related data on PinChanged.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2346:Flags enumerations zero-value members should be named \"None\"",
+        Justification = "P/Invoke")]
     [Flags]
     public enum SerialPinChange
     {

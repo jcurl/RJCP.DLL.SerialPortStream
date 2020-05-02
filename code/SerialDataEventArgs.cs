@@ -11,23 +11,18 @@ namespace RJCP.IO.Ports
     /// </summary>
     public class SerialDataReceivedEventArgs : EventArgs
     {
-        private SerialData m_EventType;
-
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="eventType">Event that occurred.</param>
         public SerialDataReceivedEventArgs(SerialData eventType)
         {
-            m_EventType = eventType;
+            EventType = eventType;
         }
 
         /// <summary>
         /// The event type for DataReceived.
         /// </summary>
-        public SerialData EventType
-        {
-            get { return m_EventType; }
-        }
+        public SerialData EventType { get; private set; }
     }
 }

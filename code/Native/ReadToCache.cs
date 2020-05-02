@@ -95,17 +95,17 @@ namespace RJCP.IO.Ports.Native
             char[] oneChar = new char[2];
             int cu = 0;
             while (cu == 0 && m_ReadOffset < readLen) {
-                int bu; bool complete;
+                int bu;
                 try {
                     // Some UTF8 sequences may result in two UTF16 characters being generated.
                     Decoder.Convert(sbuffer.Serial.ReadBuffer.Array,
                         sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
-                        1, oneChar, 0, 1, false, out bu, out cu, out complete);
-                } catch (System.ArgumentException ex) {
+                        1, oneChar, 0, 1, false, out bu, out cu, out _);
+                } catch (ArgumentException ex) {
                     if (!ex.ParamName.Equals("chars")) throw;
                     Decoder.Convert(sbuffer.Serial.ReadBuffer.Array,
                         sbuffer.Serial.ReadBuffer.ToArrayIndex(m_ReadOffset),
-                        1, oneChar, 0, 2, false, out bu, out cu, out complete);
+                        1, oneChar, 0, 2, false, out bu, out cu, out _);
                 }
                 m_ReadOffset += bu;
             }
@@ -304,8 +304,7 @@ namespace RJCP.IO.Ports.Native
             lock (sbuffer.ReadLock) {
                 do {
                     char[] c = new char[2048];
-                    int bu, cu; bool complete;
-                    Decoder.Convert(sbuffer.Serial.ReadBuffer, c, 0, c.Length, false, out bu, out cu, out complete);
+                    Decoder.Convert(sbuffer.Serial.ReadBuffer, c, 0, c.Length, false, out int bu, out int cu, out bool complete);
                     sb.Append(c, 0, cu);
                     if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
                         Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
@@ -315,7 +314,7 @@ namespace RJCP.IO.Ports.Native
             return sb.ToString();
         }
 
-        private int ReadToConsume(SerialBuffer sbuffer, int chars)
+        private void ReadToConsume(SerialBuffer sbuffer, int chars)
         {
             int bytesRead = 0;
             for (int i = 0; i < chars; i++) {
@@ -330,7 +329,6 @@ namespace RJCP.IO.Ports.Native
                 Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadToConsume(chars={0}) = {1} bytes", chars, bytesRead);
                 Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadToConsume: m_ReadOffset={0}; m_ReadCache.Free={1}", m_ReadOffset, m_ReadCache.Free);
             }
-            return bytesRead;
         }
 
         /// <summary>

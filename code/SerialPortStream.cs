@@ -745,8 +745,7 @@ namespace RJCP.IO.Ports
         /// Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.</returns>
         public override int EndRead(IAsyncResult asyncResult)
         {
-            LocalAsync<int> localAsync = asyncResult as LocalAsync<int>;
-            if (localAsync != null) {
+            if (asyncResult is LocalAsync<int> localAsync) {
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
                 if (localAsync.Result == 0) ReadCheckDeviceError();
@@ -894,10 +893,9 @@ namespace RJCP.IO.Ports
             if (ReadCheckDeviceError()) return null;
 
             TimerExpiry te = new TimerExpiry(m_ReadTimeout);
-            bool dataAvailable = false;
+            bool dataAvailable;
             do {
-                string line;
-                if (m_ReadTo.ReadTo(m_Buffer, text, out line)) return line;
+                if (m_ReadTo.ReadTo(m_Buffer, text, out string line)) return line;
                 dataAvailable =
                     m_NativeSerial.IsRunning &&
                     m_ReadTo.ReadToWaitForNewData(m_Buffer, te.RemainingTime());
@@ -1210,8 +1208,7 @@ namespace RJCP.IO.Ports
         /// </remarks>
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            LocalAsync localAsync = asyncResult as LocalAsync;
-            if (localAsync != null) {
+            if (asyncResult is LocalAsync localAsync) {
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
             } else {
@@ -1873,9 +1870,9 @@ namespace RJCP.IO.Ports
 
         private void HandleEvent(object state)
         {
-            SerialData serialDataFlags = SerialData.NoData;
-            SerialError serialErrorFlags = SerialError.NoError;
-            SerialPinChange serialPinChange = SerialPinChange.NoChange;
+            SerialData serialDataFlags;
+            SerialError serialErrorFlags;
+            SerialPinChange serialPinChange;
 
             bool handleEvent;
             do {
@@ -1990,12 +1987,15 @@ namespace RJCP.IO.Ports
             base.Dispose(disposing);
         }
 
+
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested",
+            Justification = "Code is still readable")]
         public override string ToString()
         {
             if (IsDisposed) return "SerialPortStream: Disposed";

@@ -256,11 +256,8 @@ namespace RJCP.IO.Ports.Native
 
         int ISerialBufferStreamData.Read(char[] buffer, int offset, int count, Decoder decoder)
         {
-            int bu;
-            int cu;
-            bool complete;
             lock (m_ReadLock) {
-                decoder.Convert(m_ReadBuffer, buffer, offset, count, false, out bu, out cu, out complete);
+                decoder.Convert(m_ReadBuffer, buffer, offset, count, false, out int bu, out int cu, out bool complete);
                 if (m_ReadBuffer.Length == 0) {
                     m_ReadBufferNotEmptyEvent.Reset();
                 }

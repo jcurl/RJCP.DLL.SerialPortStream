@@ -69,12 +69,17 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MsdnFrameworkTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerialPortStreamCharTest.cs" />
+    <Compile Include="SerialPortStreamManualTest.cs" />
+    <Compile Include="SerialPortStreamParityTest.cs" />
+    <Compile Include="SerialPortStreamRxTxTest.cs" />
+    <Compile Include="SerialPortStreamSimpleTest.cs" />
     <None Include="packages.SerialPortStreamTest-net45.config" />
-    <None Include="ReadToTest.cs" />
     <Compile Include="SerialConfiguration.cs" />
-    <Compile Include="SerialPortStreamTest.cs" />
+    <None Include="SerialPortStreamTest-net40.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\code\SerialPortStream-net45.csproj">

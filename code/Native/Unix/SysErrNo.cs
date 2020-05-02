@@ -1,7 +1,5 @@
 ﻿namespace RJCP.IO.Ports.Native.Unix
 {
-    using System;
-
     /// <summary>
     /// Mapped C-Library errors to constants for Managed Code
     /// </summary>

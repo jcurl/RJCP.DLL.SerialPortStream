@@ -3,13 +3,14 @@
     using System;
     using System.IO;
     using System.Text;
+#if NET45
     using System.Threading;
     using System.Threading.Tasks;
+#endif
 
     /// <summary>
     /// Interface for the <see cref="SerialPortStream"/>, which can be used for mocking in unit tests.
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
     public interface ISerialPortStream : IDisposable
     {
         /// <summary>

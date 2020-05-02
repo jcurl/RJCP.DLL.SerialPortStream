@@ -11,24 +11,18 @@ namespace RJCP.IO.Ports.FrameworkTest
     using NUnit.Framework;
     using SerialPortStreamTest;
 
-    [TestFixture(Category = "SerialPortStream.Framework")]
+    [TestFixture(Category = "SerialPortStream.Framework.ManualTest")]
     public class MsdnFrameworkTest
     {
-        private readonly string c_SourcePort;
-        private readonly string c_DestPort;
-
-        public MsdnFrameworkTest()
-        {
-            c_SourcePort = SerialConfiguration.SourcePort;
-            c_DestPort = SerialConfiguration.DestPort;
-        }
+        private readonly string SourcePort = SerialConfiguration.SourcePort;
+        private readonly string DestPort = SerialConfiguration.DestPort;
 
         [Test]
         public void SerialPortClosedWrite()
         {
             byte[] buffer = new byte[256];
 
-            using (SerialPort serialSource = new SerialPort(c_SourcePort, 115200, Parity.None, 8, StopBits.One)) {
+            using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One)) {
                 Assert.That(() => { serialSource.Write(buffer, 0, buffer.Length); }, Throws.TypeOf<InvalidOperationException>());
             }
         }
@@ -40,8 +34,8 @@ namespace RJCP.IO.Ports.FrameworkTest
         {
             byte[] buffer = new byte[1024];
 
-            using (SerialPort serialSource = new SerialPort(c_SourcePort, 115200, Parity.None, 8, StopBits.One))
-            using (SerialPort serialDest = new SerialPort(c_DestPort, 115200, Parity.None, 8, StopBits.One)) {
+            using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One))
+            using (SerialPort serialDest = new SerialPort(DestPort, 115200, Parity.None, 8, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 
@@ -75,8 +69,8 @@ namespace RJCP.IO.Ports.FrameworkTest
         {
             byte[] buffer = new byte[1024];
 
-            using (SerialPort serialSource = new SerialPort(c_SourcePort, 115200, Parity.None, 8, StopBits.One))
-            using (SerialPort serialDest = new SerialPort(c_DestPort, 115200, Parity.None, 8, StopBits.One)) {
+            using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One))
+            using (SerialPort serialDest = new SerialPort(DestPort, 115200, Parity.None, 8, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 
@@ -107,16 +101,11 @@ namespace RJCP.IO.Ports.FrameworkTest
         [Test]
         public void DecoderTooManyBytes()
         {
-            Encoding encoding = Encoding.GetEncoding("UTF-8");
-            Decoder decoder = encoding.GetDecoder();
-
             byte[] data = new byte[] { 0x61, 0xE2, 0x82, 0xAC, 0x40, 0x41 };
             char[] oneChar = new char[2];
 
-            int bu;
-            int cu;
-            bool complete;
-            decoder.Convert(data, 0, 2, oneChar, 0, 1, false, out bu, out cu, out complete);
+            Decoder decoder = Encoding.UTF8.GetDecoder();
+            decoder.Convert(data, 0, 2, oneChar, 0, 1, false, out int bu, out int cu, out _);
 
             // One might expect that only one byte is used, but in .NET 4.0 and later (including Mono), we see
             // that while 'cu' is 1, 'bu' is not 1. This had an impact during development that we couldn't optimise

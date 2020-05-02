@@ -6,14 +6,14 @@ namespace RJCP.IO.Ports.Native.Unix
 {
     using System;
     using System.Runtime.InteropServices;
-    using System.Security;
 
     internal class SerialUnix : INativeSerialDll
     {
-
         [ThreadStatic]
-        private static int m_ErrNo = 0;
+        private static int m_ErrNo;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2696:Instance members should not write to \"static\" fields",
+            Justification = "P/Invoke and this is ThreadStatic. Same behaviour as libc")]
         public int errno
         {
             get { return m_ErrNo; }

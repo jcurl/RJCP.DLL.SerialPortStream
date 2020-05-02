@@ -6,6 +6,7 @@ namespace RJCP.IO.Ports.Native.Unix
 {
     using System;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "P/Invoke")]
     internal interface INativeSerialDll
     {
         string serial_version();

@@ -4,7 +4,6 @@
 
 namespace RJCP.IO.Ports.Native.Windows
 {
-    using System;
     using System.IO;
     using System.Runtime.InteropServices;
     using Microsoft.Win32.SafeHandles;
@@ -24,8 +23,7 @@ namespace RJCP.IO.Ports.Native.Windows
 
         public void GetCommModemStatus()
         {
-            NativeMethods.ModemStat s;
-            if (!UnsafeNativeMethods.GetCommModemStatus(m_ComPortHandle, out s)) {
+            if (!UnsafeNativeMethods.GetCommModemStatus(m_ComPortHandle, out NativeMethods.ModemStat s)) {
                 throw new IOException("Unable to get serial port modem state", Marshal.GetLastWin32Error());
             }
 

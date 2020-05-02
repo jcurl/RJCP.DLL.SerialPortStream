@@ -4,9 +4,10 @@
     using System.Runtime.InteropServices;
     using System.Security;
 
-    #if !NETSTANDARD15
+#if !NETSTANDARD15
     [SuppressUnmanagedCodeSecurity]
-    #endif
+#endif
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "P/Invoke")]
     internal static class UnsafeNativeMethods
     {
         [DllImport("libnserial.so.1", SetLastError = true)]

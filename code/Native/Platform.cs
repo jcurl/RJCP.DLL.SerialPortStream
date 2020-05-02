@@ -1,7 +1,9 @@
 ﻿namespace RJCP.IO.Ports.Native
 {
     using System;
+#if NETSTANDARD15
     using System.Runtime.InteropServices;
+#endif
 
     internal static class Platform
     {

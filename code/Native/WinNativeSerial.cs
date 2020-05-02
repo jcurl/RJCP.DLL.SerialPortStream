@@ -22,7 +22,6 @@ namespace RJCP.IO.Ports.Native
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
-    /// <seealso cref="RJCP.IO.Ports.Native.INativeSerial" />
     internal class WinNativeSerial : INativeSerial
     {
         private SafeFileHandle m_ComPortHandle;

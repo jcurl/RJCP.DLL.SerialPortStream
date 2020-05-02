@@ -6,7 +6,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
     public static class SerialConfiguration
     {
-        private static object m_SyncLock = new object();
+        private static readonly object m_SyncLock = new object();
         private static string s_SourcePort = null;
         private static string s_DestPort = null;
 
@@ -52,7 +52,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 } else if (p == 4 || p == 8 || p == 128) {
                     return "Linux";
                 }
-                return "";
+                return string.Empty;
             }
         }
     }
