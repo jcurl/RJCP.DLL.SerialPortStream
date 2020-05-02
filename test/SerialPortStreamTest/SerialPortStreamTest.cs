@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2018
+﻿// Copyright © Jason Curl 2012-2020
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -20,7 +20,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     /// <para>You need to update the variables c_SourcePort and c_DestPort to be the names
     /// of the two serial ports.</para>
     /// </remarks>
-    [TestFixture(Category="SerialPortStream")]
+    [TestFixture(Category = "SerialPortStream")]
     [Timeout(10000)]
     public class SerialPortStreamTest
     {

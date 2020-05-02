@@ -1,15 +1,15 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2020
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
+
 namespace RJCP.Datastructures.TimerExpiryTest
 {
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture(Category = "Datastructures/PassiveTimer")]
     public class TimerExpiryTest
     {
         [Test]
-        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Basic()
         {
             TimerExpiry te = new TimerExpiry(200);
@@ -22,7 +22,7 @@ namespace RJCP.Datastructures.TimerExpiryTest
             // Note, you should put your delays in loops like this one, as
             // the OS doesn't guarantee that you will actually wait this
             // long. Normally, this kind of loop is exactly the type you
-            // want, as you wait for another event to occur, and if it 
+            // want, as you wait for another event to occur, and if it
             // doesn't occur, you keep waiting until the timeout is zero.
             //
             // On some systems, a signal may cause a timeout to abort
@@ -41,7 +41,6 @@ namespace RJCP.Datastructures.TimerExpiryTest
         }
 
         [Test]
-        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Reset()
         {
             TimerExpiry te = new TimerExpiry(1000);
@@ -70,7 +69,6 @@ namespace RJCP.Datastructures.TimerExpiryTest
         }
 
         [Test]
-        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Reset2()
         {
             TimerExpiry te = new TimerExpiry(1000);
@@ -87,7 +85,6 @@ namespace RJCP.Datastructures.TimerExpiryTest
         }
 
         [Test]
-        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Negative()
         {
             TimerExpiry te = new TimerExpiry(-1);
@@ -105,7 +102,6 @@ namespace RJCP.Datastructures.TimerExpiryTest
         }
 
         [Test]
-        [Category("Datastructures/PassiveTimer")]
         public void TimerExpiry_Zero()
         {
             TimerExpiry te = new TimerExpiry(0);
