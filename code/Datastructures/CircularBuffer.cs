@@ -412,7 +412,7 @@ namespace RJCP.Datastructures
             } else {
                 count = Math.Min(Free, count);
                 System.Array.Copy(array, offset, m_Array, End, WriteLength);
-                System.Array.Copy(array, WriteLength, m_Array, 0, count - WriteLength);
+                System.Array.Copy(array, offset + WriteLength, m_Array, 0, count - WriteLength);
                 Produce(count);
                 return count;
             }

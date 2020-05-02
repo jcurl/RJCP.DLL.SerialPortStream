@@ -426,6 +426,22 @@ namespace RJCP.Datastructures.CircularBufferTest
 
         [Test]
         [Category("Datastructures/CircularBuffer")]
+        public void CircularBuffer_AppendWithOffsetBoundaries()
+        {
+            CircularBuffer<char> cb = new CircularBuffer<char>(20);
+
+            cb.Append("abcdefghijklmno".ToCharArray());
+            cb.Consume(14);
+            Assert.That(cb.Length, Is.EqualTo(1));
+            Assert.That(cb.GetString(), Is.EqualTo("o"));
+
+            cb.Append("pqrstuvwxy".ToCharArray(), 3, 7);
+            Assert.That(cb.Length, Is.EqualTo(8));
+            Assert.That(cb.GetString(), Is.EqualTo("ostuvwxy"));
+        }
+
+        [Test]
+        [Category("Datastructures/CircularBuffer")]
         public void CircularBuffer_ConstructorArray()
         {
             byte[] m = { 

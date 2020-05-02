@@ -6,6 +6,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using NUnit.Framework;
 
@@ -2299,6 +2300,90 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             } finally {
                 if (serial != null) serial.Dispose();
             }
+        }
+
+        [Test]
+        public void SendReceiveBoundaries()
+        {
+            using (var sp = new SerialPortStream(c_SourcePort, 56700))
+            using (var spReceive = new SerialPortStream(c_DestPort, 56700)) {
+                var bufferSize = 250;
+
+                // get data which is a bit larger than twice the size of the buffer (0x20000*2)
+                var data = Enumerable.Range(0, (sp.WriteBufferSize * 2) + 0x100).Select(e => (byte)(e % 0xFF)).ToArray();
+                var size = data.Length; // 0x40100
+                var position = 0;
+                sp.Open();
+                spReceive.Open();
+
+                List<int> positions = new List<int>();
+                while (size - position > bufferSize) {
+                    positions.Add(position);
+                    if (position >= sp.WriteBufferSize - bufferSize) {
+                        Console.WriteLine("data[{0:x}] = {1:x}", position, data[position]);
+                    }
+                    sp.Write(data, position, bufferSize);
+                    position += bufferSize;
+                }
+                positions.Add(position);
+                if (data.Length - position > 0) {
+                    sp.Write(data, position, data.Length - position);
+                }
+
+                sp.Flush();
+
+                byte[] receiveData = ReceiveData(spReceive, size);
+                Assert.That(Compare(data, receiveData), Is.True);
+
+                sp.Close();
+                spReceive.Close();
+            }
+        }
+
+        private byte[] ReceiveData(SerialPortStream sp, int size)
+        {
+            var buffer = new byte[size];
+            var dataReceived = 0;
+            while (dataReceived < size) {
+                dataReceived += sp.Read(buffer, dataReceived, size - dataReceived);
+            }
+            return buffer;
+        }
+
+        private struct Difference
+        {
+            public Difference(int position, byte sent, byte received) : this()
+            {
+                Position = $"0x{position:X5}";
+                Sent = $"0x{sent:X2}";
+                Received = $"0x{received:X2}";
+            }
+
+            public string Position { get; set; }
+
+            public string Sent { get; set; }
+
+            public string Received { get; set; }
+        }
+
+        private bool Compare(byte[] data, byte[] receivedData)
+        {
+            bool equal = data.SequenceEqual(receivedData);
+            Console.WriteLine("Are data the same: {0}", equal);
+
+            List<Difference> differences = new List<Difference>();
+            for (int i = 0; i < data.Length; i++) {
+                var sent = data[i];
+                var received = receivedData[i];
+                if (sent != received) {
+                    differences.Add(new Difference(i, sent, received));
+                }
+            }
+
+            foreach (Difference item in differences) {
+                Console.WriteLine("Pos: {0}, Tx: {1}, Rx: {2}", item.Position, item.Received, item.Sent);
+            }
+            return equal;
         }
     }
 }
