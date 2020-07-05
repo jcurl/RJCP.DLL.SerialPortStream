@@ -1,5 +1,12 @@
 # List of Changes with Releases
 
+## Version 2.2.2 (libnserial 1.1.4)
+
+Bugfixes
+
+* DOTNET-194: Prevent exceptions when converting bytes to chars when using
+  ISO-8859-15.
+
 ## Version 2.2.1 (libnserial 1.1.4)
 
 Bugfixes

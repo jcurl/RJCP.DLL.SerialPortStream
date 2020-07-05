@@ -14,6 +14,32 @@ example.
 These notes are for version 2.x, which is a new design based on version 1.x that
 enhances portability and fixes bugs. See the end of these notes for differences.
 
+* 1.0 Why another Serial Port implementation
+* 2.0 Goals
+  * 2.1 Issues with MS Serial Port
+* 3.0 System Requirements
+  * 3.1 Tested
+  * 3.2 Compatibility
+    * 3.2.1 Mono Framework (Linux Only)
+    * 3.2.2 Microsoft Compact Framework (not supported)
+    * 3.2.3 Untested, but should work
+* 4.0 Installation
+  * 4.1 Windows
+  * 4.2 Linux
+* 5.0 Extra Features
+  * 5.1 Reading and Writing - Buffering
+* 6.0 Known Issues
+  * 6.1 Windows
+    * 6.1.1 Driver Specific Issues on Windows
+      * 6.1.1.1 Flow Control
+  * 6.2 Linux
+    * 6.2.1 Mono on non-Windows Platforms
+    * 6.2.2 Driver Specific Issues on Linux
+      * 6.2.2.1 Parity Errors
+      * 6.2.2.2 Garbage Data on Open
+      * 6.2.2.3 Monitoring Pins and Timing Resolution
+      * 6.2.2.4 Close Times with Flow Control
+
 ## 1.0 Why another Serial Port implementation
 
 Microsoft and Mono already provides a reasonable implementation for accessing
@@ -87,7 +113,10 @@ See later in these notes for known issues and changes.
 
 ### 3.2 Compatibility
 
-#### 3.2.1 Mono Framework
+#### 3.2.1 Mono Framework (Linux Only)
+
+Only Mono on Linux is supported. Embedded platforms are not supported. You are
+welcome to make a patch with appropriate test cases.
 
 You should use the latest version of Mono. Version 3.2.8 has significant bugs
 and will not work (Ubuntu 14.04 ships with this). Use the latest version of Mono
@@ -97,7 +126,7 @@ For instructions on how to install the latest Mono for your system, refer to
 [Install Mono On
 Linux](http://www.mono-project.com/docs/getting-started/install/linux/).
 
-#### 3.2.2 Microsoft Compact Framework
+#### 3.2.2 Microsoft Compact Framework (not supported)
 
 SerialPortStream is not designed for the Compact Framework.
 

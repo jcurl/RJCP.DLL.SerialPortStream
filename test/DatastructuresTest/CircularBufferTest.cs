@@ -8,9 +8,70 @@ namespace RJCP.Datastructures.CircularBufferTest
     using System.Text;
     using NUnit.Framework;
 
-    [TestFixture(Category = "Datastructures/CircularBuffer")]
+    [TestFixture(Category = "Datastructures.CircularBuffer")]
     public class CircularBufferTest
     {
+        [TestCase(-1)]
+        [TestCase(0)]
+        [TestCase(int.MinValue)]
+        public void CircularBuffer_InvalidCapacity(int capacity)
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(capacity); }, Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
+        [Test]
+        public void CircularBuffer_NullArray()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(null); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void CircularBuffer_EmptyArray()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(new byte[0]); }, Throws.TypeOf<ArgumentException>());
+        }
+
+        [Test]public void CircularBuffer_NullArrayCount()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(null, 0); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void CircularBuffer_EmptyArrayCount()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(new byte[0], 1); }, Throws.TypeOf<ArgumentException>());
+        }
+
+        [Test]
+        public void CircularBuffer_CountOutOfBounds()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(new byte[10], 11); }, Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
+        [Test]
+        public void CircularBuffer_NullArrayCountOffset()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(null, 0, 0); }, Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void CircularBuffer_EmptyArrayCountOffset()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(new byte[0], 0, 0); }, Throws.TypeOf<ArgumentException>());
+        }
+
+        [Test]
+        public void CircularBuffer_CountOutOfBoundsCountWithOffset()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(new byte[10], 0, 11); }, Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
+        [Test]
+        public void CircularBuffer_CountOutOfBoundsOffset()
+        {
+            Assert.That(() => { _ = new CircularBuffer<byte>(new byte[10], 11, 0); }, Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
         [Test]
         public void CircularBuffer_ProduceConsume()
         {
@@ -460,6 +521,76 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.That(cb3[0], Is.EqualTo(0x02));
         }
 
+        [Test]
+        public void CircularBufferExt_DecoderConvertSourceLengthZeroDestCharArray()
+        {
+            // On Mono when using ISO-8859-15, a source length of zero causes problems.
+            Decoder d = Encoding.GetEncoding("ISO-8859-15").GetDecoder();
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(100);
+            char[] outc = new char[100];
+
+            d.Convert(cb, outc, 0, outc.Length, true, out int bu, out int cu, out bool completed);
+            Assert.That(bu, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(0));
+            Assert.That(completed, Is.True);
+        }
+
+        [Test]
+        public void CircularBufferExt_DecoderConvertSourceLengthZeroDestCharBuffer()
+        {
+            // On Mono when using ISO-8859-15, a source length of zero causes problems.
+            Decoder d = Encoding.GetEncoding("ISO-8859-15").GetDecoder();
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(100);
+            CircularBuffer<char> cc = new CircularBuffer<char>(100);
+
+            d.Convert(cb, cc, cc.Length, true, out int bu, out int cu, out bool completed);
+            Assert.That(bu, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(0));
+            Assert.That(completed, Is.True);
+        }
+
+        [Test]
+        public void CircularBufferExt_DecoderConvertSourceLengthZeroDestCharBuffer2()
+        {
+            // On Mono when using ISO-8859-15, a source length of zero causes problems.
+            Decoder d = Encoding.GetEncoding("ISO-8859-15").GetDecoder();
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(100);
+            CircularBuffer<char> cc = new CircularBuffer<char>(100);
+
+            d.Convert(cb, cc, true, out int bu, out int cu, out bool completed);
+            Assert.That(bu, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(0));
+            Assert.That(completed, Is.True);
+        }
+
+        [Test]
+        public void CircularBufferExt_DecoderConvertSourceArrayZeroDestCharBuffer()
+        {
+            // On Mono when using ISO-8859-15, a source length of zero causes problems.
+            Decoder d = Encoding.GetEncoding("ISO-8859-15").GetDecoder();
+            byte[] sb = new byte[100];
+            CircularBuffer<char> cc = new CircularBuffer<char>(100);
+
+            d.Convert(sb, 0, 0, cc, true, out int bu, out int cu, out bool completed);
+            Assert.That(bu, Is.EqualTo(0));
+            Assert.That(cu, Is.EqualTo(0));
+            Assert.That(completed, Is.True);
+        }
+
+        [Test]
+        public void CircularBufferExt_EncoderConvertSourceZero()
+        {
+            // On Mono when using ISO-8859-15, a source length of zero causes problems.
+            Encoder e = Encoding.GetEncoding("ISO-8859-15").GetEncoder();
+            char[] sc = new char[100];
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(100);
+
+            e.Convert(sc, 0, 0, cb, true, out int cu, out int bu, out bool completed);
+            Assert.That(cu, Is.EqualTo(0));
+            Assert.That(bu, Is.EqualTo(0));
+            Assert.That(completed, Is.True);
+        }
+
         /// <summary>
         /// Check converting a byte array to a char array with convert works.
         /// </summary>
@@ -692,7 +823,6 @@ namespace RJCP.Datastructures.CircularBufferTest
         [Test]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars2()
         {
-            Decoder d = Encoding.UTF8.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
@@ -703,6 +833,7 @@ namespace RJCP.Datastructures.CircularBufferTest
             CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 16, 16);
 
             // Based on the test "Decoder_Utf16Chars2"
+            Decoder d = Encoding.UTF8.GetDecoder();
             d.Convert(cb, c, 0, 13, false, out _, out int cu, out bool complete);
             Assert.That(complete, Is.False);
             Assert.That(cu, Is.EqualTo(12));
@@ -711,66 +842,82 @@ namespace RJCP.Datastructures.CircularBufferTest
             // This particular test is hard. The decoder consumes 12 bytes, but our function consumes more (because the
             // 4-bytes cross a boundary). The decoder needs to see all four bytes to decide not to convert it. There is
             // nothing in the documentation to say that the decoder should behave this way. So we can't simulate the
-            // original behaviour in this case.
+            // original behavior in this case.
         }
 
         [Test]
         public void CircularBufferExt_DecoderConvert1_Utf16Chars3()
         {
-            Decoder d = Encoding.UTF8.GetDecoder();
             byte[] m = {
                 0x82, 0x84, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
                 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0
             };
-            char[] c = new char[30];
-            CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 28, 4);
 
             // Based on the test "Decoder_Utf16Chars3"
 
-            // The behaviour isn't the same due to non-documented behaviour. MS documentation doesn't say if an
-            // exception should occur or not and it has slightly inconsistent behaviour if we sent 3 bytes (of 4), or 4
+            // The behavior isn't the same due to non-documented behavior. MS documentation doesn't say if an
+            // exception should occur or not and it has slightly inconsistent behavior if we sent 3 bytes (of 4), or 4
             // bytes at once.
 
-            int bu;
+            Decoder d = Encoding.UTF8.GetDecoder();
             int cu;
+            int bu;
             bool complete;
             bool exception = false;
+            char[] c = new char[30];
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 28, 4);
             try {
+                // An exception might be raised to say that the data can't be converted to fit in the output memory
+                // buffer. But then nothing should be consumed. Instead, it may be bytes are consumed and no exception,
+                // or no bytes are consumed and an exception.
                 d.Convert(cb, c, 0, 1, false, out bu, out cu, out complete);
+                Assert.That(bu, Is.Not.EqualTo(0));          // If no exception, then bytes must be consumed.
+                Assert.That(cb.Length, Is.EqualTo(4 - bu));  // And that the buffer is reduced by the correct amount.
+                Assert.That(complete, Is.False);
             } catch (ArgumentException e) {
-                if (!e.ParamName.Equals("chars")) throw;
+                if (e.ParamName == null || !e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
+
             if (!exception) {
+                // The conversion must be a single Unicode character, which is two UTF-16. As the previous test allowed
+                // only 1 UTF16 char, it must be zero if no exception was raised.
                 Assert.That(cu, Is.EqualTo(0));
                 Assert.That(() => {
-                    d.Convert(cb, c, 0, 1, false, out bu, out cu, out complete);
+                    d.Convert(cb, c, 0, 1, false, out _, out _, out _);
                 }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
+            // Second test shows that after a decoder reset, the results are consistent.
+
+            exception = false;
             cb = new CircularBuffer<byte>(m, 28, 4);
             d.Reset();
-            exception = false;
             try {
                 d.Convert(cb, c, 0, 1, true, out bu, out cu, out complete);
+                Assert.That(bu, Is.Not.EqualTo(0));          // If no exception, then bytes must be consumed.
+                Assert.That(cb.Length, Is.EqualTo(4 - bu));  // And that the buffer is reduced by the correct amount.
+                Assert.That(complete, Is.False);
             } catch (ArgumentException e) {
-                if (!e.ParamName.Equals("chars")) throw;
+                if (e.ParamName == null || !e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
+
             if (!exception) {
                 Assert.That(cu, Is.EqualTo(0));
                 Assert.That(() => {
-                    d.Convert(cb, c, 0, 1, false, out bu, out cu, out complete);
+                    d.Convert(cb, c, 0, 1, false, out _, out _, out _);
                 }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
-            d.Convert(cb, c, 0, 2, true, out bu, out cu, out complete);
+            d.Convert(cb, c, 0, 2, true, out _, out cu, out complete);
             Assert.That(complete, Is.True);
             Assert.That(cu, Is.EqualTo(2));
+            Assert.That(cb.Length, Is.EqualTo(0));  // Show that all data was now consumed
         }
 
         [Test]
@@ -1027,15 +1174,16 @@ namespace RJCP.Datastructures.CircularBufferTest
 
             // Based on the test "Decoder_Utf16Chars2"
             Decoder d = Encoding.UTF8.GetDecoder();
-            d.Convert(cb, cc, 13, false, out _, out int cu, out bool complete);
+            d.Convert(cb, cc, 13, false, out int bu, out int cu, out bool complete);
             Assert.That(complete, Is.False);
             Assert.That(cu, Is.EqualTo(12));
             Assert.That(cc.GetString(), Is.EqualTo("OPQRSTUVWXYZ"));
+            Assert.That(cb.Length, Is.EqualTo(16 - bu));
 
             // This particular test is hard. The decoder consumes 12 bytes, but our function consumes more (because the
             // 4-bytes cross a boundary). The decoder needs to see all four bytes to decide not to convert it. There is
             // nothing in the documentation to say that the decoder should behave this way. So we can't simulate the
-            // original behaviour in this case.
+            // original behavior in this case.
         }
 
         [Test]
@@ -1047,14 +1195,11 @@ namespace RJCP.Datastructures.CircularBufferTest
                 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
                 0x57, 0x58, 0x59, 0x5A, 0xF3, 0xA0
             };
-            char[] c = new char[30];
-            CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 28, 4);
-            CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
 
             // Based on the test "Decoder_Utf16Chars3"
 
-            // The behaviour isn't the same due to non-documented behaviour. MS documentation doesn't say if an
-            // exception should occur or not and it has slightly inconsistent behaviour if we sent 3 bytes (of 4), or 4
+            // The behavior isn't the same due to non-documented behavior. MS documentation doesn't say if an
+            // exception should occur or not and it has slightly inconsistent behavior if we sent 3 bytes (of 4), or 4
             // bytes at once.
 
             int bu;
@@ -1062,40 +1207,57 @@ namespace RJCP.Datastructures.CircularBufferTest
             bool complete;
             bool exception = false;
             Decoder d = Encoding.UTF8.GetDecoder();
+            char[] c = new char[30];
+            CircularBuffer<byte> cb = new CircularBuffer<byte>(m, 28, 4);
+            CircularBuffer<char> cc = new CircularBuffer<char>(c, 5, 0);
             try {
+                // An exception might be raised to say that the data can't be converted to fit in the output memory
+                // buffer. But then nothing should be consumed. Instead, it may be bytes are consumed and no exception,
+                // or no bytes are consumed and an exception.
                 d.Convert(cb, cc, 1, false, out bu, out cu, out complete);
+                Assert.That(bu, Is.Not.EqualTo(0));          // If no exception, then bytes must be consumed.
+                Assert.That(cb.Length, Is.EqualTo(4 - bu));  // And that the buffer is reduced by the correct amount.
+                Assert.That(complete, Is.False);
             } catch (ArgumentException e) {
-                if (!e.ParamName.Equals("chars")) throw;
+                if (e.ParamName == null || !e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
             if (!exception) {
+                // The conversion must be a single Unicode character, which is two UTF-16. As the previous test allowed
+                // only 1 UTF16 char, it must be zero if no exception was raised.
                 Assert.That(cu, Is.EqualTo(0));
                 Assert.That(() => {
-                    d.Convert(cb, cc, 1, false, out bu, out cu, out complete);
+                    d.Convert(cb, cc, 1, false, out _, out _, out _);
                 }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
+            // Second test shows that after a decoder reset, the results are consistent.
+
+            exception = false;
             cb = new CircularBuffer<byte>(m, 28, 4);
             d.Reset();
-            exception = false;
             try {
                 d.Convert(cb, cc, 1, true, out bu, out cu, out complete);
+                Assert.That(bu, Is.Not.EqualTo(0));          // If no exception, then bytes must be consumed.
+                Assert.That(cb.Length, Is.EqualTo(4 - bu));  // And that the buffer is reduced by the correct amount.
+                Assert.That(complete, Is.False);
             } catch (ArgumentException e) {
-                if (!e.ParamName.Equals("chars")) throw;
+                if (e.ParamName == null || !e.ParamName.Equals("chars")) throw;
                 exception = true;
                 cu = -1;
             }
             if (!exception) {
                 Assert.That(cu, Is.EqualTo(0));
                 Assert.That(() => {
-                    d.Convert(cb, cc, 1, false, out bu, out cu, out complete);
+                    d.Convert(cb, cc, 1, false, out _, out _, out _);
                 }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
             }
 
-            d.Convert(cb, cc, 2, true, out bu, out cu, out complete);
+            d.Convert(cb, cc, 2, true, out _, out cu, out complete);
             Assert.That(complete, Is.True);
             Assert.That(cu, Is.EqualTo(2));
+            Assert.That(cb.Length, Is.EqualTo(0));  // Show that all data was now consumed
         }
 
         [Test]
@@ -1162,12 +1324,11 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.That(cc.GetString(), Is.EqualTo("0123456789@ABCDIJKLMNOPQRSTU"));
 
             // There are no bytes to convert, an exception should be raised like the real decoder in a char[].
-            try {
+            Assert.That(() => {
                 d.Convert(cb, cc, cc.Free, false, out bu, out cu, out complete);
-            } catch (System.ArgumentException e) {
-                if (!e.ParamName.Equals("chars")) throw;
-            }
+            }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
         }
+
         [Test]
         public void CircularBufferExt_DecoderConvert3_BoundariesWithFlush()
         {
@@ -1492,21 +1653,18 @@ namespace RJCP.Datastructures.CircularBufferTest
             // We expect this to fail, as a two-char Unicode character doesn't fit in one byte
             Encoding enc = Encoding.GetEncoding("UTF-8", new EncoderReplacementFallback("."), new DecoderReplacementFallback("."));
             Decoder d = enc.GetDecoder();
-            int bu;
-            int cu;
-            bool complete;
             Assert.That(() => {
-                d.Convert(m, 12, 10, cc, false, out bu, out cu, out complete);
+                d.Convert(m, 12, 10, cc, false, out _, out _, out _);
             }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
 
             // We expect this to fail, as a two-char Unicode character doesn't fit in one byte
             Assert.That(() => {
-                d.Convert(m, 12, 10, cc, true, out bu, out cu, out complete);
+                d.Convert(m, 12, 10, cc, false, out _, out _, out _);
             }, Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("chars"));
 
             c = new char[2];
             cc = new CircularBuffer<char>(c, 1, 0);
-            d.Convert(m, 12, 4, cc, true, out bu, out cu, out complete);
+            d.Convert(m, 12, 4, cc, true, out int bu, out int cu, out bool complete);
             Assert.That(complete, Is.True);
             Assert.That(bu, Is.EqualTo(4));
             Assert.That(cu, Is.EqualTo(2));
