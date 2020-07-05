@@ -212,9 +212,10 @@ namespace RJCP.Datastructures
         /// Such a property is necessary in case that the free space wraps around the buffer. Where below <c>X</c> is
         /// your stream you wish to read from, <c>b</c> is the circular buffer instantiated as the type
         /// <c>CircularBuffer{T}</c>.
-        /// <code>
-        ///c = X.Read(b.Array, b.End, b.WriteLength);
-        ///b.Produce(c);
+        /// <code language="csharp">
+        /// <![CDATA[
+        ///  c = X.Read(b.Array, b.End, b.WriteLength);
+        ///  b.Produce(c);]]>
         /// </code>
         /// If the property <b>WriteLength</b> is not zero, then there is space in the buffer to read data.
         /// </para>
@@ -268,9 +269,16 @@ namespace RJCP.Datastructures
         /// </para>
         /// </remarks>
         /// <example>
-        /// short crc; if (buffer.GetReadBlock(3) &gt;= length - 3) { crc = crc16.Compute(buffer.Array,
-        /// buffer.ToArrayIndex(3), length - 3); } else { crc = crc16.Compute(buffer.Array, buffer.ToArrayIndex(3),
-        /// buffer.ReadLength - 3); crc = crc16.Compute(crc, buffer.Array, 0, length - buffer.ReadLength); }
+        /// <code language="csharp">
+        /// <![CDATA[
+        /// short crc;
+        /// if (buffer.GetReadBlock(3) >= length - 3) {
+        ///   crc = crc16.Compute(buffer.Array, buffer.ToArrayIndex(3), length - 3);
+        /// } else {
+        ///   crc = crc16.Compute(buffer.Array, buffer.ToArrayIndex(3), buffer.ReadLength - 3);
+        ///   crc = crc16.Compute(crc, buffer.Array, 0, length - buffer.ReadLength);
+        /// }]]>
+        /// </code>
         /// </example>
         public int GetReadBlock(int offset)
         {
