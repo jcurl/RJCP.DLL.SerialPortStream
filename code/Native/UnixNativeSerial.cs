@@ -2,6 +2,8 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
+using System.Collections.Generic;
+
 namespace RJCP.IO.Ports.Native
 {
     using System;
@@ -956,6 +958,15 @@ namespace RJCP.IO.Ports.Native
         /// Occurs when modem pin changes are detected.
         /// </summary>
         public event EventHandler<SerialPinChangedEventArgs> PinChanged;
+
+        public IDictionary<string, object> GetPlatformSpecificSettings()
+        {
+	        return new Dictionary<string, object>();
+        }
+
+        public void SetPlatformSpecificSettings(IDictionary<string, object> settings)
+        {
+        }
 
         protected virtual void OnPinChanged(object sender, SerialPinChangedEventArgs args)
         {

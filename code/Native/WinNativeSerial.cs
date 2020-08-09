@@ -24,10 +24,12 @@ namespace RJCP.IO.Ports.Native
     /// </summary>
     internal class WinNativeSerial : INativeSerial
     {
+	    private readonly IDictionary<string, object> m_PlatformSpecificSettings = new Dictionary<string, object>();
         private SafeFileHandle m_ComPortHandle;
         private CommProperties m_CommProperties;
         private CommState m_CommState;
         private CommModemStatus m_CommModemStatus;
+        private CommTimeouts m_CommTimeouts;
         private CommOverlappedIo m_CommOverlappedIo;
 
         private string m_Version;
@@ -712,6 +714,8 @@ namespace RJCP.IO.Ports.Native
                 break;
             }
             m_DtrEnable = m_CommState.DtrControl != DtrControl.Disable;
+
+            m_CommTimeouts.GetCommTimeouts();
         }
 
         /// <summary>
@@ -777,6 +781,8 @@ namespace RJCP.IO.Ports.Native
 
             if (m_CommState.RtsControl != RtsControl.Handshake) m_CommModemStatus.SetRts(m_RtsEnable);
             if (m_CommState.DtrControl != DtrControl.Handshake) m_CommModemStatus.SetDtr(m_DtrEnable);
+
+            m_CommTimeouts.SetCommTimeouts();
         }
 
         private void SetRtsPortSettings(bool immediate)
@@ -872,6 +878,7 @@ namespace RJCP.IO.Ports.Native
             m_CommState = new CommState(m_ComPortHandle);
             m_CommProperties = new CommProperties(m_ComPortHandle);
             m_CommModemStatus = new CommModemStatus(m_ComPortHandle);
+            m_CommTimeouts = new CommTimeouts(m_ComPortHandle, m_PlatformSpecificSettings);
             m_CommOverlappedIo = new CommOverlappedIo(m_ComPortHandle);
             RegisterEvents();
         }
@@ -894,6 +901,7 @@ namespace RJCP.IO.Ports.Native
                 m_CommOverlappedIo = null;
                 m_CommState = null;
                 m_CommModemStatus = null;
+                m_CommTimeouts = null;
                 handle.Dispose();
             }
     }
@@ -1050,6 +1058,31 @@ namespace RJCP.IO.Ports.Native
         /// Occurs when modem pin changes are detected.
         /// </summary>
         public event EventHandler<SerialPinChangedEventArgs> PinChanged;
+
+        public IDictionary<string, object> GetPlatformSpecificSettings()
+        {
+            var settings = new Dictionary<string, object>(m_PlatformSpecificSettings);
+	        if (IsOpen)
+	        {
+		        m_CommTimeouts.GetCommTimeouts();
+		        m_CommTimeouts.GetPlatformSpecificSettings(settings);
+	        }
+            return settings;
+        }
+
+        public void SetPlatformSpecificSettings(IDictionary<string, object> settings)
+        {
+	        foreach (var setting in settings)
+	        {
+		        m_PlatformSpecificSettings[setting.Key] = setting.Value;
+	        }
+
+	        if (IsOpen)
+	        {
+		        m_CommTimeouts.SetPlatformSpecificSettings(m_PlatformSpecificSettings);
+		        m_CommTimeouts.SetCommTimeouts();
+	        }
+        }
 
         /// <summary>
         /// Called when modem pin changes are detected.

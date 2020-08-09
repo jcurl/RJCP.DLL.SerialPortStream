@@ -207,27 +207,6 @@ namespace RJCP.IO.Ports.Native.Windows
             m_Name = name;
             m_IsRunning = true;
             try {
-                // Set the time outs
-                NativeMethods.COMMTIMEOUTS timeouts = new NativeMethods.COMMTIMEOUTS() {
-                    // We read only the data that is buffered
-#if PL2303_WORKAROUNDS
-                    // Time out if data hasn't arrived in 10ms, or if the read takes longer than 100ms in total
-                    ReadIntervalTimeout = 10,
-                    ReadTotalTimeoutConstant = 100,
-                    ReadTotalTimeoutMultiplier = 0,
-#else
-                    // Non-asynchronous behaviour
-                    ReadIntervalTimeout = System.Threading.Timeout.Infinite,
-                    ReadTotalTimeoutConstant = 0,
-                    ReadTotalTimeoutMultiplier = 0,
-#endif
-                    // We have no time outs when writing
-                    WriteTotalTimeoutMultiplier = 0,
-                    WriteTotalTimeoutConstant = 500
-                };
-
-                bool result = UnsafeNativeMethods.SetCommTimeouts(m_ComPortHandle, ref timeouts);
-                if (!result) throw new IOException("Couldn't set CommTimeouts", Marshal.GetLastWin32Error());
 
                 m_Thread = new Thread(new ThreadStart(OverlappedIoThread)) {
                     Name = "SerialPortStream_" + m_Name,

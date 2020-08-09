@@ -2,6 +2,8 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
+using System.Collections.Generic;
+
 namespace RJCP.IO.Ports.Native
 {
     using System;
@@ -324,5 +326,19 @@ namespace RJCP.IO.Ports.Native
         /// Occurs when modem pin changes are detected.
         /// </summary>
         event EventHandler<SerialPinChangedEventArgs> PinChanged;
+
+        /// <summary>
+        /// Returns an <see cref="IDictionary{TKey,TValue}"/> containing platform-specific settings for the serial port.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IDictionary{TKey,TValue}"/> containing platform-specific settings for the serial port.
+        /// </returns>
+        IDictionary<string, object> GetPlatformSpecificSettings();
+
+        /// <summary>
+        /// Sets the values of any supported platform-specific settings for the serial port.
+        /// </summary>
+        /// <param name="settings">An <see cref="IDictionary{TKey,TValue}"/> containing platform-specific settings for the serial port.</param>
+        void SetPlatformSpecificSettings(IDictionary<string, object> settings);
     }
 }

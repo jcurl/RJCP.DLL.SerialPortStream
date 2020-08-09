@@ -81,6 +81,7 @@
     <Compile Include="Native\Windows\CommErrorEventArgs.cs" />
     <Compile Include="Native\Windows\CommEventArgs.cs" />
     <Compile Include="Native\Windows\CommOverlappedIo.cs" />
+    <Compile Include="Native\Windows\CommTimeouts.cs" />
     <Compile Include="Native\Windows\DtrControl.cs" />
     <Compile Include="Native\Windows\NativeMethods.cs" />
     <Compile Include="Native\Windows\RtsControl.cs" />
