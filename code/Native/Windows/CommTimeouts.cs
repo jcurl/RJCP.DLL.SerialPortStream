@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
-
-namespace RJCP.IO.Ports.Native.Windows
+﻿namespace RJCP.IO.Ports.Native.Windows
 {
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Runtime.InteropServices;
+	using Microsoft.Win32.SafeHandles;
+
 	internal sealed class CommTimeouts
 	{
 		private const string ReadIntervalTimeoutKey = nameof(CommTimeouts) + "." + nameof(NativeMethods.COMMTIMEOUTS.ReadIntervalTimeout);

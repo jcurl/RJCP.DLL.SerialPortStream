@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace RJCP.IO.Ports
+﻿namespace RJCP.IO.Ports
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Text;
 #if NET45

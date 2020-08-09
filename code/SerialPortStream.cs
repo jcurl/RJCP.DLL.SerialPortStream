@@ -7,11 +7,10 @@
 // this implementation.
 //#define DRIVERBUFFEREDBYTES
 
-using System.Collections.Generic;
-
 namespace RJCP.IO.Ports
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text;
     using System.IO;
