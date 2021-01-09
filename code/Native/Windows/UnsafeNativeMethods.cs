@@ -32,7 +32,7 @@ namespace RJCP.IO.Ports.Native.Windows
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool ReadFile(SafeFileHandle hFile, [Out] IntPtr lpBuffer, uint nNumberOfBytesToRead,
+        public static extern bool ReadFile(SafeFileHandle hFile, IntPtr lpBuffer, uint nNumberOfBytesToRead,
             out uint lpNumberOfBytesRead, [In] ref System.Threading.NativeOverlapped lpOverlapped);
 
         [DllImport("kernel32.dll", SetLastError = true)]
