@@ -1,5 +1,4 @@
-﻿using System;
-namespace RJCP.IO.Ports.SerialPortStreamTest
+﻿namespace RJCP.IO.Ports.SerialPortStreamTest
 {
     using System;
     using System.Configuration;

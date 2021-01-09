@@ -51,7 +51,7 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// Access to properties and methods specific to the native serial object.
         /// </value>
-        public ISerialBufferSerialData Serial { get { return this as ISerialBufferSerialData; } }
+        public ISerialBufferSerialData Serial { get { return this; } }
 
         CircularBuffer<byte> ISerialBufferSerialData.ReadBuffer { get { return m_ReadBuffer; } }
 
@@ -173,7 +173,7 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// Access to properties and methods specific to the native serial object.
         /// </value>
-        public ISerialBufferStreamData Stream { get { return this as ISerialBufferStreamData; } }
+        public ISerialBufferStreamData Stream { get { return this; } }
 
         private readonly WaitHandle[] m_BufferStreamWaitForReadHandles;
         private readonly WaitHandle[] m_BufferStreamWaitForReadCountHandles;

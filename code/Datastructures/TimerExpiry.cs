@@ -4,7 +4,6 @@
 
 namespace RJCP.Datastructures
 {
-    using System;
     using System.Diagnostics;
 
     /// <summary>
