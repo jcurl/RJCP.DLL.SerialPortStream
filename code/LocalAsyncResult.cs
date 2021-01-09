@@ -47,7 +47,6 @@ namespace RJCP.IO
         /// </summary>
         /// <returns>A <see cref="T:System.Threading.WaitHandle" /> that is
         /// used to wait for an asynchronous operation to complete.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public WaitHandle AsyncWaitHandle
         {
             get

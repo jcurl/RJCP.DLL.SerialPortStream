@@ -291,7 +291,6 @@ namespace RJCP.IO.Ports.Native.Windows
             NativeMethods.SerialEventMask.EV_EVENT2 |
             NativeMethods.SerialEventMask.EV_PERR;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Runtime.InteropServices.SafeHandle.DangerousGetHandle")]
         private void OverlappedIoThread()
         {
             try {

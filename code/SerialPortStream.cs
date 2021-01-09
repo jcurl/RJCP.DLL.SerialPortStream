@@ -711,7 +711,6 @@ namespace RJCP.IO.Ports
         /// <param name="callback">An optional asynchronous callback, to be called when the read is complete.</param>
         /// <param name="state">A user-provided object that distinguishes this particular asynchronous read request from other requests.</param>
         /// <returns>An <see cref="IAsyncResult"/> object to be used with <see cref="EndRead"/>.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             ReadCheck(buffer, offset, count);
@@ -1174,7 +1173,6 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             WriteCheck(buffer, offset, count);

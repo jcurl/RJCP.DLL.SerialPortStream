@@ -719,7 +719,6 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="InvalidOperationException">Port not open.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
         public void SetPortSettings()
         {
             if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");

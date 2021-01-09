@@ -123,7 +123,6 @@ namespace RJCP.IO.Ports.Native.Windows
         /// </remarks>
         /// <param name="baudrate">The baud rate to check for.</param>
         /// <returns><b>true</b> if the baud rate is indicated to be supported.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         public bool IsValidBaud(int baudrate)
         {
             if (baudrate <= 0) return false;
