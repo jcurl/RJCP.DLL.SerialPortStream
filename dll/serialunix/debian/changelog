@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~focal1) focal; urgency=low
+
+  * Initial release for Ubuntu 20.04 Focal Fossa
+
+ -- Jason Curl <jcurl@arcor.de>  Tue, 23 Mar 2021 15:12:00 +0100
