@@ -1,0 +1,5 @@
+usr/include/*
+usr/lib/*/lib*.so
+usr/lib/*/nserial-*/*.cmake
+#usr/lib/*/pkgconfig/*
+#usr/share/pkgconfig/*

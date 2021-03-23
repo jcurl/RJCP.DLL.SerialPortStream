@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~impish1) impish; urgency=low
+
+  * Initial release for Ubuntu 21.10 Impish Indri
+
+ -- Jason Curl <jcurl@arcor.de>  Tue, 18 Oct 2021 21:14:00 +0200
