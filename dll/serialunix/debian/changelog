@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~eoan1) eoan; urgency=low
+
+  * Initial release for Ubuntu 19.10 Eoan Ermine
+
+ -- Jason Curl <jcurl@arcor.de>  Tue, 23 Mar 2021 15:03:00 +0100
