@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~hirsute1) hirsute; urgency=low
+
+  * Initial release for Ubuntu 21.04 Hirsute Hippo
+
+ -- Jason Curl <jcurl@arcor.de>  Tue, 19 Oct 2021 11:04:00 +0200
