@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~groovy1) groovy; urgency=low
+
+  * Initial release for Ubuntu 20.10 Groovy Gorilla
+
+ -- Jason Curl <jcurl@arcor.de>  Tue, 23 Mar 2021 15:15:00 +0100

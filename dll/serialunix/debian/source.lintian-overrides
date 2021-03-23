@@ -1,0 +1,8 @@
+# We build directly within GIT on its own branch with debhelper. Thus
+# there is no need for patches, etc. However, we still need the dash
+# version to indicate if there was a package update on the branch even
+# if the main branch didn't change.
+libnserial: native-package-with-dash-version
+
+# We don't need any dependencies for documentation as it's not executable.
+libnserial: debhelper-but-no-misc-depends libnserial-doc
