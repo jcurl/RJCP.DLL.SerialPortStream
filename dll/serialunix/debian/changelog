@@ -1,0 +1,5 @@
+libnserial (1.1.4-0ubuntu1~disco1) disco; urgency=low
+
+  * Initial release for Ubuntu 19.04 Disco Dingo
+
+ -- Jason Curl <jcurl@arcor.de>  Tue, 23 Mar 2021 14:42:00 +0100
