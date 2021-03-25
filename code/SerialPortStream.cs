@@ -22,6 +22,7 @@ namespace RJCP.IO.Ports
     using System.Runtime.Remoting.Messaging;
 #else
     using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
 #endif
 
     /// <summary>
@@ -699,9 +700,26 @@ namespace RJCP.IO.Ports
             return bytes;
         }
 
-#if !NETSTANDARD15
-        private delegate int ReadDelegate(byte[] buffer, int offset, int count);
-
+#if NETSTANDARD15
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="buffer">The buffer to read the data into.</param>
+        /// <param name="offset">The byte offset in <paramref name="buffer"/> at which to begin writing data read from the stream.</param>
+        /// <param name="count">The maximum number of bytes to read.</param>
+        /// <param name="cancellationToken">Using a cancellation token is not supported and will be ignored.</param>
+        /// <returns>A <see cref="Task{Int32}"/> representing the asynchronous operation.</returns>
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return Task<int>.Factory.FromAsync(
+                this.InternalBeginRead,
+                this.InternalEndRead,
+                buffer,
+                offset,
+                count,
+                null);
+        }
+#else
         /// <summary>
         /// Begins an asynchronous read operation.
         /// </summary>
@@ -713,25 +731,7 @@ namespace RJCP.IO.Ports
         /// <returns>An <see cref="IAsyncResult"/> object to be used with <see cref="EndRead"/>.</returns>
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            ReadCheck(buffer, offset, count);
-
-            if (m_Buffer == null || count == 0 || m_Buffer.Stream.WaitForRead(0)) {
-                // Data in the buffer, we can return immediately
-                LocalAsync<int> ar = new LocalAsync<int>(state);
-                if (m_Buffer != null && count > 0) {
-                    ar.Result = InternalRead(buffer, offset, count);
-                } else {
-                    ar.Result = 0;
-                }
-                ar.IsCompleted = true;
-                ar.CompletedSynchronously = true;
-                if (callback != null) callback(ar);
-                return ar;
-            } else {
-                // No data in buffer, so we create a thread in the background
-                ReadDelegate read = InternalBlockingRead;
-                return read.BeginInvoke(buffer, offset, count, callback, state);
-            }
+            return this.InternalBeginRead(buffer, offset, count, callback, state);
         }
 
         /// <summary>
@@ -744,18 +744,67 @@ namespace RJCP.IO.Ports
         /// Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.</returns>
         public override int EndRead(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync<int> localAsync) {
+            return this.InternalEndRead(asyncResult);
+        }
+#endif
+
+        private delegate int ReadDelegate(byte[] buffer, int offset, int count);
+
+        private IAsyncResult InternalBeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            ReadCheck(buffer, offset, count);
+
+            if (this.m_Buffer == null || count == 0 || this.m_Buffer.Stream.WaitForRead(0))
+            {
+                // Data in the buffer, we can return immediately
+                LocalAsync<int> ar = new LocalAsync<int>(state);
+                if (this.m_Buffer != null && count > 0)
+                {
+                    ar.Result = this.InternalRead(buffer, offset, count);
+                }
+                else
+                {
+                    ar.Result = 0;
+                }
+                ar.IsCompleted = true;
+                ar.CompletedSynchronously = true;
+                if (callback != null) callback(ar);
+                return ar;
+            }
+            else
+            {
+                ReadDelegate read = this.InternalBlockingRead;
+#if NETSTANDARD15
+                // No data in buffer, so we create a thread in the background
+                return Task.Run(() => read(buffer, offset, count));
+#else
+                // No data in buffer, so we create a thread in the background
+                return read.BeginInvoke(buffer, offset, count, callback, state);
+#endif
+            }
+        }
+
+        private int InternalEndRead(IAsyncResult asyncResult)
+        {
+            if (asyncResult is LocalAsync<int> localAsync)
+            {
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
-                if (localAsync.Result == 0) ReadCheckDeviceError();
+                if (localAsync.Result == 0) this.ReadCheckDeviceError();
                 return localAsync.Result;
-            } else {
+            }
+            else
+            {
+#if NETSTANDARD15
+                var ar = (Task<int>)asyncResult;
+                return ar.Result;
+#else
                 AsyncResult ar = (AsyncResult)asyncResult;
                 ReadDelegate caller = (ReadDelegate)ar.AsyncDelegate;
                 return caller.EndInvoke(asyncResult);
+#endif
             }
         }
-#endif
 
         /// <summary>
         /// Synchronously reads one byte from the SerialPort input buffer.
@@ -1157,9 +1206,30 @@ namespace RJCP.IO.Ports
             m_Buffer.Stream.Write(buffer, offset, count);
         }
 
-#if !NETSTANDARD15
-        private delegate void WriteDelegate(byte[] buffer, int offset, int count);
-
+#if NETSTANDARD15
+        /// <summary>
+        /// Performs an asynchronous write operation.
+        /// </summary>
+        /// <param name="buffer">The buffer to write data from.</param>
+        /// <param name="offset">The byte offset in buffer from which to begin writing.</param>
+        /// <param name="count">The maximum number of bytes to write.</param>
+        /// <param name="cancellationToken">Using a cancellation token is not supported and will be ignored.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="System.ArgumentNullException">NULL buffer was provided.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            return Task.Factory.FromAsync(
+                this.InternalBeginWrite,
+                this.InternalEndWrite,
+                buffer,
+                offset,
+                count,
+                null);
+        }
+#else
         /// <summary>
         /// Begins an asynchronous write operation.
         /// </summary>
@@ -1175,21 +1245,7 @@ namespace RJCP.IO.Ports
         /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            WriteCheck(buffer, offset, count);
-
-            if (count == 0 || m_Buffer.Stream.WaitForWrite(count, 0)) {
-                LocalAsync ar = new LocalAsync(state);
-                if (count > 0) {
-                    InternalWrite(buffer, offset, count);
-                }
-                ar.IsCompleted = true;
-                ar.CompletedSynchronously = true;
-                if (callback != null) callback(ar);
-                return ar;
-            } else {
-                WriteDelegate write = InternalBlockingWrite;
-                return write.BeginInvoke(buffer, offset, count, callback, state);
-            }
+            return this.InternalBeginWrite(buffer, offset, count, callback, state);
         }
 
         /// <summary>
@@ -1206,18 +1262,59 @@ namespace RJCP.IO.Ports
         /// </remarks>
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync localAsync) {
-                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
-                localAsync.Dispose();
-            } else {
-                AsyncResult ar = (AsyncResult)asyncResult;
-                WriteDelegate caller = (WriteDelegate)ar.AsyncDelegate;
-
-                // This will raise any exceptions from the method InternalBlockingWrite
-                caller.EndInvoke(asyncResult);
-            }
+            this.InternalEndWrite(asyncResult);
         }
 #endif
+
+        private delegate void WriteDelegate(byte[] buffer, int offset, int count);
+
+        private IAsyncResult InternalBeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            this.WriteCheck(buffer, offset, count);
+
+            if (count == 0 || this.m_Buffer.Stream.WaitForWrite(count, 0))
+            {
+                LocalAsync ar = new LocalAsync(state);
+                if (count > 0)
+                {
+                    this.InternalWrite(buffer, offset, count);
+                }
+                ar.IsCompleted = true;
+                ar.CompletedSynchronously = true;
+                if (callback != null) callback(ar);
+                return ar;
+            }
+            else
+            {
+                WriteDelegate write = this.InternalBlockingWrite;
+#if NETSTANDARD15
+                return Task.Run(() => write(buffer, offset, count));
+#else
+                return write.BeginInvoke(buffer, offset, count, callback, state);
+#endif
+            }
+        }
+
+        private void InternalEndWrite(IAsyncResult asyncResult)
+        {
+            if (asyncResult is LocalAsync localAsync)
+            {
+                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
+                localAsync.Dispose();
+            }
+            else
+            {
+#if NETSTANDARD15
+                var ar = (Task)asyncResult;
+                ar.Wait();
+#else
+                AsyncResult ar = (AsyncResult)asyncResult;
+                WriteDelegate caller = (WriteDelegate)ar.AsyncDelegate;
+                // This will raise any exceptions from the method InternalBlockingWrite
+                caller.EndInvoke(asyncResult);
+#endif
+            }
+        }
 
         /// <summary>
         /// Writes a specified number of characters to the serial port using data from a buffer.
