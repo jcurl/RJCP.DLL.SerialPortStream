@@ -43,14 +43,14 @@ namespace RJCP.IO.Ports
         private SerialBuffer m_Buffer;
         private ReadToCache m_ReadTo = new ReadToCache();
 
-#region Public constants
+        #region Public constants
         /// <summary>
         /// Indicates that no time out should occur.
         /// </summary>
         public const int InfiniteTimeout = Timeout.Infinite;
-#endregion
+        #endregion
 
-#region Constructor, Port Name, Open
+        #region Constructor, Port Name, Open
         /// <summary>
         /// Constructor. Create a stream that doesn't connect to any port.
         /// </summary>
@@ -308,9 +308,9 @@ namespace RJCP.IO.Ports
                 m_NativeSerial.Close();
             }
         }
-#endregion
+        #endregion
 
-#region Computer Configuration and Ports
+        #region Computer Configuration and Ports
         /// <summary>
         /// Gets an array of serial port names for the current computer.
         /// </summary>
@@ -341,9 +341,9 @@ namespace RJCP.IO.Ports
                 return serial.GetPortDescriptions();
             }
         }
-#endregion
+        #endregion
 
-#region Reading and Writing Configuration
+        #region Reading and Writing Configuration
         /// <summary>
         /// Gets or sets the byte encoding for pre- and post-transmission conversion of text.
         /// </summary>
@@ -383,9 +383,9 @@ namespace RJCP.IO.Ports
                 m_NewLine = value;
             }
         }
-#endregion
+        #endregion
 
-#region Driver Settings
+        #region Driver Settings
         /// <summary>
         /// Specify the driver In Queue at the time it is opened.
         /// </summary>
@@ -427,7 +427,7 @@ namespace RJCP.IO.Ports
                 m_NativeSerial.DriverOutQueue = value;
             }
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Gets a value that determines whether the current stream can time out.
@@ -435,7 +435,7 @@ namespace RJCP.IO.Ports
         /// <returns>A value that determines whether the current stream can time out.</returns>
         public override bool CanTimeout { get { return true; } }
 
-#region Reading
+        #region Reading
         /// <summary>
         /// Check if this stream supports reading.
         /// </summary>
@@ -987,9 +987,9 @@ namespace RJCP.IO.Ports
                 if (m_NativeSerial.IsOpen) m_NativeSerial.DiscardInBuffer();
             }
         }
-#endregion
+        #endregion
 
-#region Writing
+        #region Writing
         /// <summary>
         /// Check if this stream supports writing.
         /// </summary>
@@ -1393,9 +1393,9 @@ namespace RJCP.IO.Ports
             // to purge.
             if (m_NativeSerial.IsOpen) m_NativeSerial.DiscardOutBuffer();
         }
-#endregion
+        #endregion
 
-#region Modem Information and Serial State
+        #region Modem Information and Serial State
         /// <summary>
         /// Gets the state of the Carrier Detect line for the port.
         /// </summary>
@@ -1464,9 +1464,9 @@ namespace RJCP.IO.Ports
                 return m_NativeSerial.RingHolding;
             }
         }
-#endregion
+        #endregion
 
-#region Serial Configuration Settings
+        #region Serial Configuration Settings
         /// <summary>
         /// Gets or sets the serial baud rate.
         /// </summary>
@@ -1796,9 +1796,9 @@ namespace RJCP.IO.Ports
                 m_NativeSerial.BreakState = value;
             }
         }
-#endregion
+        #endregion
 
-#region Seeking
+        #region Seeking
         /// <summary>
         /// This stream is not seekable, so always returns false.
         /// </summary>
@@ -1847,9 +1847,9 @@ namespace RJCP.IO.Ports
         {
             throw new NotSupportedException();
         }
-#endregion
+        #endregion
 
-#region Event Handling and Abstraction
+        #region Event Handling and Abstraction
         private readonly object m_EventLock = new object();
         private ManualResetEvent m_EventProcessing = new ManualResetEvent(false);
         private SerialData m_SerialDataFlags = SerialData.NoData;
@@ -2020,7 +2020,7 @@ namespace RJCP.IO.Ports
                 m_EventProcessing.Reset();
             }
         }
-#endregion
+        #endregion
 
         private volatile bool m_IsDisposed;
 
