@@ -17,11 +17,12 @@ namespace RJCP.IO.Ports
     using Datastructures;
     using Native;
     using Trace;
-
 #if !NETSTANDARD15
     using System.Runtime.Remoting.Messaging;
 #else
     using System.Runtime.InteropServices;
+#endif
+#if NETSTANDARD15 || NET45
     using System.Threading.Tasks;
 #endif
 
@@ -42,14 +43,14 @@ namespace RJCP.IO.Ports
         private SerialBuffer m_Buffer;
         private ReadToCache m_ReadTo = new ReadToCache();
 
-        #region Public constants
+#region Public constants
         /// <summary>
         /// Indicates that no time out should occur.
         /// </summary>
         public const int InfiniteTimeout = Timeout.Infinite;
-        #endregion
+#endregion
 
-        #region Constructor, Port Name, Open
+#region Constructor, Port Name, Open
         /// <summary>
         /// Constructor. Create a stream that doesn't connect to any port.
         /// </summary>
@@ -307,9 +308,9 @@ namespace RJCP.IO.Ports
                 m_NativeSerial.Close();
             }
         }
-        #endregion
+#endregion
 
-        #region Computer Configuration and Ports
+#region Computer Configuration and Ports
         /// <summary>
         /// Gets an array of serial port names for the current computer.
         /// </summary>
@@ -340,9 +341,9 @@ namespace RJCP.IO.Ports
                 return serial.GetPortDescriptions();
             }
         }
-        #endregion
+#endregion
 
-        #region Reading and Writing Configuration
+#region Reading and Writing Configuration
         /// <summary>
         /// Gets or sets the byte encoding for pre- and post-transmission conversion of text.
         /// </summary>
@@ -382,9 +383,9 @@ namespace RJCP.IO.Ports
                 m_NewLine = value;
             }
         }
-        #endregion
+#endregion
 
-        #region Driver Settings
+#region Driver Settings
         /// <summary>
         /// Specify the driver In Queue at the time it is opened.
         /// </summary>
@@ -426,7 +427,7 @@ namespace RJCP.IO.Ports
                 m_NativeSerial.DriverOutQueue = value;
             }
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// Gets a value that determines whether the current stream can time out.
@@ -434,7 +435,7 @@ namespace RJCP.IO.Ports
         /// <returns>A value that determines whether the current stream can time out.</returns>
         public override bool CanTimeout { get { return true; } }
 
-        #region Reading
+#region Reading
         /// <summary>
         /// Check if this stream supports reading.
         /// </summary>
@@ -700,7 +701,7 @@ namespace RJCP.IO.Ports
             return bytes;
         }
 
-#if NETSTANDARD15
+#if NETSTANDARD15 || NET45
         /// <summary>
         /// 
         /// </summary>
@@ -712,14 +713,15 @@ namespace RJCP.IO.Ports
         public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             return Task<int>.Factory.FromAsync(
-                this.InternalBeginRead,
-                this.InternalEndRead,
+                InternalBeginRead,
+                InternalEndRead,
                 buffer,
                 offset,
                 count,
                 null);
         }
-#else
+#endif
+#if NET40 || NET45
         /// <summary>
         /// Begins an asynchronous read operation.
         /// </summary>
@@ -754,25 +756,19 @@ namespace RJCP.IO.Ports
         {
             ReadCheck(buffer, offset, count);
 
-            if (this.m_Buffer == null || count == 0 || this.m_Buffer.Stream.WaitForRead(0))
-            {
+            if (this.m_Buffer == null || count == 0 || this.m_Buffer.Stream.WaitForRead(0)) {
                 // Data in the buffer, we can return immediately
                 LocalAsync<int> ar = new LocalAsync<int>(state);
-                if (this.m_Buffer != null && count > 0)
-                {
+                if (this.m_Buffer != null && count > 0) {
                     ar.Result = this.InternalRead(buffer, offset, count);
-                }
-                else
-                {
+                } else {
                     ar.Result = 0;
                 }
                 ar.IsCompleted = true;
                 ar.CompletedSynchronously = true;
                 if (callback != null) callback(ar);
                 return ar;
-            }
-            else
-            {
+            } else {
                 ReadDelegate read = this.InternalBlockingRead;
 #if NETSTANDARD15
                 // No data in buffer, so we create a thread in the background
@@ -786,15 +782,12 @@ namespace RJCP.IO.Ports
 
         private int InternalEndRead(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync<int> localAsync)
-            {
+            if (asyncResult is LocalAsync<int> localAsync) {
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
                 if (localAsync.Result == 0) this.ReadCheckDeviceError();
                 return localAsync.Result;
-            }
-            else
-            {
+            } else {
 #if NETSTANDARD15
                 var ar = (Task<int>)asyncResult;
                 return ar.Result;
@@ -994,9 +987,9 @@ namespace RJCP.IO.Ports
                 if (m_NativeSerial.IsOpen) m_NativeSerial.DiscardInBuffer();
             }
         }
-        #endregion
+#endregion
 
-        #region Writing
+#region Writing
         /// <summary>
         /// Check if this stream supports writing.
         /// </summary>
@@ -1206,7 +1199,7 @@ namespace RJCP.IO.Ports
             m_Buffer.Stream.Write(buffer, offset, count);
         }
 
-#if NETSTANDARD15
+#if NETSTANDARD15 || NET45
         /// <summary>
         /// Performs an asynchronous write operation.
         /// </summary>
@@ -1229,7 +1222,8 @@ namespace RJCP.IO.Ports
                 count,
                 null);
         }
-#else
+#endif
+#if NET40 || NET45
         /// <summary>
         /// Begins an asynchronous write operation.
         /// </summary>
@@ -1272,20 +1266,16 @@ namespace RJCP.IO.Ports
         {
             this.WriteCheck(buffer, offset, count);
 
-            if (count == 0 || this.m_Buffer.Stream.WaitForWrite(count, 0))
-            {
+            if (count == 0 || this.m_Buffer.Stream.WaitForWrite(count, 0)) {
                 LocalAsync ar = new LocalAsync(state);
-                if (count > 0)
-                {
+                if (count > 0) {
                     this.InternalWrite(buffer, offset, count);
                 }
                 ar.IsCompleted = true;
                 ar.CompletedSynchronously = true;
                 if (callback != null) callback(ar);
                 return ar;
-            }
-            else
-            {
+            } else {
                 WriteDelegate write = this.InternalBlockingWrite;
 #if NETSTANDARD15
                 return Task.Run(() => write(buffer, offset, count));
@@ -1297,12 +1287,10 @@ namespace RJCP.IO.Ports
 
         private void InternalEndWrite(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync localAsync)
-            {
+            if (asyncResult is LocalAsync localAsync) {
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
-            }
-            else
+            } else
             {
 #if NETSTANDARD15
                 var ar = (Task)asyncResult;
@@ -1405,9 +1393,9 @@ namespace RJCP.IO.Ports
             // to purge.
             if (m_NativeSerial.IsOpen) m_NativeSerial.DiscardOutBuffer();
         }
-        #endregion
+#endregion
 
-        #region Modem Information and Serial State
+#region Modem Information and Serial State
         /// <summary>
         /// Gets the state of the Carrier Detect line for the port.
         /// </summary>
@@ -1476,9 +1464,9 @@ namespace RJCP.IO.Ports
                 return m_NativeSerial.RingHolding;
             }
         }
-        #endregion
+#endregion
 
-        #region Serial Configuration Settings
+#region Serial Configuration Settings
         /// <summary>
         /// Gets or sets the serial baud rate.
         /// </summary>
@@ -1808,9 +1796,9 @@ namespace RJCP.IO.Ports
                 m_NativeSerial.BreakState = value;
             }
         }
-        #endregion
+#endregion
 
-        #region Seeking
+#region Seeking
         /// <summary>
         /// This stream is not seekable, so always returns false.
         /// </summary>
@@ -1859,9 +1847,9 @@ namespace RJCP.IO.Ports
         {
             throw new NotSupportedException();
         }
-        #endregion
+#endregion
 
-        #region Event Handling and Abstraction
+#region Event Handling and Abstraction
         private readonly object m_EventLock = new object();
         private ManualResetEvent m_EventProcessing = new ManualResetEvent(false);
         private SerialData m_SerialDataFlags = SerialData.NoData;
@@ -2032,7 +2020,7 @@ namespace RJCP.IO.Ports
                 m_EventProcessing.Reset();
             }
         }
-        #endregion
+#endregion
 
         private volatile bool m_IsDisposed;
 
