@@ -8,6 +8,9 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+#if NET45
+    using System.Threading.Tasks;
+#endif
     using NUnit.Framework;
 
     /// <summary>
@@ -431,6 +434,40 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 spReceive.Close();
             }
         }
+
+#if NET45
+        [Test]
+        [Timeout(10000)]
+        public async Task ReadAndWriteAsyncInDifferentThreadsAtSameTime()
+        {
+            SerialPortStream serial = null;
+            try {
+                serial = new SerialPortStream(SourcePort) {
+                    BaudRate = 115200,
+                    DataBits = 8,
+                    Parity = Parity.None,
+                    DtrEnable = false,
+                    StopBits = StopBits.One,
+                    ReadTimeout = -1,
+                    WriteTimeout = -1
+                };
+
+                serial.Open();
+
+                var buffer = new byte[1024];
+                var readTask = Task.Run(async () => await serial.ReadAsync(buffer, 0, buffer.Length));
+
+                await Task.Run(async () => {
+                    var bytes = new byte[] { 0x01, 0x02, 0x03 };
+
+                    await serial.WriteAsync(bytes, 0, bytes.Length);
+                    await serial.FlushAsync();
+                });
+            } finally {
+                if (serial != null) serial.Dispose();
+            }
+        }
+#endif
 
         private byte[] ReceiveData(SerialPortStream sp, int size)
         {
