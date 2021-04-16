@@ -84,3 +84,20 @@ When running the docker container, it performs the following checks:
 The output is in the `build/${CODENAME}` folder.
 
 Finally, sign the packages with `debsign`.
+
+### Accessing the Container using a Shell
+
+If you want to access the docker containiner using a shall as root (so you can
+check the contents, debug, etc.):
+
+```sh
+mkdir -p ../build
+docker run -it --rm --read-only --cap-drop all \
+   -v ${PWD}:/source:ro \
+   -v ${PWD}/../build:/build:rw \
+   --tmpfs /tmp \
+   libnserial:${CODENAME} \
+   sh
+```
+
+Note, that this command doesn't set the user name/group and runs as root.

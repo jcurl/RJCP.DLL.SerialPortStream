@@ -90,6 +90,17 @@ deb() {
   exit 0
 }
 
+shell() {
+  create_home_dir
+  exec /bin/bash
+}
+
+dpkgquery() {
+  create_home_dir
+  dpkg-query -W dpkg gcc binutils autoconf automake libtool m4 cmake doxygen debhelper
+  exit 0
+}
+
 COMMANDARG="$1"
 case ${COMMANDARG} in
   build)
@@ -97,6 +108,12 @@ case ${COMMANDARG} in
     ;;
   deb)
     deb
+    ;;
+  sh)
+    shell
+    ;;
+  dpkg-query)
+    dpkgquery
     ;;
   *)
     echo "Unknown command ${COMMANDARG}"
