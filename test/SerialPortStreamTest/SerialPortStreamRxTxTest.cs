@@ -463,8 +463,39 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                     await serial.WriteAsync(bytes, 0, bytes.Length);
                     await serial.FlushAsync();
                 });
+                await Task.Delay(100);
             } finally {
                 if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        [Timeout(2000)] // We abort the test after timeout. This tests the blocking behavior in ReadAsync and the test will fail if ReadAsync blocks.
+        public async Task ReadAndWriteAsync()
+        {
+            using (var serialPortStreamWrite = new SerialPortStream(SourcePort, 9600, 8, Parity.None, StopBits.One))
+            using (var serialPortStreamRead = new SerialPortStream(DestPort, 9600, 8, Parity.None, StopBits.One))
+            {
+                serialPortStreamWrite.Open();
+                serialPortStreamRead.Open();
+
+                var buffer = new byte[1024];
+                var readTask = Task.Run(async () => {
+                    int expected = 3;
+                    while (expected > 0) {
+                        int r = await serialPortStreamRead.ReadAsync(buffer, 0, buffer.Length);
+                        expected -= r;
+                    }
+                });
+
+                var bytes = new byte[] { 0x01, 0x02, 0x03 };
+                await serialPortStreamWrite.WriteAsync(bytes, 0, bytes.Length);
+                await serialPortStreamWrite.FlushAsync();
+                await readTask;
+
+                Assert.That(buffer[0], Is.EqualTo(0x01));
+                Assert.That(buffer[1], Is.EqualTo(0x02));
+                Assert.That(buffer[2], Is.EqualTo(0x03));
             }
         }
 #endif
