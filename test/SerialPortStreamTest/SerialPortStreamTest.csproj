@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net45;net40</TargetFrameworks>
+    <AssemblyName>RJCP.SerialPortStreamTest</AssemblyName>
+    <Product>RJCP.SerialPortStream</Product>
+    <RootNamespace>RJCP.IO.Ports.SerialPortStreamTest</RootNamespace>
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Jason Curl</Authors>
+    <Copyright>(C) Jason Curl, 2012-2021</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="MsdnFrameworkTest.cs" />
+    <Compile Include="SerialConfiguration.cs" />
+    <Compile Include="SerialPortStreamCharTest.cs" />
+    <Compile Include="SerialPortStreamManualTest.cs" />
+    <Compile Include="SerialPortStreamParityTest.cs" />
+    <Compile Include="SerialPortStreamRxTxTest.cs" />
+    <Compile Include="SerialPortStreamSimpleTest.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,116 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net45;net40</TargetFrameworks>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>RJCP.SerialPortStream</AssemblyName>
+    <Product>RJCP.SerialPortStream</Product>
+    <RootNamespace>RJCP.IO.Ports</RootNamespace>
+    <Configurations>Debug;Release;Signed_Release</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyTitle>SerialPortStream</AssemblyTitle>
+    <Authors>Jason Curl</Authors>
+    <Copyright>(C) Jason Curl, 2012-2021</Copyright>
+    <PackageId>SerialPortStream</PackageId>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/jcurl/serialportstream</PackageProjectUrl>
+    <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.</Description>
+    <Version>2.3.2-beta.20210422.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Signed_Release'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <AssemblyOriginatorKeyFile>rjcp_serialportstream.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Mono.Posix" Version="4.0.0.0" >
+      <PrivateAssets>all</PrivateAssets>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="Datastructures\CircularBuffer.cs" />
+    <Compile Include="Datastructures\ReusableList.cs" />
+    <Compile Include="Datastructures\TimerExpiry.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HandShake.cs" />
+    <Compile Include="InternalApplicationException.cs" />
+    <Compile Include="ISerialPortStream.cs" />
+    <Compile Include="LocalAsyncResult.cs" />
+    <Compile Include="Native\INativeSerial.cs" />
+    <Compile Include="Native\ISerialBufferSerialData.cs" />
+    <Compile Include="Native\ISerialBufferStreamData.cs" />
+    <Compile Include="Native\Platform.cs" />
+    <Compile Include="Native\ReadToCache.cs" />
+    <Compile Include="Native\SerialBuffer.cs" />
+    <Compile Include="Native\Unix\INativeSerialDll.cs" />
+    <Compile Include="Native\Unix\SafeNativeMethods.cs" />
+    <Compile Include="Native\Unix\SafeSerialHandle.cs" />
+    <Compile Include="Native\Unix\SerialUnix.cs" />
+    <Compile Include="Native\Unix\SerialReadWriteEvent.cs" />
+    <Compile Include="Native\Unix\SysErrNo.cs" />
+    <Compile Include="Native\Unix\WaitForModemEvent.cs" />
+    <Compile Include="Native\Unix\UnsafeNativeMethods.cs" />
+    <Compile Include="Native\UnixNativeSerial.cs" />
+    <Compile Include="Native\Windows\CommErrorEventArgs.cs" />
+    <Compile Include="Native\Windows\CommEventArgs.cs" />
+    <Compile Include="Native\Windows\CommOverlappedIo.cs" />
+    <Compile Include="Native\Windows\CommState.cs" />
+    <Compile Include="Native\Windows\CommProperties.cs" />
+    <Compile Include="Native\Windows\CommModemStatus.cs" />
+    <Compile Include="Native\Windows\DtrControl.cs" />
+    <Compile Include="Native\Windows\NativeMethods.cs" />
+    <Compile Include="Native\Windows\RtsControl.cs" />
+    <Compile Include="Native\Windows\SafeNativeMethods.cs" />
+    <Compile Include="Native\Windows\UnsafeNativeMethods.cs" />
+    <Compile Include="Native\Windows\WinError.cs" />
+    <Compile Include="Native\WinNativeSerial.cs" />
+    <Compile Include="Parity.cs" />
+    <Compile Include="PortDescription.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerialData.cs" />
+    <Compile Include="SerialDataEventArgs.cs" />
+    <Compile Include="SerialError.cs" />
+    <Compile Include="SerialErrorReceivedEventArgs.cs" />
+    <Compile Include="SerialPinChange.cs" />
+    <Compile Include="SerialPinChangedEventArgs.cs" />
+    <Compile Include="SerialPortStream.cs" />
+    <Compile Include="StopBits.cs" />
+    <Compile Include="Trace\Log.cs" />
+    <Compile Include="Trace\LogSource.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="rjcp_serialportstream.snk" />
+  </ItemGroup>
+
+</Project>

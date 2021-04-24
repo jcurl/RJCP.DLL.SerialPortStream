@@ -20,9 +20,9 @@ enhances portability and fixes bugs. See the end of these notes for differences.
 * 3.0 System Requirements
   * 3.1 Tested
   * 3.2 Compatibility
-    * 3.2.1 Mono Framework (Linux Only)
-    * 3.2.2 Microsoft Compact Framework (not supported)
-    * 3.2.3 Untested, but should work
+    * 3.2.1 .NET Frameworks (Windows)
+    * 3.2.2 Mono Framework (Linux Only)
+    * 3.2.3 Microsoft Compact Framework (not supported)
 * 4.0 Installation
   * 4.1 Windows
   * 4.2 Linux
@@ -99,23 +99,33 @@ The `SerialPortStream` tries to solve the following issues observed:
 
 Software has been tested and developed using:
 
+* .NET Standard 1.5 on Windows 10 Pro x64
 * .NET 4.8 on Windows 10 Pro x64
 * .NET 4.5 on Windows 8 Pro x64 and Windows 8.1 Pro x64.
 * .NET 4.5 on Windows 7 x86 and x64.
 * Mono 6.x from Xamarin on Ubuntu 18.04 (64-bit)
 
 I use this software for automation in another system (Windows) that runs for
-multiple days and it appears stable. The implementation for Mono is relatively
-new and has been tested with a battery of unit and component tests. It probably
-needs more testing in real world environments though.
+multiple days and it appears stable.
 
 See later in these notes for known issues and changes.
 
 ### 3.2 Compatibility
 
-#### 3.2.1 Mono Framework (Linux Only)
+#### 3.2.1 .NET Frameworks (Windows)
 
-Only Mono on Linux is supported. Embedded platforms are not supported. You are
+The software is written originally for .NET 4.0 and should work on those
+platforms. It is extended for .NET 4.5 features. A version targets .NET Core
+with API level .NET Stanrdard 1.5, so should work on .NET Core 2.1, 3.1 and .NET
+5.0 and later.
+
+Windows XP SP3 and later should work.
+
+#### 3.2.2 Mono Framework (Linux Only)
+
+TBD: Since the migration to the .NET SDK project format, this is not tested.
+
+Mono on Linux is supported. Embedded platforms are not supported. You are
 welcome to make a patch with appropriate test cases.
 
 You should use the latest version of Mono. Version 3.2.8 has significant bugs
@@ -126,19 +136,9 @@ For instructions on how to install the latest Mono for your system, refer to
 [Install Mono On
 Linux](http://www.mono-project.com/docs/getting-started/install/linux/).
 
-#### 3.2.2 Microsoft Compact Framework (not supported)
+#### 3.2.3 Microsoft Compact Framework (not supported)
 
 SerialPortStream is not designed for the Compact Framework.
-
-#### 3.2.3 Untested, but should work
-
-Theoretically it should work on the following, but it hasn't been tested.
-
-* .NET 4.0 on Windows XP
-* .NET 4.0 on Windows 7
-
-If you have feedback that it works on these platforms, please let the author
-know! The documentation can then be updated for the benefit of others.
 
 ## 4.0 Installation
 

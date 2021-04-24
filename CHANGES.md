@@ -1,13 +1,43 @@
 # List of Changes with Releases
 
-## Version 2.2.2 (libnserial 1.1.4)
+## Version 2.3.2-beta (libnserial 1.1.4)
+
+Features
+
+* DOTNET-329: Migrate to .NET SDK Project with .NET 4.0, 4.5
+* DOTNET-185: Port test cases to NUnit 3.x
+
+## Version 2.3.1 (libnserial 1.1.4) - 19/Apr/2021
+
+Bugfixes
+
+* [Issue #116](https://github.com/jcurl/SerialPortStream/issues/116): Fix
+  ReadAsync() and WriteAsync() on .NET Standard 1.5 (.NET Core and .NET 5.0 and
+  later).
+
+## Version 2.3.0 (libnserial 1.1.4) - Do not use - 13/Apr/2021
+
+Features
+
+* [Issue #114](https://github.com/jcurl/SerialPortStream/issues/114): Provide
+  ReadAsync() and WriteAsync() implementation
+  * Note, the ReadAsync CancellationToken is ignored, and doesn't match the
+    ISerialPortStream.ReadAsync.
+  * This implementation is broken on .NET Core (.NET Standard 1.5). Works on
+    .NET 4.5
+
+Bugfixes
+
+* [Issue #110](https://github.com/jcurl/SerialPortStream/issues/110): Fix ReadFile P/Invoke
+
+## Version 2.2.2 (libnserial 1.1.4) - 5/Jul/2020
 
 Bugfixes
 
 * DOTNET-194: Prevent exceptions when converting bytes to chars when using
   ISO-8859-15.
 
-## Version 2.2.1 (libnserial 1.1.4)
+## Version 2.2.1 (libnserial 1.1.4) - 8/May/2020
 
 Bugfixes
 
@@ -25,7 +55,7 @@ Features:
 * [Issue #82](https://github.com/jcurl/SerialPortStream/issues/82): Provide
   release note documentation
 
-## Version 2.2.0 (libnserial 1.1.4)
+## Version 2.2.0 (libnserial 1.1.4) - 14/Nov/2018
 
 Bugfixes
 
@@ -45,7 +75,7 @@ Features
 * [Pull #77](https://github.com/jcurl/SerialPortStream/pull/77): Add interface
   for the `SerialPortStream`.
 
-## Version 2.1.4 (libnserial 1.1.3)
+## Version 2.1.4 (libnserial 1.1.3) - 1/Jun/2018
 
 Bugfixes
 
@@ -59,7 +89,7 @@ Features
 * [Issue #55](https://github.com/jcurl/SerialPortStream/issues/55): Sign the
   .NET Standard 1.5 library.
 
-## Version 2.1.3 (libnserial 1.1.2)
+## Version 2.1.3 (libnserial 1.1.2) - 26/Apr/2018
 
 Bugfixes
 
@@ -74,7 +104,7 @@ Features
 * [Issue #20](https://github.com/jcurl/SerialPortStream/issues/20): Upgrade
   project to work with .NET Core 1.0.4.
 
-## Version 2.1.2 (libnserial 1.1.2)
+## Version 2.1.2 (libnserial 1.1.2) - 26/May/2017
 
 Bugfixes
 
@@ -98,13 +128,13 @@ Features
 * [Issue #26](https://github.com/jcurl/SerialPortStream/issues/26): Provide an
   implementation for DiscardInBuffer and DiscardOutBuffer.
 
-## Version 2.1.1 (libnserial 1.1.1)
+## Version 2.1.1 (libnserial 1.1.1) - 8/Apr/2017
 
 Bugfixes
 
 * DOTNET-82: Close a serial port properly on Linux with Native Lib.
 
-## Version 2.1.0 (libnserial 1.1.0)
+## Version 2.1.0 (libnserial 1.1.0) - 25/Mar/2017
 
 Bugfixes
 
@@ -118,7 +148,7 @@ Features
 * DOTNET-74: Refactor projects to separate .NET 4.0 and .NET 4.5 for
   multitargetting.
 
-## Version 2.0.3 (libnserial 1.0.1)
+## Version 2.0.3 (libnserial 1.0.1) - 22/Jan/2017
 
 Bugfixes
 
@@ -137,25 +167,25 @@ Features
   (Linux).
 * DOTNET-62: Enable possibility to log open/close issues.
 
-## Version 2.0.2 (libnserial 1.0.0)
+## Version 2.0.2 (libnserial 1.0.0) - 13/Oct/2016
 
 Bugfixes
 
 * `ToString()` shouldn't raise an exception in case the device causes problems.
 
-## Version 2.0.1.1 (libnserial 1.0.0)
+## Version 2.0.1.1 (libnserial 1.0.0) - 7/Sep/2016
 
 Bugfixes
 
 * Reenable tracing in the final nuget package.
 
-## Version 2.0.1 (libnserial 1.0.0)
+## Version 2.0.1 (libnserial 1.0.0) - 7/Sep/2016
 
 Bugfixes
 
 * `OverlappedResult` should wait when completing.
 
-## Version 2.0.0
+## Version 2.0.0 - 25/May/2016
 
 This is a rewrite from v1.x
 

@@ -221,6 +221,14 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
                 src.Write(sdata, 0, sdata.Length);
                 src.Flush();
                 Assert.That(src.BytesToWrite, Is.EqualTo(0));
+
+                // Receive all data, just so that it is removed in the hardware buffers for the next test case.
+                byte[] ddata = new byte[512];
+                int r;
+                do {
+                    r = dst.Read(ddata, 0, ddata.Length);
+                    Console.WriteLine("Read: {0} bytes", r);
+                } while (r > 0);
             }
         }
 
@@ -398,10 +406,11 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         }
 
         [Test]
+        [Timeout(60000)]
         public void SendReceiveBoundaries()
         {
-            using (var sp = new SerialPortStream(SourcePort, 56700))
-            using (var spReceive = new SerialPortStream(DestPort, 56700)) {
+            using (var sp = new SerialPortStream(SourcePort, 57600))
+            using (var spReceive = new SerialPortStream(DestPort, 57600)) {
                 var bufferSize = 250;
 
                 // get data which is a bit larger than twice the size of the buffer (0x20000*2)
@@ -481,10 +490,20 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
 
                 var buffer = new byte[1024];
                 var readTask = Task.Run(async () => {
-                    int expected = 3;
-                    while (expected > 0) {
-                        int r = await serialPortStreamRead.ReadAsync(buffer, 0, buffer.Length);
-                        expected -= r;
+                    int pos = 0;
+                    while (pos < 3) {
+                        int r = await serialPortStreamRead.ReadAsync(buffer, pos, buffer.Length - pos);
+                        Console.WriteLine("Got: {0}", r);
+                        pos += r;
+                    }
+
+                    if (pos > 3) {
+                        // A previous test case probably didn't flush properly.
+                        // Print out contents to help debug that other test
+                        // case.
+                        for (int i = 0; i < pos; i++) {
+                            Console.WriteLine(" Byte: {0} = {1}", i, buffer[i]);
+                        }
                     }
                 });
 

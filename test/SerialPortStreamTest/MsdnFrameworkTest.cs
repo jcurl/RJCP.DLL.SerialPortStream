@@ -11,7 +11,8 @@ namespace RJCP.IO.Ports.FrameworkTest
     using NUnit.Framework;
     using SerialPortStreamTest;
 
-    [TestFixture(Category = "SerialPortStream.Framework.ManualTest")]
+    [TestFixture(Category = "ManualTest")]
+    [Explicit("Framework Test")]
     public class MsdnFrameworkTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
