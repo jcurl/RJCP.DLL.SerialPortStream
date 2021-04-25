@@ -4,7 +4,7 @@
     using System.Runtime.InteropServices;
     using System.Security;
 
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
     [SuppressUnmanagedCodeSecurity]
 #endif
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "P/Invoke")]

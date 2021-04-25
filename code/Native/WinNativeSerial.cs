@@ -13,7 +13,7 @@ namespace RJCP.IO.Ports.Native
     using Microsoft.Win32.SafeHandles;
     using Windows;
 
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
     using System.Management;
 #else
     using System.Reflection;
@@ -44,7 +44,7 @@ namespace RJCP.IO.Ports.Native
             {
                 if (m_Version != null) return m_Version;
 
-#if NETSTANDARD15
+#if NETSTANDARD1_5
                 var assembly = typeof(WinNativeSerial).GetTypeInfo().Assembly;
 #else
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -120,7 +120,7 @@ namespace RJCP.IO.Ports.Native
                 }
             }
 
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
             ManagementObjectCollection objects;
             // Look for standard serial ports
             using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_SerialPort")) {
@@ -845,7 +845,7 @@ namespace RJCP.IO.Ports.Native
             bool validOverride = false;
             if (t != NativeMethods.FileType.FILE_TYPE_CHAR && t != NativeMethods.FileType.FILE_TYPE_UNKNOWN) {
                 foreach (string port in GetPortNames()) {
-#if NETSTANDARD15
+#if NETSTANDARD1_5
                     if (port.Equals(PortName, StringComparison.OrdinalIgnoreCase)) {
                         validOverride = true;
                         break;

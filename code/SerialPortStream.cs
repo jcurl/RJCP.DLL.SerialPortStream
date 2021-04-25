@@ -18,13 +18,13 @@ namespace RJCP.IO.Ports
     using Native;
     using Trace;
 
-#if NETSTANDARD15
+#if NETSTANDARD1_5
     using System.Runtime.ExceptionServices;
 #else
     using System.Runtime.Remoting.Messaging;
 #endif
 
-#if NETSTANDARD15 || NET45
+#if NETSTANDARD1_5 || NET45
     using System.Threading.Tasks;
 #endif
 
@@ -298,7 +298,7 @@ namespace RJCP.IO.Ports
         /// This method will clean up the object so far as to close the port. Internal buffers remain
         /// active that the stream can continue to read. Writes will throw an exception.
         /// </remarks>
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
         public new void Close()
 #else
         public void Close()
@@ -703,7 +703,7 @@ namespace RJCP.IO.Ports
             return bytes;
         }
 
-#if NETSTANDARD15 || NET45
+#if NETSTANDARD1_5 || NET45
         /// <summary>
         /// Asynchronously reads a sequence of bytes from the current stream and advances the
         /// position within the stream by the number of bytes read.
@@ -769,7 +769,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
         private delegate int ReadDelegate(byte[] buffer, int offset, int count);
 #endif
 
@@ -790,7 +790,7 @@ namespace RJCP.IO.Ports
             } else {
                 // No data in buffer, so we create a thread in the background
 
-#if NETSTANDARD15
+#if NETSTANDARD1_5
                 TaskCompletionSource<int> tcs = new TaskCompletionSource<int>(state);
                 Task<int> task = new Task<int>(() => {
                     int r = InternalBlockingRead(buffer, offset, count);
@@ -828,7 +828,7 @@ namespace RJCP.IO.Ports
                 if (localAsync.Result == 0) ReadCheckDeviceError();
                 return localAsync.Result;
             } else {
-#if NETSTANDARD15
+#if NETSTANDARD1_5
                 try {
                     return ((Task<int>)asyncResult).Result;
                 } catch (AggregateException ex) {
@@ -1243,7 +1243,7 @@ namespace RJCP.IO.Ports
             m_Buffer.Stream.Write(buffer, offset, count);
         }
 
-#if NETSTANDARD15 || NET45
+#if NETSTANDARD1_5 || NET45
         /// <summary>
         /// Performs an asynchronous write operation.
         /// </summary>
@@ -1317,7 +1317,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
         private delegate void WriteDelegate(byte[] buffer, int offset, int count);
 #endif
 
@@ -1333,7 +1333,7 @@ namespace RJCP.IO.Ports
                 if (callback != null) callback(ar);
                 return ar;
             } else {
-#if NETSTANDARD15
+#if NETSTANDARD1_5
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>(state);
                 Task task = new Task(() => {
                     InternalBlockingWrite(buffer, offset, count);
@@ -1368,7 +1368,7 @@ namespace RJCP.IO.Ports
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
             } else {
-#if NETSTANDARD15
+#if NETSTANDARD1_5
                 try {
                     ((Task)asyncResult).Wait();
                 } catch (AggregateException ex) {

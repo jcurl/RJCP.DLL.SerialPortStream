@@ -18,6 +18,8 @@ better integration with .NET Core projects, and to allow better unit testing.
     * 2.4.1 Preconditions
     * 2.4.2 Executing Unit Tests on Linux
     * 2.4.3 Probable Failing Tests for Linux
+* 3.0 Developer
+  * 3.1 Net Standard 1.5
 
 ## 1.0 Windows
 
@@ -53,11 +55,11 @@ To build the software, ensure to be in the working directory where the
 
 ### 1.2 Packaging
 
-To build the package for upload to NuGet:
+To build the package for upload (see building for the sign key) to NuGet:
 
 ```cmd
-dotnet build -c signed_release code\SerialPortStream.csproj
-dotnet pack -c signed_release --include-source code\SerialPortStream.csproj
+dotnet build -c signed_release .\code\SerialPortStream.csproj
+dotnet pack -c signed_release --include-source .\code\SerialPortStream.csproj
 ```
 
 I generally upload the symbols version that also includes the sources.
@@ -224,3 +226,12 @@ but provided on Windows. Linux doesn't provide this functionality natively.
 * `WaitForRxCharEventOnEofChar`
 * `WaitForCtsChangedEvent`
 * `WaitForDsrChangedEvent`
+
+## 3.0 Developer
+
+### 3.1 Net Standard 1.5
+
+This project also targets .NET Standard 1.5. There are some features that are
+available in .NET 4.x that are not available in .NET Standard 1.5, and so there
+are replacement libraries in the `System` folder, which are not otherwise
+needed.

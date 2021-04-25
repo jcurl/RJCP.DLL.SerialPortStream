@@ -4,7 +4,9 @@
 
 Features
 
-* DOTNET-329: Migrate to .NET SDK Project with .NET 4.0, 4.5
+* DOTNET-329: Migrate to .NET SDK Project
+  * DOTNET-330: with .NET 4.0, 4.5
+  * DOTNET-331: with .NET Core (API .NET Standard 1.5)
 * DOTNET-185: Port test cases to NUnit 3.x
 
 ## Version 2.3.1 (libnserial 1.1.4) - 19/Apr/2021

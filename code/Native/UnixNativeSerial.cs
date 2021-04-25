@@ -28,7 +28,7 @@ namespace RJCP.IO.Ports.Native
             }
             m_HandlePtr = m_Handle.DangerousGetHandle();
 
-#if NETSTANDARD15
+#if NETSTANDARD1_5
             // On NetStandard 1.5, we must have proper exception handling
             try {
                 // These methods were first added in libnserial 1.1
@@ -53,7 +53,7 @@ namespace RJCP.IO.Ports.Native
                 managedErrNo = m_Dll.netfx_errno(m_Dll.errno);
                 sysDescription = m_Dll.netfx_errstring(m_Dll.errno);
             } catch (System.EntryPointNotFoundException) {
-#if NETSTANDARD15
+#if NETSTANDARD1_5
                 ThrowExceptionNetStandard();
 #else
                 ThrowExceptionMono();
@@ -91,7 +91,7 @@ namespace RJCP.IO.Ports.Native
             }
         }
 
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
         // For compatibility with libnserial 1.0 only.
         private void ThrowExceptionMono()
         {
@@ -108,7 +108,7 @@ namespace RJCP.IO.Ports.Native
         }
 #endif
 
-#if NETSTANDARD15
+#if NETSTANDARD1_5
         // For compatibility with libnserial 1.0 only.
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown",
             Justification = "Compatibility")]

@@ -1,13 +1,10 @@
 bin/
 obj/
-project.lock.json
-/packages
-/distribute
-.vs
-.vscode
+TestResults/
+.vs/
 *.nupkg
 *.suo
 *.user
 *.userprefs
 *.GhostDoc.xml
-.DS_Store
+*.snk

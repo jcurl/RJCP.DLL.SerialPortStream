@@ -6,7 +6,7 @@ namespace RJCP.IO.Ports.Native.Windows
 {
     using System.Security;
 
-#if !NETSTANDARD15
+#if !NETSTANDARD1_5
     [SuppressUnmanagedCodeSecurity]
 #endif
     internal static class SafeNativeMethods
