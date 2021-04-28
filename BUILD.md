@@ -19,7 +19,8 @@ better integration with .NET Core projects, and to allow better unit testing.
     * 2.4.2 Executing Unit Tests on Linux
     * 2.4.3 Probable Failing Tests for Linux
 * 3.0 Developer
-  * 3.1 Net Standard 1.5
+  * 3.1 .NET Framework SDK Project
+  * 3.2 .Net Standard 1.5
 
 ## 1.0 Windows
 
@@ -125,6 +126,10 @@ correctly.
 
 ## 2.0 Linux
 
+Building on Linux should be done with the Microsoft `dotnet` commands.
+Development should be done with VSCode. References to the MONO IDE have been
+removed.
+
 ### 2.1 .NET Core Installation
 
 The instructions here were written and tested for Ubuntu 20.04. See Microsoft
@@ -229,7 +234,22 @@ but provided on Windows. Linux doesn't provide this functionality natively.
 
 ## 3.0 Developer
 
-### 3.1 Net Standard 1.5
+### 3.1 .NET Framework SDK Project
+
+This project uses the newest Microsoft SDK Project format, which is simpler and
+easier to write. It has been modified from the original to require explicit
+inclusion of files (this is for safety reasons to ensure that unexpected files
+do not get included).
+
+The library targets .NET 4.0, .NET 4.5, .NET Standard 1.5; where as the unit
+tests are using NUnit 3.x and target .NET 4.0, .NET 4.5 and .NET Core App 3.1
+(LTS).
+
+When adding files, you'll need to look and modify the `.csproj` files directly,
+Visual Studio 2019 will likely not be able to put the files in the correct
+`<ItemGroup/>`.
+
+### 3.2 .Net Standard 1.5
 
 This project also targets .NET Standard 1.5. There are some features that are
 available in .NET 4.x that are not available in .NET Standard 1.5, and so there

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;net40</TargetFrameworks>
+    <TargetFrameworks>net45;net40;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>RJCP.SerialPortStreamTest</AssemblyName>
     <Product>RJCP.SerialPortStream</Product>
     <RootNamespace>RJCP.IO.Ports.SerialPortStreamTest</RootNamespace>
@@ -41,15 +41,22 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="MsdnFrameworkTest.cs" />
     <Compile Include="SerialConfiguration.cs" />
     <Compile Include="SerialPortStreamCharTest.cs" />
     <Compile Include="SerialPortStreamManualTest.cs" />
     <Compile Include="SerialPortStreamParityTest.cs" />
     <Compile Include="SerialPortStreamRxTxTest.cs" />
     <Compile Include="SerialPortStreamSimpleTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Compile Include="MsdnFrameworkTest.cs" />
   </ItemGroup>
 
 </Project>

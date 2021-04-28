@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2020
+﻿// Copyright © Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -8,7 +8,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-#if NET45
+#if NET45 || NETCOREAPP3_1
     using System.Threading.Tasks;
 #endif
     using NUnit.Framework;
@@ -444,7 +444,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
             }
         }
 
-#if NET45
+#if NET45 || NETCOREAPP3_1
         [Test]
         [Timeout(10000)]
         public async Task ReadAndWriteAsyncInDifferentThreadsAtSameTime()

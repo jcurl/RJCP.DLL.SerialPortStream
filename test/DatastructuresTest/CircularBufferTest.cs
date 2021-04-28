@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2020
+﻿// Copyright © Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -11,6 +11,16 @@ namespace RJCP.Datastructures.CircularBufferTest
     [TestFixture(Category = "Datastructures.CircularBuffer")]
     public class CircularBufferTest
     {
+#if NETCOREAPP3_1_OR_GREATER
+        [OneTimeSetUp]
+        public void OneTimeSetup()
+        {
+            // Required for support for 'iso-8859-15' conversions for .NET Core
+            var instance = CodePagesEncodingProvider.Instance;
+            Encoding.RegisterProvider(instance);
+        }
+#endif
+
         [TestCase(-1)]
         [TestCase(0)]
         [TestCase(int.MinValue)]

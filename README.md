@@ -119,22 +119,20 @@ platforms. It is extended for .NET 4.5 features. A version targets .NET Core
 with API level .NET Stanrdard 1.5, so should work on .NET Core 2.1, 3.1 and .NET
 5.0 and later.
 
-Windows XP SP3 and later should work.
+Windows XP SP3 and later should work when using .NET 4.0. It's not possible to
+run the unit tests on Windows XP since the unit tests have migrated to NUnit
+3.x, but was working fine prior to that with NUnit 2.x.
 
 #### 3.2.2 Mono Framework (Linux Only)
 
-TBD: Since the migration to the .NET SDK project format, this is not tested.
+The SerialPortStream should work on Linux, and it should be possible to import
+the assembly into your code when running on Linux.
 
-Mono on Linux is supported. Embedded platforms are not supported. You are
-welcome to make a patch with appropriate test cases.
+When using the Mono Framework, you should reference the .NET 4.0 or .NET 4.5
+projects.
 
-You should use the latest version of Mono. Version 3.2.8 has significant bugs
-and will not work (Ubuntu 14.04 ships with this). Use the latest version of Mono
-that comes direct from Xamarin instead of your distribution where possible.
-
-For instructions on how to install the latest Mono for your system, refer to
-[Install Mono On
-Linux](http://www.mono-project.com/docs/getting-started/install/linux/).
+It has been tested to compile and unit test cases pass with the `dotnet` command
+on Linux.
 
 #### 3.2.3 Microsoft Compact Framework (not supported)
 

@@ -20,6 +20,12 @@ dotnet test -c Release -f net45 --logger "trx"
 
 echo.
 echo ======================================================================
+echo == Testing SerialPortStream on .NET Core App 3.1
+echo ======================================================================
+dotnet test -c Release -f netcoreapp3.1 --logger "trx"
+
+echo.
+echo ======================================================================
 echo == Generating Signed SerialPortStream NuGet Package
 echo ======================================================================
 dotnet build -c Signed_Release .\code\SerialPortStream.csproj
