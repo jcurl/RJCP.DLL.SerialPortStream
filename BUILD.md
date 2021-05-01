@@ -13,6 +13,7 @@ better integration with .NET Core projects, and to allow better unit testing.
 * 2.0 Linux
   * 2.1 .NET Core Installation
   * 2.2 Building the libnserial Library
+    * 2.2.1 Ubuntu Packages
   * 2.3 Building on Linux
   * 2.4 Running Unit Tests on Linux
     * 2.4.1 Preconditions
@@ -33,21 +34,21 @@ To build the software, ensure to be in the working directory where the
   mistakes in deployment.
 
   ```cmd
-  dotnet build
+  PS1> dotnet build
   ```
 
 * To build RELEASE mode. Release mode is unsigned, useful for beta testing or
   your own testing.
 
   ```cmd
-  dotnet build -c Release
+  PS1> dotnet build -c Release
   ```
 
 * To build SIGNED_RELEASE mode. The `rjcp_serialportstream.snk` file must be in
   the `code` directory used for the signing.
 
   ```cmd
-  dotnet build -c Signed_Release code\SerialPortStream.csproj
+  PS1> dotnet build -c Signed_Release code\SerialPortStream.csproj
   ```
 
   It is important to only build the project file, so that test cases are not
@@ -59,8 +60,8 @@ To build the software, ensure to be in the working directory where the
 To build the package for upload (see building for the sign key) to NuGet:
 
 ```cmd
-dotnet build -c signed_release .\code\SerialPortStream.csproj
-dotnet pack -c signed_release --include-source .\code\SerialPortStream.csproj
+PS1> dotnet build -c signed_release .\code\SerialPortStream.csproj
+PS1> dotnet pack -c signed_release --include-source .\code\SerialPortStream.csproj
 ```
 
 I generally upload the symbols version that also includes the sources.
@@ -96,13 +97,13 @@ IDE.
 * To test DEBUG mode
 
   ```cmd
-  dotnet test
+  PS1> dotnet test
   ```
 
 * To test RELEASE mode
 
   ```cmd
-  dotnet test -c Release
+  PS1> dotnet test -c Release
   ```
 
 To get logs of the output, run with the additional option `--logger
@@ -111,9 +112,10 @@ To get logs of the output, run with the additional option `--logger
 To skip the manual tests in the Visual Studio IDE, filter with
 `-Trait:ManualTest`.
 
-#### 1.3.3 Probable Failing Tests
+#### 1.3.3 Failing Tests on Windows
 
-When using the Com0Com driver, the following tests are likely to fail:
+When using the Com0Com driver, the following tests will fail (but pass with real
+hardware):
 
 * `EvenParityLoopback`
 * `OddParityLoopback`
@@ -142,17 +144,17 @@ Ubuntu](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
 1. Preconditions
 
    ```cmd
-   wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-   sudo dpkg -i packages-microsoft-prod.deb
+   $ wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+   $ sudo dpkg -i packages-microsoft-prod.deb
    ```
 
 2. Install the SDK
 
-   ```sh
-   sudo apt-get update; \
+   ```cmd
+   $ sudo apt-get update; \
     sudo apt-get install -y apt-transport-https && \
     sudo apt-get update && \
-    sudo apt-get install -y dotnet-sdk-5.0
+    sudo apt-get install -y dotnet-sdk-3.1
    ```
 
 ### 2.2 Building the libnserial Library
@@ -161,16 +163,33 @@ You should install the latest version of libnserial. The package for Ubuntu is
 given on the release pages. For other Operating Systems, build and install from
 sources (see the folder `dll\serialunix` for more information).
 
-```sh
-apt install libnserial
+```cmd
+# apt install libnserial_1.1.4-0ubuntu1~focal1_amd64.deb
 ```
+
+#### 2.2.1 Ubuntu Packages
+
+* 1.1.4
+  * [libnserial-1.1.4 trusty 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.0.0/libnserial-1.1.4-0ubuntu1.trusty1.zip)
+  * [libnserial-1.1.4 xenial 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.0.0/libnserial-1.1.4-0ubuntu1.xenial1.zip)
+  * [libnserial-1.1.4 yakkety 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.0.0/libnserial-1.1.4-0ubuntu1.yakkety1.zip)
+  * [libnserial-1.1.4 zesty 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.0.0/libnserial-1.1.4-0ubuntu1.zesty1.zip)
+  * [libnserial-1.1.4 artful 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.0.0/libnserial-1.1.4-0ubuntu1.artful1.zip)
+  * [libnserial-1.1.4 bionic 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.0.0/libnserial-1.1.4-0ubuntu1.bionic1.zip)
+  * [libnserial-1.1.4 cosmic 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.0.0/libnserial-1.1.4-0ubuntu1.cosmic1.zip)
+  * [libnserial-1.1.4 disco 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.2.0/libnserial-1.1.4-0ubuntu1.disco1.zip)
+  * [libnserial-1.1.4 eoan 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.2.0/libnserial-1.1.4-0ubuntu1.eoan1.zip)
+  * [libnserial-1.1.4 focal 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.2.0/libnserial-1.1.4-0ubuntu1.focal1.zip)
+  * [libnserial-1.1.4 groovy 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.2.0/libnserial-1.1.4-0ubuntu1.groovy1.zip)
+* 1.1.2
+  * [libnserial-1.1.2-precise 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.1.2.0/libnserial_1.1.2-0ubuntu1.precise1.zip)
 
 ### 2.3 Building on Linux
 
 The instructions to build are the same as Windows, e.g. from the directory where
 the `SerialPortStream.sln` file is kept:
 
-```sh
+```cmd
 $ dotnet build
 Microsoft (R) Build Engine version 16.9.0+57a23d249 for .NET
 Copyright (C) Microsoft Corporation. All rights reserved.
@@ -203,7 +222,7 @@ same as for Windows, but the variables `LinuxSourcePort` and `LinuxDestPort`.
 Ensure that the user running the tests have permissions to access the serial
 ports. e.g. on Ubuntu this is not the case by default:
 
-```sh
+```cmd
 $ ls -l /dev/ttyU*
 crw-rw---- 1 root dialout 188, 0 Apr 24 18:32 /dev/ttyUSB0
 crw-rw---- 1 root dialout 188, 1 Apr 24 18:32 /dev/ttyUSB1
@@ -219,11 +238,11 @@ AFter assigning permissions, you may need to log out and log back in.
 
 Executing the tests is the same as on Windows.
 
-```sh
-dotnet test
+```cmd
+$ dotnet test
 ```
 
-#### 2.4.3 Probable Failing Tests for Linux
+#### 2.4.3 Failing Tests for Linux
 
 There are three failing tests on Linux. This functionality is missing on Linux,
 but provided on Windows. Linux doesn't provide this functionality natively.
@@ -231,6 +250,12 @@ but provided on Windows. Linux doesn't provide this functionality natively.
 * `WaitForRxCharEventOnEofChar`
 * `WaitForCtsChangedEvent`
 * `WaitForDsrChangedEvent`
+
+The following tests occasionally fail
+
+* `ReadToWithMbcs`
+* `ReadToResetWithMbcs2`
+* `WriteLineReadLineTimeout1`
 
 ## 3.0 Developer
 
