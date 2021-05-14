@@ -5,7 +5,7 @@ SerialPortStream is an independent implementation of
 maintainability, and now for portability to Mono on Linux systems.
 
 The `SerialPortStream` is a ground up implementation of a Stream that buffers
-data to and from a serial port. It uses low level Win32API (on Windows) or Posix
+data to and from a serial port. It uses low level Win32API (on Windows) or POSIX
 (on Linux) for managing events and asynchronous I/O, using a programming model
 as in the MSDN
 [PipeServer](http://msdn.microsoft.com/en-us/library/windows/desktop/aa365603.aspx)
@@ -81,7 +81,7 @@ The `SerialPortStream` tries to solve the following issues observed:
   resulting in "lost" data. I take some care when decoding bytes to characters
   to ensure a seamless and accurate transition between bytes and characters.
 * `Write()` gives the data to the serial port. If the operation is asynchronous,
-  the callback results in the number of bytes that were actually transferred to
+  the call back results in the number of bytes that were actually transferred to
   the driver. You need to check yourself if this is valid or not. In the
   synchronous case, the data is simply thrown away. The `SerialPortStream`
   method simply copies data to a local buffer and uses asynchronous writes in a
@@ -116,7 +116,7 @@ See later in these notes for known issues and changes.
 
 The software is written originally for .NET 4.0 and should work on those
 platforms. It is extended for .NET 4.5 features. A version targets .NET Core
-with API level .NET Stanrdard 1.5, so should work on .NET Core 2.1, 3.1 and .NET
+with API level .NET Standard 1.5, so should work on .NET Core 2.1, 3.1 and .NET
 5.0 and later.
 
 Windows XP SP3 and later should work when using .NET 4.0. It's not possible to
@@ -244,7 +244,7 @@ for other distributions!
 The main functionality on Linux is provided by a support C library. The issues
 are observed:
 
-* Custom baud rates are not supported. To know what baudrates are supported on
+* Custom baud rates are not supported. To know what baud rates are supported on
   your system, look at the file `config.h` after building.
 * DSR and DTR handshaking is not supported. You can still set and clear the pins
   though.
@@ -260,7 +260,7 @@ Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
   The System.Text implementation for converting bytes to UTF8 don't work. If you
   don't use the character based methods, it may work. But the software has not
   been tested against this framework.
-* The DataReceived event doesn't fire for the EOF character (0x1A). On WIndows
+* The DataReceived event doesn't fire for the EOF character (0x1A). On Windows
   it does, as this is managed by the driver itself.
 * The test case for opening two serial ports simultaneously on Mono fails,
   meaning that it's possible to open the same device twice, which on Windows
@@ -283,7 +283,7 @@ exist!).  The following has been observed:
 Some chipsets do not report properly parity errors. The 16550A chipset works as
 expected. Issues observed with FTDI, PL2303H, PL2303RA. In particular, on a
 parity error, more bytes are reported as having parity errors than there are in
-the stream. Tested using loopback devices with 'comptest'.
+the stream. Tested using loopback devices with `comptest`.
 
 ```sh
 $ ./nserialcomptest /dev/ttyUSB0 /dev/ttyUSB1`
@@ -316,7 +316,7 @@ On Linux Kernel with Ubuntu 14.04 and Ubuntu 16.04, we observe that some USB-SER
 drivers provide extra data depending on what a previous process was doing. It
 shows itself as garbage zero's appearing at the beginning of a stream when
 reading, and may be visible in your application also. There's a test case
-`comptest/kernelbug` that shows this behaviour on a Lenevo T61p. Affected is
+`comptest/kernelbug` that shows this behaviour on a Lenovo T61p. Affected is
 PL2303H and FTDI chipsets. Chipsets that don't show this behaviour are 16550A
 and PL2303RA chipsets. Invocate the test program twice and you'll see the error.
 This is reported to
@@ -350,10 +350,10 @@ Complete...
 
 Monitoring of pins CTS, DSR, RI and DCD is not 100% reliable for some chipsets
 and workarounds are in place. In particular, the chips PL2303H, PL2303RA do not
-support the ioctl(TIOCGICOUNT), so on a pin toggle, we cannot reliably detect if
-they have changed if the pulse is too short. For 16550A and FTDI chips, this
-ioctl() does work and so we can always detect a change. To check if your driver
-supports the TIOCGICOUNT ioctl() call, run the small test program
+support the `ioctl(TIOCGICOUNT)`, so on a pin toggle, we cannot reliably detect
+if they have changed if the pulse is too short. For 16550A and FTDI chips, this
+`ioctl()` does work and so we can always detect a change. To check if your
+driver supports the TIOCGICOUNT `ioctl()` call, run the small test program
 `comptest/icount`.
 
 ```sh

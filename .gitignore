@@ -1,6 +1,8 @@
 bin/
 obj/
 TestResults/
+/distribute/
+/packages/
 .vs/
 *.nupkg
 *.suo
@@ -8,3 +10,4 @@ TestResults/
 *.userprefs
 *.GhostDoc.xml
 *.snk
+*.exe

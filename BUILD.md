@@ -232,7 +232,7 @@ $ sudo usermod -aG dialout <user>
 
 Replace `<user>` with the user name.
 
-AFter assigning permissions, you may need to log out and log back in.
+After assigning permissions, you may need to log out and log back in.
 
 #### 2.4.2 Executing Unit Tests on Linux
 
