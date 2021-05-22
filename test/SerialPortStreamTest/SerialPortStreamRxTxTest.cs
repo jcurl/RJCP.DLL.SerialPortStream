@@ -31,6 +31,14 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         private readonly string DestPort = SerialConfiguration.DestPort;
         private const int TimeOut = 300;
 
+#if NETCOREAPP3_1
+        [SetUp]
+        public void InitLogging()
+        {
+            Trace.GlobalLogger.Initialize();
+        }
+#endif
+
         [Test]
         [Timeout(20000)]
         public void SendReceive()
@@ -483,8 +491,7 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         public async Task ReadAndWriteAsync()
         {
             using (var serialPortStreamWrite = new SerialPortStream(SourcePort, 9600, 8, Parity.None, StopBits.One))
-            using (var serialPortStreamRead = new SerialPortStream(DestPort, 9600, 8, Parity.None, StopBits.One))
-            {
+            using (var serialPortStreamRead = new SerialPortStream(DestPort, 9600, 8, Parity.None, StopBits.One)) {
                 serialPortStreamWrite.Open();
                 serialPortStreamRead.Open();
 

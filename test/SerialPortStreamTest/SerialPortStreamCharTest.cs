@@ -26,6 +26,14 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         private readonly string DestPort = SerialConfiguration.DestPort;
         private const int TimeOut = 300;
 
+#if NETCOREAPP3_1
+        [SetUp]
+        public void InitLogging()
+        {
+            Trace.GlobalLogger.Initialize();
+        }
+#endif
+
         [Test]
         public void NewLine()
         {

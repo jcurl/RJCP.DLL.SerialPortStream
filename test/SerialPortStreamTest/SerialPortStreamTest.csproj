@@ -42,7 +42,15 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <!-- For loading the app.config file for serial port settings, as in .NET 4.x -->
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+
+    <!-- For loading settings for enabling logging -->
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.15" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,6 +65,16 @@
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Compile Include="MsdnFrameworkTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">
+    <Compile Include="SerialPortStreamLoggerTest.cs" />
+    <Compile Include="Trace\GlobalLogger.cs" />
+    <Compile Include="Trace\SerialLogger.cs" />
+    <Compile Include="Trace\SerialLoggerFactory.cs" />
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

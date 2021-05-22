@@ -28,17 +28,21 @@ enhances portability and fixes bugs. See the end of these notes for differences.
   * 4.2 Linux
 * 5.0 Extra Features
   * 5.1 Reading and Writing - Buffering
-* 6.0 Known Issues
-  * 6.1 Windows
-    * 6.1.1 Driver Specific Issues on Windows
-      * 6.1.1.1 Flow Control
-  * 6.2 Linux
-    * 6.2.1 Mono on non-Windows Platforms
-    * 6.2.2 Driver Specific Issues on Linux
-      * 6.2.2.1 Parity Errors
-      * 6.2.2.2 Garbage Data on Open
-      * 6.2.2.3 Monitoring Pins and Timing Resolution
-      * 6.2.2.4 Close Times with Flow Control
+* 6.0 Developer Notes
+  * 6.1 Logging
+    * 6.1.1 .NET Framework
+    * 6.1.2 .NET Core
+* 7.0 Known Issues
+  * 7.1 Windows
+    * 7.1.1 Driver Specific Issues on Windows
+      * 7.1.1.1 Flow Control
+  * 7.2 Linux
+    * 7.2.1 Mono on non-Windows Platforms
+    * 7.2.2 Driver Specific Issues on Linux
+      * 7.2.2.1 Parity Errors
+      * 7.2.2.2 Garbage Data on Open
+      * 7.2.2.3 Monitoring Pins and Timing Resolution
+      * 7.2.2.4 Close Times with Flow Control
 
 ## 1.0 Why another Serial Port implementation
 
@@ -187,6 +191,8 @@ implementation:
 * You can obtain the RingIndicator pin status.
 * The `Read()` and `Write()` buffers are completely independent of the low level
   Windows driver.
+  * For those concerned, the buffering means that a copy must always be made on
+    every `Read()` and `Write()` method.
 
 ### 5.1 Reading and Writing - Buffering
 
@@ -208,9 +214,63 @@ you've still lost no data. The MS implementation wouldn't be so simple, you have
 to make sure that you perform frequent read operations else the driver itself
 might overflow (resulting in lost data).
 
-## 6.0 Known Issues
+## 6.0 Developer Notes
 
-### 6.1 Windows
+### 6.1 Logging
+
+If you come across a problem using this library, you may be asked to provide
+additional debug logs. This section describes how to obtain those logs for
+.NET Framework and .NET Core.
+
+### 6.1.1 .NET Framework
+
+The library uses the `TraceSource` object, so you can add tracing to your
+project in the normal way. You should use the switch name
+`IO.Ports.SerialPortStream`. An example of an `app.config` file that you can
+use to enable logging:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <system.diagnostics>
+    <sources>
+      <source name="IO.Ports.SerialPortStream" switchValue="Verbose">
+        <listeners>
+          <clear/>
+          <add name="myListener"/>
+        </listeners>
+      </source>
+    </sources> 
+    <sharedListeners>
+      <add name="myListener" type="System.Diagnostics.TextWriterTraceListener" initializeData="logfile.txt"/>
+    </sharedListeners>
+  </system.diagnostics>
+</configuration>
+```
+
+### 6.1.2 .NET Core
+
+.NET Core has an implementation of `TraceListener` and `TraceSource`, but it
+doesn't load the `app.config` on start up, nor provide a singleton for
+applications to use for tracing. The preferred method is Dependency Injection.
+
+The `SerialPortStream` has a constructor where you can provide your `ILogger`
+object for tracing.
+
+For people supporting .NET Framework and .NET Core, there is a singleton
+object where you can set a `ILoggerFactory`. The method `CreateLogger` will be
+given the name `IO.Ports.SerialPortStream` that you can use to know what logger
+to instantiate. Set the global singleton value `LogSourceFactory.LoggerFactory`
+to your factory object.
+
+Note, when running with `dotnet test` and in the VS IDE, logging needed to be
+set up at the beginning of every test. There was no obvious reason why it is
+necessary to do this (the `ConsoleLogger` is still set, the correct debug level
+is set). Be careful when logging in your own applications.
+
+## 7.0 Known Issues
+
+### 7.1 Windows
 
 The following issues are known:
 
@@ -224,9 +284,9 @@ The following issues are known:
   [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
   Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP also.
 
-#### 6.1.1 Driver Specific Issues on Windows
+#### 7.1.1 Driver Specific Issues on Windows
 
-##### 6.1.1.1 Flow Control
+##### 7.1.1.1 Flow Control
 
 Using the FTDI chipset on Windows 10 x64 (FTDI 2.12.16.0 dated 09/Mar/2016) flow
 control (RTS/CTS) doesn't work as expected. For writing small amounts of data
@@ -236,7 +296,7 @@ test case now fails. This problem is not observable with com0com 3.0. You can
 see the effect in logs, there is a TX-EMPTY event that occurs, which should
 never be there if no data is ever sent.
 
-### 6.2 Linux
+### 7.2 Linux
 
 SerialPortStream was tested on Ubuntu 14.04 and Ubuntu 16.04. Feedback welcome
 for other distributions!
@@ -251,7 +311,7 @@ are observed:
 
 Patches are welcome to implement these features!
 
-#### 6.2.1 Mono on non-Windows Platforms
+#### 7.2.1 Mono on non-Windows Platforms
 
 Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
 
@@ -273,12 +333,12 @@ Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
   against Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows
   XP also.
 
-#### 6.2.2 Driver Specific Issues on Linux
+#### 7.2.2 Driver Specific Issues on Linux
 
 Tests have been done using FTDO, PL2303H, PL2303RA and 16550A (some still do
 exist!).  The following has been observed:
 
-##### 6.2.2.1 Parity Errors
+##### 7.2.2.1 Parity Errors
 
 Some chipsets do not report properly parity errors. The 16550A chipset works as
 expected. Issues observed with FTDI, PL2303H, PL2303RA. In particular, on a
@@ -310,7 +370,7 @@ Unexpected byte received with Even Parity
 [  FAILED  ] SerialParityTest.Parity7O1ReceiveErrorWithReplace (572 ms)
 ```
 
-##### 6.2.2.2 Garbage Data on Open
+##### 7.2.2.2 Garbage Data on Open
 
 On Linux Kernel with Ubuntu 14.04 and Ubuntu 16.04, we observe that some USB-SER
 drivers provide extra data depending on what a previous process was doing. It
@@ -346,7 +406,7 @@ Reading complete...
 Complete...
 ```
 
-##### 6.2.2.3 Monitoring Pins and Timing Resolution
+##### 7.2.2.3 Monitoring Pins and Timing Resolution
 
 Monitoring of pins CTS, DSR, RI and DCD is not 100% reliable for some chipsets
 and workarounds are in place. In particular, the chips PL2303H, PL2303RA do not
@@ -373,7 +433,7 @@ Your driver doesn't support TIOCGICOUNT
   Error: 25 (Inappropriate ioctl for device)
 ```
 
-##### 6.2.2.4 Close Times with Flow Control
+##### 7.2.2.4 Close Times with Flow Control
 
 Some times closing the serial port may take a long time (observed from 5s to
 21s) if it is write blocked due to hardware flow control. In particular, the

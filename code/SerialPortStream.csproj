@@ -76,6 +76,7 @@
     <PackageReference Include="System.Threading" Version="4.3.0" />
     <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
   
   <ItemGroup>
@@ -133,6 +134,9 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <Compile Include="System\EntryPointNotFoundException.cs" />
     <Compile Include="System\IO\Ports\SerialPort.cs" />
+    <Compile Include="Trace\LineSplitter.cs" />
+    <Compile Include="Trace\LoggerTraceListener.cs" />
+    <Compile Include="Trace\LogSourceFactory.cs" />
   </ItemGroup>
 
   <ItemGroup>

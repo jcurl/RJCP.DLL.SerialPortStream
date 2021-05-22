@@ -26,6 +26,14 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         private readonly string SourcePort = SerialConfiguration.SourcePort;
         private readonly string DestPort = SerialConfiguration.DestPort;
 
+#if NETCOREAPP3_1
+        [SetUp]
+        public void InitLogging()
+        {
+            Trace.GlobalLogger.Initialize();
+        }
+#endif
+
         [Test]
         public void SimpleConstructor()
         {

@@ -21,7 +21,7 @@ better integration with .NET Core projects, and to allow better unit testing.
     * 2.4.3 Probable Failing Tests for Linux
 * 3.0 Developer
   * 3.1 .NET Framework SDK Project
-  * 3.2 .Net Standard 1.5
+  * 3.2 .NET Standard 1.5
 
 ## 1.0 Windows
 
@@ -103,11 +103,8 @@ IDE.
 * To test RELEASE mode
 
   ```cmd
-  PS1> dotnet test -c Release
+  PS1> dotnet test -c Release --logger "trx"
   ```
-
-To get logs of the output, run with the additional option `--logger
-"trx;LogFileName=test.trx"`
 
 To skip the manual tests in the Visual Studio IDE, filter with
 `-Trait:ManualTest`.
@@ -274,9 +271,16 @@ When adding files, you'll need to look and modify the `.csproj` files directly,
 Visual Studio 2019 will likely not be able to put the files in the correct
 `<ItemGroup/>`.
 
-### 3.2 .Net Standard 1.5
+### 3.2 .NET Standard 1.5
 
 This project also targets .NET Standard 1.5. There are some features that are
 available in .NET 4.x that are not available in .NET Standard 1.5, and so there
 are replacement libraries in the `System` folder, which are not otherwise
 needed.
+
+#### 3.2.1 Logging in Unit Tests
+
+The Unit Tests for .NET Standard 1.5 is run by compiling for .NET Core App 3.1.
+In .NET Framework, logging is done using the `TraceSource` which doesn't work
+well in .NET Core, and so the unit test cases come with its own implementation.
+See the files under the `SerialPortStreamTest\Trace` folder.

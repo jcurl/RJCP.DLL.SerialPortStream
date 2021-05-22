@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2020
+﻿// Copyright © Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -20,6 +20,7 @@ namespace RJCP.IO.Ports
 
 #if NETSTANDARD1_5
     using System.Runtime.ExceptionServices;
+    using Microsoft.Extensions.Logging;
 #else
     using System.Runtime.Remoting.Messaging;
 #endif
@@ -62,11 +63,7 @@ namespace RJCP.IO.Ports
         /// </remarks>
         public SerialPortStream()
         {
-            m_NativeSerial = CreateNativeSerial();
-            if (m_NativeSerial == null)
-                throw new NotSupportedException("SerialPortStream is not supported on this platform");
-
-            InitialiseEvents();
+            Initialize();
             Log.Open();
         }
 
@@ -125,6 +122,35 @@ namespace RJCP.IO.Ports
             m_NativeSerial.DataBits = data;
             m_NativeSerial.Parity = parity;
             m_NativeSerial.StopBits = stopbits;
+        }
+
+#if NETSTANDARD1_5
+        /// <summary>
+        /// Constructor. Create a stream that doesn't connect to any port. Specify the logger.
+        /// </summary>
+        /// <remarks>
+        /// This constructor initialises a stream object, but doesn't assign it to any COM port.
+        /// The properties then assume default settings. No COM port is opened and queried.
+        /// <para>This method allows to inject a logging instance to help track down and debug
+        /// communication on the serial port. Many defects and issues can be traced back to
+        /// behaviours of various drivers.</para>
+        /// </remarks>
+        /// <param name="logger">The logger instance to log to.</param>
+        [CLSCompliant(false)]
+        public SerialPortStream(ILogger logger)
+        {
+            Initialize();
+            Log.Open(logger);
+        }
+#endif
+
+        private void Initialize()
+        {
+            m_NativeSerial = CreateNativeSerial();
+            if (m_NativeSerial == null)
+                throw new NotSupportedException("SerialPortStream is not supported on this platform");
+
+            InitialiseEvents();
         }
 
         private static INativeSerial CreateNativeSerial()

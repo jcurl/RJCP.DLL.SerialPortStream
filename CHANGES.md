@@ -9,13 +9,18 @@ Features
   * DOTNET-331: with .NET Core (API .NET Standard 1.5)
   * DOTNET-334: Unit Test cases for .NET Core 3.1 (tests .NET Standard)
 * DOTNET-185: Port test cases to NUnit 3.x
+* DOTNET-328: Add logging/debugging support for .NET Core
+
+Source
+
+* Add editor support for VSCode
 
 ## Version 2.3.1 (libnserial 1.1.4) - 19/Apr/2021
 
 Bugfixes
 
 * [Issue #116](https://github.com/jcurl/SerialPortStream/issues/116): Fix
-  ReadAsync() and WriteAsync() on .NET Standard 1.5 (.NET Core and .NET 5.0 and
+  `ReadAsync()` and `WriteAsync()` on .NET Standard 1.5 (.NET Core and .NET 5.0 and
   later).
 
 ## Version 2.3.0 (libnserial 1.1.4) - Do not use - 13/Apr/2021
@@ -23,9 +28,8 @@ Bugfixes
 Features
 
 * [Issue #114](https://github.com/jcurl/SerialPortStream/issues/114): Provide
-  ReadAsync() and WriteAsync() implementation
-  * Note, the ReadAsync CancellationToken is ignored, and doesn't match the
-    ISerialPortStream.ReadAsync.
+  `ReadAsync()` and `WriteAsync()` implementation
+  * Note, the `ReadAsync` `CancellationToken` is ignored
   * This implementation is broken on .NET Core (.NET Standard 1.5). Works on
     .NET 4.5
 
@@ -48,7 +52,7 @@ Bugfixes
 * [Issue #104](https://github.com/jcurl/SerialPortStream/issues/104): Fix buffer
   handling. `Write()` would sometimes corrupt data.
 * [Issue #90](https://github.com/jcurl/SerialPortStream/issues/90): `IsOpen()`
-  might return `NullReferenceException` as it's not threadsafe with `Close()`.
+  might return `NullReferenceException` as it's not thread safe with `Close()`.
 
 Features:
 
@@ -180,7 +184,7 @@ Bugfixes
 
 Bugfixes
 
-* Reenable tracing in the final nuget package.
+* Reenable tracing in the final Nuget package.
 
 ## Version 2.0.1 (libnserial 1.0.0) - 7/Sep/2016
 
@@ -203,7 +207,7 @@ Bugfixes
   `InvalidOperationException`.
 * When closing/disposing during an active write, we now raise an exception.
 * Use a more explicit solution for aborting a `Write()` by aborting it
-  explicltly on `Close()`.
+  explicitly on `Close()`.
 * Fix RTS and DTR control on opening the port.
 * Flush now properly aborts when closed/disposed while blocked.
 * Change `InvalidOperationException` during a blocking write to `IOException`.
@@ -214,4 +218,4 @@ Bugfixes
 Features
 
 * Major refactoring for `WinNative` against a more formal architecture.
-* Provide DLL used for running under unix operating systems.
+* Provide DLL used for running under Unix operating systems.

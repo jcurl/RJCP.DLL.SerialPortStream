@@ -6,8 +6,15 @@ namespace RJCP.IO.Ports.Trace
 {
     using System.Diagnostics;
 
+#if NETSTANDARD1_5
+    using Microsoft.Extensions.Logging;
+#endif
+
     internal static class Log
     {
+        private const string SerialPortStream = "IO.Ports.SerialPortStream";
+        private const string SerialPortStream_ReadTo = "IO.Ports.SerialPortStream_ReadTo";
+
         private static readonly object m_RefLock = new object();
         private static int s_RefCounter;
 
@@ -26,12 +33,25 @@ namespace RJCP.IO.Ports.Trace
         {
             lock (m_RefLock) {
                 if (s_RefCounter == 0) {
-                    s_Serial = new LogSource("IO.Ports.SerialPortStream");
-                    s_ReadTo = new LogSource("IO.Ports.SerialPortStream_ReadTo");
+                    s_Serial = new LogSource(SerialPortStream);
+                    s_ReadTo = new LogSource(SerialPortStream_ReadTo);
                 }
                 s_RefCounter++;
             }
         }
+
+#if NETSTANDARD1_5
+        public static void Open(ILogger logger)
+        {
+            lock (m_RefLock) {
+                if (s_RefCounter == 0) {
+                    s_Serial = new LogSource(SerialPortStream, logger);
+                    s_ReadTo = new LogSource(SerialPortStream_ReadTo, null);
+                }
+                s_RefCounter++;
+            }
+        }
+#endif
 
         /// <summary>
         /// Closes trace instances.
