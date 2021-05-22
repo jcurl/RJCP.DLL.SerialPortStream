@@ -2,7 +2,7 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.SerialPortStreamTest
+namespace RJCP.IO.Ports
 {
     using System;
     using System.Collections.Generic;

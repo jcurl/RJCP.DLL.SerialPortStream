@@ -64,7 +64,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Compile Include="MsdnFrameworkTest.cs" />
+    <Compile Include="System\IO\Ports\SerialPortTest.cs" />
+    <Compile Include="System\Text\EncodingTest.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('netcore'))">

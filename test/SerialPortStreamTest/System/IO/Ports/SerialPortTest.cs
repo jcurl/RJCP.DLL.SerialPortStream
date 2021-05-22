@@ -2,19 +2,19 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.FrameworkTest
+namespace System.IO.Ports
 {
     using System;
-    using System.IO.Ports;
-    using System.Text;
     using System.Threading;
     using NUnit.Framework;
-    using SerialPortStreamTest;
+    using RJCP.IO.Ports;
 
     [TestFixture(Category = "ManualTest")]
     [Explicit("Framework Test")]
-    public class MsdnFrameworkTest
+    public class SerialPortTest
     {
+        // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
+        // invalid port name.
         private readonly string SourcePort = SerialConfiguration.SourcePort;
         private readonly string DestPort = SerialConfiguration.DestPort;
 
@@ -23,8 +23,10 @@ namespace RJCP.IO.Ports.FrameworkTest
         {
             byte[] buffer = new byte[256];
 
+            // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
+            // invalid port name.
             using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One)) {
-                Assert.That(() => { serialSource.Write(buffer, 0, buffer.Length); }, Throws.TypeOf<InvalidOperationException>());
+                Assume.That(() => { serialSource.Write(buffer, 0, buffer.Length); }, Throws.TypeOf<InvalidOperationException>());
             }
         }
 
@@ -35,6 +37,8 @@ namespace RJCP.IO.Ports.FrameworkTest
         {
             byte[] buffer = new byte[1024];
 
+            // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
+            // invalid port name.
             using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One))
             using (SerialPort serialDest = new SerialPort(DestPort, 115200, Parity.None, 8, StopBits.One)) {
                 serialSource.Open();
@@ -70,6 +74,8 @@ namespace RJCP.IO.Ports.FrameworkTest
         {
             byte[] buffer = new byte[1024];
 
+            // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
+            // invalid port name.
             using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One))
             using (SerialPort serialDest = new SerialPort(DestPort, 115200, Parity.None, 8, StopBits.One)) {
                 serialSource.Open();
@@ -96,23 +102,6 @@ namespace RJCP.IO.Ports.FrameworkTest
                     Console.WriteLine("{0}", bufferCount);
                 }
             }
-        }
-
-        // NOTE: This test is expected to fail on Windows and Mono.
-        [Test]
-        public void DecoderTooManyBytes()
-        {
-            byte[] data = new byte[] { 0x61, 0xE2, 0x82, 0xAC, 0x40, 0x41 };
-            char[] oneChar = new char[2];
-
-            Decoder decoder = Encoding.UTF8.GetDecoder();
-            decoder.Convert(data, 0, 2, oneChar, 0, 1, false, out int bu, out int cu, out _);
-
-            // One might expect that only one byte is used, but in .NET 4.0 and later (including Mono), we see
-            // that while 'cu' is 1, 'bu' is not 1. This had an impact during development that we couldn't optimise
-            // our byte to character decoder and expect them to be on MBCS character boundaries.
-            Assert.That(bu, Is.EqualTo(1));
-            Assert.That(cu, Is.EqualTo(1));
         }
     }
 }

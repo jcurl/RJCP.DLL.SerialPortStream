@@ -8,9 +8,11 @@
 
 namespace RJCP.IO.Ports.Trace
 {
+#if NETCORE_LOGGER
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.DependencyInjection;
+#endif
 
     internal static class GlobalLogger
     {

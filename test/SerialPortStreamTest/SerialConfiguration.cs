@@ -2,7 +2,7 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.SerialPortStreamTest
+namespace RJCP.IO.Ports
 {
     using System;
     using System.Configuration;
@@ -13,7 +13,8 @@ namespace RJCP.IO.Ports.SerialPortStreamTest
         private static string s_SourcePort = null;
         private static string s_DestPort = null;
 
-        private static AppSettingsSection AppSettings {
+        private static AppSettingsSection AppSettings
+        {
             get
             {
 #if NETFRAMEWORK
