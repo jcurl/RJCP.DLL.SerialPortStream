@@ -173,13 +173,17 @@ namespace RJCP.IO.Ports
         /// Gets the port for communications, including but not limited to all available COM ports.
         /// </summary>
         /// <remarks>
-        /// A list of valid port names can be obtained using the GetPortNames method.
-        /// <para>When changing the port name, and the property UpdateOnPortSet is <b>true</b>, setting
-        /// this property will cause the port to be opened, status read and the port then closed. Thus, you
-        /// can use this behaviour to determine the actual settings of the port (which remain constant
-        /// until a program actually changes the port settings).</para>
-        /// <para>Setting this property to itself, while having UpdateOnPortSet to <b>true</b> has the
-        /// effect of updating the local properties based on the current port settings.</para>
+        /// A list of valid port names can be obtained using the <see cref="GetPortNames"/> method.
+        /// <para>
+        /// When changing the port name, and the property UpdateOnPortSet is <see langword="true"/>, setting this
+        /// property will cause the port to be opened, status read and the port then closed. Thus, you can use this
+        /// behaviour to determine the actual settings of the port (which remain constant until a program actually
+        /// changes the port settings).
+        /// </para>
+        /// <para>
+        /// Setting this property to itself, while having UpdateOnPortSet to <see langword="true"/> has the effect of
+        /// updating the local properties based on the current port settings.
+        /// </para>
         /// </remarks>
         public string PortName
         {
@@ -200,8 +204,8 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Update properties based on the current port, overwriting already existing properties.
         /// </summary>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.InvalidOperationException">Serial Port already opened.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException">Serial Port already opened.</exception>
         /// <remarks>
         /// This method opens the serial port and retrieves the current settings from Windows.
         /// These settings are then made available via the various properties, BaudRate, DataBits,
@@ -220,26 +224,28 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Opens a new serial port connection.
         /// </summary>
-        /// <exception cref="InvalidOperationException">This object is already managing a serial port
-        /// connection.</exception>
-        /// <exception cref="System.ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// This object is already managing a serial port connection.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
-        /// Opens a connection to the serial port provided by the constructor or the Port property.
-        /// If this object is already managing a serial port, this object raises an exception.
-        /// <para>When opening the port, only the settings explicitly applied will be given to the
-        /// port. That is, if you read the default BaudRate as 115200, this value will only be
-        /// applied if you explicitly set it to 115200. Else the default baud rate of the serial
-        /// port when its opened will be used.</para>
-        /// <para>Normally when you instantiate this stream on a COM port, it is opened for a brief
-        /// time and queried for the capabilities and default settings. This allows your application
-        /// to use the settings that were already available (such as defined by the windows user
-        /// in the Control Panel, or the last open application). If you require to open the COM
-        /// port without briefly opening it to query its status, then you need to instantiate
-        /// this object through the default constructor. Set the property UpdateOnPortSet to false
-        /// and then set the Port property. Provide all the other properties you require then call
-        /// the Open() method. The port will be opened using the default properties providing
-        /// you with a consistent environment (independent of the state of the Operating System
-        /// or the driver beforehand).</para>
+        /// Opens a connection to the serial port provided by the constructor or the Port property. If this object is
+        /// already managing a serial port, this object raises an exception.
+        /// <para>
+        /// When opening the port, only the settings explicitly applied will be given to the port. That is, if you read
+        /// the default BaudRate as 115200, this value will only be applied if you explicitly set it to 115200. Else the
+        /// default baud rate of the serial port when its opened will be used.
+        /// </para>
+        /// <para>
+        /// Normally when you instantiate this stream on a COM port, it is opened for a brief time and queried for the
+        /// capabilities and default settings. This allows your application to use the settings that were already
+        /// available (such as defined by the windows user in the Control Panel, or the last open application). If you
+        /// require to open the COM port without briefly opening it to query its status, then you need to instantiate
+        /// this object through the default constructor. Set the property UpdateOnPortSet to false and then set the Port
+        /// property. Provide all the other properties you require then call the Open() method. The port will be opened
+        /// using the default properties providing you with a consistent environment (independent of the state of the
+        /// Operating System or the driver beforehand).
+        /// </para>
         /// </remarks>
         public void Open()
         {
@@ -249,18 +255,20 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Opens a new serial port connection with control if the port settings are initialised or not.
         /// </summary>
-        /// <exception cref="System.ObjectDisposedException">SerialPortStream is disposed of.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial Port already opened</exception>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="InvalidOperationException">Serial Port already opened</exception>
         /// <remarks>
-        /// Opens a connection to the serial port provided by the constructor or the Port property.
-        /// If this object is already managing a serial port, this object raises an exception.
-        /// <para>You can override the open so that no communication settings are retrieved or set.
-        /// This is useful for virtual COM ports that do not manage state bits (some as some emulated
-        /// COM ports or USB based communications that present themselves as a COM port but do not have
-        /// any underlying physical RS232 implementation).</para>
-        /// <note type="note">If you use this method to avoid setting parameters for the serial port,
-        /// instead only to open the serial port, you should be careful not to set any properties
-        /// associated with the serial port, as they will set the communications properties.</note>
+        /// Opens a connection to the serial port provided by the constructor or the <see cref="PortName"/> property. If
+        /// this object is already managing a serial port, this object raises an exception.
+        /// <para>
+        /// You can override the open so that no communication settings are retrieved or set. This is useful for virtual
+        /// COM ports that do not manage state bits (some as some emulated COM ports or USB based communications that
+        /// present themselves as a COM port but do not have any underlying physical RS232 implementation).
+        /// </para>
+        /// <note type="note">
+        /// If you use this method to avoid setting parameters for the serial port, instead only to open the serial
+        /// port, you should be careful not to set any properties associated with the serial port, as they will set the
+        /// communications properties. </note>
         /// </remarks>
         public void OpenDirect()
         {
@@ -298,11 +306,12 @@ namespace RJCP.IO.Ports
         /// Gets a value indicating the open or closed status of the SerialPortStream object.
         /// </summary>
         /// <remarks>
-        /// The IsOpen property tracks whether the port is open for use by the caller, not
-        /// whether the port is open by any application on the machine.
+        /// The <see cref="IsOpen"/> property tracks whether the port is open for use by the caller, not whether the
+        /// port is open by any application on the machine.
         /// </remarks>
         /// <value>
-        /// True if the serial port is open; otherwise, false. The default is false.
+        /// <see langword="true"/> if the serial port is open; otherwise, <see langword="false"/>. The default is
+        /// <see langword="false"/>.
         /// </value>
         public bool IsOpen
         {
@@ -318,11 +327,12 @@ namespace RJCP.IO.Ports
         private readonly object m_CloseLock = new object();
 
         /// <summary>
-        /// Closes the port connection, sets the IsOpen property to false. Does not dispose the object.
+        /// Closes the port connection, sets the <see cref="IsOpen"/> property to <see langword="false"/>. Does not
+        /// dispose the object.
         /// </summary>
         /// <remarks>
-        /// This method will clean up the object so far as to close the port. Internal buffers remain
-        /// active that the stream can continue to read. Writes will throw an exception.
+        /// This method will clean up the object so far as to close the port. Internal buffers remain active that the
+        /// stream can continue to read. Writes will throw an exception.
         /// </remarks>
 #if !NETSTANDARD1_5
         public new void Close()
@@ -356,7 +366,7 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <remarks>
         /// This method uses the Windows Management Interface to obtain its information. Therefore,
-        /// the list may be different to the list obtained using the GetPortNames() method which
+        /// the list may be different to the list obtained using the <see cref="GetPortNames"/> method which
         /// uses other techniques.
         /// <para>On Windows 7, this method shows to return normal COM ports, but not those
         /// associated with a modem driver.</para>
@@ -394,12 +404,13 @@ namespace RJCP.IO.Ports
         private string m_NewLine = "\n";
 
         /// <summary>
-        /// Gets or sets the value used to interpret the end of a call to the
-        /// ReadLine and WriteLine methods.
+        /// Gets or sets the value used to interpret the end of a call to the <see cref="ReadLine"/> and
+        /// <see cref="WriteLine"/> methods.
         /// </summary>
-        /// <remarks>
-        /// A value that represents the end of a line. The default is a line feed, (NewLine).
-        /// </remarks>
+        /// <remarks>A value that represents the end of a line. The default is a line feed, (NewLine).</remarks>
+        /// <exception cref="ObjectDisposedException">The object is disposed.</exception>
+        /// <exception cref="ArgumentNullException">The <see cref="NewLine"/> cannot be <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The <see cref="NewLine"/> may not be empty.</exception>
         public string NewLine
         {
             get { return m_NewLine; }
@@ -628,7 +639,7 @@ namespace RJCP.IO.Ports
         private void ReadCheck(byte[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-            if (buffer == null) throw new ArgumentNullException("buffer", "NULL buffer provided");
+            if (buffer == null) throw new ArgumentNullException("buffer");
             if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
@@ -637,7 +648,7 @@ namespace RJCP.IO.Ports
         private void ReadCheck(char[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
-            if (buffer == null) throw new ArgumentNullException("buffer", "NULL buffer provided");
+            if (buffer == null) throw new ArgumentNullException("buffer");
             if (offset < 0) throw new ArgumentOutOfRangeException("offset", "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException("count", "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
@@ -657,7 +668,7 @@ namespace RJCP.IO.Ports
                     if (immediate || m_ReadCheckDeviceErrorNotified) {
                         // This should only happen if the monitoring/buffering threads
                         // have died without explicitly closing the serial port.
-                        throw new System.IO.IOException("Device Error");
+                        throw new IOException("Device Error");
                     }
 
                     // We don't want to raise an exception the first time the issue is detected,
@@ -673,28 +684,27 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// Reads a sequence of bytes from the current stream and advances the
-        /// position within the stream by the number of bytes read.
+        /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number
+        /// of bytes read.
         /// </summary>
-        /// <param name="buffer">An array of bytes. When this method returns,
-        /// the buffer contains the specified byte array with the values between
-        /// <paramref name="offset" /> and (<paramref name="offset" />
-        /// + <paramref name="count" /> - 1) replaced by the bytes read from the
-        /// current source.</param>
-        /// <param name="offset">The zero-based byte offset in
-        /// <paramref name="buffer" /> at which to begin storing the data read
-        /// from the current stream.</param>
-        /// <param name="count">The maximum number of bytes to be read from the
-        /// current stream.</param>
+        /// <param name="buffer">
+        /// An array of bytes. When this method returns, the buffer contains the specified byte array with the values
+        /// between <paramref name="offset" /> and (<paramref name="offset" /> + <paramref name="count" /> - 1) replaced
+        /// by the bytes read from the current source.
+        /// </param>
+        /// <param name="offset">
+        /// The zero-based byte offset in <paramref name="buffer" /> at which to begin storing the data read from the
+        /// current stream.
+        /// </param>
+        /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
         /// <exception cref="ObjectDisposedException"/>
-        /// <exception cref="ArgumentNullException">Null buffer provided.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset provided, or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <returns>
-        /// The total number of bytes read into the buffer. This can be less than
-        /// the number of bytes requested if that many bytes are not currently
-        /// available, or zero (0) if the end of the stream has been reached.
+        /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that
+        /// many bytes are not currently available, or zero (0) if the end of the stream has been reached.
         /// </returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -785,8 +795,11 @@ namespace RJCP.IO.Ports
         /// <param name="asyncResult">The reference to the pending asynchronous request to finish.</param>
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
-        /// <returns>The number of bytes read from the stream, between zero (0) and the number of bytes you requested.
-        /// Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.</returns>
+        /// <returns>
+        /// The number of bytes read from the stream, between zero (0) and the number of bytes you requested. Streams
+        /// return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is
+        /// available.
+        /// </returns>
         public override int EndRead(IAsyncResult asyncResult)
         {
             if (asyncResult == null) throw new ArgumentNullException(nameof(asyncResult));
@@ -872,7 +885,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Synchronously reads one byte from the SerialPort input buffer.
         /// </summary>
-        /// <returns>The byte, cast to an Int32, or -1 if the end of the stream has been read.</returns>
+        /// <returns>The byte, cast to an <see langword="int"/>, or -1 if the end of the stream has been read.</returns>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         public override int ReadByte()
         {
@@ -931,8 +944,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Synchronously reads one character from the SerialPortStream input buffer.
         /// </summary>
-        /// <returns>The character that was read. -1 indicates no data was available
-        /// within the time out.</returns>
+        /// <returns>The character that was read. -1 indicates no data was available within the time out.</returns>
         public int ReadChar()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -971,28 +983,27 @@ namespace RJCP.IO.Ports
         /// Reads a string up to the specified <i>text</i> in the input buffer.
         /// </summary>
         /// <remarks>
-        /// The ReadTo() function will read text from the byte buffer up to a predetermined
-        /// limit (1024 characters) when looking for the string <i>text</i>. If <i>text</i>
-        /// is not found within this limit, data is thrown away and more data is read
-        /// (effectively consuming the earlier bytes).
-        /// <para>This method is provided as compatibility with the Microsoft implementation.
-        /// There are some important differences however. This method attempts to fix a minor
-        /// pathological problem with the Microsoft implementation. If the string <i>text</i>
-        /// is not found, the MS implementation may modify the internal state of the decoder.
-        /// As a workaround, it pushes all decoded characters back into its internal byte
-        /// buffer, which fixes the problem that a second call to the ReadTo() method returns
-        /// the consistent results, but a call to Read(byte[], ..) may return data that was
-        /// not actually transmitted by the DCE. This would happen in case that an invalid
-        /// byte sequence was found, converted to a fall back character. The original byte
-        /// sequence is removed and replaced with the byte equivalent of the fall back
-        /// character.</para>
-        /// <para>This method is rather slow, because it tries to preserve the byte buffer
-        /// in case of failure.</para>
-        /// <para>In case the data cannot be read, an exception is always thrown. So you may
-        /// assume that if this method returns, you have valid data.</para>
+        /// The ReadTo() function will read text from the byte buffer up to a predetermined limit (1024 characters) when
+        /// looking for the string <paramref name="text"/>. If <paramref name="text"/> is not found within this limit,
+        /// data is thrown away and more data is read (effectively consuming the earlier bytes).
+        /// <para>
+        /// This method is provided as compatibility with the Microsoft implementation. There are some important
+        /// differences however. This method attempts to fix a minor pathological problem with the Microsoft
+        /// implementation. If the string <paramref name="text"/> is not found, the MS implementation may modify the
+        /// internal state of the decoder. As a workaround, it pushes all decoded characters back into its internal byte
+        /// buffer, which fixes the problem that a second call to the ReadTo() method returns the consistent results,
+        /// but a call to Read(byte[], ..) may return data that was not actually transmitted by the DCE. This would
+        /// happen in case that an invalid byte sequence was found, converted to a fall back character. The original
+        /// byte sequence is removed and replaced with the byte equivalent of the fall back character.
+        /// </para>
+        /// <para>This method is rather slow, because it tries to preserve the byte buffer in case of failure.</para>
+        /// <para>
+        /// In case the data cannot be read, an exception is always thrown. So you may assume that if this method
+        /// returns, you have valid data.
+        /// </para>
         /// </remarks>
         /// <param name="text">The text to indicate where the read operation stops.</param>
-        /// <returns>The contents of the input buffer up to the specified <i>text</i>.</returns>
+        /// <returns>The contents of the input buffer up to the specified <paramref name="text"/>.</returns>
         /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <exception cref="ObjectDisposedException"/>
@@ -1019,19 +1030,20 @@ namespace RJCP.IO.Ports
         /// Reads all immediately available bytes.
         /// </summary>
         /// <remarks>
-        /// Reads all data in the current buffer. If there is no data available, then no data
-        /// is returned. This is different to the Microsoft implementation, that will read all
-        /// data, and if there is no data, then it waits for data based on the time outs. This
-        /// method employs no time outs.
-        /// <para>Because this method returns only the data that is currently in the cached
-        /// buffer and ignores the data that is actually buffered by the driver itself,
-        /// there may be a slight discrepancy between the value returned by BytesToRead and the
-        /// actual length of the string returned.</para>
-        /// <para>This method differs slightly from the Microsoft implementation in that this
-        /// function doesn't initiate a read operation, as we have a dedicated thread to reading
-        /// data that is running independently.</para>
+        /// Reads all data in the current buffer. If there is no data available, then no data is returned. This is
+        /// different to the Microsoft implementation, that will read all data, and if there is no data, then it waits
+        /// for data based on the time outs. This method employs no time outs.
+        /// <para>
+        /// Because this method returns only the data that is currently in the cached buffer and ignores the data that is
+        /// actually buffered by the driver itself, there may be a slight discrepancy between the value returned by
+        /// BytesToRead and the actual length of the string returned.
+        /// </para>
+        /// <para>
+        /// This method differs slightly from the Microsoft implementation in that this function doesn't initiate a read
+        /// operation, as we have a dedicated thread to reading data that is running independently.
+        /// </para>
         /// </remarks>
-        /// <returns>The contents of the stream and the input buffer of the SerialPortStream.</returns>
+        /// <returns>The contents of the stream and the input buffer of the <see cref="SerialPortStream"/>.</returns>
         public string ReadExisting()
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -1045,7 +1057,7 @@ namespace RJCP.IO.Ports
         /// Discards data from the serial driver's receive buffer.
         /// </summary>
         /// <remarks>
-        /// This function will discard the receive buffer of the SerialPortStream.
+        /// This function will discard the receive buffer of the <see cref="SerialPortStream"/>.
         /// </remarks>
         public void DiscardInBuffer()
         {
@@ -1077,18 +1089,20 @@ namespace RJCP.IO.Ports
         /// Define the time out when writing data to the local buffer.
         /// </summary>
         /// <remarks>
-        /// This defines the time out when writing data to the local buffer.
-        /// No guarantees are given to when the data will actually be transferred
-        /// over to the serial port as this is dependent on the hardware configuration
-        /// and flow control.
-        /// <para>When writing data to the stream buffer, a time out will
-        /// occur if not all data can be written to the local buffer and the buffer
-        /// wasn't able to empty itself in the period given by the time out.</para>
-        /// <para>Naturally then, this depends on the size of the send buffer
-        /// in use, how much data is already in the buffer, how fast the data
-        /// can leave the buffer.</para>
-        /// <para>In case the data cannot be written to the buffer in the given
-        /// time out, no data will be written at all.</para>
+        /// This defines the time out when writing data to the local buffer. No guarantees are given to when the data
+        /// will actually be transferred over to the serial port as this is dependent on the hardware configuration and
+        /// flow control.
+        /// <para>
+        /// When writing data to the stream buffer, a time out will occur if not all data can be written to the local
+        /// buffer and the buffer wasn't able to empty itself in the period given by the time out.
+        /// </para>
+        /// <para>
+        /// Naturally then, this depends on the size of the send buffer in use, how much data is already in the buffer,
+        /// how fast the data can leave the buffer.
+        /// </para>
+        /// <para>
+        /// In case the data cannot be written to the buffer in the given time out, no data will be written at all.
+        /// </para>
         /// </remarks>
         public override int WriteTimeout
         {
@@ -1110,17 +1124,18 @@ namespace RJCP.IO.Ports
         /// Gets or sets the size of the serial port output buffer.
         /// </summary>
         /// <remarks>
-        /// Defines the size of the buffered stream write buffer, used to send data
-        /// to the serial port. It does not affect the buffers in the serial port
-        /// hardware itself.
-        /// <para>The Microsoft implementation uses this to set the buffer size of the
-        /// underlying driver. This implementation interprets the WriteBufferSize
-        /// differently by setting the local buffer which can be much larger (megabytes)
-        /// and independent of the low level driver.</para>
+        /// Defines the size of the buffered stream write buffer, used to send data to the serial port. It does not
+        /// affect the buffers in the serial port hardware itself.
+        /// <para>
+        /// The Microsoft implementation uses this to set the buffer size of the underlying driver. This implementation
+        /// interprets the WriteBufferSize differently by setting the local buffer which can be much larger (megabytes)
+        /// and independent of the low level driver.
+        /// </para>
         /// </remarks>
-        /// <exception cref="InvalidOperationException">An attempt was used to change
-        /// the size of the buffer while the port is open (and therefore buffering is
-        /// active).</exception>
+        /// <exception cref="InvalidOperationException">
+        /// An attempt was used to change the size of the buffer while the port is open (and therefore buffering is
+        /// active).
+        /// </exception>
         public int WriteBufferSize
         {
             get { return m_WriteBufferSize; }
@@ -1147,8 +1162,8 @@ namespace RJCP.IO.Ports
         /// Gets the number of bytes of data in the send buffer.
         /// </summary>
         /// <remarks>
-        /// The send buffer includes the serial driver's send buffer as well as internal
-        /// buffering in the SerialPortStream itself.
+        /// The send buffer includes the serial driver's send buffer as well as internal buffering in the
+        /// <see cref="SerialPortStream"/> itself.
         /// </remarks>
         public int BytesToWrite
         {
@@ -1165,10 +1180,10 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
         /// </summary>
-        /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="System.TimeoutException">Flush write time out exceeded.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial Port not opened.</exception>
-        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="TimeoutException">Flush write time out exceeded.</exception>
+        /// <exception cref="InvalidOperationException">Serial Port not opened.</exception>
+        /// <exception cref="IOException">Serial Port was closed during the flush operation;
         /// or there was a device error.</exception>
         public override void Flush()
         {
@@ -1207,7 +1222,7 @@ namespace RJCP.IO.Ports
         {
             if (m_Buffer != null) {
                 if (m_NativeSerial.IsOpen && !m_NativeSerial.IsRunning) {
-                    throw new System.IO.IOException("Device Error");
+                    throw new IOException("Device Error");
                 }
             }
         }
@@ -1218,30 +1233,32 @@ namespace RJCP.IO.Ports
         /// <param name="buffer">The buffer containing data to send.</param>
         /// <param name="offset">Offset into the array buffer where data begins.</param>
         /// <param name="count">Number of bytes to copy into the local buffer.</param>
-        /// <exception cref="System.TimeoutException">Not enough buffer space was made available
-        /// before the time out expired.</exception>
-        /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="System.ArgumentNullException">NULL buffer was provided.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
-        /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
-        /// or there was a device error.</exception>
+        /// <exception cref="TimeoutException">
+        /// Not enough buffer space was made available before the time out expired.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush
+        /// operation.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the flush operation; or there was a device error.
+        /// </exception>
         /// <remarks>
-        /// Data is copied from the array provided into the local stream buffer. It does
-        /// not guarantee that data will be sent over the serial port. So long as there is
-        /// enough local buffer space to accept the write of count bytes, this function
-        /// will succeed. In case that the buffered serial stream doesn't have enough data,
-        /// the function will wait up to <see cref="WriteTimeout"/> milliseconds for enough
-        /// buffer data to become available. In case that there is not enough space before
-        /// the write time out expires, no data is copied to the local stream and the
-        /// function fails with an exception.
-        /// <para>For reliability, this function will only write data to the write buffer
-        /// if the complete set of data requested can be written. This implies that the
-        /// parameter <b>count</b> be less or equal to the number of bytes that are
-        /// available in the write buffer. Equivalently, you must make sure that you
-        /// have a write buffer with at least <b>count</b> allocated bytes or this
-        /// function will always raise an exception.</para>
+        /// Data is copied from the array provided into the local stream buffer. It does not guarantee that data will be
+        /// sent over the serial port. So long as there is enough local buffer space to accept the write of count bytes,
+        /// this function will succeed. In case that the buffered serial stream doesn't have enough data, the function
+        /// will wait up to <see cref="WriteTimeout"/> milliseconds for enough buffer data to become available. In case
+        /// that there is not enough space before the write time out expires, no data is copied to the local stream and
+        /// the function fails with an exception.
+        /// <para>
+        /// For reliability, this function will only write data to the write buffer if the complete set of data
+        /// requested can be written. This implies that the parameter <paramref name="count"/> be less or equal to the
+        /// number of bytes that are available in the write buffer. Equivalently, you must make sure that you have a
+        /// write buffer with at least <paramref name="count"/> allocated bytes or this function will always raise an
+        /// exception.
+        /// </para>
         /// </remarks>
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -1271,17 +1288,20 @@ namespace RJCP.IO.Ports
 
 #if NETSTANDARD1_5 || NET45
         /// <summary>
-        /// Performs an asynchronous write operation.
+        /// Asynchronously writes a sequence of bytes to the current stream, advances the current position within this
+        /// stream by the number of bytes written, and monitors cancellation requests.
         /// </summary>
         /// <param name="buffer">The buffer to write data from.</param>
-        /// <param name="offset">The byte offset in buffer from which to begin writing.</param>
+        /// <param name="offset">
+        /// The zero-based byte offset in <paramref name="buffer"/> from which to begin copying bytes to the stream.
+        /// </param>
         /// <param name="count">The maximum number of bytes to write.</param>
-        /// <param name="cancellationToken">Using a cancellation token is not supported and will be ignored.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        /// <exception cref="System.ArgumentNullException">NULL buffer was provided.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
-        /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>A task that represents the asynchronous write operation.</returns>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (!WriteCheck(buffer, offset, count))
@@ -1312,10 +1332,10 @@ namespace RJCP.IO.Ports
         /// <param name="callback">An optional asynchronous callback, to be called when the write is complete.</param>
         /// <param name="state">A user-provided object that distinguishes this particular asynchronous write request from other requests.</param>
         /// <returns>An IAsyncResult that represents the asynchronous write, which could still be pending.</returns>
-        /// <exception cref="System.ArgumentNullException">NULL buffer was provided.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
-        /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             WriteCheck(buffer, offset, count);
@@ -1327,10 +1347,10 @@ namespace RJCP.IO.Ports
         /// Ends an asynchronous write operation.
         /// </summary>
         /// <param name="asyncResult">A reference to the outstanding asynchronous I/O request.</param>
-        /// <exception cref="System.TimeoutException">Not enough buffer space was made available
+        /// <exception cref="TimeoutException">Not enough buffer space was made available
         /// before the time out expired.</exception>
-        /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="IOException">Serial Port was closed during the flush operation;
         /// or there was a device error.</exception>
         /// <remarks>
         /// EndWrite must be called exactly once on every IAsyncResult from BeginWrite.
@@ -1417,15 +1437,17 @@ namespace RJCP.IO.Ports
         /// <param name="buffer">The buffer containing data to send.</param>
         /// <param name="offset">Offset into the array buffer where data begins.</param>
         /// <param name="count">Number of characters to copy into the local buffer.</param>
-        /// <exception cref="System.TimeoutException">Not enough buffer space was made available
-        /// before the time out expired.</exception>
-        /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="System.ArgumentNullException">NULL buffer was provided.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
-        /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
-        /// or there was a device error.</exception>
+        /// <exception cref="TimeoutException">
+        /// Not enough buffer space was made available before the time out expired.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the flush operation; or there was a device error.
+        /// </exception>
         public void Write(char[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException("SerialPortStream");
@@ -1445,14 +1467,14 @@ namespace RJCP.IO.Ports
         /// Writes the specified string to the serial port.
         /// </summary>
         /// <param name="text">The string for output.</param>
-        /// <exception cref="System.TimeoutException">Not enough buffer space was made available
+        /// <exception cref="TimeoutException">Not enough buffer space was made available
         /// before the time out expired.</exception>
-        /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="System.ArgumentNullException">NULL buffer was provided.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
-        /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="IOException">Serial Port was closed during the flush operation;
         /// or there was a device error.</exception>
         public void Write(string text)
         {
@@ -1470,14 +1492,14 @@ namespace RJCP.IO.Ports
         /// Writes the specified string and the NewLine value to the output buffer.
         /// </summary>
         /// <param name="text">The string to write to the output buffer.</param>
-        /// <exception cref="System.TimeoutException">Not enough buffer space was made available
+        /// <exception cref="TimeoutException">Not enough buffer space was made available
         /// before the time out expired.</exception>
-        /// <exception cref="System.ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="System.ArgumentNullException">NULL buffer was provided.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
-        /// <exception cref="System.ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="System.InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="System.IO.IOException">Serial Port was closed during the flush operation;
+        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="IOException">Serial Port was closed during the flush operation;
         /// or there was a device error.</exception>
         public void WriteLine(string text)
         {
@@ -1683,7 +1705,7 @@ namespace RJCP.IO.Ports
         /// Gets or sets the byte that replaces invalid bytes in a data stream when a parity error occurs.
         /// </summary>
         /// <remarks>
-        /// If the value is set to the null character, parity replacement is disabled. This property
+        /// If the value is set to the nul character, parity replacement is disabled. This property
         /// only has an effect if the Parity property is not Parity.None.
         /// </remarks>
         public byte ParityReplace
@@ -1937,9 +1959,9 @@ namespace RJCP.IO.Ports
         /// This stream does not support seeking.
         /// </summary>
         /// <param name="offset">A byte offset relative to the <paramref name="origin" /> parameter.</param>
-        /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin" /> indicating the reference point used to obtain the new position.</param>
+        /// <param name="origin">A value of type <see cref="SeekOrigin" /> indicating the reference point used to obtain the new position.</param>
         /// <returns>The new position within the current stream.</returns>
-        /// <exception cref="System.NotSupportedException">This stream doesn't support seeking.</exception>
+        /// <exception cref="NotSupportedException">This stream doesn't support seeking.</exception>
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotSupportedException();
@@ -1949,7 +1971,7 @@ namespace RJCP.IO.Ports
         /// This stream does not support the SetLength property.
         /// </summary>
         /// <param name="value">The desired length of the current stream in bytes.</param>
-        /// <exception cref="System.NotSupportedException">This stream doesn't support the SetLength property.</exception>
+        /// <exception cref="NotSupportedException">This stream doesn't support the SetLength property.</exception>
         public override void SetLength(long value)
         {
             throw new NotSupportedException();
@@ -2143,8 +2165,8 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Clean up all resources managed by this object.
         /// </summary>
-        /// <param name="disposing"><b>true</b> if the user is disposing this object,
-        /// <b>false</b> if being cleaned up by the finalizer.</param>
+        /// <param name="disposing"><see langword="true"/> if the user is disposing this object,
+        /// <see langword="false"/> if being cleaned up by the finalizer.</param>
         protected override void Dispose(bool disposing)
         {
             if (IsDisposed) return;
@@ -2179,10 +2201,10 @@ namespace RJCP.IO.Ports
 
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="string" /> that represents this instance.
         /// </returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested",
             Justification = "Code is still readable")]
