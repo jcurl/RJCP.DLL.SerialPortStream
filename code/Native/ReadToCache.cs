@@ -72,8 +72,8 @@ namespace RJCP.IO.Ports.Native
         /// Reads a single character from the byte buffer provided, putting it into the internal cache
         /// </summary>
         /// <param name="sbuffer">The buffer to read.</param>
-        /// <returns><c>true</c> if a character was found; <c>false</c> otherwise.</returns>
-        /// <exception cref="System.ArgumentNullException">buffer may not be null.</exception>
+        /// <returns><see langword="true"/> if a character was found; <see langword="false"/> otherwise.</returns>
+        /// <exception cref="ArgumentNullException">buffer may not be <see langword="null"/>.</exception>
         /// <remarks>
         /// It is expected that this method be used iteratively to find a single character. Data is not consumed
         /// from the <paramref name="sbuffer"/>, but state is updated in this class to advance the byte offset
@@ -215,7 +215,7 @@ namespace RJCP.IO.Ports.Native
         /// <param name="sbuffer">The byte buffer to read from.</param>
         /// <param name="text">The text to indicate where the read operation stops.</param>
         /// <param name="line">On success, contains the line up to the text string requested.</param>
-        /// <returns><c>true</c> if a line was found; <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if a line was found; <see langword="false"/> otherwise.</returns>
         public bool ReadTo(SerialBuffer sbuffer, string text, out string line)
         {
             bool changedText = !text.Equals(m_ReadToString);
@@ -282,8 +282,8 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         /// <param name="sbuffer">The byte buffer to read from.</param>
         /// <param name="timeout">The time out in milliseconds.</param>
-        /// <returns><c>true</c> if one more byte is available since the last <see cref="ReadTo"/>
-        /// call; <c>false</c> otherwise</returns>
+        /// <returns><see langword="true"/> if one more byte is available since the last <see cref="ReadTo"/>
+        /// call; <see langword="false"/> otherwise</returns>
         public bool ReadToWaitForNewData(SerialBuffer sbuffer, int timeout)
         {
             return sbuffer.Stream.WaitForRead(m_ReadOffset + 1, timeout);
@@ -334,8 +334,10 @@ namespace RJCP.IO.Ports.Native
         /// <summary>
         /// Resets the cache, taking optionally into account a previous overflow.
         /// </summary>
-        /// <param name="withOverflow">if set to <c>true</c> a previous overflow is taken into account and reinserted into
-        /// the buffer, as if the first character had already been read.</param>
+        /// <param name="withOverflow">
+        /// if set to <see langword="true"/> a previous overflow is taken into account and reinserted into the buffer,
+        /// as if the first character had already been read.
+        /// </param>
         public void Reset(bool withOverflow)
         {
             if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
@@ -374,7 +376,7 @@ namespace RJCP.IO.Ports.Native
         /// Indicates if the ReadTo buffer has cached data.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance has cached data; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if this instance has cached data; otherwise, <see langword="false"/>.
         /// </value>
         private bool IsCached
         {
@@ -385,7 +387,7 @@ namespace RJCP.IO.Ports.Native
         /// Indicates if the amount of data read exceeds the line length.
         /// </summary>
         /// <value>
-        /// <c>true</c> if this instance is overflowed; otherwise, <c>false</c>.
+        /// <see langword="true"/> if this instance is overflowed; otherwise, <see langword="false"/>.
         /// </value>
         private bool IsOverflowed
         {

@@ -133,7 +133,7 @@ namespace RJCP.IO.Ports.Native.Windows
         /// </summary>
         /// <param name="bytesInRecvQueue">Output indicating number of bytes in queue but not read by ReadFile.</param>
         /// <param name="eofReceived">Output indicating whether an EOF character was received.</param>
-        /// <returns>true if the stats were received, otherwise false.</returns>
+        /// <returns><see langword="true"/> if the stats were received, otherwise <see langword="false"/>.</returns>
         /// <remarks>
         /// Getting this information has the side effect of processing and clearing any serial port
         /// errors and firing CommErrorEvent.
@@ -404,9 +404,9 @@ namespace RJCP.IO.Ports.Native.Windows
 
                 if (!readPending) {
                     if (!m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) {
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Read Buffer Full", m_Name);
-                    handles.Add(m_Buffer.Serial.ReadBufferNotFull);
+                        if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
+                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Read Buffer Full", m_Name);
+                        handles.Add(m_Buffer.Serial.ReadBufferNotFull);
                     } else {
                         readPending = DoReadEvent(ref readOverlapped);
                     }
@@ -840,8 +840,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     "{0}: CommEvent: {1}", m_Name, args.EventType.ToString());
 
             EventHandler<CommEventArgs> handler = CommEvent;
-            if (handler != null)
-            {
+            if (handler != null) {
                 handler(this, args);
             }
         }
@@ -857,8 +856,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     "{0}: CommErrorEvent: {1}", m_Name, args.EventType.ToString());
 
             EventHandler<CommErrorEventArgs> handler = CommErrorEvent;
-            if (handler != null)
-            {
+            if (handler != null) {
                 handler(this, args);
             }
         }

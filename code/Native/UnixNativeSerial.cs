@@ -288,7 +288,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets or sets a value if null bytes should be discarded or not.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if null bytes should be discarded; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if null bytes should be discarded; otherwise, <see langword="false"/>.
         /// </value>
         public bool DiscardNull
         {
@@ -327,9 +327,9 @@ namespace RJCP.IO.Ports.Native
         /// be sent when the input buffer is full and if the XOff character has been sent.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if transmission should continue after the input buffer
+        ///   <see langword="true"/> if transmission should continue after the input buffer
         ///   is within <see cref="XOffLimit"/> bytes of being full and the driver has sent the
-        ///   XOff character; otherwise, <c>false</c> that transmission should stop
+        ///   XOff character; otherwise,<see langword="false"/> that transmission should stop
         ///   and only continue when the input buffer is within <see cref="XOnLimit"/> bytes of
         ///   being empty and the driver has sent the XOn character.
         /// </value>
@@ -388,7 +388,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets or sets the break state of the serial port.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if in the break state; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if in the break state; otherwise, <see langword="false"/>.
         /// </value>
         public bool BreakState
         {
@@ -453,7 +453,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets the state of the Carrier Detect pin on the serial port.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if carrier detect pin is active; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if carrier detect pin is active; otherwise, <see langword="false"/>.
         /// </value>
         public bool CDHolding
         {
@@ -468,7 +468,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets the state of the Clear To Send pin on the serial port.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the clear to send pin is active; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if the clear to send pin is active; otherwise, <see langword="false"/>.
         /// </value>
         public bool CtsHolding
         {
@@ -483,7 +483,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets the state of the Data Set Ready pin on the serial port.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if data set ready pin is active; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if data set ready pin is active; otherwise, <see langword="false"/>.
         /// </value>
         public bool DsrHolding
         {
@@ -498,7 +498,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets the state of the Ring Indicator pin on the serial port.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if ring indicator state is active; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if ring indicator state is active; otherwise, <see langword="false"/>.
         /// </value>
         public bool RingHolding
         {
@@ -513,7 +513,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets or sets the Data Terminal Ready pin of the serial port.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if data terminal pin is active; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if data terminal pin is active; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// This pin only has an effect if handshaking for DTR/DTS is disabled.
@@ -535,7 +535,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets or sets the Request To Send pin of the serial port.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [RTS enable]; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if [RTS enable]; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// This pin only has an effect if the handshaking for RTS/CTS is disabled.
@@ -576,7 +576,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets a value indicating whether the serial port has been opened.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is open; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if this instance is open; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// This property only indicates if the port has been opened and that the
@@ -917,7 +917,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets a value indicating whether the thread for monitoring the serial port is running.
         /// </summary>
         /// <value>
-        /// <c>true</c> if this instance is running; otherwise, <c>false</c>.
+        /// <see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// This property differs slightly from <see cref="IsOpen"/>, as this returns status if
@@ -981,8 +981,8 @@ namespace RJCP.IO.Ports.Native
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources;
-        /// <c>false</c> to release only unmanaged resources.</param>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources;
+        /// <see langword="false"/> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (m_IsDisposed) return;

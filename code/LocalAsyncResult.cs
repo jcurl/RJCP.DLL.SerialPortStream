@@ -75,8 +75,8 @@ namespace RJCP.IO
         /// Gets a value that indicates whether the asynchronous
         /// operation completed synchronously.
         /// </summary>
-        /// <returns>true if the asynchronous operation completed synchronously;
-        /// otherwise, false.</returns>
+        /// <returns><see langword="true"/> if the asynchronous operation completed synchronously;
+        /// otherwise, <see langword="false"/>.</returns>
 
         public bool CompletedSynchronously { get; internal set; }
 
@@ -85,7 +85,7 @@ namespace RJCP.IO
         /// <summary>
         /// Gets a value that indicates whether the asynchronous operation has completed.
         /// </summary>
-        /// <returns>true if the operation is complete; otherwise, false.</returns>
+        /// <returns><see langword="true"/> if the operation is complete; otherwise, <see langword="false"/>.</returns>
         public bool IsCompleted
         {
             get { return m_IsCompleted; }
@@ -111,8 +111,8 @@ namespace RJCP.IO
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources;
-        /// <c>false</c> to release only unmanaged resources.</param>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources;
+        /// <see langword="false"/> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;

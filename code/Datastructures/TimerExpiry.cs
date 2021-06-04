@@ -34,7 +34,7 @@ namespace RJCP.Datastructures
     /// for the first set of data within a time out. But your method must wait for at least
     /// two elements of data within the time out. This can be implemented as follows:</para>
     /// <example>
-    /// public true MyFunc(int timeOut)
+    /// public bool MyFunc(int timeOut)
     /// {
     ///     TimerExpiry myExpiry = new TimerExpiry(timeOut);
     ///     int elements = 0;

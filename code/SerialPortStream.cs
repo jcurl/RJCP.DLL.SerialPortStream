@@ -241,10 +241,10 @@ namespace RJCP.IO.Ports
         /// capabilities and default settings. This allows your application to use the settings that were already
         /// available (such as defined by the windows user in the Control Panel, or the last open application). If you
         /// require to open the COM port without briefly opening it to query its status, then you need to instantiate
-        /// this object through the default constructor. Set the property UpdateOnPortSet to false and then set the Port
-        /// property. Provide all the other properties you require then call the Open() method. The port will be opened
-        /// using the default properties providing you with a consistent environment (independent of the state of the
-        /// Operating System or the driver beforehand).
+        /// this object through the default constructor. Set the property UpdateOnPortSet to <see langword="false"/> and
+        /// then set the Port property. Provide all the other properties you require then call the <see cref="Open()"/>
+        /// method. The port will be opened using the default properties providing you with a consistent environment
+        /// (independent of the state of the Operating System or the driver beforehand).
         /// </para>
         /// </remarks>
         public void Open()
@@ -1727,8 +1727,8 @@ namespace RJCP.IO.Ports
         /// between the port and the receive buffer.
         /// </summary>
         /// <remarks>
-        /// This value should normally be set to false, especially for binary transmissions. Setting
-        /// this property to true can cause unexpected results for UTF32- and UTF16-encoded bytes.
+        /// This value should normally be set to <see langword="false"/>, especially for binary transmissions. Setting
+        /// this property to <see langword="true"/> can cause unexpected results for UTF32- and UTF16-encoded bytes.
         /// </remarks>
         public bool DiscardNull
         {
@@ -1871,9 +1871,9 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <remarks>
         /// MSDN documentation states this flag as follows:
-        /// <para>If this member is TRUE, transmission continues after the input buffer
+        /// <para>If this member is <see langword="true"/>, transmission continues after the input buffer
         /// has come within <see cref="XOffLimit"/> bytes of being full and the driver has transmitted
-        /// the XoffChar character to stop receiving bytes. If this member is FALSE,
+        /// the XoffChar character to stop receiving bytes. If this member is <see langword="false"/>,
         /// transmission does not continue until the input buffer is within XonLim bytes
         /// of being empty and the driver has transmitted the XonChar character to
         /// resume reception.</para>
@@ -1883,7 +1883,7 @@ namespace RJCP.IO.Ports
         /// <para>The Microsoft SerialPort implementation doesn't provide this option
         /// (in fact, in .NET 4.0 it doesn't appear to control this at all).</para>
         /// <para>Some DCE devices will resume sending after any character arrives.
-        /// The <see cref="TxContinueOnXOff"/> member should be set to FALSE when communicating with
+        /// The <see cref="TxContinueOnXOff"/> member should be set to <see langword="false"/> when communicating with
         /// a DCE device that resumes sending after any character arrives.</para>
         /// </remarks>
         public bool TxContinueOnXOff
@@ -1904,11 +1904,11 @@ namespace RJCP.IO.Ports
         /// Gets or sets the break signal state.
         /// </summary>
         /// <remarks>
-        /// The break signal state occurs when a transmission is suspended and the line is placed
-        /// in a break state (all low, no stop bit) until released. To enter a break state, set this
-        /// property to true. If the port is already in a break state, setting this property again
-        /// to true does not result in an exception. It is not possible to write to the SerialPortStream
-        /// while BreakState is true.
+        /// The break signal state occurs when a transmission is suspended and the line is placed in a break state (all
+        /// low, no stop bit) until released. To enter a break state, set this property to <see langword="true"/>. If
+        /// the port is already in a break state, setting this property again to <see langword="true"/> does not result
+        /// in an exception. It is not possible to write to the <see cref="SerialPortStream"/> while
+        /// <see cref="BreakState"/> is <see langword="true"/>.
         /// </remarks>
         public bool BreakState
         {
@@ -1929,7 +1929,7 @@ namespace RJCP.IO.Ports
 
         #region Seeking
         /// <summary>
-        /// This stream is not seekable, so always returns false.
+        /// This stream is not seekable, so always returns <see langword="false"/>.
         /// </summary>
         public override bool CanSeek
         {
@@ -2198,7 +2198,6 @@ namespace RJCP.IO.Ports
             }
             base.Dispose(disposing);
         }
-
 
         /// <summary>
         /// Returns a <see cref="string" /> that represents this instance.

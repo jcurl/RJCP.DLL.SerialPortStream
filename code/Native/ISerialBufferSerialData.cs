@@ -56,7 +56,7 @@
         /// <summary>
         /// Indicates that the write buffer is now empty.
         /// </summary>
-        /// <returns><c>true</c> if the write buffer is empty.</returns>
+        /// <returns><see langword="true"/> if the write buffer is empty.</returns>
         /// <remarks>
         /// Systems that return immediately after a Write before the write has been sent over the wire
         /// should call this method when the hardware indicates that data is flushed.
@@ -71,7 +71,7 @@
         /// Gets a value indicating whether this instance uses a pinned buffer.
         /// </summary>
         /// <value>
-        /// <c>true</c> if this instance uses a pinned buffer; otherwise, <c>false</c>.
+        /// <see langword="true"/> if this instance uses a pinned buffer; otherwise, <see langword="false"/>.
         /// </value>
         bool IsPinnedBuffer { get; }
 

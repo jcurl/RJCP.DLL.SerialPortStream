@@ -421,9 +421,9 @@ namespace RJCP.IO.Ports
         /// <remarks>
         /// The break signal state occurs when a transmission is suspended and the line is placed in a break state (all
         /// low, no stop bit) until released. To enter a break state, set this property to <see langword="true"/>. If
-        /// the port is already in a break state, setting this property again to true does not result in an exception.
-        /// It is not possible to write to the <see cref="SerialPortStream"/> while <see cref="BreakState"/> is
-        /// <see langword="false"/>.
+        /// the port is already in a break state, setting this property again to <see langword="true"/> does not result
+        /// in an exception. It is not possible to write to the <see cref="SerialPortStream"/> while
+        /// <see cref="BreakState"/> is <see langword="false"/>.
         /// </remarks>
         bool BreakState { get; set; }
 

@@ -11,7 +11,7 @@
         /// Waits up to a specified time out for data to be available to read.
         /// </summary>
         /// <param name="timeout">The time out in milliseconds.</param>
-        /// <returns><c>true</c> if data is available to read in time; <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if data is available to read in time; <see langword="false"/> otherwise.</returns>
         bool WaitForRead(int timeout);
 
         /// <summary>
@@ -19,7 +19,7 @@
         /// </summary>
         /// <param name="count">The number of bytes that should be in the read buffer.</param>
         /// <param name="timeout">The time out in milliseconds.</param>
-        /// <returns><c>true</c> if data is available to read in time; <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if data is available to read in time; <see langword="false"/> otherwise.</returns>
         bool WaitForRead(int count, int timeout);
 
         /// <summary>
@@ -76,9 +76,9 @@
         /// </summary>
         /// <param name="count">The number of bytes required to be free.</param>
         /// <param name="timeout">The time out in milliseconds.</param>
-        /// <returns><c>true</c> if <paramref name="count"/> bytes are available for writing to the buffer;
-        /// <c>false</c> if there is not enough buffer available within the <paramref name="timeout"/>
-        /// parameter. If <paramref name="count"/> is larger than the capacity of the buffer, <c>false</c>
+        /// <returns><see langword="true"/> if <paramref name="count"/> bytes are available for writing to the buffer;
+        /// <see langword="false"/> if there is not enough buffer available within the <paramref name="timeout"/>
+        /// parameter. If <paramref name="count"/> is larger than the capacity of the buffer, <see langword="false"/>
         /// is returned immediately.</returns>
         bool WaitForWrite(int count, int timeout);
 
@@ -110,13 +110,16 @@
         /// Waits for all data in the write buffer to be written with notification also by the serial buffer.
         /// </summary>
         /// <param name="timeout">The time out in milliseconds.</param>
-        /// <returns><c>true</c> if the data was flushed within the specified time out; <c>false</c> otherwise.</returns>
+        /// <returns>
+        /// <see langword="true"/> if the data was flushed within the specified time out; <see langword="false"/>
+        /// otherwise.
+        /// </returns>
         bool Flush(int timeout);
 
         /// <summary>
         /// Reset the buffer to an initial state ready for a new connection.
         /// </summary>
-        /// <param name="clearBuffer">Set to <c>true</c> to reset the contents of the buffers.</param>
+        /// <param name="clearBuffer">Set to <see langword="true"/> to reset the contents of the buffers.</param>
         /// <remarks>
         /// This should only be closed when the serial port is closed.
         /// </remarks>

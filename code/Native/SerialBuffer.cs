@@ -115,7 +115,7 @@ namespace RJCP.IO.Ports.Native
         /// Gets a value indicating whether this instance uses a pinned buffer.
         /// </summary>
         /// <value>
-        /// <c>true</c> if this instance uses a pinned buffer; otherwise, <c>false</c>.
+        /// <see langword="true"/> if this instance uses a pinned buffer; otherwise, <see langword="false"/>.
         /// </value>
         bool ISerialBufferSerialData.IsPinnedBuffer
         {
@@ -421,7 +421,7 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         /// <param name="readBuffer">The read buffer size in bytes.</param>
         /// <param name="writeBuffer">The write buffer size in bytes.</param>
-        /// <param name="pinned">if set to <c>true</c> then the read and write buffers are pinned.</param>
+        /// <param name="pinned">if set to <see langword="true"/> then the read and write buffers are pinned.</param>
         /// <remarks>
         /// Allocates buffer space for reading and writing (accessible via the <see cref="Serial"/> and <see cref="Stream"/>
         /// properties). If specified, the buffers can be pinned. THis causes the buffers to not move for the duration of
@@ -515,8 +515,8 @@ namespace RJCP.IO.Ports.Native
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources;
-        /// <c>false</c> to release only unmanaged resources.</param>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources;
+        /// <see langword="false"/> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
             // This is a sealed class, so we have "private void" instead of "protected virtual"

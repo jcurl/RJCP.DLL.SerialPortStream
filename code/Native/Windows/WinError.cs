@@ -6583,11 +6583,11 @@ namespace RJCP.IO.Ports.Native.Windows
         /// </summary>
         public const int ERROR_DS_ADMIN_LIMIT_EXCEEDED = 8228;
         /// <summary>
-        /// The compare response was false.
+        /// The compare response was <see langword="false"/>.
         /// </summary>
         public const int ERROR_DS_COMPARE_FALSE = 8229;
         /// <summary>
-        /// The compare response was true.
+        /// The compare response was <see langword="true"/>.
         /// </summary>
         public const int ERROR_DS_COMPARE_TRUE = 8230;
         /// <summary>
