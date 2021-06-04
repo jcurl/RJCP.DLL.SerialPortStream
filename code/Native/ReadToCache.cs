@@ -50,7 +50,7 @@ namespace RJCP.IO.Ports.Native
                     m_Encoding = value;
                     m_Decoder = null;
                 } else {
-                    throw new ArgumentNullException("value", "Encoding may not be null");
+                    throw new ArgumentNullException(nameof(value));
                 }
             }
         }
@@ -83,7 +83,7 @@ namespace RJCP.IO.Ports.Native
         private bool PeekChar(SerialBuffer sbuffer)
         {
             // Once the bug from Mono is fixed, we just drop the code above.
-            if (sbuffer == null) throw new ArgumentNullException("sbuffer");
+            if (sbuffer == null) throw new ArgumentNullException(nameof(sbuffer));
             int readLen = sbuffer.Serial.ReadBuffer.Length;
             if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
                 Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
@@ -184,7 +184,7 @@ namespace RJCP.IO.Ports.Native
         /// within the time out.</returns>
         public int ReadChar(SerialBuffer sbuffer)
         {
-            if (sbuffer == null) throw new ArgumentNullException("sbuffer", "NULL buffer provided");
+            if (sbuffer == null) throw new ArgumentNullException(nameof(sbuffer));
             char[] schar = new char[1];
             if (IsOverflowed) Reset(true);
 

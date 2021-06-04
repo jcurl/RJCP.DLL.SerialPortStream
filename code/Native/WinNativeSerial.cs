@@ -63,14 +63,14 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The port device path.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.InvalidOperationException">Port already open.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException">Port already open.</exception>
         public string PortName
         {
             get { return m_PortName; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (IsOpen) throw new InvalidOperationException("Port already open");
                 m_PortName = value;
             }
@@ -168,15 +168,15 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The baud rate.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.ArgumentOutOfRangeException">Baud rate must be positive.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentOutOfRangeException">Baud rate must be positive.</exception>
         public int BaudRate
         {
             get { return m_Baud; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
-                if (value < 0) throw new ArgumentOutOfRangeException("value", "Baud rate must be positive");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "Baud rate must be positive");
 
                 m_Baud = value;
                 if (IsOpen) SetPortSettings();
@@ -191,16 +191,16 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The data bits.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.ArgumentOutOfRangeException">May only be 5, 6, 7, 8 or 16.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentOutOfRangeException">May only be 5, 6, 7, 8 or 16.</exception>
         public int DataBits
         {
             get { return m_DataBits; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if ((value < 5 || value > 8) && value != 16) {
-                    throw new ArgumentOutOfRangeException("value", "May only be 5, 6, 7, 8 or 16");
+                    throw new ArgumentOutOfRangeException(nameof(value), "May only be 5, 6, 7, 8 or 16");
                 }
                 m_DataBits = value;
                 if (IsOpen) SetPortSettings();
@@ -215,16 +215,16 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The parity.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.ArgumentOutOfRangeException">Unknown value for Parity.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentOutOfRangeException">Unknown value for Parity.</exception>
         public Parity Parity
         {
             get { return m_Parity; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!Enum.IsDefined(typeof(Parity), value)) {
-                    throw new ArgumentOutOfRangeException("value", "Unknown value for Parity");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown value for Parity");
                 }
                 m_Parity = value;
                 if (IsOpen) SetPortSettings();
@@ -239,15 +239,15 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The stop bits.
         /// </value>
-        /// <exception cref="System.ArgumentOutOfRangeException">Unknown value for Stop Bits.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Unknown value for Stop Bits.</exception>
         public StopBits StopBits
         {
             get { return m_StopBits; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!Enum.IsDefined(typeof(StopBits), value)) {
-                    throw new ArgumentOutOfRangeException("value", "Unknown value for Stop Bits");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown value for Stop Bits");
                 }
                 m_StopBits = value;
                 if (IsOpen) SetPortSettings();
@@ -267,7 +267,7 @@ namespace RJCP.IO.Ports.Native
             get { return m_DiscardNull; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 m_DiscardNull = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -281,13 +281,13 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The byte to use on parity errors.
         /// </value>
-        /// <exception cref="System.ArgumentOutOfRangeException">Must be a byte value from 0 to 255.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Must be a byte value from 0 to 255.</exception>
         public byte ParityReplace
         {
             get { return m_ParityReplace; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 m_ParityReplace = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -311,7 +311,7 @@ namespace RJCP.IO.Ports.Native
             get { return m_TxContinueOnXOff; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 m_TxContinueOnXOff = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -325,15 +325,15 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The XOff buffer limit.
         /// </value>
-        /// <exception cref="System.ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
         public int XOffLimit
         {
             get { return m_XOffLimit; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (value < 0) {
-                    throw new ArgumentOutOfRangeException("value", "XOffLimit must be positive");
+                    throw new ArgumentOutOfRangeException(nameof(value), "XOffLimit must be positive");
                 }
                 m_XOffLimit = value;
                 if (IsOpen) SetPortSettings();
@@ -348,15 +348,15 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The XOn buffer limit.
         /// </value>
-        /// <exception cref="System.ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
         public int XOnLimit
         {
             get { return m_XOnLimit; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (value < 0) {
-                    throw new ArgumentOutOfRangeException("value", "XOffLimit must be positive");
+                    throw new ArgumentOutOfRangeException(nameof(value), "XOffLimit must be positive");
                 }
                 m_XOnLimit = value;
                 if (IsOpen) SetPortSettings();
@@ -371,19 +371,19 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         ///   <c>true</c> if in the break state; otherwise, <c>false</c>.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.InvalidOperationException">Port not open.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException">Port not open.</exception>
         public bool BreakState
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) return false;
                 return m_BreakState;
             }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) throw new InvalidOperationException("Port not open");
                 if (value) {
                     m_CommModemStatus.SetCommBreak();
@@ -402,8 +402,8 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The driver input queue size.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.ArgumentOutOfRangeException">value must be a positive integer.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentOutOfRangeException">value must be a positive integer.</exception>
         /// <remarks>
         /// This method is typically available with Windows API only.
         /// </remarks>
@@ -412,8 +412,8 @@ namespace RJCP.IO.Ports.Native
             get { return m_DriverInQueue; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
-                if (value < 0) throw new ArgumentOutOfRangeException("value", "value must be a positive integer");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "value must be a positive integer");
                 m_DriverInQueue = value;
 
                 if (IsOpen) {
@@ -430,8 +430,8 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The driver output queue size.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.ArgumentOutOfRangeException">value must be a positive integer.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentOutOfRangeException">value must be a positive integer.</exception>
         /// <remarks>
         /// This method is typically available with Windows API only.
         /// </remarks>
@@ -440,8 +440,8 @@ namespace RJCP.IO.Ports.Native
             get { return m_DriverOutQueue; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
-                if (value < 0) throw new ArgumentOutOfRangeException("value", "value must be a positive integer");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "value must be a positive integer");
                 m_DriverOutQueue = value;
 
                 if (IsOpen) {
@@ -460,7 +460,7 @@ namespace RJCP.IO.Ports.Native
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) return 0;
                 return m_CommOverlappedIo.BytesToRead;
             }
@@ -472,12 +472,12 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The number of bytes in the driver queue for writing. If this value is not supported, zero is returned.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         public int BytesToWrite
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) return 0;
                 return m_CommOverlappedIo.BytesToWrite;
             }
@@ -489,12 +489,12 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// <c>true</c> if carrier detect pin is active; otherwise, <c>false</c>.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         public bool CDHolding
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Rlsd;
@@ -507,12 +507,12 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// <c>true</c> if the clear to send pin is active; otherwise, <c>false</c>.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         public bool CtsHolding
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Cts;
@@ -525,12 +525,12 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// <c>true</c> if data set ready pin is active; otherwise, <c>false</c>.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         public bool DsrHolding
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Dsr;
@@ -543,12 +543,12 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// <c>true</c> if ring indicator state is active; otherwise, <c>false</c>.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         public bool RingHolding
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Ring;
@@ -563,7 +563,7 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// <c>true</c> if data terminal pin is active; otherwise, <c>false</c>.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         /// <remarks>
         /// This pin only has an effect if handshaking for DTR/DTS is disabled. Reading from this
         /// pin returns the state that should be requested. Setting this pin then changing the
@@ -574,7 +574,7 @@ namespace RJCP.IO.Ports.Native
             get { return m_DtrEnable; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 m_DtrEnable = value;
                 if (IsOpen && (m_Handshake & Handshake.Dtr) == 0) SetDtrPortSettings(true);
             }
@@ -588,7 +588,7 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         ///   <c>true</c> if [RTS enable]; otherwise, <c>false</c>.
         /// </value>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         /// <remarks>
         /// This pin only has an effect if the handshaking for RTS/CTS is disabled. Reading from this
         /// pin returns the state that should be requested. Setting this pin then changing the
@@ -599,7 +599,7 @@ namespace RJCP.IO.Ports.Native
             get { return m_RtsEnable; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 m_RtsEnable = value;
                 if (IsOpen && (m_Handshake & Handshake.Rts) == 0) SetRtsPortSettings(true);
             }
@@ -613,15 +613,15 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The handshake mode to use on the serial port.
         /// </value>
-        /// <exception cref="System.ArgumentOutOfRangeException">Unknown value for Handshake.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Unknown value for Handshake.</exception>
         public Handshake Handshake
         {
             get { return m_Handshake; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!Enum.IsDefined(typeof(Handshake), value)) {
-                    throw new ArgumentOutOfRangeException("value", "Unknown value for Handshake");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown value for Handshake");
                 }
                 m_Handshake = value;
                 if (IsOpen) SetPortSettings();
@@ -647,11 +647,11 @@ namespace RJCP.IO.Ports.Native
         /// <summary>
         /// Discards the input queue buffer of the driver.
         /// </summary>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.InvalidOperationException">Port not open.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void DiscardInBuffer()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             UnsafeNativeMethods.PurgeComm(m_ComPortHandle, NativeMethods.PurgeFlags.PURGE_RXABORT |
@@ -660,7 +660,7 @@ namespace RJCP.IO.Ports.Native
 
         public void DiscardOutBuffer()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             m_CommOverlappedIo.DiscardOutBuffer();
@@ -669,11 +669,11 @@ namespace RJCP.IO.Ports.Native
         /// <summary>
         /// Gets the port settings and updates the properties of the object.
         /// </summary>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.InvalidOperationException">Port not open.</exception>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void GetPortSettings()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             m_CommState.GetCommState();
@@ -721,7 +721,7 @@ namespace RJCP.IO.Ports.Native
         /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void SetPortSettings()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             // Binary mode must always be set per MSDN
@@ -815,20 +815,20 @@ namespace RJCP.IO.Ports.Native
         /// <summary>
         /// Opens the serial port specified by <see cref="PortName" />.
         /// </summary>
-        /// <exception cref="System.ObjectDisposedException"/>
-        /// <exception cref="System.InvalidOperationException">
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException">
         /// Port must first be set;
         /// or
         /// Serial Port currently open.
         /// </exception>
-        /// <exception cref="System.IO.IOException">Wrong file type.</exception>
+        /// <exception cref="IOException">Wrong file type.</exception>
         /// <remarks>
         /// Opening the serial port does not set any settings (such as baud rate, etc.). On the windows implementation,
         /// it only sets the internal driver input and output queue.
         /// </remarks>
         public void Open()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (string.IsNullOrWhiteSpace(PortName)) throw new InvalidOperationException("Port must first be set");
             if (IsOpen) throw new InvalidOperationException("Serial Port currently open");
 
@@ -861,7 +861,7 @@ namespace RJCP.IO.Ports.Native
                 if (!validOverride) {
                     m_ComPortHandle.Dispose();
                     m_ComPortHandle = null;
-                    throw new IOException("Wrong file type: " + PortName);
+                    throw new IOException(string.Format("Wrong file type: {0}", PortName));
                 }
             }
 
@@ -878,14 +878,14 @@ namespace RJCP.IO.Ports.Native
         /// <summary>
         /// Closes the serial port.
         /// </summary>
-        /// <exception cref="System.ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException"/>
         /// <remarks>
         /// Closing the serial port invalidates actions that can be done to the serial port,
         /// but it does not prevent the serial port from being reopened
         /// </remarks>
         public void Close()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (IsOpen) {
                 SafeFileHandle handle = m_ComPortHandle;
                 m_ComPortHandle = null;
@@ -895,14 +895,14 @@ namespace RJCP.IO.Ports.Native
                 m_CommModemStatus = null;
                 handle.Dispose();
             }
-    }
+        }
 
         /// <summary>
         /// Creates the serial buffer suitable for monitoring.
         /// </summary>
         /// <param name="readBuffer">The read buffer size to allocate.</param>
         /// <param name="writeBuffer">The write buffer size to allocate.</param>
-        /// <returns>A serial buffer object that can be given to <see cref="StartMonitor" /></returns>
+        /// <returns>A serial buffer object that can be given to <see cref="StartMonitor"/></returns>
         public SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer)
         {
             return new SerialBuffer(readBuffer, writeBuffer, true);
@@ -916,7 +916,7 @@ namespace RJCP.IO.Ports.Native
         /// <param name="name">The name of the thread to use.</param>
         public void StartMonitor(SerialBuffer buffer, string name)
         {
-            if (m_IsDisposed) throw new ObjectDisposedException("WinNativeSerial");
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (!IsOpen) throw new InvalidOperationException("Serial Port not open");
             m_CommOverlappedIo.Start(buffer, name);
         }
@@ -949,15 +949,15 @@ namespace RJCP.IO.Ports.Native
             switch (e) {
             case 2:
             case 3:
-                throw new IOException("Port not found: " + PortName, e);
+                throw new IOException(string.Format("Port not found: {0}", PortName), e);
             case 5:
-                throw new UnauthorizedAccessException("Access Denied: " + PortName);
+                throw new UnauthorizedAccessException(string.Format("Access Denied: {0}", PortName));
             case 32:
-                throw new IOException("Sharing violation: " + PortName, e);
+                throw new IOException(string.Format("Sharing violation: {0}", PortName), e);
             case 206:
-                throw new PathTooLongException("Path too long: " + PortName);
+                throw new PathTooLongException(string.Format("Path too long: {0}", PortName));
             }
-            throw new IOException("Unknown error 0x" + e.ToString("X") + ": " + PortName, e);
+            throw new IOException(string.Format("Unknown error 0x{0}: {1}", e.ToString("X"), PortName), e);
         }
 
         #region Event Handling
@@ -988,14 +988,12 @@ namespace RJCP.IO.Ports.Native
         private void CommOverlappedIo_CommEvent(object sender, CommEventArgs e)
         {
             SerialData dataFlags = (SerialData)(e.EventType & c_DataFlags);
-            if (dataFlags != 0)
-            {
+            if (dataFlags != 0) {
                 OnDataReceived(this, new SerialDataReceivedEventArgs(dataFlags));
             }
 
             SerialPinChange pinFlags = (SerialPinChange)(e.EventType & c_PinFlags);
-            if (pinFlags != 0)
-            {
+            if (pinFlags != 0) {
                 OnPinChanged(this, new SerialPinChangedEventArgs(pinFlags));
             }
         }
@@ -1003,8 +1001,7 @@ namespace RJCP.IO.Ports.Native
         private void CommOverlappedIo_CommErrorEvent(object sender, CommErrorEventArgs e)
         {
             SerialError errorFlags = (SerialError)(e.EventType & c_ErrorFlags);
-            if (errorFlags != 0)
-            {
+            if (errorFlags != 0) {
                 OnCommError(this, new SerialErrorReceivedEventArgs(errorFlags));
             }
         }

@@ -42,8 +42,8 @@ namespace RJCP.IO.Ports.Trace
         /// </remarks>
         public LogSource(string name)
         {
-            if (name == null) throw new ArgumentNullException("name");
-            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Name may not be empty", "name");
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Name may not be empty", nameof(name));
             m_Name = name;
 
 #if NETFRAMEWORK
