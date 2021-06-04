@@ -281,6 +281,11 @@ namespace RJCP.IO.Ports.Native
         void Close();
 
         /// <summary>
+        /// Wait for the Operating System to write bytes from the underlying hardware.
+        /// </summary>
+        void Flush();
+
+        /// <summary>
         /// Creates the serial buffer suitable for monitoring.
         /// </summary>
         /// <param name="readBuffer">The read buffer size to allocate.</param>

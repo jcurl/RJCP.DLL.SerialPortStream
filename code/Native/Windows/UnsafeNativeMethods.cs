@@ -37,6 +37,10 @@ namespace RJCP.IO.Ports.Native.Windows
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FlushFileBuffers(SafeFileHandle hFile);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetOverlappedResult(SafeFileHandle hFile,
            [In] ref System.Threading.NativeOverlapped lpOverlapped,
            out uint lpNumberOfBytesTransferred,

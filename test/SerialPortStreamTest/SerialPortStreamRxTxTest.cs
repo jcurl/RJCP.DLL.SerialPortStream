@@ -240,6 +240,41 @@ namespace RJCP.IO.Ports
             }
         }
 
+        [TestCase(true, Category = "FlashAndDrain")]
+        [TestCase(false, Category = "FlushAndNoDrain")]
+        public void Flush(bool drain)
+        {
+            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+                src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
+                dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
+                src.Open(); Assert.That(src.IsOpen, Is.True);
+                dst.Open(); Assert.That(dst.IsOpen, Is.True);
+
+                byte[] sdata = new byte[512];
+                for (int i = 0; i < sdata.Length; i++) {
+                    sdata[i] = (byte)(64 + i % 48);
+                }
+
+                // It should take 512 * 10 / 115200 s = 44ms to send, timeout of 300ms.
+                src.Write(sdata, 0, sdata.Length);
+                src.Flush(drain);
+                Assert.That(src.BytesToWrite, Is.EqualTo(0));
+
+                src.Write(sdata, 0, sdata.Length);
+                src.Flush(drain);
+                Assert.That(src.BytesToWrite, Is.EqualTo(0));
+
+                // Receive all data, just so that it is removed in the hardware buffers for the next test case.
+                byte[] ddata = new byte[512];
+                int r;
+                do {
+                    r = dst.Read(ddata, 0, ddata.Length);
+                    Console.WriteLine("Read: {0} bytes", r);
+                } while (r > 0);
+            }
+        }
+
         [Test]
         public void WaitForRxCharEventOn1Byte()
         {

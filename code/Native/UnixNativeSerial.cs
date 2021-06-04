@@ -648,6 +648,17 @@ namespace RJCP.IO.Ports.Native
         }
 
         /// <summary>
+        /// Wait for the Operating System to write bytes from the underlying hardware.
+        /// </summary>
+        public void Flush()
+        {
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(UnixNativeSerial));
+            if (!IsOpen) throw new InvalidOperationException("Port not open");
+
+            // For now this is a no-op
+        }
+
+        /// <summary>
         /// Creates the serial buffer suitable for monitoring.
         /// </summary>
         /// <param name="readBuffer">The read buffer size to allocate.</param>

@@ -898,6 +898,19 @@ namespace RJCP.IO.Ports.Native
         }
 
         /// <summary>
+        /// Wait for the Operating System to write bytes from the underlying hardware.
+        /// </summary>
+        /// <remarks>
+        /// Flushes the transmit buffer. If flow control is enabled, then this is likely to block.
+        /// </remarks>
+        public void Flush()
+        {
+            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            if (!IsOpen) throw new InvalidOperationException("Port not open");
+            UnsafeNativeMethods.FlushFileBuffers(m_ComPortHandle);
+        }
+
+        /// <summary>
         /// Creates the serial buffer suitable for monitoring.
         /// </summary>
         /// <param name="readBuffer">The read buffer size to allocate.</param>

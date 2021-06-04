@@ -1183,9 +1183,37 @@ namespace RJCP.IO.Ports
         /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
         /// <exception cref="TimeoutException">Flush write time out exceeded.</exception>
         /// <exception cref="InvalidOperationException">Serial Port not opened.</exception>
-        /// <exception cref="IOException">Serial Port was closed during the flush operation;
-        /// or there was a device error.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the flush operation; or there was a device error.
+        /// </exception>
         public override void Flush()
+        {
+            Flush(false);
+        }
+
+        /// <summary>
+        /// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
+        /// </summary>
+        /// <param name="drain">
+        /// When set to <see langword="false"/>, this method has the same behaviour as <see cref="Flush()"/> and it will
+        /// only wait for data to be written to the underlying device. When set to <see langword="true"/> it will
+        /// additionally issue a command to the driver that it should also clear its underlying buffers.
+        /// </param>
+        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush
+        /// operation.</exception>
+        /// <exception cref="TimeoutException">Flush write time out exceeded.</exception>
+        /// <exception cref="InvalidOperationException">Serial Port not opened.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the flush operation; or there was a device error.
+        /// </exception>
+        /// <remarks>
+        /// It may occur that when flushing the underlying hardware device with <paramref name="drain"/> set to
+        /// <see langword="true"/>, that timeouts might be ignored. A timeout can only occur while waiting for the
+        /// buffers in this class to drain, but timeouts do not apply when flushing memory already received by the
+        /// driver This may lead to the method blocking your program. Typical reasons why your program might block is
+        /// due to hardware or software flow control being active.
+        /// </remarks>
+        public void Flush(bool drain)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port not opened");
@@ -1197,6 +1225,8 @@ namespace RJCP.IO.Ports
             if (!flushed) {
                 throw new TimeoutException("Flush write time out exceeded");
             }
+
+            if (drain) m_NativeSerial.Flush();
         }
 
         private bool WriteCheck(byte[] buffer, int offset, int count)
