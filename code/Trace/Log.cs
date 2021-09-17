@@ -6,7 +6,7 @@ namespace RJCP.IO.Ports.Trace
 {
     using System.Diagnostics;
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
     using Microsoft.Extensions.Logging;
 #endif
 
@@ -40,7 +40,7 @@ namespace RJCP.IO.Ports.Trace
             }
         }
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
         public static void Open(ILogger logger)
         {
             lock (m_RefLock) {

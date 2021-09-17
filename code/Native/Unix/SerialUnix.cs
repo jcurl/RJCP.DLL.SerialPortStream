@@ -42,7 +42,7 @@ namespace RJCP.IO.Ports.Native.Unix
         {
             // The portdesc is an array of two string pointers, where the last element is zero
             IntPtr portdesc;
-#if !NETSTANDARD1_5
+#if !NETSTANDARD
             portdesc = UnsafeNativeMethods.serial_getports(handle);
 #else
             try {
@@ -409,7 +409,7 @@ namespace RJCP.IO.Ports.Native.Unix
 
         public SysErrNo netfx_errno(int errno)
         {
-#if !NETSTANDARD1_5
+#if !NETSTANDARD
             return (SysErrNo)SafeNativeMethods.netfx_errno(errno);
 #else
             try {
@@ -425,7 +425,7 @@ namespace RJCP.IO.Ports.Native.Unix
 
         public string netfx_errstring(int errno)
         {
-#if !NETSTANDARD1_5
+#if !NETSTANDARD
             IntPtr strerror = SafeNativeMethods.netfx_errstring(errno);
 #else
             IntPtr strerror;

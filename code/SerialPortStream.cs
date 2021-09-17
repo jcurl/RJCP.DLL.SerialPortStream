@@ -18,14 +18,14 @@ namespace RJCP.IO.Ports
     using Native;
     using Trace;
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
     using System.Runtime.ExceptionServices;
     using Microsoft.Extensions.Logging;
 #else
     using System.Runtime.Remoting.Messaging;
 #endif
 
-#if NETSTANDARD1_5 || NET45
+#if NETSTANDARD || NET45_OR_GREATER
     using System.Threading.Tasks;
 #endif
 
@@ -124,7 +124,7 @@ namespace RJCP.IO.Ports
             m_NativeSerial.StopBits = stopbits;
         }
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
         /// <summary>
         /// Constructor. Create a stream that doesn't connect to any port. Specify the logger.
         /// </summary>
@@ -334,11 +334,7 @@ namespace RJCP.IO.Ports
         /// This method will clean up the object so far as to close the port. Internal buffers remain active that the
         /// stream can continue to read. Writes will throw an exception.
         /// </remarks>
-#if !NETSTANDARD1_5
         public new void Close()
-#else
-        public void Close()
-#endif
         {
             lock (m_CloseLock) {
                 if (IsDisposed) return;
@@ -739,7 +735,7 @@ namespace RJCP.IO.Ports
             return bytes;
         }
 
-#if NETSTANDARD1_5 || NET45
+#if NETSTANDARD || NET45_OR_GREATER
         /// <summary>
         /// Asynchronously reads a sequence of bytes from the current stream and advances the
         /// position within the stream by the number of bytes read.
@@ -772,7 +768,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NET40 || NET45
+#if NETFRAMEWORK
         /// <summary>
         /// Begins an asynchronous read operation.
         /// </summary>
@@ -808,7 +804,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if !NETSTANDARD1_5
+#if !NETSTANDARD
         private delegate int ReadDelegate(byte[] buffer, int offset, int count);
 #endif
 
@@ -829,7 +825,7 @@ namespace RJCP.IO.Ports
             } else {
                 // No data in buffer, so we create a thread in the background
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
                 TaskCompletionSource<int> tcs = new TaskCompletionSource<int>(state);
                 Task<int> task = new Task<int>(() => {
                     int r = InternalBlockingRead(buffer, offset, count);
@@ -867,7 +863,7 @@ namespace RJCP.IO.Ports
                 if (localAsync.Result == 0) ReadCheckDeviceError();
                 return localAsync.Result;
             } else {
-#if NETSTANDARD1_5
+#if NETSTANDARD
                 try {
                     return ((Task<int>)asyncResult).Result;
                 } catch (AggregateException ex) {
@@ -1286,7 +1282,7 @@ namespace RJCP.IO.Ports
             m_Buffer.Stream.Write(buffer, offset, count);
         }
 
-#if NETSTANDARD1_5 || NET45
+#if NETSTANDARD || NET45_OR_GREATER
         /// <summary>
         /// Asynchronously writes a sequence of bytes to the current stream, advances the current position within this
         /// stream by the number of bytes written, and monitors cancellation requests.
@@ -1322,7 +1318,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NET40 || NET45
+#if NETFRAMEWORK
         /// <summary>
         /// Begins an asynchronous write operation.
         /// </summary>
@@ -1363,7 +1359,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if !NETSTANDARD1_5
+#if !NETSTANDARD
         private delegate void WriteDelegate(byte[] buffer, int offset, int count);
 #endif
 
@@ -1379,7 +1375,7 @@ namespace RJCP.IO.Ports
                 if (callback != null) callback(ar);
                 return ar;
             } else {
-#if NETSTANDARD1_5
+#if NETSTANDARD
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>(state);
                 Task task = new Task(() => {
                     InternalBlockingWrite(buffer, offset, count);
@@ -1414,7 +1410,7 @@ namespace RJCP.IO.Ports
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
             } else {
-#if NETSTANDARD1_5
+#if NETSTANDARD
                 try {
                     ((Task)asyncResult).Wait();
                 } catch (AggregateException ex) {

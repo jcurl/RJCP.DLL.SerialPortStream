@@ -1,7 +1,7 @@
 ﻿namespace RJCP.IO.Ports.Native
 {
     using System;
-#if NETSTANDARD1_5
+#if NETSTANDARD
     using System.Runtime.InteropServices;
 #endif
 
@@ -9,7 +9,7 @@
     {
         public static bool IsUnix()
         {
-#if NETSTANDARD1_5
+#if NETSTANDARD
             return
                 RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
                 RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
@@ -21,7 +21,7 @@
 
         public static bool IsWinNT()
         {
-#if NETSTANDARD1_5
+#if NETSTANDARD
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #else
             int p = (int)Environment.OSVersion.Platform;

@@ -1,40 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;net40;netstandard1.5</TargetFrameworks>
-    <EnableNETAnalyzers>false</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TargetFrameworks>net40;net45;netstandard21</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <Configurations>Debug;Release;Signed_Release</Configurations>
+    <NeutralLanguage>en-US</NeutralLanguage>
+
     <AssemblyName>RJCP.SerialPortStream</AssemblyName>
+    <AssemblyTitle>SerialPortStream</AssemblyTitle>
     <Product>RJCP.SerialPortStream</Product>
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
-    <Configurations>Debug;Release;Signed_Release</Configurations>
-  </PropertyGroup>
 
-  <PropertyGroup>
-    <AssemblyTitle>SerialPortStream</AssemblyTitle>
     <Authors>Jason Curl</Authors>
     <Copyright>(C) Jason Curl, 2012-2021</Copyright>
+    <Company></Company>
     <PackageId>SerialPortStream</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/jcurl/serialportstream</PackageProjectUrl>
     <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.</Description>
-    <Version>2.3.2-beta.20210603.1</Version>
+    <Version>3.0.0</Version>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Signed_Release'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Signed_Release'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <AssemblyOriginatorKeyFile>rjcp_serialportstream.snk</AssemblyOriginatorKeyFile>
@@ -42,11 +46,7 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-  </PropertyGroup>
-
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -56,17 +56,17 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="System.Threading.Overlapped" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
-    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'">
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0"/>
+    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0"/>
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0"/>
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0"/>
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0"/>
+    <PackageReference Include="System.Threading.Overlapped" Version="4.3.0"/>
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0"/>
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="Datastructures\CircularBuffer.cs" />
     <Compile Include="Datastructures\ReusableList.cs" />
@@ -119,8 +119,7 @@
     <Compile Include="Trace\LogSource.cs" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <Compile Include="System\EntryPointNotFoundException.cs" />
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'">
     <Compile Include="System\IO\Ports\SerialPort.cs" />
     <Compile Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\LoggerTraceListener.cs" />

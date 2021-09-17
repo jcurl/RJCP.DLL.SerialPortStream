@@ -9,9 +9,7 @@ namespace RJCP.IO.Ports.Native.Windows
     using System.Security;
     using Microsoft.Win32.SafeHandles;
 
-#if !NETSTANDARD1_5
     [SuppressUnmanagedCodeSecurity]
-#endif
     internal static class UnsafeNativeMethods
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]

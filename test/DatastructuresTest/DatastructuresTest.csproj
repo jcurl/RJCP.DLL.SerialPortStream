@@ -1,20 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;net40;netcoreapp3.1</TargetFrameworks>
-    <AssemblyName>RJCP.DatastructuresTest</AssemblyName>
-    <Product>RJCP.SerialPortStream</Product>
-    <RootNamespace>RJCP.Datastructures.DatastructuresTest</RootNamespace>
+    <TargetFrameworks>net40;net45;netcoreapp3.1</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <IsPackable>false</IsPackable>
     <Configurations>Debug;Release</Configurations>
-  </PropertyGroup>
 
-  <PropertyGroup>
+    <AssemblyName>RJCP.DatastructuresTest</AssemblyName>
+    <AssemblyTitle>RJCP.DatastructuresTest</AssemblyTitle>
+    <Product>RJCP.SerialPortStream</Product>
+    <RootNamespace>RJCP.Datastructures</RootNamespace>
+
     <Authors>Jason Curl</Authors>
     <Copyright>(C) Jason Curl, 2012-2021</Copyright>
-  </PropertyGroup>
+    <Company></Company>
+    <Description>Test Harness for Datastructures Tests</Description>
+    <Version>1.0.0</Version>
 
-  <PropertyGroup>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>Default</AnalysisMode>
+    <AnalysisLevel>latest</AnalysisLevel>
+
+    <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
@@ -28,14 +36,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
-    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.1.0" />
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
     <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>

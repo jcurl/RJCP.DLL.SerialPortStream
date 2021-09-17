@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports
     using System;
     using System.IO;
     using System.Text;
-#if NETSTANDARD1_5 || NET45
+#if NETSTANDARD || NET45_OR_GREATER
     using System.Threading;
     using System.Threading.Tasks;
 #endif
@@ -804,7 +804,7 @@ namespace RJCP.IO.Ports
         /// </param>
         void CopyTo(Stream destination, int bufferSize);
 
-#if NETSTANDARD1_5 || NET45
+#if NETSTANDARD || NET45_OR_GREATER
         /// <summary>
         /// Asynchronously reads the bytes from the current stream and writes them to another stream.
         /// </summary>

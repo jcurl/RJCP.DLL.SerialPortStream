@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports.Trace
     using System;
     using System.Diagnostics;
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
     using Microsoft.Extensions.Logging;
 #endif
 
@@ -54,7 +54,7 @@ namespace RJCP.IO.Ports.Trace
 #endif
         }
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
         /// <summary>
         /// Initialize the internal <see cref="TraceSource"/> object.
         /// </summary>
