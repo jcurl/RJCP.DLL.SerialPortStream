@@ -7,3 +7,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+[assembly: SuppressMessage("Design", "CA1069:Enums values should not be duplicated", Justification = "Native Methods", Scope = "namespaceanddescendants", Target = "~N:RJCP.IO.Ports.Native.Win32")]

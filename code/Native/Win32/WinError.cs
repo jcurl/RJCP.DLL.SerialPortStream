@@ -2,7 +2,7 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.Native.Windows
+namespace RJCP.IO.Ports.Native.Win32
 {
     internal static class WinError
     {

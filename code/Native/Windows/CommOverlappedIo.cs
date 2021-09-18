@@ -13,6 +13,7 @@ namespace RJCP.IO.Ports.Native.Windows
     using System.Threading;
     using Datastructures;
     using Microsoft.Win32.SafeHandles;
+    using Native.Win32;
     using Trace;
 
     internal class CommOverlappedIo : IDisposable
@@ -143,8 +144,8 @@ namespace RJCP.IO.Ports.Native.Windows
             bytesInRecvQueue = 0;
             eofReceived = false;
             lock (m_Buffer.ReadLock) {
-                NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out NativeMethods.ComStatErrors cErr, ref comStat);
+                Kernel32.COMSTAT comStat = new Kernel32.COMSTAT();
+                bool result = Kernel32.ClearCommError(m_ComPortHandle, out Kernel32.ComStatErrors cErr, ref comStat);
                 if (!result) {
                     int w32err = Marshal.GetLastWin32Error();
                     int hr = Marshal.GetHRForLastWin32Error();
@@ -156,7 +157,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 }
                 if (cErr != 0) OnCommErrorEvent(new CommErrorEventArgs(cErr));
                 bytesInRecvQueue = comStat.cbInQue;
-                eofReceived = ((comStat.Flags & NativeMethods.ComStatFlags.Eof) == NativeMethods.ComStatFlags.Eof);
+                eofReceived = ((comStat.Flags & Kernel32.ComStatFlags.Eof) == Kernel32.ComStatFlags.Eof);
                 return true;
             }
         }
@@ -171,8 +172,8 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             get
             {
-                NativeMethods.COMSTAT comStat = new NativeMethods.COMSTAT();
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out _, ref comStat);
+                Kernel32.COMSTAT comStat = new Kernel32.COMSTAT();
+                bool result = Kernel32.ClearCommError(m_ComPortHandle, out _, ref comStat);
                 if (result) return (int)comStat.cbOutQue;
                 return 0;
             }
@@ -208,7 +209,7 @@ namespace RJCP.IO.Ports.Native.Windows
             m_IsRunning = true;
             try {
                 // Set the time outs
-                NativeMethods.COMMTIMEOUTS timeouts = new NativeMethods.COMMTIMEOUTS() {
+                Kernel32.COMMTIMEOUTS timeouts = new Kernel32.COMMTIMEOUTS() {
                     // We read only the data that is buffered
 #if PL2303_WORKAROUNDS
                     // Time out if data hasn't arrived in 10ms, or if the read takes longer than 100ms in total
@@ -226,7 +227,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     WriteTotalTimeoutConstant = 500
                 };
 
-                bool result = UnsafeNativeMethods.SetCommTimeouts(m_ComPortHandle, ref timeouts);
+                bool result = Kernel32.SetCommTimeouts(m_ComPortHandle, ref timeouts);
                 if (!result) throw new IOException("Couldn't set CommTimeouts", Marshal.GetLastWin32Error());
 
                 m_Thread = new Thread(new ThreadStart(OverlappedIoThread)) {
@@ -264,32 +265,32 @@ namespace RJCP.IO.Ports.Native.Windows
         public bool IsRunning { get { return m_IsRunning; } }
         #endregion
 
-        private const NativeMethods.SerialEventMask maskRead =
-            NativeMethods.SerialEventMask.EV_BREAK |
-            NativeMethods.SerialEventMask.EV_CTS |
-            NativeMethods.SerialEventMask.EV_DSR |
-            NativeMethods.SerialEventMask.EV_ERR |
-            NativeMethods.SerialEventMask.EV_RING |
-            NativeMethods.SerialEventMask.EV_RLSD |
-            NativeMethods.SerialEventMask.EV_RXCHAR |
-            NativeMethods.SerialEventMask.EV_TXEMPTY |
-            NativeMethods.SerialEventMask.EV_EVENT1 |
-            NativeMethods.SerialEventMask.EV_EVENT2 |
-            NativeMethods.SerialEventMask.EV_PERR |
-            NativeMethods.SerialEventMask.EV_RX80FULL |
-            NativeMethods.SerialEventMask.EV_RXFLAG;
+        private const Kernel32.SerialEventMask maskRead =
+            Kernel32.SerialEventMask.EV_BREAK |
+            Kernel32.SerialEventMask.EV_CTS |
+            Kernel32.SerialEventMask.EV_DSR |
+            Kernel32.SerialEventMask.EV_ERR |
+            Kernel32.SerialEventMask.EV_RING |
+            Kernel32.SerialEventMask.EV_RLSD |
+            Kernel32.SerialEventMask.EV_RXCHAR |
+            Kernel32.SerialEventMask.EV_TXEMPTY |
+            Kernel32.SerialEventMask.EV_EVENT1 |
+            Kernel32.SerialEventMask.EV_EVENT2 |
+            Kernel32.SerialEventMask.EV_PERR |
+            Kernel32.SerialEventMask.EV_RX80FULL |
+            Kernel32.SerialEventMask.EV_RXFLAG;
 
-        private const NativeMethods.SerialEventMask maskReadPending =
-            NativeMethods.SerialEventMask.EV_BREAK |
-            NativeMethods.SerialEventMask.EV_CTS |
-            NativeMethods.SerialEventMask.EV_DSR |
-            NativeMethods.SerialEventMask.EV_ERR |
-            NativeMethods.SerialEventMask.EV_RING |
-            NativeMethods.SerialEventMask.EV_RLSD |
-            NativeMethods.SerialEventMask.EV_TXEMPTY |
-            NativeMethods.SerialEventMask.EV_EVENT1 |
-            NativeMethods.SerialEventMask.EV_EVENT2 |
-            NativeMethods.SerialEventMask.EV_PERR;
+        private const Kernel32.SerialEventMask maskReadPending =
+            Kernel32.SerialEventMask.EV_BREAK |
+            Kernel32.SerialEventMask.EV_CTS |
+            Kernel32.SerialEventMask.EV_DSR |
+            Kernel32.SerialEventMask.EV_ERR |
+            Kernel32.SerialEventMask.EV_RING |
+            Kernel32.SerialEventMask.EV_RLSD |
+            Kernel32.SerialEventMask.EV_TXEMPTY |
+            Kernel32.SerialEventMask.EV_EVENT1 |
+            Kernel32.SerialEventMask.EV_EVENT2 |
+            Kernel32.SerialEventMask.EV_PERR;
 
         private void OverlappedIoThread()
         {
@@ -343,10 +344,10 @@ namespace RJCP.IO.Ports.Native.Windows
             writeOverlapped.EventHandle = m_WriteEvent.SafeWaitHandle.DangerousGetHandle();
 #endif
             // SEt up the types of serial events we want to see.
-            UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
+            Kernel32.SetCommMask(m_ComPortHandle, maskRead);
 
             bool result;
-            NativeMethods.SerialEventMask commEventMask = 0;
+            Kernel32.SerialEventMask commEventMask = 0;
 
             bool running = true;
             uint bytes;
@@ -365,9 +366,9 @@ namespace RJCP.IO.Ports.Native.Windows
                 // for reading data. To do so will result in errors.
                 // Have no idea why.
                 if (readPending) {
-                    UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskReadPending);
+                    Kernel32.SetCommMask(m_ComPortHandle, maskReadPending);
                 } else {
-                    UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
+                    Kernel32.SetCommMask(m_ComPortHandle, maskRead);
 
                     // While the comm event mask was set to ignore read events, data could have been written
                     // to the input queue. Check for that and if there are bytes waiting or EOF was received,
@@ -379,7 +380,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     }
                 }
 #else
-                UnsafeNativeMethods.SetCommMask(m_ComPortHandle, maskRead);
+                Kernel32.SetCommMask(m_ComPortHandle, maskRead);
 #endif
 
                 // commEventMask is on the stack, and is therefore fixed
@@ -433,7 +434,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     if (whandles[ev] == m_StopRunning) {
                         if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
                             Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Thread closing", m_Name);
-                        result = UnsafeNativeMethods.CancelIo(m_ComPortHandle);
+                        result = Kernel32.CancelIo(m_ComPortHandle);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
@@ -444,7 +445,7 @@ namespace RJCP.IO.Ports.Native.Windows
                         }
                         running = false;
                     } else if (whandles[ev] == m_SerialCommEvent) {
-                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref serialCommOverlapped, out bytes, true);
+                        result = Kernel32.GetOverlappedResult(m_ComPortHandle, ref serialCommOverlapped, out bytes, true);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
@@ -456,7 +457,7 @@ namespace RJCP.IO.Ports.Native.Windows
                         ProcessWaitCommEvent(commEventMask);
                         serialCommPending = false;
                     } else if (whandles[ev] == m_ReadEvent) {
-                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref readOverlapped, out bytes, true);
+                        result = Kernel32.GetOverlappedResult(m_ComPortHandle, ref readOverlapped, out bytes, true);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
@@ -480,7 +481,7 @@ namespace RJCP.IO.Ports.Native.Windows
                         // The read buffer is no longer full. We just loop back to the beginning to test if we
                         // should read or not.
                     } else if (whandles[ev] == m_WriteEvent) {
-                        result = UnsafeNativeMethods.GetOverlappedResult(m_ComPortHandle, ref writeOverlapped, out bytes, true);
+                        result = Kernel32.GetOverlappedResult(m_ComPortHandle, ref writeOverlapped, out bytes, true);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
@@ -508,8 +509,8 @@ namespace RJCP.IO.Ports.Native.Windows
                             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
                                 Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: PurgeComm() write pending", m_Name);
                             m_PurgePending = true;
-                            result = UnsafeNativeMethods.PurgeComm(m_ComPortHandle,
-                                NativeMethods.PurgeFlags.PURGE_TXABORT | NativeMethods.PurgeFlags.PURGE_TXCLEAR);
+                            result = Kernel32.PurgeComm(m_ComPortHandle,
+                                Kernel32.PurgeFlags.PURGE_TXABORT | Kernel32.PurgeFlags.PURGE_TXCLEAR);
                             if (!result) {
                                 int win32Error = Marshal.GetLastWin32Error();
                                 int hr = Marshal.GetHRForLastWin32Error();
@@ -569,9 +570,9 @@ namespace RJCP.IO.Ports.Native.Windows
         /// <param name="mask">The mask value if information is available immediately.</param>
         /// <param name="overlap">The overlap structure to use.</param>
         /// <returns>If the operation is pending or not.</returns>
-        private bool DoWaitCommEvent(out NativeMethods.SerialEventMask mask, ref NativeOverlapped overlap)
+        private bool DoWaitCommEvent(out Kernel32.SerialEventMask mask, ref NativeOverlapped overlap)
         {
-            bool result = UnsafeNativeMethods.WaitCommEvent(m_ComPortHandle, out mask, ref overlap);
+            bool result = Kernel32.WaitCommEvent(m_ComPortHandle, out mask, ref overlap);
             if (!result) {
                 int w32err = Marshal.GetLastWin32Error();
                 int hr = Marshal.GetHRForLastWin32Error();
@@ -591,7 +592,7 @@ namespace RJCP.IO.Ports.Native.Windows
         /// Do work based on the mask event that has occurred.
         /// </summary>
         /// <param name="mask">The mask that was provided.</param>
-        private void ProcessWaitCommEvent(NativeMethods.SerialEventMask mask)
+        private void ProcessWaitCommEvent(Kernel32.SerialEventMask mask)
         {
             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose)) {
                 if (mask != 0) {
@@ -601,19 +602,19 @@ namespace RJCP.IO.Ports.Native.Windows
             }
 
             // Reading a character
-            if ((mask & NativeMethods.SerialEventMask.EV_RXCHAR) != 0) {
+            if ((mask & Kernel32.SerialEventMask.EV_RXCHAR) != 0) {
                 m_ReadByteAvailable = true;
             }
-            if ((mask & NativeMethods.SerialEventMask.EV_RXFLAG) != 0) {
+            if ((mask & Kernel32.SerialEventMask.EV_RXFLAG) != 0) {
                 m_ReadByteAvailable = true;
                 m_ReadByteEof = true;
             }
 
             // We don't raise an event for characters immediately, but only after the read operation
             // is complete.
-            OnCommEvent(new CommEventArgs(mask & ~(NativeMethods.SerialEventMask.EV_RXCHAR | NativeMethods.SerialEventMask.EV_RXFLAG)));
+            OnCommEvent(new CommEventArgs(mask & ~(Kernel32.SerialEventMask.EV_RXCHAR | Kernel32.SerialEventMask.EV_RXFLAG)));
 
-            if ((mask & NativeMethods.SerialEventMask.EV_TXEMPTY) != 0) {
+            if ((mask & Kernel32.SerialEventMask.EV_TXEMPTY) != 0) {
                 lock (m_Buffer.WriteLock) {
                     if (m_Buffer.Serial.TxEmptyEvent()) {
                         if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
@@ -623,8 +624,8 @@ namespace RJCP.IO.Ports.Native.Windows
                 }
             }
 
-            if ((mask & (NativeMethods.SerialEventMask.EV_RXCHAR | NativeMethods.SerialEventMask.EV_ERR)) != 0) {
-                bool result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out NativeMethods.ComStatErrors comErr, IntPtr.Zero);
+            if ((mask & (Kernel32.SerialEventMask.EV_RXCHAR | Kernel32.SerialEventMask.EV_ERR)) != 0) {
+                bool result = Kernel32.ClearCommError(m_ComPortHandle, out Kernel32.ComStatErrors comErr, IntPtr.Zero);
                 if (!result) {
                     int w32err = Marshal.GetLastWin32Error();
                     int hr = Marshal.GetHRForLastWin32Error();
@@ -633,7 +634,7 @@ namespace RJCP.IO.Ports.Native.Windows
                             "{0}: SerialThread: ClearCommError: WINERROR {1}", m_Name, w32err);
                     Marshal.ThrowExceptionForHR(hr);
                 } else {
-                    comErr = (NativeMethods.ComStatErrors)((int)comErr & 0x10F);
+                    comErr = (Kernel32.ComStatErrors)((int)comErr & 0x10F);
                     if (comErr != 0) {
                         OnCommErrorEvent(new CommErrorEventArgs(comErr));
                     }
@@ -675,7 +676,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 bufLen = (uint)m_Buffer.Serial.ReadBuffer.WriteLength;
             }
 
-            bool result = UnsafeNativeMethods.ReadFile(m_ComPortHandle, bufPtr, bufLen, out uint bufRead, ref overlap);
+            bool result = Kernel32.ReadFile(m_ComPortHandle, bufPtr, bufLen, out uint bufRead, ref overlap);
             int w32err = Marshal.GetLastWin32Error();
             int hr = Marshal.GetHRForLastWin32Error();
             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
@@ -734,7 +735,7 @@ namespace RJCP.IO.Ports.Native.Windows
                     m_Buffer.Serial.ReadBufferProduce((int)bytes);
                 }
 
-                OnCommEvent(new CommEventArgs((m_ReadByteEof ? NativeMethods.SerialEventMask.EV_RXFLAG : 0) | NativeMethods.SerialEventMask.EV_RXCHAR));
+                OnCommEvent(new CommEventArgs((m_ReadByteEof ? Kernel32.SerialEventMask.EV_RXFLAG : 0) | Kernel32.SerialEventMask.EV_RXCHAR));
                 m_ReadByteEof = false;
             }
         }
@@ -761,7 +762,7 @@ namespace RJCP.IO.Ports.Native.Windows
                 bufLen = (uint)m_Buffer.Serial.WriteBuffer.ReadLength;
             }
 
-            bool result = UnsafeNativeMethods.WriteFile(m_ComPortHandle, bufPtr, bufLen, out uint bufWrite, ref overlap);
+            bool result = Kernel32.WriteFile(m_ComPortHandle, bufPtr, bufLen, out uint bufWrite, ref overlap);
             int win32err = Marshal.GetLastWin32Error();
             int hr = Marshal.GetHRForLastWin32Error();
             if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))

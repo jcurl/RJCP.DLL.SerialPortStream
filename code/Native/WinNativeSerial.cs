@@ -12,6 +12,7 @@ namespace RJCP.IO.Ports.Native
     using Microsoft.Win32;
     using Microsoft.Win32.SafeHandles;
     using Windows;
+    using Native.Win32;
 
 #if !NETSTANDARD
     using System.Management;
@@ -417,7 +418,7 @@ namespace RJCP.IO.Ports.Native
                 m_DriverInQueue = value;
 
                 if (IsOpen) {
-                    UnsafeNativeMethods.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
+                    Kernel32.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
                 }
             }
         }
@@ -445,7 +446,7 @@ namespace RJCP.IO.Ports.Native
                 m_DriverOutQueue = value;
 
                 if (IsOpen) {
-                    UnsafeNativeMethods.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
+                    Kernel32.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
                 }
             }
         }
@@ -654,8 +655,9 @@ namespace RJCP.IO.Ports.Native
             if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
-            UnsafeNativeMethods.PurgeComm(m_ComPortHandle, NativeMethods.PurgeFlags.PURGE_RXABORT |
-                NativeMethods.PurgeFlags.PURGE_RXCLEAR);
+            Kernel32.PurgeComm(m_ComPortHandle,
+                Kernel32.PurgeFlags.PURGE_RXABORT |
+                Kernel32.PurgeFlags.PURGE_RXCLEAR);
         }
 
         public void DiscardOutBuffer()
@@ -832,18 +834,18 @@ namespace RJCP.IO.Ports.Native
             if (string.IsNullOrWhiteSpace(PortName)) throw new InvalidOperationException("Port must first be set");
             if (IsOpen) throw new InvalidOperationException("Serial Port currently open");
 
-            m_ComPortHandle = UnsafeNativeMethods.CreateFile(@"\\.\" + PortName,
-                NativeMethods.FileAccess.GENERIC_READ | NativeMethods.FileAccess.GENERIC_WRITE,
-                NativeMethods.FileShare.FILE_SHARE_NONE,
+            m_ComPortHandle = Kernel32.CreateFile(@"\\.\" + PortName,
+                Kernel32.FileAccess.GENERIC_READ | Kernel32.FileAccess.GENERIC_WRITE,
+                Kernel32.FileShare.FILE_SHARE_NONE,
                 IntPtr.Zero,
-                NativeMethods.CreationDisposition.OPEN_EXISTING,
-                NativeMethods.FileAttributes.FILE_FLAG_OVERLAPPED,
+                Kernel32.CreationDisposition.OPEN_EXISTING,
+                Kernel32.FileAttributes.FILE_FLAG_OVERLAPPED,
                 IntPtr.Zero);
             if (m_ComPortHandle.IsInvalid) WinIOError();
 
-            NativeMethods.FileType t = UnsafeNativeMethods.GetFileType(m_ComPortHandle);
+            Kernel32.FileType t = Kernel32.GetFileType(m_ComPortHandle);
             bool validOverride = false;
-            if (t != NativeMethods.FileType.FILE_TYPE_CHAR && t != NativeMethods.FileType.FILE_TYPE_UNKNOWN) {
+            if (t != Kernel32.FileType.FILE_TYPE_CHAR && t != Kernel32.FileType.FILE_TYPE_UNKNOWN) {
                 foreach (string port in GetPortNames()) {
 #if NETSTANDARD
                     if (port.Equals(PortName, StringComparison.OrdinalIgnoreCase)) {
@@ -866,7 +868,7 @@ namespace RJCP.IO.Ports.Native
             }
 
             // Set the default parameters
-            UnsafeNativeMethods.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
+            Kernel32.SetupComm(m_ComPortHandle, m_DriverInQueue, m_DriverOutQueue);
 
             m_CommState = new CommState(m_ComPortHandle);
             m_CommProperties = new CommProperties(m_ComPortHandle);
@@ -967,23 +969,23 @@ namespace RJCP.IO.Ports.Native
             m_CommOverlappedIo.CommErrorEvent += CommOverlappedIo_CommErrorEvent;
         }
 
-        private const NativeMethods.SerialEventMask c_DataFlags =
-            NativeMethods.SerialEventMask.EV_RXFLAG |
-            NativeMethods.SerialEventMask.EV_RXCHAR;
+        private const Kernel32.SerialEventMask c_DataFlags =
+            Kernel32.SerialEventMask.EV_RXFLAG |
+            Kernel32.SerialEventMask.EV_RXCHAR;
 
-        private const NativeMethods.SerialEventMask c_PinFlags =
-            NativeMethods.SerialEventMask.EV_CTS |
-            NativeMethods.SerialEventMask.EV_RING |
-            NativeMethods.SerialEventMask.EV_RLSD |
-            NativeMethods.SerialEventMask.EV_DSR |
-            NativeMethods.SerialEventMask.EV_BREAK;
+        private const Kernel32.SerialEventMask c_PinFlags =
+            Kernel32.SerialEventMask.EV_CTS |
+            Kernel32.SerialEventMask.EV_RING |
+            Kernel32.SerialEventMask.EV_RLSD |
+            Kernel32.SerialEventMask.EV_DSR |
+            Kernel32.SerialEventMask.EV_BREAK;
 
-        private const NativeMethods.ComStatErrors c_ErrorFlags =
-            NativeMethods.ComStatErrors.CE_TXFULL |
-            NativeMethods.ComStatErrors.CE_FRAME |
-            NativeMethods.ComStatErrors.CE_RXPARITY |
-            NativeMethods.ComStatErrors.CE_OVERRUN |
-            NativeMethods.ComStatErrors.CE_RXOVER;
+        private const Kernel32.ComStatErrors c_ErrorFlags =
+            Kernel32.ComStatErrors.CE_TXFULL |
+            Kernel32.ComStatErrors.CE_FRAME |
+            Kernel32.ComStatErrors.CE_RXPARITY |
+            Kernel32.ComStatErrors.CE_OVERRUN |
+            Kernel32.ComStatErrors.CE_RXOVER;
 
         private void CommOverlappedIo_CommEvent(object sender, CommEventArgs e)
         {

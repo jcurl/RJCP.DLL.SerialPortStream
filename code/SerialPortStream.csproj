@@ -51,20 +51,20 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Mono.Posix" Version="4.0.0.0" >
+    <PackageReference Include="Mono.Posix" Version="4.0.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'">
-    <PackageReference Include="System.Collections.Specialized" Version="4.3.0"/>
-    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0"/>
-    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0"/>
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0"/>
-    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0"/>
-    <PackageReference Include="System.Threading.Overlapped" Version="4.3.0"/>
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0"/>
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Overlapped" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,6 +91,29 @@
     <Compile Include="Native\Unix\WaitForModemEvent.cs" />
     <Compile Include="Native\Unix\UnsafeNativeMethods.cs" />
     <Compile Include="Native\UnixNativeSerial.cs" />
+    <Compile Include="Native\Win32\Kernel32+CommProp.cs" />
+    <Compile Include="Native\Win32\Kernel32+COMMTIMEOUTS.cs" />
+    <Compile Include="Native\Win32\Kernel32+COMSTAT.cs" />
+    <Compile Include="Native\Win32\Kernel32+ComStatErrors.cs" />
+    <Compile Include="Native\Win32\Kernel32+ComStatFlags.cs" />
+    <Compile Include="Native\Win32\Kernel32+CreationDisposition.cs" />
+    <Compile Include="Native\Win32\Kernel32+DCB.cs" />
+    <Compile Include="Native\Win32\Kernel32+ExtendedFunctions.cs" />
+    <Compile Include="Native\Win32\Kernel32+FileAccess.cs" />
+    <Compile Include="Native\Win32\Kernel32+FileAttributes.cs" />
+    <Compile Include="Native\Win32\Kernel32+FileShare.cs" />
+    <Compile Include="Native\Win32\Kernel32+FileType.cs" />
+    <Compile Include="Native\Win32\Kernel32+MaxBaud.cs" />
+    <Compile Include="Native\Win32\Kernel32+ModemStat.cs" />
+    <Compile Include="Native\Win32\Kernel32+ProvCapabilities.cs" />
+    <Compile Include="Native\Win32\Kernel32+ProvSubType.cs" />
+    <Compile Include="Native\Win32\Kernel32+PurgeFlags.cs" />
+    <Compile Include="Native\Win32\Kernel32+SerialEventMask.cs" />
+    <Compile Include="Native\Win32\Kernel32+SettableData.cs" />
+    <Compile Include="Native\Win32\Kernel32+SettableParams.cs" />
+    <Compile Include="Native\Win32\Kernel32+SettableStopParity.cs" />
+    <Compile Include="Native\Win32\Kernel32.cs" />
+    <Compile Include="Native\Win32\Kernel32_DcbFlags.cs" />
     <Compile Include="Native\Windows\CommErrorEventArgs.cs" />
     <Compile Include="Native\Windows\CommEventArgs.cs" />
     <Compile Include="Native\Windows\CommOverlappedIo.cs" />
@@ -98,11 +121,8 @@
     <Compile Include="Native\Windows\CommProperties.cs" />
     <Compile Include="Native\Windows\CommModemStatus.cs" />
     <Compile Include="Native\Windows\DtrControl.cs" />
-    <Compile Include="Native\Windows\NativeMethods.cs" />
     <Compile Include="Native\Windows\RtsControl.cs" />
-    <Compile Include="Native\Windows\SafeNativeMethods.cs" />
-    <Compile Include="Native\Windows\UnsafeNativeMethods.cs" />
-    <Compile Include="Native\Windows\WinError.cs" />
+    <Compile Include="Native\Win32\WinError.cs" />
     <Compile Include="Native\WinNativeSerial.cs" />
     <Compile Include="Parity.cs" />
     <Compile Include="PortDescription.cs" />
