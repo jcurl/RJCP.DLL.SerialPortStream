@@ -12,8 +12,6 @@ namespace RJCP.IO.Ports.Native.Unix
         [ThreadStatic]
         private static int m_ErrNo;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2696:Instance members should not write to \"static\" fields",
-            Justification = "P/Invoke and this is ThreadStatic. Same behaviour as libc")]
         public int errno
         {
             get { return m_ErrNo; }

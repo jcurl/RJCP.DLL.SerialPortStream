@@ -10,8 +10,6 @@ namespace RJCP.IO.Ports
     /// Event related information on ErrorReceived.
     /// </summary>
     // Values are obtained from ClearCommErrors() Win32API.
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2346:Flags enumerations zero-value members should be named \"None\"",
-        Justification = "P/Invoke")]
     [Flags]
     public enum SerialError
     {

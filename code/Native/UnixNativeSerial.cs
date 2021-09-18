@@ -40,8 +40,6 @@ namespace RJCP.IO.Ports.Native
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown",
-            Justification = "P/Invoke")]
         private void ThrowException()
         {
             if (m_Dll == null)
@@ -111,8 +109,6 @@ namespace RJCP.IO.Ports.Native
 
 #if NETSTANDARD
         // For compatibility with libnserial 1.0 only.
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown",
-            Justification = "Compatibility")]
         private void ThrowExceptionNetStandard()
         {
             string description = m_Dll.serial_error(m_Handle);

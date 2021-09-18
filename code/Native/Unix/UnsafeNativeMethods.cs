@@ -5,7 +5,6 @@
     using System.Security;
 
     [SuppressUnmanagedCodeSecurity]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "P/Invoke")]
     internal static class UnsafeNativeMethods
     {
         [DllImport("libnserial.so.1", SetLastError = true)]

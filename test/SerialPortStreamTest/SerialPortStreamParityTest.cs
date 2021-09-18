@@ -122,8 +122,6 @@ namespace RJCP.IO.Ports
         }
 
         [Test]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2234:Parameters should be passed in the correct order",
-            Justification = "False Positive. TestOddParity intentially swapped in tests")]
         public void ParityChangeLoopback()
         {
             using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 7, Parity.Even, StopBits.One))

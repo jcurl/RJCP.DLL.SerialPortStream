@@ -9,8 +9,6 @@
     /// The InternalApplicationError indicates a programming error in the application. Such an
     /// error should never occur and always indicates a bug in the application itself.
     /// </remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S3871:Exception types should be \"public\"",
-        Justification = "Exception should never occur, so should be internal")]
     internal class InternalApplicationException : Exception
     {
         /// <summary>

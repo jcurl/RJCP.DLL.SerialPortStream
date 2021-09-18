@@ -11,10 +11,6 @@ namespace RJCP.IO.Ports.Native.Windows
     internal static class NativeMethods
     {
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2344:Enumeration type names should not have \"Flags\" or \"Enum\" suffixes",
-            Justification = "P/Invoke")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2346:Flags enumerations zero-value members should be named \"None\"",
-            Justification = "P/Invoke")]
         public enum DcbFlags
         {
             Binary = 0x0001,
@@ -43,10 +39,6 @@ namespace RJCP.IO.Ports.Native.Windows
         /// Defines the control setting for a serial communications device
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed",
-            Justification = "P/Invoke")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S101:Types should be named in PascalCase",
-            Justification = "P/Invoke")]
         public struct DCB
         {
             /// <summary>
@@ -64,7 +56,6 @@ namespace RJCP.IO.Ports.Native.Windows
             /// </summary>
             [MarshalAs(UnmanagedType.U4)]
             public DcbFlags Flags;
-
 
             /// <summary>
             /// Not currently used
@@ -128,8 +119,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4070:Non-flags enums should not be marked with \"FlagsAttribute\"",
-            Justification = "P/Invoke")]
         public enum FileAccess
         {
             #region Standard Access Rights
@@ -356,8 +345,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2346:Flags enumerations zero-value members should be named \"None\"",
-            Justification = "P/Invoke")]
         public enum FileShare
         {
             /// <summary>
@@ -436,8 +423,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4070:Non-flags enums should not be marked with \"FlagsAttribute\"",
-            Justification = "P/Invoke")]
         public enum FileAttributes
         {
             /// <summary>
@@ -1073,8 +1058,6 @@ namespace RJCP.IO.Ports.Native.Windows
         /// Contains information about a communications driver
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed",
-            Justification = "P/Invoke")]
         public struct CommProp
         {
             /// <summary>
@@ -1336,8 +1319,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S101:Types should be named in PascalCase",
-            Justification = "P/Invoke")]
         public struct COMMTIMEOUTS
         {
             public int ReadIntervalTimeout;
@@ -1364,8 +1345,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2344:Enumeration type names should not have \"Flags\" or \"Enum\" suffixes",
-            Justification = "P/Invoke")]
         public enum ComStatFlags
         {
             CtsHold = 0x01,
@@ -1378,8 +1357,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S101:Types should be named in PascalCase",
-            Justification = "P/Invoke")]
         public struct COMSTAT
         {
             [MarshalAs(UnmanagedType.U4)]
@@ -1389,8 +1366,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2344:Enumeration type names should not have \"Flags\" or \"Enum\" suffixes",
-            Justification = "P/Invoke")]
         public enum PurgeFlags
         {
             PURGE_TXABORT = 0x0001,

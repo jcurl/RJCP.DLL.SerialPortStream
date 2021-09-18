@@ -7,7 +7,3 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "<Pending>")]
-[assembly: SuppressMessage("Major Code Smell", "S1066:Collapsible \"if\" statements should be merged", Justification = "No benefit")]
-[assembly: SuppressMessage("Major Code Smell", "S2933:Fields that are only assigned in the constructor should be \"readonly\"", Justification = "<Pending>")]
-[assembly: SuppressMessage("Minor Code Smell", "S4136:Method overloads should be grouped together", Justification = "No benefit")]

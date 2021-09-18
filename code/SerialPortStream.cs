@@ -2201,8 +2201,6 @@ namespace RJCP.IO.Ports
         /// <returns>
         /// A <see cref="string" /> that represents this instance.
         /// </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested",
-            Justification = "Code is still readable")]
         public override string ToString()
         {
             if (IsDisposed) return "SerialPortStream: Disposed";

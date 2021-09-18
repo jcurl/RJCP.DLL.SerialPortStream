@@ -472,7 +472,6 @@ namespace RJCP.IO.Ports.Native
             };
         }
 
-
         /// <summary>
         /// Object to use for locking access to the byte read buffer.
         /// </summary>
