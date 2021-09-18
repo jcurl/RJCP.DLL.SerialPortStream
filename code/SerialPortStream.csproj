@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net40;net45;netstandard21</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <Configurations>Debug;Release;Signed_Release</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <NeutralLanguage>en-US</NeutralLanguage>
 
     <AssemblyName>RJCP.SerialPortStream</AssemblyName>
@@ -36,14 +36,6 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Signed_Release'">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <AssemblyOriginatorKeyFile>rjcp_serialportstream.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
@@ -144,10 +136,6 @@
     <Compile Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\LoggerTraceListener.cs" />
     <Compile Include="Trace\LogSourceFactory.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="rjcp_serialportstream.snk" />
   </ItemGroup>
 
 </Project>

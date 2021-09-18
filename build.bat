@@ -26,9 +26,8 @@ dotnet test -c Release -f netcoreapp3.1 --logger "trx"
 
 echo.
 echo ======================================================================
-echo == Generating Signed SerialPortStream NuGet Package
+echo == Generating SerialPortStream NuGet Package
 echo ======================================================================
-dotnet build -c Signed_Release .\code\SerialPortStream.csproj
-dotnet pack -c Signed_Release .\code\SerialPortStream.csproj
+dotnet pack -c Release .\code\SerialPortStream.csproj
 
 pause

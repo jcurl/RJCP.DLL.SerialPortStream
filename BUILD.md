@@ -44,24 +44,13 @@ To build the software, ensure to be in the working directory where the
   PS1> dotnet build -c Release
   ```
 
-* To build SIGNED_RELEASE mode. The `rjcp_serialportstream.snk` file must be in
-  the `code` directory used for the signing.
-
-  ```cmd
-  PS1> dotnet build -c Signed_Release code\SerialPortStream.csproj
-  ```
-
-  It is important to only build the project file, so that test cases are not
-  built (which will result in a build failure, as the unit test cases don't have
-  access to the internals of the project to test in this mode).
-
 ### 1.2 Packaging
 
 To build the package for upload (see building for the sign key) to NuGet:
 
 ```cmd
-PS1> dotnet build -c signed_release .\code\SerialPortStream.csproj
-PS1> dotnet pack -c signed_release --include-source .\code\SerialPortStream.csproj
+PS1> dotnet build -c release .\code\SerialPortStream.csproj
+PS1> dotnet pack -c release --include-source .\code\SerialPortStream.csproj
 ```
 
 I generally upload the symbols version that also includes the sources.
@@ -89,10 +78,9 @@ COM1, COM2).
 
 #### 1.3.2 Running Unit Tests
 
-Unit tests are supported for the configurations `Debug` and `Release`. It will
-not work for the `Signed_Release` configuration. Unit tests marked as
-`[Explicit]` will not run. But you can run these from within the Visual Studio
-IDE.
+Unit tests are supported for the configurations `Debug` and `Release`. Unit
+tests marked as [Explicit]` will not run. But you can run these from within the
+Visual Studio IDE.
 
 * To test DEBUG mode
 
