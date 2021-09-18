@@ -6,7 +6,7 @@ namespace RJCP.IO.Ports.Native
 {
     using System;
     using System.Text;
-    using Datastructures;
+    using Buffer;
     using Trace;
 
     internal class ReadToCache

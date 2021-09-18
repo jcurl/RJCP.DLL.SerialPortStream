@@ -60,7 +60,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Datastructures\CircularBuffer.cs" />
+    <ProjectReference Include="..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="Datastructures\ReusableList.cs" />
     <Compile Include="Datastructures\TimerExpiry.cs" />
     <Compile Include="GlobalSuppressions.cs" />

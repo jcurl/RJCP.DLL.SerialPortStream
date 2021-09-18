@@ -4,9 +4,6 @@
 
 namespace RJCP.IO.Ports
 {
-    using System;
-    using System.Threading;
-    using Microsoft.Extensions.Logging;
     using NUnit.Framework;
     using Trace;
 

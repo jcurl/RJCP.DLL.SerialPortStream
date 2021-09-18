@@ -8,6 +8,7 @@ namespace RJCP.IO.Ports.Native
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
+    using Buffer;
     using Datastructures;
 
     /// <summary>

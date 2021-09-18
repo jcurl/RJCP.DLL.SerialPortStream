@@ -50,7 +50,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="CircularBufferTest.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="TimerExpiryTest.cs" />
   </ItemGroup>

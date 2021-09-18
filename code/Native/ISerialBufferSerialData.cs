@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading;
-    using Datastructures;
+    using Buffer;
 
     /// <summary>
     /// Container structure for properties and methods related to the Native Serial object.

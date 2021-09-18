@@ -4,12 +4,13 @@ The project has been migrated to the .NET SDK project format. This is to allow
 better integration with .NET Core projects, and to allow better unit testing.
 
 * 1.0 Windows
-  * 1.1 Building
-  * 1.2 Packaging
-  * 1.3 Unit Tests
-    * 1.3.1 Configuring Tests
-    * 1.3.2 Running Unit Tests
-    * 1.3.3 Probable Failing Tests
+  * 1.1 Dependencies
+  * 1.2 Building
+  * 1.3 Packaging
+  * 1.4 Unit Tests
+    * 1.4.1 Configuring Tests
+    * 1.4.2 Running Unit Tests
+    * 1.4.3 Probable Failing Tests
 * 2.0 Linux
   * 2.1 .NET Core Installation
   * 2.2 Building the libnserial Library
@@ -25,7 +26,19 @@ better integration with .NET Core projects, and to allow better unit testing.
 
 ## 1.0 Windows
 
-### 1.1 Building
+### 1.1 Dependencies
+
+From Verson 3.0 and onwards, the SerialPortStream library is being split into multiple libraries that some code
+originally came from other projects and is also useful in other contexts. This allows for simpler maintenance.
+
+The following other projects are needed in parallel
+
+| Path             | GIT Repository                |
+| ---------------- | ----------------------------- |
+| serialportstream | RJCP.DLL.SerialPortStream.git |
+| bufferio         | RJCP.DLL.BufferIO             |
+
+### 1.2 Building
 
 To build the software, ensure to be in the working directory where the
 `SerialPortStream.sln` file is kept.
@@ -44,7 +57,7 @@ To build the software, ensure to be in the working directory where the
   PS1> dotnet build -c Release
   ```
 
-### 1.2 Packaging
+### 1.3 Packaging
 
 To build the package for upload (see building for the sign key) to NuGet:
 
@@ -55,9 +68,9 @@ PS1> dotnet pack -c release --include-source .\code\SerialPortStream.csproj
 
 I generally upload the symbols version that also includes the sources.
 
-### 1.3 Unit Tests
+### 1.4 Unit Tests
 
-#### 1.3.1 Configuring Tests
+#### 1.4.1 Configuring Tests
 
 The tests written are a combination of unit tests and integration tests. The
 tests can be run with the driver Com0Com. The ports used for the source and
@@ -76,7 +89,7 @@ is:
 Change the `Win32SourcePort` and `Win32DestPort` to be the actual hardware (e.g.
 COM1, COM2).
 
-#### 1.3.2 Running Unit Tests
+#### 1.4.2 Running Unit Tests
 
 Unit tests are supported for the configurations `Debug` and `Release`. Unit
 tests marked as [Explicit]` will not run. But you can run these from within the
@@ -97,7 +110,7 @@ Visual Studio IDE.
 To skip the manual tests in the Visual Studio IDE, filter with
 `-Trait:ManualTest`.
 
-#### 1.3.3 Failing Tests on Windows
+#### 1.4.3 Failing Tests on Windows
 
 When using the Com0Com driver, the following tests will fail (but pass with real
 hardware):

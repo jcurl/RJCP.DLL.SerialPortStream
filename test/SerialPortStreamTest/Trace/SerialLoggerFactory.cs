@@ -6,7 +6,6 @@
 
 namespace RJCP.IO.Ports.Trace
 {
-    using System;
     using Microsoft.Extensions.Logging;
 
     internal sealed class SerialLoggerFactory : ILoggerFactory
