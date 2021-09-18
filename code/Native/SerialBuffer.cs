@@ -9,7 +9,7 @@ namespace RJCP.IO.Ports.Native
     using System.Text;
     using System.Threading;
     using Buffer;
-    using Datastructures;
+    using Timer;
 
     /// <summary>
     /// Manages two buffers, for reading and writing, between a Stream and a Native Serial object.

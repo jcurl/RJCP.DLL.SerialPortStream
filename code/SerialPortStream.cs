@@ -14,7 +14,7 @@ namespace RJCP.IO.Ports
     using System.Text;
     using System.IO;
     using System.Threading;
-    using Datastructures;
+    using Timer;
     using Native;
     using Trace;
 
