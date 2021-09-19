@@ -14,6 +14,7 @@ namespace RJCP.IO.Ports
     using System.Text;
     using System.IO;
     using System.Threading;
+    using System.Threading.Tasks;
     using Timer;
     using Native;
     using Trace;
@@ -21,12 +22,6 @@ namespace RJCP.IO.Ports
 #if NETSTANDARD
     using System.Runtime.ExceptionServices;
     using Microsoft.Extensions.Logging;
-#else
-    using System.Runtime.Remoting.Messaging;
-#endif
-
-#if NETSTANDARD || NET45_OR_GREATER
-    using System.Threading.Tasks;
 #endif
 
     /// <summary>
@@ -804,78 +799,59 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if !NETSTANDARD
-        private delegate int ReadDelegate(byte[] buffer, int offset, int count);
-#endif
+        private class ReadAsyncResult : AsyncResult<int>
+        {
+            public ReadAsyncResult(AsyncCallback callback, object state, object owner, string operation)
+                : base(callback, state, owner, operation) { }
+
+            public override void Process()
+            {
+                SetResult(0);
+                Complete(null, true);
+            }
+
+            public void Process(SerialPortStream stream, byte[] buffer, int offset, int count, bool synchronous)
+            {
+                try {
+                    if (synchronous) {
+                        if (buffer != null && count > 0)
+                            SetResult(stream.InternalRead(buffer, offset, count));
+                        Complete(null, true);
+                    } else {
+                        Task.Factory.StartNew(() => {
+                            try {
+                                int result = stream.InternalBlockingRead(buffer, offset, count);
+                                SetResult(result);
+                                Complete(null, false);
+                            } catch (Exception ex) {
+                                Complete(ex, false);
+                            }
+                        });
+                    }
+                } catch (Exception ex) {
+                    Complete(ex, true);
+                }
+            }
+        }
 
         private IAsyncResult InternalBeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
+            ReadAsyncResult ar = new ReadAsyncResult(callback, state, this, "Read");
             if (m_Buffer == null || count == 0 || m_Buffer.Stream.WaitForRead(0)) {
                 // Data in the buffer, we can return immediately
-                LocalAsync<int> ar = new LocalAsync<int>(state);
-                if (m_Buffer != null && count > 0) {
-                    ar.Result = InternalRead(buffer, offset, count);
-                } else {
-                    ar.Result = 0;
-                }
-                ar.IsCompleted = true;
-                ar.CompletedSynchronously = true;
-                if (callback != null) callback(ar);
-                return ar;
+                ar.Process(this, buffer, offset, count, true);
             } else {
                 // No data in buffer, so we create a thread in the background
-
-#if NETSTANDARD
-                TaskCompletionSource<int> tcs = new TaskCompletionSource<int>(state);
-                Task<int> task = new Task<int>(() => {
-                    int r = InternalBlockingRead(buffer, offset, count);
-                    return r;
-                });
-
-                task.ContinueWith(t => {
-                    // Copy the task result into the returned task.
-                    if (t.IsFaulted)
-                        tcs.TrySetException(t.Exception.InnerExceptions);
-                    else if (t.IsCanceled)
-                        tcs.TrySetCanceled();
-                    else
-                        tcs.TrySetResult(t.Result);
-
-                    // Invoke the user callback if necessary.
-                    if (callback != null)
-                        callback(tcs.Task);
-                });
-
-                task.Start();
-                return tcs.Task;
-#else
-                ReadDelegate read = InternalBlockingRead;
-                return read.BeginInvoke(buffer, offset, count, callback, state);
-#endif
+                ar.Process(this, buffer, offset, count, false);
             }
+            return ar;
         }
 
         private int InternalEndRead(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync<int> localAsync) {
-                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
-                localAsync.Dispose();
-                if (localAsync.Result == 0) ReadCheckDeviceError();
-                return localAsync.Result;
-            } else {
-#if NETSTANDARD
-                try {
-                    return ((Task<int>)asyncResult).Result;
-                } catch (AggregateException ex) {
-                    ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                    throw;
-                }
-#else
-                AsyncResult ar = (AsyncResult)asyncResult;
-                ReadDelegate caller = (ReadDelegate)ar.AsyncDelegate;
-                return caller.EndInvoke(asyncResult);
-#endif
-            }
+            int bytes = ReadAsyncResult.End(asyncResult, this, "Read");
+            if (bytes == 0) ReadCheckDeviceError();
+            return bytes;
         }
 
         /// <summary>
@@ -1359,72 +1335,54 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if !NETSTANDARD
-        private delegate void WriteDelegate(byte[] buffer, int offset, int count);
-#endif
+        private class WriteAsyncResult : AsyncResult
+        {
+
+            public WriteAsyncResult(AsyncCallback callback, object state, object owner, string operation)
+                : base(callback, state, owner, operation) { }
+
+            public override void Process()
+            {
+                Complete(null, true);
+            }
+
+            public void Process(SerialPortStream stream, byte[] buffer, int offset, int count, bool synchronous)
+            {
+                try {
+                    if (synchronous) {
+                        if (count > 0)
+                            stream.InternalWrite(buffer, offset, count);
+                        Complete(null, true);
+                    } else {
+                        Task.Factory.StartNew(() => {
+                            try {
+                                stream.InternalBlockingWrite(buffer, offset, count);
+                                Complete(null, false);
+                            } catch (Exception ex) {
+                                Complete(ex, false);
+                            }
+                        });
+                    }
+                } catch (Exception ex) {
+                    Complete(ex, true);
+                }
+            }
+        }
 
         private IAsyncResult InternalBeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
+            WriteAsyncResult ar = new WriteAsyncResult(callback, state, this, "Write");
             if (count == 0 || m_Buffer.Stream.WaitForWrite(count, 0)) {
-                LocalAsync ar = new LocalAsync(state);
-                if (count > 0) {
-                    InternalWrite(buffer, offset, count);
-                }
-                ar.IsCompleted = true;
-                ar.CompletedSynchronously = true;
-                if (callback != null) callback(ar);
-                return ar;
+                ar.Process(this, buffer, offset, count, true);
             } else {
-#if NETSTANDARD
-                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>(state);
-                Task task = new Task(() => {
-                    InternalBlockingWrite(buffer, offset, count);
-                });
-
-                task.ContinueWith(t => {
-                    // Copy the task result into the returned task.
-                    if (t.IsFaulted)
-                        tcs.TrySetException(t.Exception.InnerExceptions);
-                    else if (t.IsCanceled)
-                        tcs.TrySetCanceled();
-                    else
-                        tcs.TrySetResult(null);
-
-                    // Invoke the user callback if necessary.
-                    if (callback != null)
-                        callback(tcs.Task);
-                });
-
-                task.Start();
-                return tcs.Task;
-#else
-                WriteDelegate write = InternalBlockingWrite;
-                return write.BeginInvoke(buffer, offset, count, callback, state);
-#endif
+                ar.Process(this, buffer, offset, count, false);
             }
+            return ar;
         }
 
         private void InternalEndWrite(IAsyncResult asyncResult)
         {
-            if (asyncResult is LocalAsync localAsync) {
-                if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
-                localAsync.Dispose();
-            } else {
-#if NETSTANDARD
-                try {
-                    ((Task)asyncResult).Wait();
-                } catch (AggregateException ex) {
-                    ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                    throw;
-                }
-#else
-                AsyncResult ar = (AsyncResult)asyncResult;
-                WriteDelegate caller = (WriteDelegate)ar.AsyncDelegate;
-
-                // This will raise any exceptions from the method InternalBlockingWrite
-                caller.EndInvoke(asyncResult);
-#endif
-            }
+            AsyncResult.End(asyncResult, this, "Write");
         }
 
         /// <summary>
