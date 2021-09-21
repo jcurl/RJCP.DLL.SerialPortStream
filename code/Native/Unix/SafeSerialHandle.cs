@@ -15,11 +15,10 @@
             }
         }
 
-        protected override bool ReleaseHandle ()
+        protected override bool ReleaseHandle()
         {
             UnsafeNativeMethods.serial_terminate(handle);
             return true;
         }
     }
 }
-

@@ -41,7 +41,8 @@ namespace RJCP.Datastructures.CircularBufferTest
             Assert.That(() => { _ = new CircularBuffer<byte>(new byte[0]); }, Throws.TypeOf<ArgumentException>());
         }
 
-        [Test]public void CircularBuffer_NullArrayCount()
+        [Test]
+        public void CircularBuffer_NullArrayCount()
         {
             Assert.That(() => { _ = new CircularBuffer<byte>(null, 0); }, Throws.TypeOf<ArgumentNullException>());
         }

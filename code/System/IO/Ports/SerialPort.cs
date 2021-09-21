@@ -1,7 +1,5 @@
 ﻿namespace System.IO.Ports
 {
-    using System;
-
     /// <summary>
     /// Class SerialPort compatibility layer for .NET Stanard 1.5
     /// </summary>
