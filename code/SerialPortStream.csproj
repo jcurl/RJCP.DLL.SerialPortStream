@@ -21,7 +21,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/jcurl/serialportstream</PackageProjectUrl>
     <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability.</Description>
-    <Version>2.3.2-beta.20210603.1</Version>
+    <Version>2.3.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
@@ -66,7 +66,7 @@
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="Datastructures\CircularBuffer.cs" />
     <Compile Include="Datastructures\ReusableList.cs" />
@@ -115,8 +115,13 @@
     <Compile Include="SerialPinChangedEventArgs.cs" />
     <Compile Include="SerialPortStream.cs" />
     <Compile Include="StopBits.cs" />
+    <None Include="System\EntryPointNotFoundException.cs" />
+    <None Include="System\IO\Ports\SerialPort.cs" />
+    <None Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\Log.cs" />
+    <None Include="Trace\LoggerTraceListener.cs" />
     <Compile Include="Trace\LogSource.cs" />
+    <None Include="Trace\LogSourceFactory.cs" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">

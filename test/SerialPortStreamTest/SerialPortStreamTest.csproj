@@ -54,13 +54,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="appsettings.json" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="SerialConfiguration.cs" />
     <Compile Include="SerialPortStreamCharTest.cs" />
+    <None Include="SerialPortStreamLoggerTest.cs" />
     <Compile Include="SerialPortStreamManualTest.cs" />
     <Compile Include="SerialPortStreamParityTest.cs" />
     <Compile Include="SerialPortStreamRxTxTest.cs" />
     <Compile Include="SerialPortStreamSimpleTest.cs" />
+    <None Include="System\IO\Ports\SerialPortTest.cs" />
+    <None Include="System\Text\EncodingTest.cs" />
+    <None Include="Trace\GlobalLogger.cs" />
+    <None Include="Trace\SerialLogger.cs" />
+    <None Include="Trace\SerialLoggerFactory.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
