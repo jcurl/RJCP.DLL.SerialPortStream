@@ -44,7 +44,8 @@ namespace RJCP.IO.Ports
     {
         private INativeSerial m_NativeSerial;
         private SerialBuffer m_Buffer;
-        private ReadToCache m_ReadTo = new ReadToCache();
+        private ReadToCache m_ReadTo;
+        private LogSource m_Log;
 
         #region Public constants
         /// <summary>
@@ -63,8 +64,10 @@ namespace RJCP.IO.Ports
         /// </remarks>
         public SerialPortStream()
         {
+            m_Log = Log.Serial;
+            m_ReadTo = new ReadToCache(Log.ReadTo);
+
             Initialize();
-            Log.Open();
         }
 
         /// <summary>
@@ -139,14 +142,16 @@ namespace RJCP.IO.Ports
         [CLSCompliant(false)]
         public SerialPortStream(ILogger logger)
         {
+            m_Log = new LogSource(Log.SerialPortStream, logger);
+            m_ReadTo = new ReadToCache();
+
             Initialize();
-            Log.Open(logger);
         }
 #endif
 
         private void Initialize()
         {
-            m_NativeSerial = CreateNativeSerial();
+            m_NativeSerial = CreateNativeSerial(m_Log);
             if (m_NativeSerial == null)
                 throw new NotSupportedException("SerialPortStream is not supported on this platform");
 
@@ -157,6 +162,13 @@ namespace RJCP.IO.Ports
         {
             if (Platform.IsUnix()) return new UnixNativeSerial();
             if (Platform.IsWinNT()) return new WinNativeSerial();
+            return null;
+        }
+
+        private INativeSerial CreateNativeSerial(LogSource log)
+        {
+            if (Platform.IsUnix()) return new UnixNativeSerial(log);
+            if (Platform.IsWinNT()) return new WinNativeSerial(log);
             return null;
         }
 
@@ -2097,8 +2109,8 @@ namespace RJCP.IO.Ports
                 }
 
                 if (handleEvent) {
-                    if (Log.SerialTrace(TraceEventType.Verbose))
-                        Log.Serial.TraceEvent(TraceEventType.Verbose, 0, "{0}: HandleEvent: {1}; {2}; {3};", m_NativeSerial.PortName, serialDataFlags, serialErrorFlags, serialPinChange);
+                    if (m_Log.ShouldTrace(TraceEventType.Verbose))
+                        m_Log.TraceEvent(TraceEventType.Verbose, "{0}: HandleEvent: {1}; {2}; {3};", m_NativeSerial.PortName, serialDataFlags, serialErrorFlags, serialPinChange);
 
                     // Received Data
                     bool aboveThreshold = m_Buffer.Stream.BytesToRead >= m_RxThreshold;
@@ -2193,8 +2205,6 @@ namespace RJCP.IO.Ports
                     m_Buffer = null;
                     m_ReadTo = null;
                 }
-
-                Log.Close();
             }
             base.Dispose(disposing);
         }

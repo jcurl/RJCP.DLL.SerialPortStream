@@ -29,6 +29,12 @@ namespace RJCP.IO.Ports.Trace
         private TraceSource m_TraceSource;
         private long m_TraceLevels;
 
+        public LogSource()
+        {
+            m_TraceSource = new TraceSource("null", SourceLevels.Off);
+            m_TraceSource.Listeners.Clear();
+        }
+
         /// <summary>
         /// Initialize the internal <see cref="TraceSource"/> object.
         /// </summary>
@@ -128,6 +134,32 @@ namespace RJCP.IO.Ports.Trace
         public bool ShouldTrace(TraceEventType eventType)
         {
             return (m_TraceLevels & (long)eventType) != 0;
+        }
+
+        /// <summary>
+        /// Writes a trace event message to the trace listeners in the <see cref="TraceSource.Listeners"/> collection.
+        /// </summary>
+        /// <param name="eventType">
+        /// One of the enumeration values that specifies the event type of the trace data.
+        /// </param>
+        /// <param name="message">The trace message to write.</param>
+        public void TraceEvent(TraceEventType eventType, string message)
+        {
+            TraceSource.TraceEvent(eventType, 0, message);
+        }
+
+        /// <summary>
+        /// Writes a trace event message to the trace listeners in the <see cref="TraceSource.Listeners"/> collection.
+        /// </summary>
+        /// <param name="eventType">Type of the event.</param>
+        /// <param name="format">
+        /// A composite format string that contains text intermixed with zero or more format items, which correspond to
+        /// objects in the <paramref name="args"/> array.
+        /// </param>
+        /// <param name="args">An object array containing zero or more objects to format.</param>
+        public void TraceEvent(TraceEventType eventType, string format, params object[] args)
+        {
+            TraceSource.TraceEvent(eventType, 0, format, args);
         }
 
         private bool m_IsDisposed;
