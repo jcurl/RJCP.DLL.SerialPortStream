@@ -29,6 +29,6 @@ echo ======================================================================
 echo == Generating Signed SerialPortStream NuGet Package
 echo ======================================================================
 dotnet build -c Signed_Release .\code\SerialPortStream.csproj
-dotnet pack -c Signed_Release .\code\SerialPortStream.csproj
+dotnet pack -c Signed_Release --include-symbols --include-source .\code\SerialPortStream.csproj
 
 pause
