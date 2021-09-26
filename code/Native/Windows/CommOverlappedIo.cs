@@ -2,7 +2,6 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-//#define STRESSTEST
 #define PL2303_WORKAROUNDS
 
 namespace RJCP.IO.Ports.Native.Windows
@@ -14,7 +13,7 @@ namespace RJCP.IO.Ports.Native.Windows
     using Datastructures;
     using Microsoft.Win32.SafeHandles;
     using Native.Win32;
-    using Trace;
+    using RJCP.Diagnostics.Trace;
 
     internal class CommOverlappedIo : IDisposable
     {
@@ -94,6 +93,8 @@ namespace RJCP.IO.Ports.Native.Windows
         /// </remarks>
         private bool m_ReadByteEof;
 
+        private LogSource m_Log;
+
         private string m_Name;
         #endregion
 
@@ -102,8 +103,11 @@ namespace RJCP.IO.Ports.Native.Windows
         /// Initializes a new instance of the <see cref="CommOverlappedIo"/> class.
         /// </summary>
         /// <param name="handle">The serial port handle.</param>
-        public CommOverlappedIo(SafeFileHandle handle)
+        /// <param name="log">The <see cref="LogSource"/> which should be used for logging.</param>
+        public CommOverlappedIo(SafeFileHandle handle, LogSource log)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
+            m_Log = log;
             m_ComPortHandle = handle;
         }
         #endregion
@@ -149,9 +153,9 @@ namespace RJCP.IO.Ports.Native.Windows
                 if (!result) {
                     int w32err = Marshal.GetLastWin32Error();
                     int hr = Marshal.GetHRForLastWin32Error();
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                            "{0}: SerialThread: BytesInSerialQueue: ClearCommError() error {1}", m_Name, w32err);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                            $"{m_Name}: SerialThread: BytesInSerialQueue: ClearCommError() error {w32err}");
                     Marshal.ThrowExceptionForHR(hr);
                     return false;
                 }
@@ -247,14 +251,14 @@ namespace RJCP.IO.Ports.Native.Windows
         private void Stop()
         {
             if (m_Thread != null) {
-                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: OverlappedIO: Stopping Thread", m_Name);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: OverlappedIO: Stopping Thread");
                 m_StopRunning.Set();
-                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: OverlappedIO: Waiting for Thread", m_Name);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: OverlappedIO: Waiting for Thread");
                 m_Thread.Join();
-                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: OverlappedIO: Thread Stopped", m_Name);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: OverlappedIO: Thread Stopped");
                 m_Thread = null;
             }
         }
@@ -297,9 +301,9 @@ namespace RJCP.IO.Ports.Native.Windows
             try {
                 OverlappedIoThreadMainLoop();
             } catch (Exception ex) {
-                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                    "{0}: SerialThread: Died from {1}", m_Name, ex.Message);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                        $"{m_Name}: SerialThread: Died from {ex.Message}");
             } finally {
                 m_IsRunning = false;
 
@@ -396,17 +400,17 @@ namespace RJCP.IO.Ports.Native.Windows
                         // returned was 87 (ERROR_INVALID_PARAMETER) was returned in that case. GetReceiveStats() did
                         // work, so we can still know of data pending by polling. But we won't get any other events,
                         // such as TX_EMPTY.
-                        if (Log.SerialTrace(System.Diagnostics.TraceEventType.Warning))
-                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0,
-                                "{0}: SerialThread: Not processing WaitCommEvent events", m_Name);
+                        if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Warning))
+                            m_Log.TraceEvent(System.Diagnostics.TraceEventType.Warning,
+                                $"{m_Name}: SerialThread: Not processing WaitCommEvent events");
                         serialCommError = true;
                     }
                 }
 
                 if (!readPending) {
                     if (!m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) {
-                        if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Read Buffer Full", m_Name);
+                        if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                            m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: Read Buffer Full");
                         handles.Add(m_Buffer.Serial.ReadBufferNotFull);
                     } else {
                         readPending = DoReadEvent(ref readOverlapped);
@@ -432,15 +436,15 @@ namespace RJCP.IO.Ports.Native.Windows
 
                 if (ev != WaitHandle.WaitTimeout) {
                     if (whandles[ev] == m_StopRunning) {
-                        if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Thread closing", m_Name);
+                        if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                            m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: Thread closing");
                         result = Kernel32.CancelIo(m_ComPortHandle);
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
-                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Warning))
-                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0,
-                                    "{0}: SerialThread: CancelIo error {1}", m_Name, win32Error);
+                            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Warning))
+                                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Warning,
+                                    $"{m_Name}: SerialThread: CancelIo error {win32Error}");
                             Marshal.ThrowExceptionForHR(hr);
                         }
                         running = false;
@@ -449,9 +453,9 @@ namespace RJCP.IO.Ports.Native.Windows
                         if (!result) {
                             int win32Error = Marshal.GetLastWin32Error();
                             int hr = Marshal.GetHRForLastWin32Error();
-                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                                    "{0}: SerialThread: Overlapped WaitCommEvent() error {1}", m_Name, win32Error);
+                            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                                    $"{m_Name}: SerialThread: Overlapped WaitCommEvent() error {win32Error}");
                             Marshal.ThrowExceptionForHR(hr);
                         }
                         ProcessWaitCommEvent(commEventMask);
@@ -463,15 +467,15 @@ namespace RJCP.IO.Ports.Native.Windows
                             int hr = Marshal.GetHRForLastWin32Error();
                             // Should never get ERROR_IO_PENDING, as this method is only called when the event is triggered.
                             if (win32Error != WinError.ERROR_OPERATION_ABORTED || bytes > 0) {
-                                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                                        "{0}: SerialThread: Overlapped ReadFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                                        $"{m_Name}: SerialThread: Overlapped ReadFile() error {win32Error} bytes {bytes}");
                                 Marshal.ThrowExceptionForHR(hr);
                             } else {
                                 // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
-                                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                        "{0}: SerialThread: Overlapped ReadFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                                        $"{m_Name}: SerialThread: Overlapped ReadFile() error {win32Error} bytes {bytes}");
                             }
                         } else {
                             ProcessReadEvent(bytes);
@@ -487,15 +491,15 @@ namespace RJCP.IO.Ports.Native.Windows
                             int hr = Marshal.GetHRForLastWin32Error();
                             // Should never get ERROR_IO_PENDING, as this method is only called when the event is triggered.
                             if (win32Error != WinError.ERROR_OPERATION_ABORTED || bytes > 0) {
-                                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                                        "{0}: SerialThread: Overlapped WriteFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                                        $"{m_Name}: SerialThread: Overlapped WriteFile() error {win32Error} bytes {bytes}");
                                 Marshal.ThrowExceptionForHR(hr);
                             } else {
                                 // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
-                                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                        "{0}: SerialThread: Overlapped WriteFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                                        $"{m_Name}: SerialThread: Overlapped WriteFile() error {win32Error} bytes {bytes}");
                             }
                         } else {
                             ProcessWriteEvent(bytes);
@@ -506,8 +510,8 @@ namespace RJCP.IO.Ports.Native.Windows
                         // should write or not.
                     } else if (whandles[ev] == m_WriteClearEvent) {
                         if (writePending) {
-                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: PurgeComm() write pending", m_Name);
+                            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: PurgeComm() write pending");
                             m_PurgePending = true;
                             result = Kernel32.PurgeComm(m_ComPortHandle,
                                 Kernel32.PurgeFlags.PURGE_TXABORT | Kernel32.PurgeFlags.PURGE_TXCLEAR);
@@ -515,43 +519,26 @@ namespace RJCP.IO.Ports.Native.Windows
                                 int win32Error = Marshal.GetLastWin32Error();
                                 int hr = Marshal.GetHRForLastWin32Error();
                                 if (win32Error != WinError.ERROR_OPERATION_ABORTED) {
-                                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                                        "{0}: SerialThread: PurgeComm() error {1}", m_Name, win32Error);
+                                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                                            $"{m_Name}: SerialThread: PurgeComm() error {win32Error}");
                                     Marshal.ThrowExceptionForHR(hr);
                                 } else {
-                                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                            "{0}: SerialThread: PurgeComm() error {1}", m_Name, win32Error);
+                                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                                            $"{m_Name}: SerialThread: PurgeComm() error {win32Error}");
                                 }
                             }
                         } else {
                             lock (m_Buffer.WriteLock) {
-                                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: Purged", m_Name);
+                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: Purged");
                                 m_Buffer.Serial.Purge();
                                 m_WriteClearDoneEvent.Set();
                             }
                         }
                     }
                 }
-
-#if STRESSTEST
-                SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: STRESSTEST SerialThread: Stress Test Delay of 1000ms", m_Name);
-                System.Threading.Thread.Sleep(1000);
-                NativeMethods.ComStatErrors commStateErrors = new NativeMethods.ComStatErrors();
-                NativeMethods.COMSTAT commStat = new NativeMethods.COMSTAT();
-                result = UnsafeNativeMethods.ClearCommError(m_ComPortHandle, out commStateErrors, out commStat);
-                if (result) {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0,
-                        "{0}: STRESSTEST SerialThread: ClearCommError errors={1}", m_Name, commStateErrors);
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Information, 0,
-                        "{0}: STRESSTEST SerialThread: ClearCommError stats flags={1}, InQueue={2}, OutQueue={3}", m_Name, commStat.Flags, commStat.cbInQue, commStat.cbOutQue);
-                } else {
-                    SerialTrace.TraceSer.TraceEvent(System.Diagnostics.TraceEventType.Warning, 0,
-                        "{0}: STRESSTEST SerialThread: ClearCommError error: {1}", m_Name, Marshal.GetLastWin32Error());
-                }
-#endif
             }
         }
 
@@ -577,9 +564,9 @@ namespace RJCP.IO.Ports.Native.Windows
                 int w32err = Marshal.GetLastWin32Error();
                 int hr = Marshal.GetHRForLastWin32Error();
                 if (w32err != WinError.ERROR_IO_PENDING) {
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                            "{0}: SerialThread: DoWaitCommEvent: Result: {1}", m_Name, w32err);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                            $"{m_Name}: SerialThread: DoWaitCommEvent: Result: {w32err}");
                     throw new IOException("WaitCommEvent overlapped exception", hr);
                 }
             } else {
@@ -594,10 +581,10 @@ namespace RJCP.IO.Ports.Native.Windows
         /// <param name="mask">The mask that was provided.</param>
         private void ProcessWaitCommEvent(Kernel32.SerialEventMask mask)
         {
-            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose)) {
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
                 if (mask != 0) {
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "{0}: SerialThread: ProcessWaitCommEvent: {1}", m_Name, mask);
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        $"{m_Name}: SerialThread: ProcessWaitCommEvent: {mask}");
                 }
             }
 
@@ -617,9 +604,9 @@ namespace RJCP.IO.Ports.Native.Windows
             if ((mask & Kernel32.SerialEventMask.EV_TXEMPTY) != 0) {
                 lock (m_Buffer.WriteLock) {
                     if (m_Buffer.Serial.TxEmptyEvent()) {
-                        if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                            Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                "{0}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty", m_Name);
+                        if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                            m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                                $"{m_Name}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty");
                     }
                 }
             }
@@ -629,9 +616,9 @@ namespace RJCP.IO.Ports.Native.Windows
                 if (!result) {
                     int w32err = Marshal.GetLastWin32Error();
                     int hr = Marshal.GetHRForLastWin32Error();
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                            "{0}: SerialThread: ClearCommError: WINERROR {1}", m_Name, w32err);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                            $"{m_Name}: SerialThread: ClearCommError: WINERROR {w32err}");
                     Marshal.ThrowExceptionForHR(hr);
                 } else {
                     comErr = (Kernel32.ComStatErrors)((int)comErr & 0x10F);
@@ -679,21 +666,20 @@ namespace RJCP.IO.Ports.Native.Windows
             bool result = Kernel32.ReadFile(m_ComPortHandle, bufPtr, bufLen, out uint bufRead, ref overlap);
             int w32err = Marshal.GetLastWin32Error();
             int hr = Marshal.GetHRForLastWin32Error();
-            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "{0}: SerialThread: DoReadEvent: ReadFile({1}, {2}, {3}) == {4}", m_Name,
-                    m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"{m_Name}: SerialThread: DoReadEvent: ReadFile({m_ComPortHandle.DangerousGetHandle()}, {bufPtr}, {bufLen}) == {result}");
             if (!result) {
                 if (w32err == WinError.ERROR_OPERATION_ABORTED) {
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Information))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Information, 0,
-                            "{0}: SerialThread: DoReadEvent: ReadFile() error {1}", m_Name, w32err);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Information))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Information,
+                           $"{m_Name}: SerialThread: DoReadEvent: ReadFile() error {w32err}");
                     return false;
                 }
                 if (w32err != WinError.ERROR_IO_PENDING) {
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                            "{0}: SerialThread: DoReadEvent: ReadFile() error {1}", m_Name, w32err);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                            $"{m_Name}: SerialThread: DoReadEvent: ReadFile() error {w32err}");
                     // In case an unexpected error occurs here, we kill the thread and indicate an error.
                     // One reason for this happening is a device error, or the device is removed from the
                     // system.
@@ -721,16 +707,16 @@ namespace RJCP.IO.Ports.Native.Windows
         /// <param name="bytes">Number of bytes read.</param>
         private void ProcessReadEvent(uint bytes)
         {
-            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "{0}: SerialThread: ProcessReadEvent: {1} bytes", m_Name, bytes);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"{m_Name}: SerialThread: ProcessReadEvent: {bytes} bytes");
             if (bytes == 0) {
                 m_ReadByteAvailable = false;
             } else {
                 lock (m_Buffer.ReadLock) {
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose)) {
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                            "{0}: SerialThread: ProcessReadEvent: End={1}; Bytes={2}", m_Name,
-                            m_Buffer.Serial.ReadBuffer.End, bytes);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                            $"{m_Name}: SerialThread: ProcessReadEvent: End={m_Buffer.Serial.ReadBuffer.End}; Bytes={bytes}");
                     }
                     m_Buffer.Serial.ReadBufferProduce((int)bytes);
                 }
@@ -765,21 +751,20 @@ namespace RJCP.IO.Ports.Native.Windows
             bool result = Kernel32.WriteFile(m_ComPortHandle, bufPtr, bufLen, out uint bufWrite, ref overlap);
             int win32err = Marshal.GetLastWin32Error();
             int hr = Marshal.GetHRForLastWin32Error();
-            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "{0}: SerialThread: DoWriteEvent: WriteFile({1}, {2}, {3}, ...) == {4}", m_Name,
-                    m_ComPortHandle.DangerousGetHandle(), bufPtr, bufLen, result);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"{m_Name}: SerialThread: DoWriteEvent: WriteFile({m_ComPortHandle.DangerousGetHandle()}, {bufPtr}, {bufLen}, ...) == {result}");
             if (!result) {
                 if (win32err == WinError.ERROR_OPERATION_ABORTED) {
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Information))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Information, 0,
-                            "{0}: SerialThread: DoWriteEvent: WriteFile() error {1}", m_Name, win32err);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Information))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Information,
+                            $"{m_Name}: SerialThread: DoWriteEvent: WriteFile() error {win32err}");
                     return false;
                 }
                 if (win32err != WinError.ERROR_IO_PENDING) {
-                    if (Log.SerialTrace(System.Diagnostics.TraceEventType.Error))
-                        Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Error, 0,
-                            "{0}: SerialThread: DoWriteEvent: WriteFile() error {1}", m_Name, win32err);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                            $"{m_Name}: SerialThread: DoWriteEvent: WriteFile() error {win32err}");
                     // In case an unexpected error occurs here, we kill the thread and indicate an error.
                     // One reason for this happening is a device error, or the device is removed from the
                     // system.
@@ -799,17 +784,17 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             if (m_PurgePending) {
                 m_PurgePending = false;
-                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "{0}: SerialThread: ProcessWriteEvent: {1} bytes - Purged", m_Name, bytes);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        $"{m_Name}: SerialThread: ProcessWriteEvent: {bytes} bytes - Purged");
                 lock (m_Buffer.WriteLock) {
                     m_Buffer.Serial.Purge();
                     m_WriteClearDoneEvent.Set();
                 }
             } else {
-                if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "{0}: SerialThread: ProcessWriteEvent: {1} bytes", m_Name, bytes);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        $"{m_Name}: SerialThread: ProcessWriteEvent: {bytes} bytes");
                 if (bytes != 0) {
                     lock (m_Buffer.WriteLock) {
                         m_Buffer.Serial.WriteBufferConsume((int)bytes);
@@ -820,9 +805,9 @@ namespace RJCP.IO.Ports.Native.Windows
                             // that will tell us if we ever expect to get a TX_EMPTY. Given some weird
                             // behaviour of serial ports, not checking is probably the safest, even if not
                             // 100% correct.
-                            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                                    "{0}: SerialThread: ProcessWriteEvent: TX-BUFFER empty", m_Name);
+                            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                                    $"{m_Name}: SerialThread: ProcessWriteEvent: TX-BUFFER empty");
                         }
                     }
                 }
@@ -836,9 +821,9 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             if (args.EventType == 0) return;
 
-            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "{0}: CommEvent: {1}", m_Name, args.EventType.ToString());
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"{m_Name}: CommEvent: {args.EventType}");
 
             EventHandler<CommEventArgs> handler = CommEvent;
             if (handler != null) {
@@ -852,9 +837,9 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             if (args.EventType == 0) return;
 
-            if (Log.SerialTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.Serial.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "{0}: CommErrorEvent: {1}", m_Name, args.EventType.ToString());
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"{m_Name}: CommErrorEvent: {args.EventType}");
 
             EventHandler<CommErrorEventArgs> handler = CommErrorEvent;
             if (handler != null) {

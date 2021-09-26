@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports.Native
     using System;
     using System.Text;
     using Buffer;
-    using Trace;
+    using RJCP.Diagnostics.Trace;
 
     internal class ReadToCache
     {
@@ -31,6 +31,23 @@ namespace RJCP.IO.Ports.Native
 
         private Encoding m_Encoding = Encoding.GetEncoding("UTF-8");
         private Decoder m_Decoder;
+        private LogSource m_Log;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadToCache"/> class with no logging.
+        /// </summary>
+        public ReadToCache() : this(new LogSource()) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadToCache"/> class using logging provided.
+        /// </summary>
+        /// <param name="log">The log source provider.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="log"/> is <see langword="null"/>.</exception>
+        public ReadToCache(LogSource log)
+        {
+            if (log == null) throw new ArgumentNullException(nameof(log));
+            m_Log = log;
+        }
 
         /// <summary>
         /// Gets or sets the byte encoding for pre- and post-transmission conversion of text.
@@ -85,9 +102,9 @@ namespace RJCP.IO.Ports.Native
             // Once the bug from Mono is fixed, we just drop the code above.
             if (sbuffer == null) throw new ArgumentNullException(nameof(sbuffer));
             int readLen = sbuffer.Serial.ReadBuffer.Length;
-            if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "PeekChar: readlen={0}; m_ReadOffset={1}; m_ReadCache.Free={2}", readLen, m_ReadOffset, m_ReadCache.Free);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"PeekChar: readlen={readLen}; m_ReadOffset={m_ReadOffset}; m_ReadCache.Free={m_ReadCache.Free}");
             if (m_ReadOffset >= readLen) return false;
 
             if (m_ReadCache.Free <= 1) Overflow();
@@ -136,9 +153,9 @@ namespace RJCP.IO.Ports.Native
                     m_ReadOverflowChar[1] = m_ReadCache[1];
                     consume = 2;
                 }
-                if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "Overflow: Capture UTF32={0}; Consumed{1}", m_ReadOverflowUtf32, consume);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        $"Overflow: Capture UTF32={m_ReadOverflowUtf32}; Consumed{consume}");
             }
             m_ReadCache.Consume(consume);
             m_ReadOffsets.Consume(consume);
@@ -162,17 +179,17 @@ namespace RJCP.IO.Ports.Native
             if (IsOverflowed) Reset(true);
             if (IsCached) {
                 chars = m_ReadCache.CopyTo(cbuffer, offset, count);
-                if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "Read: Got {0} chars, need {1} count - From Cache", chars, count);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        $"Read: Got {chars} chars, need {count} count - From Cache");
                 ReadToConsume(sbuffer, chars);
                 if (chars == count) return chars;
             }
 
             chars += sbuffer.Stream.Read(cbuffer, offset + chars, count - chars, Decoder);
-            if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "Read: Got {0} chars, need {1} count", chars, count);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"Read: Got {chars} chars, need {count} count");
             return chars;
         }
 
@@ -188,9 +205,9 @@ namespace RJCP.IO.Ports.Native
             char[] schar = new char[1];
             if (IsOverflowed) Reset(true);
 
-            if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                    "ReadChar: IsCached {0}", IsCached);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"ReadChar: IsCached {IsCached}");
             bool dataAvailable = IsCached;
             if (!IsCached) {
                 lock (sbuffer.ReadLock) {
@@ -220,8 +237,8 @@ namespace RJCP.IO.Ports.Native
         {
             bool changedText = !text.Equals(m_ReadToString);
             if (changedText) {
-                if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
                         "ReadTo: Text changed!");
                 m_ReadToString = text;
                 if (IsOverflowed) Reset(true);
@@ -232,8 +249,8 @@ namespace RJCP.IO.Ports.Native
                     string lbuffer = m_ReadCache.GetString();
                     int p = lbuffer.IndexOf(text, StringComparison.Ordinal);
                     if (p != -1) {
-                        if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                            Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                        if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                            m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
                                 "ReadTo: Text changed! And Found!");
                         // It does exist, so consume up to the buffered portion
                         line = lbuffer.Substring(0, p);
@@ -243,8 +260,8 @@ namespace RJCP.IO.Ports.Native
                     }
                 }
             } else {
-                if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
                         "ReadTo: No reset, text the same.");
             }
 
@@ -267,9 +284,9 @@ namespace RJCP.IO.Ports.Native
                 }
 
                 // Found the string
-                if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                    Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                        "ReadTo: Found! Discarding {0} bytes", m_ReadOffset);
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        $"ReadTo: Found! Discarding {m_ReadOffset} bytes");
                 sbuffer.Serial.ReadBuffer.Consume(m_ReadOffset);
             }
             line = m_ReadCache.GetString(m_ReadCache.Length - text.Length);
@@ -306,9 +323,9 @@ namespace RJCP.IO.Ports.Native
                     char[] c = new char[2048];
                     Decoder.Convert(sbuffer.Serial.ReadBuffer, c, 0, c.Length, false, out int bu, out int cu, out bool complete);
                     sb.Append(c, 0, cu);
-                    if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                        Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0,
-                            "ReadExisting: Decoder.Convert(out bu={0}, out cu={1}); Remaining: {2}", bu, cu, sbuffer.Serial.ReadBuffer.Length);
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                            $"ReadExisting: Decoder.Convert(out bu={bu}, out cu={cu}); Remaining: {sbuffer.Serial.ReadBuffer.Length}");
                 } while (sbuffer.Serial.ReadBuffer.Length > 0);
             }
             return sb.ToString();
@@ -325,9 +342,11 @@ namespace RJCP.IO.Ports.Native
             m_ReadCache.Consume(chars);
             m_ReadOffsets.Consume(chars);
             sbuffer.Stream.ReadConsume(bytesRead);
-            if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose)) {
-                Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadToConsume(chars={0}) = {1} bytes", chars, bytesRead);
-                Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadToConsume: m_ReadOffset={0}; m_ReadCache.Free={1}", m_ReadOffset, m_ReadCache.Free);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"ReadToConsume(chars={chars}) = {bytesRead} bytes");
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"ReadToConsume: m_ReadOffset={m_ReadOffset}; m_ReadCache.Free={m_ReadCache.Free}");
             }
         }
 
@@ -340,8 +359,9 @@ namespace RJCP.IO.Ports.Native
         /// </param>
         public void Reset(bool withOverflow)
         {
-            if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "Reset({0})", withOverflow);
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    $"Reset({withOverflow})");
             m_ReadCache.Reset();
             m_ReadOffsets.Reset();
             if (m_Decoder != null) m_Decoder.Reset();
@@ -367,8 +387,8 @@ namespace RJCP.IO.Ports.Native
             for (int i = 0; i < text.Length; i++) {
                 if (m_ReadCache[i + offset] != text[i]) return false;
             }
-            if (Log.ReadToTrace(System.Diagnostics.TraceEventType.Verbose))
-                Log.ReadTo.TraceEvent(System.Diagnostics.TraceEventType.Verbose, 0, "ReadToMatch: Found!");
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, "ReadToMatch: Found!");
             return true;
         }
 

@@ -30,8 +30,11 @@ enhances portability and fixes bugs. See the end of these notes for differences.
   * 5.1 Reading and Writing - Buffering
 * 6.0 Developer Notes
   * 6.1 Logging
-    * 6.1.1 .NET Framework
-    * 6.1.2 .NET Core
+    * 6.1.1 The LogSource abstraction
+    * 6.1.2 .NET Framework (.NET 4.0 to .NET 4.8)
+    * 6.1.3 .NET Core
+      * 6.1.3.1 Dependency Injection
+      * 6.1.3.2 Singleton via LogSource
 * 7.0 Known Issues
   * 7.1 Windows
     * 7.1.1 Driver Specific Issues on Windows
@@ -205,8 +208,8 @@ will write the data and issue as many write calls as is necessary to get the job
 done. A Read buffer may be 5MB. The background thread will read from the serial
 port when ever data arrives and buffers into the 5MB.
 
-So long as the I/O thread in .NET an execute every 100-200ms, it can continue to
-read data from the driver. Your own application doesn't need to keep to such
+So long as the I/O thread in .NET can execute every 100-200ms, it can continue
+to read data from the driver. Your own application doesn't need to keep to such
 difficult time constraints. Such issues typically arise in Automation type
 environments where a computer has many different peripherals. So long as the
 process doesn't block, your main application might sleep for 10 seconds and
@@ -222,25 +225,33 @@ If you come across a problem using this library, you may be asked to provide
 additional debug logs. This section describes how to obtain those logs for
 .NET Framework and .NET Core.
 
-### 6.1.1 .NET Framework
+### 6.1.1 The LogSource abstraction
+
+Logging for SerialPortStream 3.x uses my `RJCP.Diagnostics.Trace` library that
+provides an implementation called `LogSource`. This is a wrapper around
+`TraceSource`, and can provide where necessary a `TraceListener` for .NET Core.
+For .NET Core, it provides a factory method as a singleton as an alternative to
+dependency injection. The following sections provide more details.
+
+### 6.1.2 .NET Framework (.NET 4.0 to .NET 4.8)
 
 The library uses the `TraceSource` object, so you can add tracing to your
 project in the normal way. You should use the switch name
-`IO.Ports.SerialPortStream`. An example of an `app.config` file that you can
-use to enable logging:
+`RJCPIO.Ports.SerialPortStream`. An example of an `app.config` file that you
+can use to enable logging:
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <system.diagnostics>
     <sources>
-      <source name="IO.Ports.SerialPortStream" switchValue="Verbose">
+      <source name="RJCP.IO.Ports.SerialPortStream" switchValue="Verbose">
         <listeners>
           <clear/>
           <add name="myListener"/>
         </listeners>
       </source>
-    </sources> 
+    </sources>
     <sharedListeners>
       <add name="myListener" type="System.Diagnostics.TextWriterTraceListener" initializeData="logfile.txt"/>
     </sharedListeners>
@@ -248,25 +259,88 @@ use to enable logging:
 </configuration>
 ```
 
-### 6.1.2 .NET Core
+Please note, for SerialPortStream 3.x and later, the name of the trace source
+has changed to include the full namespace, to be compatible with my other
+projects.
+
+### 6.1.3 .NET Core
 
 .NET Core has an implementation of `TraceListener` and `TraceSource`, but it
 doesn't load the `app.config` on start up, nor provide a singleton for
-applications to use for tracing. The preferred method is Dependency Injection.
+applications to use for tracing. There are two ways to enable logging for
+`SerialPortStream` on .NET Core.
+
+#### 6.1.3.1 Dependency Injection
 
 The `SerialPortStream` has a constructor where you can provide your `ILogger`
 object for tracing.
 
-For people supporting .NET Framework and .NET Core, there is a singleton
-object where you can set a `ILoggerFactory`. The method `CreateLogger` will be
-given the name `IO.Ports.SerialPortStream` that you can use to know what logger
-to instantiate. Set the global singleton value `LogSourceFactory.LoggerFactory`
-to your factory object.
+Internally, the `ILogger` is wrapped around a minimal `TraceListener`
+implementation to keep the code common between .NET Framework and .NET Core.
 
-Note, when running with `dotnet test` and in the VS IDE, logging needed to be
-set up at the beginning of every test. There was no obvious reason why it is
-necessary to do this (the `ConsoleLogger` is still set, the correct debug level
-is set). Be careful when logging in your own applications.
+#### 6.1.3.2 Singleton via LogSource
+
+When upgrading from .NET Framework to .NET Core, it can be quite difficult to
+refactor software from using a singleton pattern, to dependency injection, and
+may require large swaths of code to be refactored.
+
+To avoid this, the `LogSource` classes provide a mechanism to get an `ILogger`
+using a factory method you provide.
+
+You may add in your code the following:
+
+```csharp
+using Microsoft.Extensions.Logging;
+using RJCP.CodeQuality.NUnitExtensions.Trace;
+using RJCP.Diagnostics.Trace;
+
+internal static class GlobalLogger
+{
+  private static readonly object s_LoggerFactoryLock = new object();
+  private static ILoggerFactory s_LoggerFactory;
+
+  private static ILoggerFactory GetLoggerFactory() {
+    if (s_LoggerFactory == null) {
+      lock (s_LoggerFactoryLock) {
+        if (s_LoggerFactory == null) {
+          s_LoggerFactory = LoggerFactory.Create(builder => {
+            builder
+              .AddFilter("Microsoft", LogLevel.Warning)
+              .AddFilter("System", LogLevel.Warning)
+              .AddFilter("RJCP", LogLevel.Debug)
+              .AddNUnitLogger();
+            });
+          }
+        }
+      }
+      return s_LoggerFactory;
+  }
+
+  public static void Initialize() {
+    LogSource.SetLoggerFactory(GetLoggerFactory());
+  }
+}
+```
+
+The example above is from the unit test cases for `SerialPortStream`, but can
+be easily adapted for your own projects. The important part is that:
+
+* In your production code, you assign the static factory with
+  `LogSource.SetLoggerFactory()`, which is not called as part of your unit
+  tests. It will likely be different to the example given above, as you'd want
+  to instead, get the logging configuration (log levels) via a configuration
+  file.
+* Your test code would set the `LogSource.SetLoggerFactory()` similarly as in
+  the example provided above (the example given above is good for NUnit 3.x
+  with the `.AddNUnitLogger()` provided by my `RJCP.CodeQuality` library).
+* Setting the factory is only needed for .NET Core. On .NET Framework, the
+  `TraceSource` class provides the singleton functionality and will instantiate
+  for you the correct `TraceSource` from the application configuration file.
+
+The code works by requesting to the `ILoggerFactory.CreateLogger` with the name
+`RJCP.IO.Ports.SerialPortStream`. This is also the motivation why the trace
+source was changed to include the full namespace. The code above shows that it
+will create this object and log all debug level events to the NUnit logger.
 
 ## 7.0 Known Issues
 
@@ -277,12 +351,12 @@ The following issues are known:
 * This is not an issue, but when using the `Com0Com` for running unit tests,
   some specific test cases for Parity will fail. That is because Com0Com doesn't
   emulate data at a bit level.
-* .NET 4.0 to the currently tested .NET 4.6 has a minor bug in
-  System.Text.Decoder that in a special circumstance it will consume too many
-  bytes. The `PeekChar()` method is therefore a slower implementation than what
-  it could be. Please refer to the Xamarin bug
-  [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
-  Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP also.
+* .NET 4.0 to .NET 4.8 has a minor bug in `System.Text.Decoder` that in a
+  special circumstance it will consume too many bytes. The `PeekChar()` method
+  is therefore a slower implementation than what it could be. Please refer to
+  the Xamarin bug [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002).
+  Found against Mono 4.2.3.4 and later tested to be present since .NET 4.0 on
+  Windows XP also.
 
 #### 7.1.1 Driver Specific Issues on Windows
 

@@ -13,6 +13,7 @@ namespace RJCP.IO.Ports.Native
     using Microsoft.Win32.SafeHandles;
     using Windows;
     using Native.Win32;
+    using RJCP.Diagnostics.Trace;
 
 #if !NETSTANDARD
     using System.Management;
@@ -30,8 +31,17 @@ namespace RJCP.IO.Ports.Native
         private CommState m_CommState;
         private CommModemStatus m_CommModemStatus;
         private CommOverlappedIo m_CommOverlappedIo;
+        private LogSource m_Log;
 
         private string m_Version;
+
+        public WinNativeSerial() : this(new LogSource()) { }
+
+        public WinNativeSerial(LogSource log)
+        {
+            if (log == null) throw new ArgumentNullException(nameof(log));
+            m_Log = log;
+        }
 
         /// <summary>
         /// Gets the version of the implementation in use.
@@ -873,7 +883,7 @@ namespace RJCP.IO.Ports.Native
             m_CommState = new CommState(m_ComPortHandle);
             m_CommProperties = new CommProperties(m_ComPortHandle);
             m_CommModemStatus = new CommModemStatus(m_ComPortHandle);
-            m_CommOverlappedIo = new CommOverlappedIo(m_ComPortHandle);
+            m_CommOverlappedIo = new CommOverlappedIo(m_ComPortHandle, m_Log);
             RegisterEvents();
         }
 

@@ -42,6 +42,7 @@
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
     <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
+    <ProjectReference Include="..\..\..\nunitextensions\CodeQuality\RJCP.CodeQuality.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
@@ -67,10 +68,14 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="SerialConfiguration.cs" />
     <Compile Include="SerialPortStreamCharTest.cs" />
+    <None Include="SerialPortStreamLoggerTest.cs" />
     <Compile Include="SerialPortStreamManualTest.cs" />
     <Compile Include="SerialPortStreamParityTest.cs" />
     <Compile Include="SerialPortStreamRxTxTest.cs" />
     <Compile Include="SerialPortStreamSimpleTest.cs" />
+    <None Include="Trace\GlobalLogger.cs" />
+    <None Include="Trace\SerialLogger.cs" />
+    <None Include="Trace\SerialLoggerFactory.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
@@ -83,9 +88,6 @@
     <Compile Include="Trace\GlobalLogger.cs" />
     <Compile Include="Trace\SerialLogger.cs" />
     <Compile Include="Trace\SerialLoggerFactory.cs" />
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

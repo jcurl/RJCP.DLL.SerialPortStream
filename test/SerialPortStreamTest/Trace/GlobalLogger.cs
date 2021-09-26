@@ -4,48 +4,38 @@
 
 // This file is only for .NET Core
 
-//#define NETCORE_LOGGER
-
 namespace RJCP.IO.Ports.Trace
 {
-#if NETCORE_LOGGER
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.DependencyInjection;
-#endif
+    using RJCP.CodeQuality.NUnitExtensions.Trace;
+    using RJCP.Diagnostics.Trace;
 
     internal static class GlobalLogger
     {
-#if NETCORE_LOGGER
-        private static ServiceCollection m_ServiceCollection;
+        private static readonly object s_LoggerFactoryLock = new object();
+        private static ILoggerFactory s_LoggerFactory;
+
+        private static ILoggerFactory GetLoggerFactory()
+        {
+            if (s_LoggerFactory == null) {
+                lock (s_LoggerFactoryLock) {
+                    if (s_LoggerFactory == null) {
+                        s_LoggerFactory = LoggerFactory.Create(builder => {
+                            builder
+                                .AddFilter("Microsoft", LogLevel.Warning)
+                                .AddFilter("System", LogLevel.Warning)
+                                .AddFilter("RJCP", LogLevel.Debug)
+                                .AddNUnitLogger();
+                        });
+                    }
+                }
+            }
+            return s_LoggerFactory;
+        }
 
         public static void Initialize()
         {
-            if (m_ServiceCollection == null) {
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", false, false)
-                    .Build();
-
-                m_ServiceCollection = new ServiceCollection();
-                m_ServiceCollection.AddLogging(builder => {
-                    builder.AddConfiguration(configuration.GetSection("Logging"));
-                    builder.AddConsole();
-                });
-            }
-
-            // If we don't do this at the beginning of every NUnit test, logging doesn't work. Not clear why, as
-            // single-stepping each trace still shows that <c>IsEnabled</c> is <c>true</c>.
-
-            ServiceProvider serviceProvider = m_ServiceCollection.BuildServiceProvider();
-            LogSourceFactory.LoggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            LogSource.SetLoggerFactory(GetLoggerFactory());
         }
-#else
-        public static void Initialize()
-        {
-            if (LogSourceFactory.LoggerFactory == null) {
-                LogSourceFactory.LoggerFactory = new Trace.SerialLoggerFactory();
-            }
-        }
-#endif
     }
 }

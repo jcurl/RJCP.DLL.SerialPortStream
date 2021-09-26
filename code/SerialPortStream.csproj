@@ -61,6 +61,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
+    <ProjectReference Include="..\..\trace\Trace\RJCP.Diagnostics.Trace.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,6 +70,7 @@
     <Compile Include="HandShake.cs" />
     <Compile Include="InternalApplicationException.cs" />
     <Compile Include="ISerialPortStream.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Native\INativeSerial.cs" />
     <Compile Include="Native\ISerialBufferSerialData.cs" />
     <Compile Include="Native\ISerialBufferStreamData.cs" />
@@ -128,15 +130,11 @@
     <Compile Include="SerialPinChangedEventArgs.cs" />
     <Compile Include="SerialPortStream.cs" />
     <Compile Include="StopBits.cs" />
-    <Compile Include="Trace\Log.cs" />
-    <Compile Include="Trace\LogSource.cs" />
+    <None Include="System\IO\Ports\SerialPort.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'">
     <Compile Include="System\IO\Ports\SerialPort.cs" />
-    <Compile Include="Trace\LineSplitter.cs" />
-    <Compile Include="Trace\LoggerTraceListener.cs" />
-    <Compile Include="Trace\LogSourceFactory.cs" />
   </ItemGroup>
 
 </Project>
