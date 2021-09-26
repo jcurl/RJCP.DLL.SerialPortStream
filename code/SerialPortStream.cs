@@ -42,13 +42,6 @@ namespace RJCP.IO.Ports
         private ReadToCache m_ReadTo;
         private LogSource m_Log;
 
-        #region Public constants
-        /// <summary>
-        /// Indicates that no time out should occur.
-        /// </summary>
-        public const int InfiniteTimeout = Timeout.Infinite;
-        #endregion
-
         #region Constructor, Port Name, Open
         /// <summary>
         /// Constructor. Create a stream that doesn't connect to any port.
@@ -487,7 +480,7 @@ namespace RJCP.IO.Ports
             get { return !IsDisposed; }
         }
 
-        private int m_ReadTimeout = InfiniteTimeout;
+        private int m_ReadTimeout = Timeout.Infinite;
 
         /// <summary>
         /// Define the time out when reading data from the stream.
@@ -498,7 +491,7 @@ namespace RJCP.IO.Ports
         /// application.
         /// <para>Should the user perform a read operation and no data is available
         /// to copy in the buffer, a time out will occur.</para>
-        /// <para>Set this property to <see cref="InfiniteTimeout"/> for an infinite time out.</para>
+        /// <para>Set this property to <see cref="Timeout.Infinite"/> for an infinite time out.</para>
         /// </remarks>
         public override int ReadTimeout
         {
@@ -507,7 +500,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (value < 0) {
-                    m_ReadTimeout = InfiniteTimeout;
+                    m_ReadTimeout = Timeout.Infinite;
                 } else {
                     m_ReadTimeout = value;
                 }
@@ -1065,7 +1058,7 @@ namespace RJCP.IO.Ports
             get { return !IsDisposed && m_NativeSerial.IsOpen && m_NativeSerial.IsRunning; }
         }
 
-        private int m_WriteTimeout = InfiniteTimeout;
+        private int m_WriteTimeout = Timeout.Infinite;
 
         /// <summary>
         /// Define the time out when writing data to the local buffer.
@@ -1093,7 +1086,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (value < 0) {
-                    m_WriteTimeout = InfiniteTimeout;
+                    m_WriteTimeout = Timeout.Infinite;
                 } else {
                     m_WriteTimeout = value;
                 }

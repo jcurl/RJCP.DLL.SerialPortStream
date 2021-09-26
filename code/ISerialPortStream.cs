@@ -111,7 +111,7 @@ namespace RJCP.IO.Ports
         /// Should the user perform a read operation and no data is available to copy in the buffer, a time out will
         /// occur.
         /// </para>
-        /// <para>Set this property to <see cref="SerialPortStream.InfiniteTimeout"/> for an infinite time out.</para>
+        /// <para>Set this property to <see cref="System.Threading.Timeout.Infinite"/> for an infinite time out.</para>
         /// </remarks>
         int ReadTimeout { get; set; }
 
