@@ -53,6 +53,7 @@
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="Mono.Posix" Version="4.0.0.0" >
       <PrivateAssets>all</PrivateAssets>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
 
