@@ -375,20 +375,17 @@ namespace RJCP.IO.Ports.Native
             throw new InternalApplicationException("Unexpected code flow");
         }
 
-        void ISerialBufferStreamData.Reset(bool clearBuffer)
+        void ISerialBufferStreamData.Reset()
         {
-            if (clearBuffer) {
-                m_ReadBuffer.Reset();
-                m_WriteBuffer.Reset();
-                m_ReadBufferNotEmptyEvent.Reset();
-                m_ReadBufferNotFullEvent.Set();
-                m_ReadEvent.Reset();
-                m_AbortReadEvent.Reset();
-                m_WriteBufferNotFullEvent.Set();
-                m_WriteBufferNotEmptyEvent.Reset();
-                m_AbortWriteEvent.Reset();
-            }
-
+            m_ReadBuffer.Reset();
+            m_WriteBuffer.Reset();
+            m_ReadBufferNotEmptyEvent.Reset();
+            m_ReadBufferNotFullEvent.Set();
+            m_ReadEvent.Reset();
+            m_AbortReadEvent.Reset();
+            m_WriteBufferNotFullEvent.Set();
+            m_WriteBufferNotEmptyEvent.Reset();
+            m_AbortWriteEvent.Reset();
             m_TxEmptyEvent.Set();
             m_DeviceDead.Reset();
         }
