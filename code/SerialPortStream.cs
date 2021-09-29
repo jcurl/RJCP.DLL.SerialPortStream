@@ -291,7 +291,7 @@ namespace RJCP.IO.Ports
                 if (m_Buffer == null) {
                     m_Buffer = m_NativeSerial.CreateSerialBuffer(m_ReadBufferSize, m_WriteBufferSize);
                 } else {
-                    m_Buffer.Stream.Reset(true);
+                    m_Buffer.Stream.Reset();
                 }
                 m_NativeSerial.StartMonitor(m_Buffer, PortName);
             } catch {

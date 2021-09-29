@@ -119,10 +119,9 @@
         /// <summary>
         /// Reset the buffer to an initial state ready for a new connection.
         /// </summary>
-        /// <param name="clearBuffer">Set to <see langword="true"/> to reset the contents of the buffers.</param>
         /// <remarks>
         /// This should only be closed when the serial port is closed.
         /// </remarks>
-        void Reset(bool clearBuffer);
+        void Reset();
     }
 }
