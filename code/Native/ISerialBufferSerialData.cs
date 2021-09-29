@@ -68,14 +68,6 @@
         bool TxEmptyEvent();
 
         /// <summary>
-        /// Gets a value indicating whether this instance uses a pinned buffer.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> if this instance uses a pinned buffer; otherwise, <see langword="false"/>.
-        /// </value>
-        bool IsPinnedBuffer { get; }
-
-        /// <summary>
         /// Gets the event handle that is signalled when the read buffer is not full.
         /// </summary>
         /// <value>
