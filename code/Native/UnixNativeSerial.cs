@@ -21,6 +21,9 @@ namespace RJCP.IO.Ports.Native
         private IntPtr m_HandlePtr;
         private LogSource m_Log;
 
+        private readonly AutoResetEvent m_WriteClearEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent m_WriteClearDoneEvent = new AutoResetEvent(false);
+
         public UnixNativeSerial() : this(new LogSource()) { }
 
         public UnixNativeSerial(LogSource log)
@@ -605,7 +608,10 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         public void DiscardOutBuffer()
         {
-            if (m_Dll.serial_discardoutbuffer(m_Handle) == -1) ThrowException();
+            if (IsRunning) {
+                m_WriteClearEvent.Set();
+                m_WriteClearDoneEvent.WaitOne(Timeout.Infinite);
+            }
         }
 
         /// <summary>
@@ -751,6 +757,7 @@ namespace RJCP.IO.Ports.Native
         {
             WaitHandle[] handles = new WaitHandle[] {
                 m_StopRunning,
+                m_WriteClearEvent,
                 m_Buffer.Serial.ReadBufferNotFull,
                 m_Buffer.Serial.WriteBufferNotEmpty
             };
@@ -763,6 +770,11 @@ namespace RJCP.IO.Ports.Native
                 switch (handle) {
                 case 0: // StopRunning - Should abort
                     m_IsRunning = false;
+                    continue;
+                case 1: // Clear write buffers
+                    m_Buffer.Serial.Purge();
+                    m_Dll.serial_discardoutbuffer(m_Handle);
+                    m_WriteClearDoneEvent.Set();
                     continue;
                 }
 
@@ -990,6 +1002,8 @@ namespace RJCP.IO.Ports.Native
             if (disposing) {
                 if (IsOpen) Close();
                 m_Handle.Dispose();
+                m_WriteClearEvent.Dispose();
+                m_WriteClearDoneEvent.Dispose();
                 m_Dll = null;
                 m_StopRunning.Dispose();
                 m_StopRunning = null;

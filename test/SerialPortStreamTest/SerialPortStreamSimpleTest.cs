@@ -433,6 +433,20 @@ namespace RJCP.IO.Ports
         }
 
         [Test]
+        public void DiscardOutBufferAfterWrite()
+        {
+            var buffer = new byte[65536];
+
+            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+                serialSource.Open();
+                serialSource.Write(buffer, 0, buffer.Length);
+                serialSource.DiscardOutBuffer();
+                Thread.Sleep(50);
+                Assert.That(serialSource.BytesToWrite, Is.EqualTo(0));
+            }
+        }
+
+        [Test]
         public void RtsEnableBeforeOpen()
         {
             SerialPortStream serial = null;

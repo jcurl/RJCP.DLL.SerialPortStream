@@ -192,9 +192,7 @@ namespace RJCP.IO.Ports.Native.Windows
         public void DiscardOutBuffer()
         {
             if (!IsRunning) {
-                lock (m_Buffer.WriteLock) {
-                    m_Buffer.Serial.Purge();
-                }
+                m_Buffer.Serial.Purge();
             } else {
                 m_WriteClearEvent.Set();
                 m_WriteClearDoneEvent.WaitOne(Timeout.Infinite);
