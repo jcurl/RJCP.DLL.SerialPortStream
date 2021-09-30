@@ -795,8 +795,12 @@ namespace RJCP.IO.Ports.Native
                 if ((result & SerialReadWriteEvent.ReadEvent) != 0) {
                     int rresult;
                     fixed (byte* b = m_Buffer.Serial.ReadBuffer.Array) {
-                        byte* bo = b + m_Buffer.Serial.ReadBuffer.End;
-                        int length = m_Buffer.Serial.ReadBuffer.WriteLength;
+                        byte* bo;
+                        int length;
+                        lock (m_Buffer.ReadLock) {
+                            bo = b + m_Buffer.Serial.ReadBuffer.End;
+                            length = m_Buffer.Serial.ReadBuffer.WriteLength;
+                        }
                         rresult = m_Dll.serial_read(m_Handle, (IntPtr)bo, length);
                         if (rresult < 0) {
                             if (m_Log.ShouldTrace(TraceEventType.Error))
@@ -819,8 +823,12 @@ namespace RJCP.IO.Ports.Native
                 if ((result & SerialReadWriteEvent.WriteEvent) != 0) {
                     int wresult;
                     fixed (byte* b = m_Buffer.Serial.WriteBuffer.Array) {
-                        byte* bo = b + m_Buffer.Serial.WriteBuffer.Start;
-                        int length = m_Buffer.Serial.WriteBuffer.ReadLength;
+                        byte* bo;
+                        int length;
+                        lock (m_Buffer.WriteLock) {
+                            bo = b + m_Buffer.Serial.WriteBuffer.Start;
+                            length = m_Buffer.Serial.WriteBuffer.ReadLength;
+                        }
                         wresult = m_Dll.serial_write(m_Handle, (IntPtr)bo, length);
                         if (wresult < 0) {
                             if (m_Log.ShouldTrace(TraceEventType.Error))
