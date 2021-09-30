@@ -1,6 +1,6 @@
 # List of Changes with Releases
 
-## Version 2.3.2-beta (libnserial 1.1.4)
+## Version 2.4.0 (libnserial 1.1.4)
 
 Features
 
@@ -9,7 +9,15 @@ Features
   * DOTNET-331: with .NET Core (API .NET Standard 1.5)
   * DOTNET-334: Unit Test cases for .NET Core 3.1 (tests .NET Standard)
 * DOTNET-185: Port test cases to NUnit 3.x
-* DOTNET-328: Add logging/debugging support for .NET Core
+* DOTNET-328, DOTNET-419: Add logging/debugging support for .NET Core
+
+Bugfixes
+
+* DOTNET-333: Update interface for .NET Standard to include Async methods
+* Clean up internal details for dead code
+* DOTNET-422: (Linux only) DiscardOutBuffer now clears the buffers
+* DOTNET-423: (Linux only) Fix internal race condition when reading/writing
+  data that could lead to data corruption
 
 Source
 
@@ -20,8 +28,8 @@ Source
 Bugfixes
 
 * [Issue #116](https://github.com/jcurl/SerialPortStream/issues/116): Fix
-  `ReadAsync()` and `WriteAsync()` on .NET Standard 1.5 (.NET Core and .NET 5.0 and
-  later).
+  `ReadAsync()` and `WriteAsync()` on .NET Standard 1.5 (.NET Core and .NET 5.0
+  and later).
 
 ## Version 2.3.0 (libnserial 1.1.4) - Do not use - 13/Apr/2021
 
@@ -35,7 +43,8 @@ Features
 
 Bugfixes
 
-* [Issue #110](https://github.com/jcurl/SerialPortStream/issues/110): Fix ReadFile P/Invoke
+* [Issue #110](https://github.com/jcurl/SerialPortStream/issues/110): Fix
+  ReadFile P/Invoke
 
 ## Version 2.2.2 (libnserial 1.1.4) - 5/Jul/2020
 
@@ -49,8 +58,8 @@ Bugfixes
 Bugfixes
 
 * DOTNET-180: Allow compilation of libnserial on Ubuntu 16.04.5.
-* [Issue #104](https://github.com/jcurl/SerialPortStream/issues/104): Fix buffer
-  handling. `Write()` would sometimes corrupt data.
+* [Issue #104](https://github.com/jcurl/SerialPortStream/issues/104): Fix
+  buffer handling. `Write()` would sometimes corrupt data.
 * [Issue #90](https://github.com/jcurl/SerialPortStream/issues/90): `IsOpen()`
   might return `NullReferenceException` as it's not thread safe with `Close()`.
 
@@ -123,8 +132,8 @@ Bugfixes
 * DOTNET-94: Properly handle errors from pthreads.
 * DOTNET-95: Correct race condition when aborting a modem event.
 * DOTNET-91: Treat `EINTR` as a non-fatal interrupt.
-* [Issue #24](https://github.com/jcurl/SerialPortStream/issues/24): Thread names
-  on Linux too long.
+* [Issue #24](https://github.com/jcurl/SerialPortStream/issues/24): Thread
+  names on Linux too long.
 * DOTNET-100: Use a `SafeHandle` for `libnserial`.
 * [Issue #25](https://github.com/jcurl/SerialPortStream/issues/25): Support
   devices that don't work with overlapped WaitCommEvent.
@@ -149,8 +158,8 @@ Bugfixes
 
 Features
 
-* [Issue #10](https://github.com/jcurl/SerialPortStream/issues/10): Support .NET
-  Standard 1.5 (.NET Core 1.0 and .NET FX 4.6.x).
+* [Issue #10](https://github.com/jcurl/SerialPortStream/issues/10): Support
+  .NET Standard 1.5 (.NET Core 1.0 and .NET FX 4.6.x).
 * DOTNET-75: Add proper exception support for Linux.
 * DOTNET-74: Refactor projects to separate .NET 4.0 and .NET 4.5 for
   multitargetting.

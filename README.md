@@ -240,7 +240,7 @@ use to enable logging:
           <add name="myListener"/>
         </listeners>
       </source>
-    </sources> 
+    </sources>
     <sharedListeners>
       <add name="myListener" type="System.Diagnostics.TextWriterTraceListener" initializeData="logfile.txt"/>
     </sharedListeners>
