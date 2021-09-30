@@ -6,6 +6,7 @@ namespace System.IO.Ports
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using NUnit.Framework;
     using RJCP.IO.Ports;
 
@@ -46,17 +47,15 @@ namespace System.IO.Ports
 
                 serialDest.RtsEnable = false;
 
-                new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Disposing serialSource");
+                Task serial = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Disposing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        serialSource.Dispose();
-                        Console.WriteLine("Disposed serialSource");
-                    }
-                ).Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    serialSource.Dispose();
+                    Console.WriteLine("Disposed serialSource");
+                });
 
                 int bufferCount = 1024 * 1024;
                 while (bufferCount > 0) {
@@ -64,6 +63,8 @@ namespace System.IO.Ports
                     bufferCount -= buffer.Length;
                     Console.WriteLine("{0}", bufferCount);
                 }
+
+                serial.Wait();
             }
         }
 
@@ -83,17 +84,15 @@ namespace System.IO.Ports
 
                 serialDest.RtsEnable = false;
 
-                new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Closing serialSource");
+                Task serial = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Closing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        serialSource.Close();
-                        Console.WriteLine("Closed serialSource");
-                    }
-                ).Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    serialSource.Close();
+                    Console.WriteLine("Closed serialSource");
+                });
 
                 int bufferCount = 1024 * 1024;
                 while (bufferCount > 0) {
@@ -101,6 +100,8 @@ namespace System.IO.Ports
                     bufferCount -= buffer.Length;
                     Console.WriteLine("{0}", bufferCount);
                 }
+
+                serial.Wait();
             }
         }
     }

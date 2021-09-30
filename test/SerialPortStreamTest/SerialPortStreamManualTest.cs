@@ -6,6 +6,7 @@ namespace RJCP.IO.Ports
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using NUnit.Framework;
 
     /// <summary>
@@ -42,7 +43,7 @@ namespace RJCP.IO.Ports
             byte[] buffer = new byte[1024];
 
             SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One);
-            Thread testThread;
+            Task testTask;
 
             using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
             using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
@@ -57,19 +58,16 @@ namespace RJCP.IO.Ports
                 serialDest.RtsEnable = false;
                 Thread.Sleep(100);
 
-                testThread = new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Disposing serialSource");
+                testTask = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Disposing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        disposedEvent.Set();
-                        serialSource.Dispose();
-                        Console.WriteLine("Disposed serialSource");
-                    }
-                );
-                testThread.Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    disposedEvent.Set();
+                    serialSource.Dispose();
+                    Console.WriteLine("Disposed serialSource");
+                });
 
                 Assert.That(
                     () => {
@@ -85,7 +83,7 @@ namespace RJCP.IO.Ports
                     }, Throws.InstanceOf<ObjectDisposedException>());
             }
 
-            testThread.Join(20000);
+            testTask.Wait(20000);
             Console.WriteLine("Finished");
         }
 
@@ -109,18 +107,16 @@ namespace RJCP.IO.Ports
                 serialDest.RtsEnable = false;
                 Thread.Sleep(100);
 
-                new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Closing serialSource");
+                Task serial = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Closing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        closedEvent.Set();
-                        serialSource.Close();
-                        Console.WriteLine("Closed serialSource");
-                    }
-                ).Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    closedEvent.Set();
+                    serialSource.Close();
+                    Console.WriteLine("Closed serialSource");
+                });
 
                 Assert.That(
                     () => {
@@ -134,6 +130,8 @@ namespace RJCP.IO.Ports
                             Console.WriteLine("{0}", bufferCount);
                         }
                     }, Throws.InstanceOf<System.IO.IOException>());
+
+                serial.Wait();
             }
         }
 
@@ -157,24 +155,22 @@ namespace RJCP.IO.Ports
                 serialDest.RtsEnable = false;
                 Thread.Sleep(100);
 
-                new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Closing serialSource but first setting handshake to NONE");
+                Task serial = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Closing serialSource but first setting handshake to NONE");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        closedEvent.Set();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    closedEvent.Set();
 
-                        // In an attempt to "unblock" on MONO, we thought we could set the
-                        // handlshake to none. What happens instead, it blocks here which
-                        // is also an error, and so a new test case.
-                        serialSource.Handshake = Handshake.None;
-                        Console.WriteLine("Closing serialSource");
-                        serialSource.Close();
-                        Console.WriteLine("Closed serialSource");
-                    }
-                ).Start();
+                    // In an attempt to "unblock" on MONO, we thought we could set the
+                    // handlshake to none. What happens instead, it blocks here which
+                    // is also an error, and so a new test case.
+                    serialSource.Handshake = Handshake.None;
+                    Console.WriteLine("Closing serialSource");
+                    serialSource.Close();
+                    Console.WriteLine("Closed serialSource");
+                });
 
                 Assert.That(
                     () => {
@@ -188,6 +184,8 @@ namespace RJCP.IO.Ports
                             Console.WriteLine("{0}", bufferCount);
                         }
                     }, Throws.InstanceOf<System.IO.IOException>());
+
+                serial.Wait();
             }
         }
 
@@ -198,7 +196,7 @@ namespace RJCP.IO.Ports
             byte[] buffer = new byte[8192];
 
             SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One);
-            Thread testThread;
+            Task testTask;
 
             using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
             using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
@@ -213,19 +211,16 @@ namespace RJCP.IO.Ports
                 serialDest.RtsEnable = false;
                 Thread.Sleep(100);
 
-                testThread = new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Disposing serialSource");
+                testTask = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Disposing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        disposedEvent.Set();
-                        serialSource.Dispose();
-                        Console.WriteLine("Disposed serialSource");
-                    }
-                );
-                testThread.Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    disposedEvent.Set();
+                    serialSource.Dispose();
+                    Console.WriteLine("Disposed serialSource");
+                });
 
                 Assert.That(
                     () => {
@@ -240,7 +235,7 @@ namespace RJCP.IO.Ports
                     }, Throws.InstanceOf<ObjectDisposedException>());
             }
 
-            testThread.Join(20000);
+            testTask.Wait(20000);
             Console.WriteLine("Finished");
         }
 
@@ -264,18 +259,16 @@ namespace RJCP.IO.Ports
                 serialDest.RtsEnable = false;
                 Thread.Sleep(100);
 
-                new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Closing serialSource");
+                Task serial = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Closing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        closedEvent.Set();
-                        serialSource.Close();
-                        Console.WriteLine("Closed serialSource");
-                    }
-                ).Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    closedEvent.Set();
+                    serialSource.Close();
+                    Console.WriteLine("Closed serialSource");
+                });
 
                 Assert.That(
                     () => {
@@ -288,6 +281,8 @@ namespace RJCP.IO.Ports
                             Assert.Fail("Write returned after being closed.");
                         }
                     }, Throws.InstanceOf<System.IO.IOException>());
+
+                serial.Wait();
             }
         }
 
@@ -298,26 +293,23 @@ namespace RJCP.IO.Ports
             byte[] buffer = new byte[1024];
 
             SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One);
-            Thread testThread;
+            Task testTask;
 
             using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
             using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 
-                testThread = new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Disposing serialSource");
+                testTask = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Disposing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        disposedEvent.Set();
-                        serialSource.Dispose();
-                        Console.WriteLine("Disposed serialSource");
-                    }
-                );
-                testThread.Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    disposedEvent.Set();
+                    serialSource.Dispose();
+                    Console.WriteLine("Disposed serialSource");
+                });
 
                 Assert.That(
                     () => {
@@ -329,7 +321,7 @@ namespace RJCP.IO.Ports
                     }, Throws.InstanceOf<ObjectDisposedException>());
             }
 
-            testThread.Join(20000);
+            testTask.Wait(20000);
             Console.WriteLine("Finished");
         }
 
@@ -345,18 +337,16 @@ namespace RJCP.IO.Ports
                 serialSource.Open();
                 serialDest.Open();
 
-                new Thread(
-                    () => {
-                        Thread.Sleep(2000);
-                        Console.WriteLine("Closing serialSource");
+                Task serial = new TaskFactory().StartNew(() => {
+                    Thread.Sleep(2000);
+                    Console.WriteLine("Closing serialSource");
 
-                        // It appears that the MSDN .NET implementation blocks here, never
-                        // to return as we're blocked on another thread.
-                        closedEvent.Set();
-                        serialSource.Close();
-                        Console.WriteLine("Closed serialSource");
-                    }
-                ).Start();
+                    // It appears that the MSDN .NET implementation blocks here, never
+                    // to return as we're blocked on another thread.
+                    closedEvent.Set();
+                    serialSource.Close();
+                    Console.WriteLine("Closed serialSource");
+                });
 
                 int bytes = serialSource.Read(buffer, 0, buffer.Length);
                 Console.WriteLine("Read finished, returned {0} bytes", bytes);
@@ -364,6 +354,8 @@ namespace RJCP.IO.Ports
                     Assert.Fail("Read returned before being disposed.");
                 }
                 Assert.That(bytes, Is.EqualTo(0));
+
+                serial.Wait();
             }
         }
 

@@ -6,6 +6,7 @@ namespace RJCP.IO.Ports
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using NUnit.Framework;
 
     /// <summary>
@@ -79,11 +80,11 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                new Thread(() => {
+                Task write = new TaskFactory().StartNew(() => {
                     Thread.Sleep(TimeOut + 500);
                     byte[] send = new byte[] { 0x65, 0x66, 0x67 };
                     src.Write(send, 0, send.Length);
-                }).Start();
+                });
 
                 char[] recv = new char[5];
                 int cread = 0; int counter = 0;
@@ -101,6 +102,8 @@ namespace RJCP.IO.Ports
                 Assert.That(recv[0], Is.EqualTo('e'));
                 Assert.That(recv[1], Is.EqualTo('f'));
                 Assert.That(recv[2], Is.EqualTo('g'));
+
+                write.Wait();
             }
         }
 
@@ -134,15 +137,17 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                new Thread(() => {
+                Task write = new TaskFactory().StartNew(() => {
                     Thread.Sleep(TimeOut + 500);
                     byte[] send = new byte[] { 0x65, 0x66, 0x67 };
                     src.Write(send, 0, send.Length);
-                }).Start();
+                });
 
                 Assert.That(dst.ReadChar(), Is.EqualTo((int)'e'));
                 Assert.That(dst.ReadChar(), Is.EqualTo((int)'f'));
                 Assert.That(dst.ReadChar(), Is.EqualTo((int)'g'));
+
+                write.Wait();
             }
         }
 
