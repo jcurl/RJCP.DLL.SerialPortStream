@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream", "code\Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamTest", "test\SerialPortStreamTest\SerialPortStreamTest.csproj", "{7FC71C44-4761-4FAF-8EB5-6857490B7047}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTest", "IntegrationTest", "{A9039DFD-D69C-4759-9668-AD8769C3F877}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BufferBytesTest", "test\BufferBytesTest\BufferBytesTest.csproj", "{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,18 @@ Global
 		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Signed_Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Signed_Release|Any CPU.Build.0 = Release|Any CPU
+		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Signed_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Signed_Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E} = {A9039DFD-D69C-4759-9668-AD8769C3F877}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0669B6F2-2B30-4F57-908F-5F99AADEE232}
