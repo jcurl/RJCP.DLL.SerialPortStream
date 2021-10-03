@@ -1,10 +1,11 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
 namespace RJCP.IO.Ports.Native
 {
     using System;
+    using System.Text;
 
     /// <summary>
     /// Interface for accessing serial based streams.
@@ -285,8 +286,9 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         /// <param name="readBuffer">The read buffer size to allocate.</param>
         /// <param name="writeBuffer">The write buffer size to allocate.</param>
+        /// <param name="encoding">The encoding to use for character conversions.</param>
         /// <returns>A serial buffer object that can be given to <see cref="StartMonitor"/></returns>
-        SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer);
+        SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer, Encoding encoding);
 
         /// <summary>
         /// Start the monitor thread, that will watch over the serial port.

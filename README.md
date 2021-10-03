@@ -36,16 +36,18 @@ enhances portability and fixes bugs. See the end of these notes for differences.
       * 6.1.3.1 Dependency Injection
       * 6.1.3.2 Singleton via LogSource
 * 7.0 Known Issues
-  * 7.1 Windows
-    * 7.1.1 Driver Specific Issues on Windows
-      * 7.1.1.1 Flow Control
-  * 7.2 Linux
-    * 7.2.1 Mono on non-Windows Platforms
-    * 7.2.2 Driver Specific Issues on Linux
-      * 7.2.2.1 Parity Errors
-      * 7.2.2.2 Garbage Data on Open
-      * 7.2.2.3 Monitoring Pins and Timing Resolution
-      * 7.2.2.4 Close Times with Flow Control
+  * 7.1 General Issues
+    * 7.1.1 ReadTo
+  * 7.2 Windows
+    * 7.2.1 Driver Specific Issues on Windows
+      * 7.2.1.1 Flow Control
+  * 7.3 Linux
+    * 7.3.1 Mono on non-Windows Platforms
+    * 7.3.2 Driver Specific Issues on Linux
+      * 7.3.2.1 Parity Errors
+      * 7.3.2.2 Garbage Data on Open
+      * 7.3.2.3 Monitoring Pins and Timing Resolution
+      * 7.3.2.4 Close Times with Flow Control
 
 ## 1.0 Why another Serial Port implementation
 
@@ -344,7 +346,21 @@ will create this object and log all debug level events to the NUnit logger.
 
 ## 7.0 Known Issues
 
-### 7.1 Windows
+### 7.1 General Issues
+
+#### 7.1.1 ReadTo
+
+The implementation of `ReadTo` and other character based read events with the
+SerialPortStream is buggy since version 1.x until the current version, with
+some unit test cases occasionally failing.
+
+The `ReadTo` and other character based implementations are rather inefficient,
+as it tries to calculate the size (in bytes) of each individual character, in
+case the user decides to read bytes in-between. The purpose of this was to
+prevent possible data loss in when a read of bytes is mixed with a read of
+characters.
+
+### 7.2 Windows
 
 The following issues are known:
 
@@ -358,9 +374,9 @@ The following issues are known:
   Found against Mono 4.2.3.4 and later tested to be present since .NET 4.0 on
   Windows XP also.
 
-#### 7.1.1 Driver Specific Issues on Windows
+#### 7.2.1 Driver Specific Issues on Windows
 
-##### 7.1.1.1 Flow Control
+##### 7.2.1.1 Flow Control
 
 Using the FTDI chipset on Windows 10 x64 (FTDI 2.12.16.0 dated 09/Mar/2016) flow
 control (RTS/CTS) doesn't work as expected. For writing small amounts of data
@@ -370,7 +386,7 @@ test case now fails. This problem is not observable with com0com 3.0. You can
 see the effect in logs, there is a TX-EMPTY event that occurs, which should
 never be there if no data is ever sent.
 
-### 7.2 Linux
+### 7.3 Linux
 
 SerialPortStream was tested on Ubuntu 14.04 and Ubuntu 16.04. Feedback welcome
 for other distributions!
@@ -385,7 +401,7 @@ are observed:
 
 Patches are welcome to implement these features!
 
-#### 7.2.1 Mono on non-Windows Platforms
+#### 7.3.1 Mono on non-Windows Platforms
 
 Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
 
@@ -398,7 +414,7 @@ Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
   it does, as this is managed by the driver itself.
 * The test case for opening two serial ports simultaneously on Mono fails,
   meaning that it's possible to open the same device twice, which on Windows
-  raises an UnauthorizedAccessException().
+  raises an `UnauthorizedAccessException()`.
 * ListPorts is not implemented on Mono and uses the SerialPort implementation.
 * Mono 4.2.3.4 (tested) has a minor bug in System.Text.Decoder as in the .NET
   references, that in a special circumstance it will consume too many bytes. The
@@ -407,12 +423,12 @@ Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
   against Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows
   XP also.
 
-#### 7.2.2 Driver Specific Issues on Linux
+#### 7.3.2 Driver Specific Issues on Linux
 
 Tests have been done using FTDO, PL2303H, PL2303RA and 16550A (some still do
 exist!).  The following has been observed:
 
-##### 7.2.2.1 Parity Errors
+##### 7.3.2.1 Parity Errors
 
 Some chipsets do not report properly parity errors. The 16550A chipset works as
 expected. Issues observed with FTDI, PL2303H, PL2303RA. In particular, on a
@@ -444,7 +460,7 @@ Unexpected byte received with Even Parity
 [  FAILED  ] SerialParityTest.Parity7O1ReceiveErrorWithReplace (572 ms)
 ```
 
-##### 7.2.2.2 Garbage Data on Open
+##### 7.3.2.2 Garbage Data on Open
 
 On Linux Kernel with Ubuntu 14.04 and Ubuntu 16.04, we observe that some USB-SER
 drivers provide extra data depending on what a previous process was doing. It
@@ -480,7 +496,7 @@ Reading complete...
 Complete...
 ```
 
-##### 7.2.2.3 Monitoring Pins and Timing Resolution
+##### 7.3.2.3 Monitoring Pins and Timing Resolution
 
 Monitoring of pins CTS, DSR, RI and DCD is not 100% reliable for some chipsets
 and workarounds are in place. In particular, the chips PL2303H, PL2303RA do not
@@ -507,7 +523,7 @@ Your driver doesn't support TIOCGICOUNT
   Error: 25 (Inappropriate ioctl for device)
 ```
 
-##### 7.2.2.4 Close Times with Flow Control
+##### 7.3.2.4 Close Times with Flow Control
 
 Some times closing the serial port may take a long time (observed from 5s to
 21s) if it is write blocked due to hardware flow control. In particular, the

@@ -1,4 +1,4 @@
-// Copyright © Jason Curl 2012-2018
+// Copyright © Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -7,6 +7,7 @@ namespace RJCP.IO.Ports.Native
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Text;
     using System.Threading;
     using RJCP.Diagnostics.Trace;
     using Unix;
@@ -38,12 +39,12 @@ namespace RJCP.IO.Ports.Native
             m_HandlePtr = m_Handle.DangerousGetHandle();
 
 #if NETSTANDARD
-            // On NetStandard 1.5, we must have proper exception handling
+            // On NetStandard 2.1, we must have proper exception handling
             try {
                 // These methods were first added in libnserial 1.1
                 m_Dll.netfx_errno(0);
             } catch (EntryPointNotFoundException) {
-                throw new PlatformNotSupportedException("Must have libnserial 1.1.0 or later on .NET Standard 1.5");
+                throw new PlatformNotSupportedException("Must have libnserial 1.1.0 or later on .NET Core");
             }
 #endif
         }
@@ -659,10 +660,11 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         /// <param name="readBuffer">The read buffer size to allocate.</param>
         /// <param name="writeBuffer">The write buffer size to allocate.</param>
+        /// <param name="encoding">The encoding to use for character conversions.</param>
         /// <returns>A serial buffer object that can be given to <see cref="StartMonitor"/></returns>
-        public SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer)
+        public SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer, Encoding encoding)
         {
-            return new SerialBuffer(readBuffer, writeBuffer, false);
+            return new SerialBuffer(readBuffer, writeBuffer, encoding, false);
         }
 
         private SerialBuffer m_Buffer;
@@ -758,10 +760,12 @@ namespace RJCP.IO.Ports.Native
             WaitHandle[] handles = new WaitHandle[] {
                 m_StopRunning,
                 m_WriteClearEvent,
-                m_Buffer.Serial.ReadBufferNotFull,
-                m_Buffer.Serial.WriteBufferNotEmpty
+                m_Buffer.SerialRead.BufferNotFull,
+                m_Buffer.SerialWrite.BufferNotEmpty
             };
-            m_Buffer.WriteEvent += SerialBufferWriteEvent;
+
+            // The user writes data, and the serial_waitforevent should be interrupted.
+            m_Buffer.WriteStreamEvent += SerialBufferWriteEvent;
 
             while (m_IsRunning) {
                 SerialReadWriteEvent rwevent = SerialReadWriteEvent.NoEvent;
@@ -772,7 +776,7 @@ namespace RJCP.IO.Ports.Native
                     m_IsRunning = false;
                     continue;
                 case 1: // Clear write buffers
-                    m_Buffer.Serial.Purge();
+                    m_Buffer.SerialWrite.Purge();
                     m_Dll.serial_discardoutbuffer(m_Handle);
                     m_WriteClearDoneEvent.Set();
                     continue;
@@ -780,10 +784,10 @@ namespace RJCP.IO.Ports.Native
 
                 // These are not in the switch statement to ensure that we can actually
                 // read/write simultaneously.
-                if (m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) {
+                if (m_Buffer.SerialRead.IsBufferNotFull) {
                     rwevent |= SerialReadWriteEvent.ReadEvent;
                 }
-                if (m_Buffer.Serial.WriteBufferNotEmpty.WaitOne(0)) {
+                if (m_Buffer.SerialWrite.IsBufferNotEmpty) {
                     rwevent |= SerialReadWriteEvent.WriteEvent;
                 }
 
@@ -801,12 +805,12 @@ namespace RJCP.IO.Ports.Native
 
                 if ((result & SerialReadWriteEvent.ReadEvent) != 0) {
                     int rresult;
-                    fixed (byte* b = m_Buffer.Serial.ReadBuffer.Array) {
+                    fixed (byte* b = m_Buffer.SerialRead.Buffer) {
                         byte* bo;
                         int length;
-                        lock (m_Buffer.ReadLock) {
-                            bo = b + m_Buffer.Serial.ReadBuffer.End;
-                            length = m_Buffer.Serial.ReadBuffer.WriteLength;
+                        lock (m_Buffer.SerialRead.Lock) {
+                            bo = b + m_Buffer.SerialRead.BufferEnd;
+                            length = m_Buffer.SerialRead.BufferWriteLength;
                         }
                         rresult = m_Dll.serial_read(m_Handle, (IntPtr)bo, length);
                         if (rresult < 0) {
@@ -819,7 +823,11 @@ namespace RJCP.IO.Ports.Native
                             if (m_Log.ShouldTrace(TraceEventType.Verbose))
                                 m_Log.TraceEvent(TraceEventType.Verbose,
                                     $"{m_Name}: ReadWriteThread: serial_read({m_HandlePtr}, {(IntPtr)bo}, {length}) == {rresult}");
-                            if (rresult > 0) m_Buffer.Serial.ReadBufferProduce(rresult);
+                            if (rresult > 0) {
+                                lock (m_Buffer.SerialRead.Lock) {
+                                    m_Buffer.SerialRead.Produce(rresult);
+                                }
+                            }
                         }
                     }
                     if (rresult > 0) OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Chars));
@@ -827,12 +835,12 @@ namespace RJCP.IO.Ports.Native
 
                 if ((result & SerialReadWriteEvent.WriteEvent) != 0) {
                     int wresult;
-                    fixed (byte* b = m_Buffer.Serial.WriteBuffer.Array) {
+                    fixed (byte* b = m_Buffer.SerialWrite.Buffer) {
                         byte* bo;
                         int length;
-                        lock (m_Buffer.WriteLock) {
-                            bo = b + m_Buffer.Serial.WriteBuffer.Start;
-                            length = m_Buffer.Serial.WriteBuffer.ReadLength;
+                        lock (m_Buffer.SerialWrite.Lock) {
+                            bo = b + m_Buffer.SerialWrite.BufferStart;
+                            length = m_Buffer.SerialWrite.BufferReadLength;
                         }
                         wresult = m_Dll.serial_write(m_Handle, (IntPtr)bo, length);
                         if (wresult < 0) {
@@ -845,21 +853,18 @@ namespace RJCP.IO.Ports.Native
                                 m_Log.TraceEvent(TraceEventType.Verbose,
                                     $"{m_Name}: ReadWriteThread: serial_write({m_HandlePtr}, {(IntPtr)bo}, {length}) == {wresult}");
                             if (wresult > 0) {
-                                m_Buffer.Serial.WriteBufferConsume(wresult);
-                                m_Buffer.Serial.TxEmptyEvent();
+                                lock (m_Buffer.SerialWrite.Lock) {
+                                    m_Buffer.SerialWrite.Consume(wresult);
+                                }
                             }
                         }
                     }
                 }
             }
-            m_Buffer.WriteEvent -= SerialBufferWriteEvent;
-
-            // Clear the write buffer. Anything that's still in the driver serial buffer will continue to write. The I/O was cancelled
-            // so no need to purge the actual driver itself.
-            m_Buffer.Serial.Purge();
+            m_Buffer.WriteStreamEvent -= SerialBufferWriteEvent;
 
             // We must notify the stream that any blocking waits should abort.
-            m_Buffer.Serial.DeviceDead();
+            m_Buffer.Close();
         }
 
         private void SerialBufferWriteEvent(object sender, EventArgs e)

@@ -9,6 +9,7 @@ namespace RJCP.IO.Ports.Native
     using System.Diagnostics;
     using System.IO;
     using System.Runtime.InteropServices;
+    using System.Text;
     using Microsoft.Win32;
     using Microsoft.Win32.SafeHandles;
     using Windows;
@@ -914,10 +915,11 @@ namespace RJCP.IO.Ports.Native
         /// </summary>
         /// <param name="readBuffer">The read buffer size to allocate.</param>
         /// <param name="writeBuffer">The write buffer size to allocate.</param>
+        /// <param name="encoding">The encoding to use for character conversions.</param>
         /// <returns>A serial buffer object that can be given to <see cref="StartMonitor"/></returns>
-        public SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer)
+        public SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer, Encoding encoding)
         {
-            return new SerialBuffer(readBuffer, writeBuffer, true);
+            return new SerialBuffer(readBuffer, writeBuffer, encoding, true);
         }
 
         /// <summary>

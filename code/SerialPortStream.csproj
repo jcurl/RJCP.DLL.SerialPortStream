@@ -73,11 +73,11 @@
     <Compile Include="ISerialPortStream.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Native\INativeSerial.cs" />
-    <Compile Include="Native\ISerialBufferSerialData.cs" />
-    <Compile Include="Native\ISerialBufferStreamData.cs" />
+    <Compile Include="Native\IReadChars.cs" />
     <Compile Include="Native\Platform.cs" />
-    <Compile Include="Native\ReadToCache.cs" />
     <Compile Include="Native\SerialBuffer.cs" />
+    <Compile Include="Native\SerialReadBuffer.cs" />
+    <Compile Include="Native\SerialWriteBuffer.cs" />
     <Compile Include="Native\Unix\INativeSerialDll.cs" />
     <Compile Include="Native\Unix\SafeNativeMethods.cs" />
     <Compile Include="Native\Unix\SafeSerialHandle.cs" />

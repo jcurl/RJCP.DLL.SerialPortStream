@@ -9,9 +9,7 @@ namespace RJCP.IO.Ports
     internal static class Log
     {
         public const string SerialPortStream = "RJCP.IO.Ports.SerialPortStream";
-        public const string SerialPortStream_ReadTo = "RJCP.IO.Ports.SerialPortStream_ReadTo";
 
         public static readonly LogSource Serial = new LogSource(SerialPortStream);
-        public static readonly LogSource ReadTo = new LogSource(SerialPortStream_ReadTo);
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2018
+﻿// Copyright © Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -147,23 +147,22 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             bytesInRecvQueue = 0;
             eofReceived = false;
-            lock (m_Buffer.ReadLock) {
-                Kernel32.COMSTAT comStat = new Kernel32.COMSTAT();
-                bool result = Kernel32.ClearCommError(m_ComPortHandle, out Kernel32.ComStatErrors cErr, ref comStat);
-                if (!result) {
-                    int w32err = Marshal.GetLastWin32Error();
-                    int hr = Marshal.GetHRForLastWin32Error();
-                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
-                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
-                            $"{m_Name}: SerialThread: BytesInSerialQueue: ClearCommError() error {w32err}");
-                    Marshal.ThrowExceptionForHR(hr);
-                    return false;
-                }
-                if (cErr != 0) OnCommErrorEvent(new CommErrorEventArgs(cErr));
-                bytesInRecvQueue = comStat.cbInQue;
-                eofReceived = ((comStat.Flags & Kernel32.ComStatFlags.Eof) == Kernel32.ComStatFlags.Eof);
-                return true;
+
+            Kernel32.COMSTAT comStat = new Kernel32.COMSTAT();
+            bool result = Kernel32.ClearCommError(m_ComPortHandle, out Kernel32.ComStatErrors cErr, ref comStat);
+            if (!result) {
+                int w32err = Marshal.GetLastWin32Error();
+                int hr = Marshal.GetHRForLastWin32Error();
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                        $"{m_Name}: SerialThread: BytesInSerialQueue: ClearCommError() error {w32err}");
+                Marshal.ThrowExceptionForHR(hr);
+                return false;
             }
+            if (cErr != 0) OnCommErrorEvent(new CommErrorEventArgs(cErr));
+            bytesInRecvQueue = comStat.cbInQue;
+            eofReceived = ((comStat.Flags & Kernel32.ComStatFlags.Eof) == Kernel32.ComStatFlags.Eof);
+            return true;
         }
 
         /// <summary>
@@ -191,9 +190,7 @@ namespace RJCP.IO.Ports.Native.Windows
         /// </remarks>
         public void DiscardOutBuffer()
         {
-            if (!IsRunning) {
-                m_Buffer.Serial.Purge();
-            } else {
+            if (IsRunning) {
                 m_WriteClearEvent.Set();
                 m_WriteClearDoneEvent.WaitOne(Timeout.Infinite);
             }
@@ -305,12 +302,8 @@ namespace RJCP.IO.Ports.Native.Windows
             } finally {
                 m_IsRunning = false;
 
-                // Clear the write buffer. Anything that's still in the driver serial buffer will continue to write. The I/O was cancelled
-                // so no need to purge the actual driver itself.
-                m_Buffer.Serial.Purge();
-
                 // We must notify the stream that any blocking waits should abort.
-                m_Buffer.Serial.DeviceDead();
+                m_Buffer.Close();
             }
         }
 
@@ -406,10 +399,10 @@ namespace RJCP.IO.Ports.Native.Windows
                 }
 
                 if (!readPending) {
-                    if (!m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) {
+                    if (!m_Buffer.SerialRead.IsBufferNotFull) {
                         if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
                             m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: Read Buffer Full");
-                        handles.Add(m_Buffer.Serial.ReadBufferNotFull);
+                        handles.Add(m_Buffer.SerialRead.BufferNotFull);
                     } else {
                         readPending = DoReadEvent(ref readOverlapped);
                     }
@@ -417,8 +410,8 @@ namespace RJCP.IO.Ports.Native.Windows
                 if (readPending) handles.Add(m_ReadEvent);
 
                 if (!writePending) {
-                    if (!m_Buffer.Serial.WriteBufferNotEmpty.WaitOne(0)) {
-                        handles.Add(m_Buffer.Serial.WriteBufferNotEmpty);
+                    if (!m_Buffer.SerialWrite.IsBufferNotEmpty) {
+                        handles.Add(m_Buffer.SerialWrite.BufferNotEmpty);
                     } else {
                         writePending = DoWriteEvent(ref writeOverlapped);
                     }
@@ -479,7 +472,7 @@ namespace RJCP.IO.Ports.Native.Windows
                             ProcessReadEvent(bytes);
                         }
                         readPending = false;
-                    } else if (whandles[ev] == m_Buffer.Serial.ReadBufferNotFull) {
+                    } else if (whandles[ev] == m_Buffer.SerialRead.BufferNotFull) {
                         // The read buffer is no longer full. We just loop back to the beginning to test if we
                         // should read or not.
                     } else if (whandles[ev] == m_WriteEvent) {
@@ -503,7 +496,7 @@ namespace RJCP.IO.Ports.Native.Windows
                             ProcessWriteEvent(bytes);
                         }
                         writePending = false;
-                    } else if (whandles[ev] == m_Buffer.Serial.WriteBufferNotEmpty) {
+                    } else if (whandles[ev] == m_Buffer.SerialWrite.BufferNotEmpty) {
                         // The write buffer is no longer empty. We just loop back to the beginning to test if we
                         // should write or not.
                     } else if (whandles[ev] == m_WriteClearEvent) {
@@ -528,12 +521,10 @@ namespace RJCP.IO.Ports.Native.Windows
                                 }
                             }
                         } else {
-                            lock (m_Buffer.WriteLock) {
-                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
-                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: Purged");
-                                m_Buffer.Serial.Purge();
-                                m_WriteClearDoneEvent.Set();
-                            }
+                            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: Purged");
+                            m_Buffer.SerialWrite.Purge();
+                            m_WriteClearDoneEvent.Set();
                         }
                     }
                 }
@@ -600,11 +591,12 @@ namespace RJCP.IO.Ports.Native.Windows
             OnCommEvent(new CommEventArgs(mask & ~(Kernel32.SerialEventMask.EV_RXCHAR | Kernel32.SerialEventMask.EV_RXFLAG)));
 
             if ((mask & Kernel32.SerialEventMask.EV_TXEMPTY) != 0) {
-                lock (m_Buffer.WriteLock) {
-                    if (m_Buffer.Serial.TxEmptyEvent()) {
-                        if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
-                            m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
-                                $"{m_Name}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty");
+                // Some devices don't support EV_TXEMPTY, so this implementation doesn't use this information. It is
+                // logged for information only.
+                if (m_Buffer.SerialWrite.BufferReadLength == 0) {
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                            $"{m_Name}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty");
                     }
                 }
             }
@@ -649,16 +641,16 @@ namespace RJCP.IO.Ports.Native.Windows
             if (!m_ReadByteAvailable) return false;
 
             // Read Buffer is full, so can't write into it.
-            if (!m_Buffer.Serial.ReadBufferNotFull.WaitOne(0)) return false;
+            if (!m_Buffer.SerialRead.IsBufferNotFull) return false;
 
             // As C# can't convert an offset in the array to a pointer, we have to do
             // our own marshalling with (IntPtr)ReadBufferOffsetEnd that is the address
             // at the end of the read buffer.
             IntPtr bufPtr;
             uint bufLen;
-            lock (m_Buffer.ReadLock) {
-                bufPtr = m_Buffer.Serial.ReadBufferOffsetEnd;
-                bufLen = (uint)m_Buffer.Serial.ReadBuffer.WriteLength;
+            lock (m_Buffer.SerialRead.Lock) {
+                bufPtr = m_Buffer.SerialRead.BufferPtr;
+                bufLen = (uint)m_Buffer.SerialRead.BufferWriteLength;
             }
 
             bool result = Kernel32.ReadFile(m_ComPortHandle, bufPtr, bufLen, out uint bufRead, ref overlap);
@@ -711,12 +703,12 @@ namespace RJCP.IO.Ports.Native.Windows
             if (bytes == 0) {
                 m_ReadByteAvailable = false;
             } else {
-                lock (m_Buffer.ReadLock) {
+                lock (m_Buffer.SerialRead.Lock) {
                     if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
                         m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
-                            $"{m_Name}: SerialThread: ProcessReadEvent: End={m_Buffer.Serial.ReadBuffer.End}; Bytes={bytes}");
+                            $"{m_Name}: SerialThread: ProcessReadEvent: End={m_Buffer.SerialRead.BufferEnd}; Bytes={bytes}");
                     }
-                    m_Buffer.Serial.ReadBufferProduce((int)bytes);
+                    m_Buffer.SerialRead.Produce((int)bytes);
                 }
 
                 OnCommEvent(new CommEventArgs((m_ReadByteEof ? Kernel32.SerialEventMask.EV_RXFLAG : 0) | Kernel32.SerialEventMask.EV_RXCHAR));
@@ -741,9 +733,9 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             IntPtr bufPtr;
             uint bufLen;
-            lock (m_Buffer.WriteLock) {
-                bufPtr = m_Buffer.Serial.WriteBufferOffsetStart;
-                bufLen = (uint)m_Buffer.Serial.WriteBuffer.ReadLength;
+            lock (m_Buffer.SerialWrite.Lock) {
+                bufPtr = m_Buffer.SerialWrite.BufferPtr;
+                bufLen = (uint)m_Buffer.SerialWrite.BufferReadLength;
             }
 
             bool result = Kernel32.WriteFile(m_ComPortHandle, bufPtr, bufLen, out uint bufWrite, ref overlap);
@@ -785,24 +777,17 @@ namespace RJCP.IO.Ports.Native.Windows
                 if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
                     m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
                         $"{m_Name}: SerialThread: ProcessWriteEvent: {bytes} bytes - Purged");
-                lock (m_Buffer.WriteLock) {
-                    m_Buffer.Serial.Purge();
-                    m_WriteClearDoneEvent.Set();
-                }
+
+                m_Buffer.SerialWrite.Purge();
+                m_WriteClearDoneEvent.Set();
             } else {
                 if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
                     m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
                         $"{m_Name}: SerialThread: ProcessWriteEvent: {bytes} bytes");
                 if (bytes != 0) {
-                    lock (m_Buffer.WriteLock) {
-                        m_Buffer.Serial.WriteBufferConsume((int)bytes);
-                        if (m_Buffer.Serial.TxEmptyEvent()) {
-                            // We set the TxEmptyEvent always in v2.x. In release 1.x we only set it
-                            // if we received a TX_EMPTY. If we ever change this code to check for TX_EMPTY
-                            // first, ensure to check the variable SerialCommError in the main loop, as
-                            // that will tell us if we ever expect to get a TX_EMPTY. Given some weird
-                            // behaviour of serial ports, not checking is probably the safest, even if not
-                            // 100% correct.
+                    lock (m_Buffer.SerialWrite.Lock) {
+                        m_Buffer.SerialWrite.Consume((int)bytes);
+                        if (m_Buffer.SerialWrite.BufferReadLength == 0) {
                             if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
                                 m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
                                     $"{m_Name}: SerialThread: ProcessWriteEvent: TX-BUFFER empty");
