@@ -1184,7 +1184,9 @@ namespace RJCP.IO.Ports
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (m_Buffer == null) return 0;
                 lock (m_Buffer.WriteLock) {
-                    return m_Buffer.Stream.BytesToWrite + m_NativeSerial.BytesToWrite;
+                    int bytesToWrite = m_Buffer.Stream.BytesToWrite;
+                    int driverBytes = m_NativeSerial.BytesToWrite;
+                    return bytesToWrite > driverBytes ? bytesToWrite : driverBytes;
                 }
             }
         }

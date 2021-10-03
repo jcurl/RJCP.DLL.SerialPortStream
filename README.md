@@ -36,6 +36,7 @@ enhances portability and fixes bugs. See the end of these notes for differences.
   * 7.1 Windows
     * 7.1.1 Driver Specific Issues on Windows
       * 7.1.1.1 Flow Control
+      * 7.1.1.2 BytesToWrite
   * 7.2 Linux
     * 7.2.1 Mono on non-Windows Platforms
     * 7.2.2 Driver Specific Issues on Linux
@@ -295,6 +296,57 @@ case ClosedWhenFlushBlocked, change the buffer from 8192 bytes to 1024 and the
 test case now fails. This problem is not observable with com0com 3.0. You can
 see the effect in logs, there is a TX-EMPTY event that occurs, which should
 never be there if no data is ever sent.
+
+##### 7.1.1.2 BytesToWrite
+
+On Windows, the SerialPortStream returns the bigger of either the internal
+write buffer, or the amount of data in the output queue of the driver. Drivers
+don't report the number of bytes that are in the output queue before the next
+write begins, and may return sooner. This leads to the effects:
+
+###### CP2101 Driver
+
+This driver indicates more bytes are in the output queue than what it will
+return from the current ongoing write operation. This can cause some jumps
+in the returned value.
+
+[CP210x Universal Windows Driver](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
+v10.1.10 1/13/2021.
+
+For example:
+
+```text
+BytesToWrite = 40960 (driver 12288)
+RJCP.IO.Ports.SerialPortStream Verbose: 0 : COM5: SerialThread: ProcessWriteEvent: 1024 bytes
+BytesToWrite = 40412 (driver 40412)
+RJCP.IO.Ports.SerialPortStream Verbose: 0 : COM5: SerialThread: DoWriteEvent: WriteFile(736, 312385272, 39936, ...) == False
+BytesToWrite = 40387 (driver 40387)
+BytesToWrite = 40386 (driver 40386)
+```
+
+The internal buffer is 40kB, the driver returned it wrote 1024 bytes, but the
+queue still has 40412 bytes (which is more than the 39936 bytes it should be).
+
+It can also fluctuate without writes without calls to the OS in between.
+
+```text
+BytesToWrite = 40418 (driver 40418)
+BytesToWrite = 40393 (driver 40393)
+BytesToWrite = 40392 (driver 40392)
+BytesToWrite = 40391 (driver 40391)
+BytesToWrite = 40390 (driver 40390)
+BytesToWrite = 40389 (driver 40389)
+BytesToWrite = 40428 (driver 40428)
+BytesToWrite = 40427 (driver 40427)
+BytesToWrite = 40426 (driver 40426)
+```
+
+###### PL2303 RA
+
+Generally this driver reports that it has zero bytes in the output queue, but
+may sometimes report the number of bytes in the last `WriteFile()` call. This
+is not a problem, but the number of bytes in the output queue is less than what
+is still to be written, so a user may think it is complete, when it is not.
 
 ### 7.2 Linux
 

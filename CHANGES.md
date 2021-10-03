@@ -18,6 +18,7 @@ Bugfixes
 * DOTNET-422: (Linux only) DiscardOutBuffer now clears the buffers
 * DOTNET-423: (Linux only) Fix internal race condition when reading/writing
   data that could lead to data corruption
+* DOTNET-425: BytesToWrite tries not to count bytes twice
 
 Source
 
