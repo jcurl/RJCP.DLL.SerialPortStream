@@ -17,7 +17,7 @@ namespace RJCP.IO.Ports.Native
     /// </summary>
     internal class UnixNativeSerial : INativeSerial
     {
-        private INativeSerialDll m_Dll;
+        private SerialUnix m_Dll;
         private SafeSerialHandle m_Handle;
         private IntPtr m_HandlePtr;
         private LogSource m_Log;

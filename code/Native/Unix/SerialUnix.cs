@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports.Native.Unix
     using System;
     using System.Runtime.InteropServices;
 
-    internal class SerialUnix : INativeSerialDll
+    internal class SerialUnix
     {
         [ThreadStatic]
         private static int m_ErrNo;

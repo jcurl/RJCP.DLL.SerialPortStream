@@ -78,7 +78,6 @@
     <Compile Include="Native\SerialBuffer.cs" />
     <Compile Include="Native\SerialReadBuffer.cs" />
     <Compile Include="Native\SerialWriteBuffer.cs" />
-    <Compile Include="Native\Unix\INativeSerialDll.cs" />
     <Compile Include="Native\Unix\SafeNativeMethods.cs" />
     <Compile Include="Native\Unix\SafeSerialHandle.cs" />
     <Compile Include="Native\Unix\SerialUnix.cs" />
