@@ -4,7 +4,7 @@
 
 #define PL2303_WORKAROUNDS
 
-namespace RJCP.IO.Ports.Native.Windows
+namespace RJCP.IO.Ports.Serial.Windows
 {
     using System;
     using System.IO;

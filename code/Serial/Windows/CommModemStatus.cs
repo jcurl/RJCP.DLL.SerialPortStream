@@ -1,8 +1,8 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.Native.Windows
+namespace RJCP.IO.Ports.Serial.Windows
 {
     using System.IO;
     using System.Runtime.InteropServices;

@@ -2,7 +2,7 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-namespace RJCP.IO.Ports.Native
+namespace RJCP.IO.Ports.Serial
 {
     using System;
     using System.Diagnostics;
@@ -10,15 +10,15 @@ namespace RJCP.IO.Ports.Native
     using System.Text;
     using System.Threading;
     using RJCP.Diagnostics.Trace;
-    using Unix;
+    using Native.Unix;
 
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
     internal class UnixNativeSerial : INativeSerial
     {
-        private SerialUnix m_Dll;
-        private SafeSerialHandle m_Handle;
+        private LibNSerial m_Dll;
+        private LibNSerial.SafeSerialHandle m_Handle;
         private IntPtr m_HandlePtr;
         private LogSource m_Log;
 
@@ -31,7 +31,7 @@ namespace RJCP.IO.Ports.Native
         {
             if (log == null) throw new ArgumentNullException(nameof(log));
             m_Log = log;
-            m_Dll = new SerialUnix();
+            m_Dll = new LibNSerial();
             m_Handle = m_Dll.serial_init();
             if (m_Handle.IsInvalid) {
                 throw new PlatformNotSupportedException("Can't initialise platform library");
@@ -54,7 +54,7 @@ namespace RJCP.IO.Ports.Native
             if (m_Dll == null)
                 return;
 
-            SysErrNo managedErrNo;
+            LibNSerial.SysErrNo managedErrNo;
             string sysDescription;
             try {
                 // These methods were first added in libnserial 1.1
@@ -74,25 +74,25 @@ namespace RJCP.IO.Ports.Native
                 libDescription, m_Dll.errno, sysDescription);
 
             switch (managedErrNo) {
-            case SysErrNo.NETFX_OK:
-            case SysErrNo.NETFX_EINTR:
-            case SysErrNo.NETFX_EAGAIN:
-            case SysErrNo.NETFX_EWOULDBLOCK:
+            case LibNSerial.SysErrNo.NETFX_OK:
+            case LibNSerial.SysErrNo.NETFX_EINTR:
+            case LibNSerial.SysErrNo.NETFX_EAGAIN:
+            case LibNSerial.SysErrNo.NETFX_EWOULDBLOCK:
                 // We throw here in any case, as the methods that call ThrowException don't
                 // expect it to return. This would mean something that needs to be debugged
                 // and fixed (probably in the C Interop Code).
                 throw new InternalApplicationException(description);
-            case SysErrNo.NETFX_EINVAL:
+            case LibNSerial.SysErrNo.NETFX_EINVAL:
                 throw new ArgumentException(description);
-            case SysErrNo.NETFX_EACCES:
+            case LibNSerial.SysErrNo.NETFX_EACCES:
                 throw new UnauthorizedAccessException(description);
-            case SysErrNo.NETFX_ENOMEM:
+            case LibNSerial.SysErrNo.NETFX_ENOMEM:
                 throw new OutOfMemoryException(description);
-            case SysErrNo.NETFX_EBADF:
+            case LibNSerial.SysErrNo.NETFX_EBADF:
                 throw new InvalidOperationException(description);
-            case SysErrNo.NETFX_ENOSYS:
+            case LibNSerial.SysErrNo.NETFX_ENOSYS:
                 throw new PlatformNotSupportedException(description);
-            case SysErrNo.NETFX_EIO:
+            case LibNSerial.SysErrNo.NETFX_EIO:
                 throw new IOException(description);
             default:
                 throw new InvalidOperationException(description);
@@ -768,7 +768,7 @@ namespace RJCP.IO.Ports.Native
             m_Buffer.WriteStreamEvent += SerialBufferWriteEvent;
 
             while (m_IsRunning) {
-                SerialReadWriteEvent rwevent = SerialReadWriteEvent.NoEvent;
+                LibNSerial.SerialReadWriteEvent rwevent = LibNSerial.SerialReadWriteEvent.NoEvent;
 
                 int handle = WaitHandle.WaitAny(handles, -1);
                 switch (handle) {
@@ -785,14 +785,14 @@ namespace RJCP.IO.Ports.Native
                 // These are not in the switch statement to ensure that we can actually
                 // read/write simultaneously.
                 if (m_Buffer.SerialRead.IsBufferNotFull) {
-                    rwevent |= SerialReadWriteEvent.ReadEvent;
+                    rwevent |= LibNSerial.SerialReadWriteEvent.ReadEvent;
                 }
                 if (m_Buffer.SerialWrite.IsBufferNotEmpty) {
-                    rwevent |= SerialReadWriteEvent.WriteEvent;
+                    rwevent |= LibNSerial.SerialReadWriteEvent.WriteEvent;
                 }
 
-                SerialReadWriteEvent result = m_Dll.serial_waitforevent(m_Handle, rwevent, 500);
-                if (result == SerialReadWriteEvent.Error) {
+                LibNSerial.SerialReadWriteEvent result = m_Dll.serial_waitforevent(m_Handle, rwevent, 500);
+                if (result == LibNSerial.SerialReadWriteEvent.Error) {
                     if (m_Log.ShouldTrace(TraceEventType.Error))
                         m_Log.TraceEvent(TraceEventType.Error,
                             $"{m_Name}: ReadWriteThread: Error waiting for event; errno={m_Dll.errno}; description={m_Dll.serial_error(m_Handle)}");
@@ -803,7 +803,7 @@ namespace RJCP.IO.Ports.Native
                         $"{m_Name}: ReadWriteThread: serial_waitforevent({m_HandlePtr}, {rwevent}) == {result}");
                 }
 
-                if ((result & SerialReadWriteEvent.ReadEvent) != 0) {
+                if ((result & LibNSerial.SerialReadWriteEvent.ReadEvent) != 0) {
                     int rresult;
                     fixed (byte* b = m_Buffer.SerialRead.Buffer) {
                         byte* bo;
@@ -833,7 +833,7 @@ namespace RJCP.IO.Ports.Native
                     if (rresult > 0) OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Chars));
                 }
 
-                if ((result & SerialReadWriteEvent.WriteEvent) != 0) {
+                if ((result & LibNSerial.SerialReadWriteEvent.WriteEvent) != 0) {
                     int wresult;
                     fixed (byte* b = m_Buffer.SerialWrite.Buffer) {
                         byte* bo;
@@ -888,11 +888,11 @@ namespace RJCP.IO.Ports.Native
             }
         }
 
-        private const WaitForModemEvent c_ModemEvents =
-            WaitForModemEvent.RingIndicator |
-            WaitForModemEvent.ClearToSend |
-            WaitForModemEvent.DataCarrierDetect |
-            WaitForModemEvent.DataSetReady;
+        private const LibNSerial.WaitForModemEvent c_ModemEvents =
+            LibNSerial.WaitForModemEvent.RingIndicator |
+            LibNSerial.WaitForModemEvent.ClearToSend |
+            LibNSerial.WaitForModemEvent.DataCarrierDetect |
+            LibNSerial.WaitForModemEvent.DataSetReady;
 
         private void PinChangeThread()
         {
@@ -905,8 +905,8 @@ namespace RJCP.IO.Ports.Native
                 if (m_Log.ShouldTrace(TraceEventType.Verbose))
                     m_Log.TraceEvent(TraceEventType.Verbose,
                         $"{m_Name}: PinChangeThread: Waiting");
-                WaitForModemEvent mevent = m_Dll.serial_waitformodemevent(m_Handle, c_ModemEvents);
-                if (mevent == WaitForModemEvent.Error) {
+                LibNSerial.WaitForModemEvent mevent = m_Dll.serial_waitformodemevent(m_Handle, c_ModemEvents);
+                if (mevent == LibNSerial.WaitForModemEvent.Error) {
                     if (m_Log.ShouldTrace(TraceEventType.Error))
                         m_Log.TraceEvent(TraceEventType.Error,
                             $"{m_Name}: PinChangeThread: Error aborting event; errno={m_Dll.errno}; description={m_Dll.serial_error(m_Handle)}");
@@ -914,12 +914,12 @@ namespace RJCP.IO.Ports.Native
                     return;
                 }
 
-                if (mevent != WaitForModemEvent.None) {
+                if (mevent != LibNSerial.WaitForModemEvent.None) {
                     SerialPinChange pins = SerialPinChange.NoChange;
-                    if ((mevent & WaitForModemEvent.ClearToSend) != 0) pins |= SerialPinChange.CtsChanged;
-                    if ((mevent & WaitForModemEvent.DataCarrierDetect) != 0) pins |= SerialPinChange.CDChanged;
-                    if ((mevent & WaitForModemEvent.DataSetReady) != 0) pins |= SerialPinChange.DsrChanged;
-                    if ((mevent & WaitForModemEvent.RingIndicator) != 0) pins |= SerialPinChange.Ring;
+                    if ((mevent & LibNSerial.WaitForModemEvent.ClearToSend) != 0) pins |= SerialPinChange.CtsChanged;
+                    if ((mevent & LibNSerial.WaitForModemEvent.DataCarrierDetect) != 0) pins |= SerialPinChange.CDChanged;
+                    if ((mevent & LibNSerial.WaitForModemEvent.DataSetReady) != 0) pins |= SerialPinChange.DsrChanged;
+                    if ((mevent & LibNSerial.WaitForModemEvent.RingIndicator) != 0) pins |= SerialPinChange.Ring;
                     // TODO: Break not implemented
 
                     if (m_Log.ShouldTrace(TraceEventType.Verbose))
