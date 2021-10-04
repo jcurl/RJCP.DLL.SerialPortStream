@@ -40,18 +40,7 @@ namespace RJCP.IO.Ports.Native.Unix
         {
             // The portdesc is an array of two string pointers, where the last element is zero
             IntPtr portdesc;
-#if !NETSTANDARD
             portdesc = UnsafeNativeMethods.serial_getports(handle);
-#else
-            try {
-                portdesc = UnsafeNativeMethods.serial_getports(handle);
-            } catch (Exception ex) {
-                // Ugly hack as .NET Standard doesn't have EntryPointNotFoundException, so if we
-                // get any exception, we raise this one instead. To remove if it ever becomes
-                // available.
-                throw new EntryPointNotFoundException(ex.Message, ex);
-            }
-#endif
             errno = Marshal.GetLastWin32Error();
             if (portdesc.Equals(IntPtr.Zero)) return null;
 
@@ -407,35 +396,12 @@ namespace RJCP.IO.Ports.Native.Unix
 
         public SysErrNo netfx_errno(int errno)
         {
-#if !NETSTANDARD
             return (SysErrNo)SafeNativeMethods.netfx_errno(errno);
-#else
-            try {
-                return (SysErrNo)SafeNativeMethods.netfx_errno(errno);
-            } catch (Exception ex) {
-                // Ugly hack as .NET Standard doesn't have EntryPointNotFoundException, so if we
-                // get any exception, we raise this one instead. To remove if it ever becomes
-                // available.
-                throw new EntryPointNotFoundException(ex.Message, ex);
-            }
-#endif
         }
 
         public string netfx_errstring(int errno)
         {
-#if !NETSTANDARD
             IntPtr strerror = SafeNativeMethods.netfx_errstring(errno);
-#else
-            IntPtr strerror;
-            try {
-                strerror = SafeNativeMethods.netfx_errstring(errno);
-            } catch (Exception ex) {
-                // Ugly hack as .NET Standard doesn't have EntryPointNotFoundException, so if we
-                // get any exception, we raise this one instead. To remove if it ever becomes
-                // available.
-                throw new EntryPointNotFoundException(ex.Message, ex);
-            }
-#endif
             return Marshal.PtrToStringAnsi(strerror);
         }
     }
