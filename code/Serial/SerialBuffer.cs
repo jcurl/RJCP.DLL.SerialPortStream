@@ -88,7 +88,7 @@ namespace RJCP.IO.Ports.Serial
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException(nameof(Encoding));
                 if (ReadChars != null) ReadChars.Encoding = value;
                 m_Encoding = value;
             }
@@ -112,7 +112,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
                 if (m_ReadBuffer != null) throw new InvalidOperationException("Buffer already allocated");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Must be a positive integer");
+                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(ReadBufferSize), "Must be a positive integer");
 
                 m_ReadBufferSize = (value < 1024) ? 1024 : value;
             }
@@ -136,7 +136,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
                 if (m_WriteBuffer != null) throw new InvalidOperationException("Buffer already allocated");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Must be a positive integer");
+                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(WriteBufferSize), "Must be a positive integer");
 
                 m_WriteBufferSize = (value < 1024) ? 1024 : value;
             }

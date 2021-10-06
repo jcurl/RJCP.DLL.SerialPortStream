@@ -211,7 +211,7 @@ namespace RJCP.IO.Ports.Serial
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "Baud rate must be positive");
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(BaudRate), "Baud rate must be positive");
 
                 m_Baud = value;
                 if (IsOpen) SetPortSettings();
@@ -235,7 +235,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if ((value < 5 || value > 8) && value != 16) {
-                    throw new ArgumentOutOfRangeException(nameof(value), "May only be 5, 6, 7, 8 or 16");
+                    throw new ArgumentOutOfRangeException(nameof(DataBits), "May only be 5, 6, 7, 8 or 16");
                 }
                 m_DataBits = value;
                 if (IsOpen) SetPortSettings();
@@ -259,7 +259,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!Enum.IsDefined(typeof(Parity), value)) {
-                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown value for Parity");
+                    throw new ArgumentOutOfRangeException(nameof(Parity), "Unknown value for Parity");
                 }
                 m_Parity = value;
                 if (IsOpen) SetPortSettings();
@@ -282,7 +282,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!Enum.IsDefined(typeof(StopBits), value)) {
-                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown value for Stop Bits");
+                    throw new ArgumentOutOfRangeException(nameof(StopBits), "Unknown value for Stop Bits");
                 }
                 m_StopBits = value;
                 if (IsOpen) SetPortSettings();
@@ -368,7 +368,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (value < 0) {
-                    throw new ArgumentOutOfRangeException(nameof(value), "XOffLimit must be positive");
+                    throw new ArgumentOutOfRangeException(nameof(XOffLimit), "XOffLimit must be positive");
                 }
                 m_XOffLimit = value;
                 if (IsOpen) SetPortSettings();
@@ -391,7 +391,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (value < 0) {
-                    throw new ArgumentOutOfRangeException(nameof(value), "XOffLimit must be positive");
+                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOffLimit must be positive");
                 }
                 m_XOnLimit = value;
                 if (IsOpen) SetPortSettings();
@@ -448,7 +448,7 @@ namespace RJCP.IO.Ports.Serial
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "value must be a positive integer");
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(DriverInQueue), "value must be a positive integer");
                 m_DriverInQueue = value;
 
                 if (IsOpen) {
@@ -476,7 +476,7 @@ namespace RJCP.IO.Ports.Serial
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "value must be a positive integer");
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(DriverOutQueue), "value must be a positive integer");
                 m_DriverOutQueue = value;
 
                 if (IsOpen) {
@@ -656,7 +656,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (!Enum.IsDefined(typeof(Handshake), value)) {
-                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown value for Handshake");
+                    throw new ArgumentOutOfRangeException(nameof(Handshake), "Unknown value for Handshake");
                 }
                 m_Handshake = value;
                 if (IsOpen) SetPortSettings();

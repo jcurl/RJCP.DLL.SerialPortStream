@@ -224,7 +224,7 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Must provide a valid name for a COM port", nameof(value));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Must provide a valid name for a COM port", nameof(PortName));
                 if (m_NativeSerial.IsOpen && value != m_NativeSerial.PortName) throw new InvalidOperationException("Serial Port already opened");
 
                 m_NativeSerial.PortName = value;
@@ -411,7 +411,7 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value == null) throw new ArgumentNullException(nameof(value));
+                if (value == null) throw new ArgumentNullException(nameof(Encoding));
                 m_NativeSerial.Buffer.Encoding = value;
             }
         }
@@ -432,8 +432,8 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value == null) throw new ArgumentNullException(nameof(value));
-                if (string.IsNullOrEmpty(value)) throw new ArgumentException("Newline may not be empty", nameof(value));
+                if (value == null) throw new ArgumentNullException(nameof(NewLine));
+                if (string.IsNullOrEmpty(value)) throw new ArgumentException("Newline may not be empty", nameof(NewLine));
                 m_NewLine = value;
             }
         }
@@ -551,7 +551,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "ReadBufferSize must be greater than zero");
+                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(ReadBufferSize), "ReadBufferSize must be greater than zero");
 
                 m_NativeSerial.Buffer.ReadBufferSize = value;
                 if (m_RxThreshold > value) m_RxThreshold = value;
@@ -572,9 +572,9 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "Must be a positive value (1 or greater)");
+                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(ReceivedBytesThreshold), "Must be a positive value (1 or greater)");
                 if (value > ReadBufferSize)
-                    throw new ArgumentOutOfRangeException(nameof(value), "Must be less or equal to the ReadBufferSize");
+                    throw new ArgumentOutOfRangeException(nameof(ReceivedBytesThreshold), "Must be less or equal to the ReadBufferSize");
 
                 // Only raise an event if we think that we wouldn't have received an event otherwise
                 int btr = m_NativeSerial.BytesToRead;
@@ -1088,7 +1088,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value), "WriteBufferSize must be greater than zero");
+                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(WriteBufferSize), "WriteBufferSize must be greater than zero");
 
                 m_NativeSerial.Buffer.WriteBufferSize = value;
             }
@@ -1589,7 +1589,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (!Enum.IsDefined(typeof(StopBits), value))
-                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown setting for StopBits");
+                    throw new ArgumentOutOfRangeException(nameof(StopBits), "Unknown setting for StopBits");
 
                 m_NativeSerial.StopBits = value;
             }
@@ -1615,7 +1615,7 @@ namespace RJCP.IO.Ports
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (!Enum.IsDefined(typeof(Parity), value))
-                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown setting for Parity");
+                    throw new ArgumentOutOfRangeException(nameof(Parity), "Unknown setting for Parity");
 
                 m_NativeSerial.Parity = value;
             }

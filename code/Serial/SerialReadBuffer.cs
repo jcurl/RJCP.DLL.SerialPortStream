@@ -56,7 +56,7 @@ namespace RJCP.IO.Ports.Serial
                     m_Encoding = value;
                     Decoder = m_Encoding.GetDecoder();
                 } else {
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException(nameof(Encoding));
                 }
             }
         }
