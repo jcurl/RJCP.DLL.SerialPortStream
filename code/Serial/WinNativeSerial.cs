@@ -9,14 +9,13 @@ namespace RJCP.IO.Ports.Serial
     using System.Diagnostics;
     using System.IO;
     using System.Runtime.InteropServices;
-    using System.Text;
     using Microsoft.Win32;
     using Microsoft.Win32.SafeHandles;
     using Windows;
     using Native.Win32;
     using RJCP.Diagnostics.Trace;
 
-#if !NETSTANDARD
+#if NETFRAMEWORK
     using System.Management;
 #else
     using System.Reflection;
@@ -25,23 +24,34 @@ namespace RJCP.IO.Ports.Serial
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
-    internal class WinNativeSerial : INativeSerial
+    public class WinNativeSerial : INativeSerial
     {
         private SafeFileHandle m_ComPortHandle;
         private CommProperties m_CommProperties;
         private CommState m_CommState;
         private CommModemStatus m_CommModemStatus;
         private CommOverlappedIo m_CommOverlappedIo;
-        private LogSource m_Log;
+        private readonly SerialBuffer m_Buffer;
+        private readonly LogSource m_Log;
 
         private string m_Version;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WinNativeSerial"/> class for Windows.
+        /// </summary>
         public WinNativeSerial() : this(new LogSource()) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WinNativeSerial"/> class with logging for Windows.
+        /// </summary>
+        /// <param name="log">The log source object.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="log"/> is <see langword="null"/>.</exception>
         public WinNativeSerial(LogSource log)
         {
             if (log == null) throw new ArgumentNullException(nameof(log));
             m_Log = log;
+
+            m_Buffer = new SerialBuffer(true);
         }
 
         /// <summary>
@@ -89,13 +99,20 @@ namespace RJCP.IO.Ports.Serial
         }
 
         /// <summary>
-        /// Gets an array of serial port names for the current computer.
+        /// Gets an array of serial port names.
         /// </summary>
-        /// <returns>An array of serial port names for the current computer.</returns>
+        /// <returns>An array of serial port names.</returns>
         public string[] GetPortNames()
         {
             using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
-                if (local == null) return new string[0];
+                if (local == null) {
+#if NETFRAMEWORK
+                    return new string[0];
+#else
+                    return Array.Empty<string>();
+#endif
+                }
+
                 string[] k = local.GetValueNames();
                 if (k.Length > 0) {
                     string[] ports = new string[local.ValueCount];
@@ -104,21 +121,27 @@ namespace RJCP.IO.Ports.Serial
                     }
                     return ports;
                 }
+
+#if NETFRAMEWORK
                 return new string[0];
+#else
+                return Array.Empty<string>();
+#endif
             }
         }
 
         /// <summary>
-        /// Gets an array of serial port names and descriptions for the current computer.
+        /// Gets an array of serial port names and descriptions.
         /// </summary>
         /// <remarks>
-        /// This method uses the Windows Management Interface to obtain its information. Therefore,
-        /// the list may be different to the list obtained using the GetPortNames() method which
-        /// uses other techniques.
-        /// <para>On Windows 7, this method shows to return normal COM ports, but not those
-        /// associated with a modem driver.</para>
+        /// Get the ports available, and their descriptions, for the current serial port implementation. On Windows,
+        /// this uses the Windows Management Interface to obtain its information. Therefore, the list may be different
+        /// to the list obtained using the <see cref="GetPortNames"/>.
+        /// <para>
+        /// On Windows 7, this method shows to return normal COM ports, but not those associated with a modem driver.
+        /// </para>
         /// </remarks>
-        /// <returns>An array of serial ports for the current computer.</returns>
+        /// <returns>An array of serial ports.</returns>
         public PortDescription[] GetPortDescriptions()
         {
             Dictionary<string, PortDescription> list = new Dictionary<string, PortDescription>();
@@ -132,7 +155,7 @@ namespace RJCP.IO.Ports.Serial
                 }
             }
 
-#if !NETSTANDARD
+#if NETFRAMEWORK
             ManagementObjectCollection objects;
             // Look for standard serial ports
             using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_SerialPort")) {
@@ -671,6 +694,11 @@ namespace RJCP.IO.Ports.Serial
                 Kernel32.PurgeFlags.PURGE_RXCLEAR);
         }
 
+        /// <summary>
+        /// Discards the output queue buffer of the driver.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void DiscardOutBuffer()
         {
             if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
@@ -831,7 +859,7 @@ namespace RJCP.IO.Ports.Serial
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="InvalidOperationException">
         /// Port must first be set;
-        /// or
+        /// <para>- or -</para>
         /// Serial Port currently open.
         /// </exception>
         /// <exception cref="IOException">Wrong file type.</exception>
@@ -899,6 +927,7 @@ namespace RJCP.IO.Ports.Serial
         public void Close()
         {
             if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            m_Buffer.Close();
             if (IsOpen) {
                 SafeFileHandle handle = m_ComPortHandle;
                 m_ComPortHandle = null;
@@ -911,28 +940,24 @@ namespace RJCP.IO.Ports.Serial
         }
 
         /// <summary>
-        /// Creates the serial buffer suitable for monitoring.
+        /// Gets the buffer that is used for reading and writing to the serial port.
         /// </summary>
-        /// <param name="readBuffer">The read buffer size to allocate.</param>
-        /// <param name="writeBuffer">The write buffer size to allocate.</param>
-        /// <param name="encoding">The encoding to use for character conversions.</param>
-        /// <returns>A serial buffer object that can be given to <see cref="StartMonitor"/></returns>
-        public SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer, Encoding encoding)
+        /// <value>The buffer used for reading and writing to the serial port.</value>
+        public SerialBuffer Buffer
         {
-            return new SerialBuffer(readBuffer, writeBuffer, encoding, true);
+            get { return m_Buffer; }
         }
 
         /// <summary>
         /// Start the monitor thread, that will watch over the serial port.
         /// </summary>
-        /// <param name="buffer">The buffer structure that should be used to read data into
-        /// and write data from.</param>
-        /// <param name="name">The name of the thread to use.</param>
-        public void StartMonitor(SerialBuffer buffer, string name)
+        public void StartMonitor()
         {
             if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
             if (!IsOpen) throw new InvalidOperationException("Serial Port not open");
-            m_CommOverlappedIo.Start(buffer, name);
+
+            m_Buffer.Reset();
+            m_CommOverlappedIo.Start(m_Buffer, PortName);
         }
 
         /// <summary>
@@ -945,7 +970,7 @@ namespace RJCP.IO.Ports.Serial
         /// This property differs slightly from <see cref="IsOpen" />, as this returns status if
         /// the monitoring thread for reading/writing data is actually running. If the thread is
         /// not running for whatever reason, we can expect no data updates in the buffer provided
-        /// to <see cref="StartMonitor(SerialBuffer, string)" />.
+        /// to <see cref="StartMonitor()" />.
         /// </remarks>
         public bool IsRunning
         {

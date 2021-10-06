@@ -5,12 +5,11 @@
 namespace RJCP.IO.Ports.Serial
 {
     using System;
-    using System.Text;
 
     /// <summary>
     /// Interface for accessing serial based streams.
     /// </summary>
-    internal interface INativeSerial : IDisposable
+    public interface INativeSerial : IDisposable
     {
         /// <summary>
         /// Gets the version of the implementation in use.
@@ -29,22 +28,20 @@ namespace RJCP.IO.Ports.Serial
         string PortName { get; set; }
 
         /// <summary>
-        /// Gets an array of serial port names for the current computer.
+        /// Gets an array of serial port names.
         /// </summary>
-        /// <returns>An array of serial port names for the current computer.</returns>
+        /// <returns>An array of serial port names.</returns>
         string[] GetPortNames();
 
         /// <summary>
-        /// Gets an array of serial port names and descriptions for the current computer.
+        /// Gets an array of serial port names and descriptions.
         /// </summary>
+        /// <returns>An array of serial ports.</returns>
         /// <remarks>
-        /// This method uses the Windows Management Interface to obtain its information. Therefore,
-        /// the list may be different to the list obtained using the GetPortNames() method which
-        /// uses other techniques.
-        /// <para>On Windows 7, this method shows to return normal COM ports, but not those
-        /// associated with a modem driver.</para>
+        /// Get the ports available, and their descriptions, for the current serial port implementation. On Windows,
+        /// this uses the Windows Management Interface to obtain its information. Therefore, the list may be different
+        /// to the list obtained using the <see cref="GetPortNames"/>.
         /// </remarks>
-        /// <returns>An array of serial ports for the current computer.</returns>
         PortDescription[] GetPortDescriptions();
 
         /// <summary>
@@ -190,7 +187,7 @@ namespace RJCP.IO.Ports.Serial
         /// Gets the state of the Data Set Ready pin on the serial port.
         /// </summary>
         /// <value>
-        ///   <see langword="tdrue"/> if data set ready pin is active; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if data set ready pin is active; otherwise, <see langword="false"/>.
         /// </value>
         bool DsrHolding { get; }
 
@@ -282,21 +279,26 @@ namespace RJCP.IO.Ports.Serial
         void Close();
 
         /// <summary>
-        /// Creates the serial buffer suitable for monitoring.
+        /// Gets the buffer that is used for reading and writing to the serial port.
         /// </summary>
-        /// <param name="readBuffer">The read buffer size to allocate.</param>
-        /// <param name="writeBuffer">The write buffer size to allocate.</param>
-        /// <param name="encoding">The encoding to use for character conversions.</param>
-        /// <returns>A serial buffer object that can be given to <see cref="StartMonitor"/></returns>
-        SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer, Encoding encoding);
+        /// <value>The buffer used for reading and writing to the serial port.</value>
+        /// <remarks>
+        /// Buffers should be first allocated when a call to <see cref="StartMonitor"/> is given. The
+        /// <see cref="SerialPortStream"/> then uses this buffer after calling <see cref="StartMonitor"/> to read and
+        /// write data. It is required that <see cref="SerialBuffer.IsBufferAllocated"/> returns <see langword="true"/>
+        /// after <see cref="StartMonitor"/>, i.e. if <see cref="StartMonitor"/> was never called, then
+        /// <see cref="SerialBuffer.IsBufferAllocated"/> should be <see langword="false"/>.
+        /// </remarks>
+        SerialBuffer Buffer { get; }
 
         /// <summary>
         /// Start the monitor thread, that will watch over the serial port.
         /// </summary>
-        /// <param name="buffer">The buffer structure that should be used to read data into
-        /// and write data from.</param>
-        /// <param name="name">The name of the thread to use.</param>
-        void StartMonitor(SerialBuffer buffer, string name);
+        /// <remarks>
+        /// Starting the monitor thread should call <see cref="SerialBuffer.Reset"/> from the <see cref="Buffer"/>
+        /// property, which first allocates buffers for reading and writing.
+        /// </remarks>
+        void StartMonitor();
 
         /// <summary>
         /// Gets a value indicating whether the thread for monitoring the serial port is running.
@@ -308,7 +310,7 @@ namespace RJCP.IO.Ports.Serial
         /// This property differs slightly from <see cref="IsOpen"/>, as this returns status if
         /// the monitoring thread for reading/writing data is actually running. If the thread is
         /// not running for whatever reason, we can expect no data updates in the buffer provided
-        /// to <see cref="StartMonitor(SerialBuffer, string)"/>.
+        /// to <see cref="StartMonitor()"/>.
         /// </remarks>
         bool IsRunning { get; }
 

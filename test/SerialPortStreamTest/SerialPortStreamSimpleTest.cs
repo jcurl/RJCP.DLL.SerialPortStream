@@ -8,6 +8,7 @@ namespace RJCP.IO.Ports
     using System.Collections.Generic;
     using System.Threading;
     using NUnit.Framework;
+    using Serial;
 
     /// <summary>
     /// Test sending and receiving data via two serial ports.
@@ -387,31 +388,33 @@ namespace RJCP.IO.Ports
             Dictionary<string, bool> ports1 = new Dictionary<string, bool>();
             Dictionary<string, bool> ports2 = new Dictionary<string, bool>();
 
-            PortDescription[] portDescs = SerialPortStream.GetPortDescriptions();
-            foreach (PortDescription desc in portDescs) {
-                Console.WriteLine("GetPortDescriptions: " + desc.Port + "; Description: " + desc.Description);
-                ports1.Add(desc.Port, false);
-                ports2.Add(desc.Port, false);
-            }
-
-            string[] portNames = SerialPortStream.GetPortNames();
-            foreach (string c in portNames) {
-                Console.WriteLine("GetPortNames: " + c);
-                if (ports1.ContainsKey(c)) {
-                    ports1[c] = true;
-                } else {
-                    Console.WriteLine("GetPortNames() shows " + c + ", but not GetPortDescriptions()");
-                    result = false;
+            using (SerialPortStream serialPort = new SerialPortStream()) {
+                PortDescription[] portDescs = serialPort.GetPortDescriptions();
+                foreach (PortDescription desc in portDescs) {
+                    Console.WriteLine("GetPortDescriptions: " + desc.Port + "; Description: " + desc.Description);
+                    ports1.Add(desc.Port, false);
+                    ports2.Add(desc.Port, false);
                 }
-            }
-            foreach (string c in ports1.Keys) {
-                if (!ports1[c]) {
-                    Console.WriteLine("GetPortDescriptions() shows " + c + ", but not GetPortnames()");
-                    result = false;
-                }
-            }
 
-            Assert.That(result, Is.True);
+                string[] portNames = serialPort.GetPortNames();
+                foreach (string c in portNames) {
+                    Console.WriteLine("GetPortNames: " + c);
+                    if (ports1.ContainsKey(c)) {
+                        ports1[c] = true;
+                    } else {
+                        Console.WriteLine("GetPortNames() shows " + c + ", but not GetPortDescriptions()");
+                        result = false;
+                    }
+                }
+                foreach (string c in ports1.Keys) {
+                    if (!ports1[c]) {
+                        Console.WriteLine("GetPortDescriptions() shows " + c + ", but not GetPortnames()");
+                        result = false;
+                    }
+                }
+
+                Assert.That(result, Is.True);
+            }
         }
 
         [Test]
@@ -531,6 +534,30 @@ namespace RJCP.IO.Ports
                 Assert.That(serial.DtrEnable, Is.False);
             } finally {
                 if (serial != null) serial.Dispose();
+            }
+        }
+
+        [Test]
+        [Platform(Include = "Win")]
+        public void SerialPortStreamNativeSerialWindows()
+        {
+            INativeSerial serial = new WinNativeSerial();
+            Assert.That(serial.IsOpen, Is.False);
+
+            using (SerialPortStream winSerial = new SerialPortStream(serial)) {
+                Assert.That(winSerial.IsOpen, Is.False);
+            }
+        }
+
+        [Test]
+        [Platform(Include = "Linux")]
+        public void SerialPortStreamNativeSerialLinux()
+        {
+            INativeSerial serial = new UnixNativeSerial();
+            Assert.That(serial.IsOpen, Is.False);
+
+            using (SerialPortStream unixSerial = new SerialPortStream(serial)) {
+                Assert.That(unixSerial.IsOpen, Is.False);
             }
         }
     }

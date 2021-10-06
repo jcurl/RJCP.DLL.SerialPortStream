@@ -16,15 +16,10 @@ namespace RJCP.IO.Ports.Serial
     /// </remarks>
     internal sealed class SerialReadBuffer : MemoryReadBuffer, IReadChars
     {
-        public SerialReadBuffer(int length, Encoding encoding, bool pinned)
-            : base(length, pinned)
-        {
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
-            m_Encoding = encoding;
-        }
+        public SerialReadBuffer(int length, bool pinned)
+            : base(length, pinned) { }
 
         private Encoding m_Encoding;
-        private Decoder m_Decoder;
 
         // Buffers for reading characters. We reserve one "char" at the end for 2-byte UTF16 sequences, to guarantee
         // guarantee we can always read into the cache. So you'll also see free space checks that we always need at
@@ -59,25 +54,14 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (value != null) {
                     m_Encoding = value;
-                    m_Decoder = null;
+                    Decoder = m_Encoding.GetDecoder();
                 } else {
                     throw new ArgumentNullException(nameof(value));
                 }
             }
         }
 
-        private Decoder Decoder
-        {
-            get
-            {
-                if (m_Encoding != null) {
-                    if (m_Decoder == null) m_Decoder = m_Encoding.GetDecoder();
-                    return m_Decoder;
-                } else {
-                    return null;
-                }
-            }
-        }
+        private Decoder Decoder { get; set; }
 
         private bool PeekChar()
         {
@@ -146,7 +130,7 @@ namespace RJCP.IO.Ports.Serial
         {
             m_ReadCache.Reset();
             m_ReadOffsets.Reset();
-            if (m_Decoder != null) m_Decoder.Reset();
+            Decoder.Reset();
             if (withOverflow) {
                 m_ReadCache.Append(m_ReadOverflowChar, 0, m_ReadOverflowUtf32 ? 2 : 1);
                 m_ReadOffsets.Append(m_ReadOverflow);

@@ -7,30 +7,41 @@ namespace RJCP.IO.Ports.Serial
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Text;
     using System.Threading;
-    using RJCP.Diagnostics.Trace;
     using Native.Unix;
+    using RJCP.Diagnostics.Trace;
 
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
-    internal class UnixNativeSerial : INativeSerial
+    public class UnixNativeSerial : INativeSerial
     {
         private LibNSerial m_Dll;
         private LibNSerial.SafeSerialHandle m_Handle;
         private IntPtr m_HandlePtr;
         private LogSource m_Log;
+        private readonly SerialBuffer m_Buffer;
 
         private readonly AutoResetEvent m_WriteClearEvent = new AutoResetEvent(false);
         private readonly AutoResetEvent m_WriteClearDoneEvent = new AutoResetEvent(false);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnixNativeSerial"/> class for Unix systems.
+        /// </summary>
         public UnixNativeSerial() : this(new LogSource()) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnixNativeSerial"/> class with logging for Unix systems.
+        /// </summary>
+        /// <param name="log">The log source object.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="log"/> is <see langword="null"/>.</exception>
+        /// <exception cref="PlatformNotSupportedException">Can't initialise platform library.</exception>
         public UnixNativeSerial(LogSource log)
         {
             if (log == null) throw new ArgumentNullException(nameof(log));
             m_Log = log;
+
+            m_Buffer = new SerialBuffer();
             m_Dll = new LibNSerial();
             m_Handle = m_Dll.serial_init();
             if (m_Handle.IsInvalid) {
@@ -157,9 +168,9 @@ namespace RJCP.IO.Ports.Serial
         }
 
         /// <summary>
-        /// Gets an array of serial port names for the current computer.
+        /// Gets an array of serial port names.
         /// </summary>
-        /// <returns>An array of serial port names for the current computer.</returns>
+        /// <returns>An array of serial port names.</returns>
         public string[] GetPortNames()
         {
             PortDescription[] ports;
@@ -179,16 +190,14 @@ namespace RJCP.IO.Ports.Serial
         }
 
         /// <summary>
-        /// Gets an array of serial port names and descriptions for the current computer.
+        /// Gets an array of serial port names and descriptions.
         /// </summary>
+        /// <returns>An array of serial ports.</returns>
         /// <remarks>
-        /// This method uses the Windows Management Interface to obtain its information. Therefore,
-        /// the list may be different to the list obtained using the GetPortNames() method which
-        /// uses other techniques.
-        /// <para>On Windows 7, this method shows to return normal COM ports, but not those
-        /// associated with a modem driver.</para>
+        /// Get the ports available, and their descriptions, for the current serial port implementation. On Windows,
+        /// this uses the Windows Management Interface to obtain its information. Therefore, the list may be different
+        /// to the list obtained using the <see cref="GetPortNames"/>.
         /// </remarks>
-        /// <returns>An array of serial ports for the current computer.</returns>
         public PortDescription[] GetPortDescriptions()
         {
             PortDescription[] ports;
@@ -652,22 +661,19 @@ namespace RJCP.IO.Ports.Serial
         public void Close()
         {
             if (IsOpen) Stop();
+            m_Buffer.Close();
             if (m_Dll.serial_close(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
-        /// Creates the serial buffer suitable for monitoring.
+        /// Gets the buffer that is used for reading and writing to the serial port.
         /// </summary>
-        /// <param name="readBuffer">The read buffer size to allocate.</param>
-        /// <param name="writeBuffer">The write buffer size to allocate.</param>
-        /// <param name="encoding">The encoding to use for character conversions.</param>
-        /// <returns>A serial buffer object that can be given to <see cref="StartMonitor"/></returns>
-        public SerialBuffer CreateSerialBuffer(int readBuffer, int writeBuffer, Encoding encoding)
+        /// <value>The buffer used for reading and writing to the serial port.</value>
+        public SerialBuffer Buffer
         {
-            return new SerialBuffer(readBuffer, writeBuffer, encoding, false);
+            get { return m_Buffer; }
         }
 
-        private SerialBuffer m_Buffer;
         private Thread m_MonitorThread;
         private Thread m_PinThread;
         private string m_Name;
@@ -678,17 +684,13 @@ namespace RJCP.IO.Ports.Serial
         /// <summary>
         /// Start the monitor thread, that will watch over the serial port.
         /// </summary>
-        /// <param name="buffer">The buffer structure that should be used to read data into
-        /// and write data from.</param>
-        /// <param name="name">The name of the thread to use.</param>
-        public void StartMonitor(SerialBuffer buffer, string name)
+        public void StartMonitor()
         {
             if (m_IsDisposed) throw new ObjectDisposedException(nameof(UnixNativeSerial));
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
             if (!IsOpen) throw new InvalidOperationException("Serial Port not open");
 
-            m_Buffer = buffer;
-            m_Name = name;
+            m_Buffer.Reset();
+            m_Name = PortName;
             m_StopRunning.Reset();
 
             try {
@@ -940,7 +942,7 @@ namespace RJCP.IO.Ports.Serial
         /// This property differs slightly from <see cref="IsOpen"/>, as this returns status if
         /// the monitoring thread for reading/writing data is actually running. If the thread is
         /// not running for whatever reason, we can expect no data updates in the buffer provided
-        /// to <see cref="StartMonitor(SerialBuffer, string)"/>.
+        /// to <see cref="StartMonitor()"/>.
         /// </remarks>
         public bool IsRunning { get { return m_IsRunning; } }
 
@@ -949,6 +951,11 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public event EventHandler<SerialDataReceivedEventArgs> DataReceived;
 
+        /// <summary>
+        /// Handles the <see cref="DataReceived"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="SerialDataReceivedEventArgs"/> instance containing the event data.</param>
         protected virtual void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
             EventHandler<SerialDataReceivedEventArgs> handler = DataReceived;
@@ -962,6 +969,11 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public event EventHandler<SerialErrorReceivedEventArgs> ErrorReceived;
 
+        /// <summary>
+        /// Handles the <see cref="ErrorReceived"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="SerialErrorReceivedEventArgs"/> instance containing the event data.</param>
         protected virtual void OnCommError(object sender, SerialErrorReceivedEventArgs args)
         {
             EventHandler<SerialErrorReceivedEventArgs> handler = ErrorReceived;
@@ -975,6 +987,11 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public event EventHandler<SerialPinChangedEventArgs> PinChanged;
 
+        /// <summary>
+        /// Handles the <see cref="PinChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="SerialPinChangedEventArgs"/> instance containing the event data.</param>
         protected virtual void OnPinChanged(object sender, SerialPinChangedEventArgs args)
         {
             EventHandler<SerialPinChangedEventArgs> handler = PinChanged;
