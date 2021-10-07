@@ -767,7 +767,7 @@ namespace RJCP.IO.Ports.Serial
             };
 
             // The user writes data, and the serial_waitforevent should be interrupted.
-            m_Buffer.WriteStreamEvent += SerialBufferWriteEvent;
+            m_Buffer.SerialWrite.WriteEvent += SerialBufferWriteEvent;
 
             while (m_IsRunning) {
                 LibNSerial.SerialReadWriteEvent rwevent = LibNSerial.SerialReadWriteEvent.NoEvent;
@@ -863,7 +863,7 @@ namespace RJCP.IO.Ports.Serial
                     }
                 }
             }
-            m_Buffer.WriteStreamEvent -= SerialBufferWriteEvent;
+            m_Buffer.SerialWrite.WriteEvent -= SerialBufferWriteEvent;
 
             // We must notify the stream that any blocking waits should abort.
             m_Buffer.Close();

@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports.Serial
     using System;
     using Buffer;
 
-    internal sealed class SerialWriteBuffer : MemoryWriteBuffer
+    internal sealed class SerialWriteBuffer : MemoryWriteBuffer, ISerialWriteBuffer
     {
         public SerialWriteBuffer(int length, bool pinned)
             : base(length, pinned) { }

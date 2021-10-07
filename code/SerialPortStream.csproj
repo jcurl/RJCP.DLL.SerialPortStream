@@ -107,6 +107,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serial\INativeSerial.cs" />
     <Compile Include="Serial\IReadChars.cs" />
+    <Compile Include="Serial\ISerialReadBuffer.cs" />
+    <Compile Include="Serial\ISerialWriteBuffer.cs" />
     <Compile Include="Serial\Platform.cs" />
     <Compile Include="Serial\SerialBuffer.cs" />
     <Compile Include="Serial\SerialReadBuffer.cs" />

@@ -151,7 +151,7 @@ namespace RJCP.IO.Ports.Serial
         /// <see cref="INativeSerial"/>. This property is <see langword="null"/> until the first call to
         /// <see cref="Reset"/>, when the internal buffers are first allocated.
         /// </remarks>
-        public IReadBuffer SerialRead { get { return m_ReadBuffer; } }
+        public ISerialReadBuffer SerialRead { get { return m_ReadBuffer; } }
 
         /// <summary>
         /// Object with methods and properties for <see cref="System.IO.Stream"/> similar methods.
@@ -193,7 +193,7 @@ namespace RJCP.IO.Ports.Serial
         /// This property is <see langword="null"/> until the first call to <see cref="Reset"/>, when the internal
         /// buffers are first allocated.
         /// </remarks>
-        public IWriteBuffer SerialWrite { get { return m_WriteBuffer; } }
+        public ISerialWriteBuffer SerialWrite { get { return m_WriteBuffer; } }
 
         /// <summary>
         /// Object with methods and properties for <see cref="System.IO.Stream"/> similar methods.
@@ -206,20 +206,6 @@ namespace RJCP.IO.Ports.Serial
         /// the internal buffers are first allocated.
         /// </remarks>
         public IWriteBufferStream WriteStream { get { return m_WriteBuffer; } }
-
-        /// <summary>
-        /// Occurs when the user writes to the buffers via the <see cref="WriteStream"/>.
-        /// </summary>
-        /// <remarks>
-        /// The <see cref="WriteStreamEvent"/> is intended for low level API code to know when there is data written to
-        /// the write buffer. For some operating systems, this can help to interrupt an I/O loop to read data from the
-        /// write buffer to send to the low level drivers.
-        /// </remarks>
-        public event EventHandler WriteStreamEvent
-        {
-            add { m_WriteBuffer.WriteEvent += value; }
-            remove { m_WriteBuffer.WriteEvent -= value; }
-        }
 
         /// <summary>
         /// Resets this instance. If buffers aren't allocated, they will be.

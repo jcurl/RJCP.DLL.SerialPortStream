@@ -14,7 +14,7 @@ namespace RJCP.IO.Ports.Serial
     /// <remarks>
     /// Extends functionality from <see cref="MemoryReadBuffer"/> to include character based processing.
     /// </remarks>
-    internal sealed class SerialReadBuffer : MemoryReadBuffer, IReadChars
+    internal sealed class SerialReadBuffer : MemoryReadBuffer, ISerialReadBuffer, IReadChars
     {
         public SerialReadBuffer(int length, bool pinned)
             : base(length, pinned) { }
