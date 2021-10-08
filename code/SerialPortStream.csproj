@@ -111,6 +111,7 @@
     <Compile Include="Serial\ISerialWriteBuffer.cs" />
     <Compile Include="Serial\Platform.cs" />
     <Compile Include="Serial\SerialBuffer.cs" />
+    <Compile Include="Serial\SerialBufferEventArgs.cs" />
     <Compile Include="Serial\SerialReadBuffer.cs" />
     <Compile Include="Serial\SerialWriteBuffer.cs" />
     <Compile Include="Serial\UnixNativeSerial.cs" />

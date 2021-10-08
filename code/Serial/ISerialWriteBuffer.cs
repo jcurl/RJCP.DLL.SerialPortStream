@@ -15,6 +15,6 @@ namespace RJCP.IO.Ports.Serial
         /// <summary>
         /// Occurs when the user adds data to the buffer that we can send data out.
         /// </summary>
-        event EventHandler WriteEvent;
+        event EventHandler<SerialBufferEventArgs> WriteEvent;
     }
 }

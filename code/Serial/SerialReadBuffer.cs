@@ -16,6 +16,11 @@ namespace RJCP.IO.Ports.Serial
     /// </remarks>
     internal sealed class SerialReadBuffer : MemoryReadBuffer, ISerialReadBuffer, IReadChars
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SerialReadBuffer"/> class.
+        /// </summary>
+        /// <param name="length">The size of the buffer to allocate.</param>
+        /// <param name="pinned">If set to <see langword="true" />, the buffers are pinned in memory.</param>
         public SerialReadBuffer(int length, bool pinned)
             : base(length, pinned) { }
 
@@ -38,6 +43,19 @@ namespace RJCP.IO.Ports.Serial
         private int m_ReadOverflow = -1;         // Number of bytes to discard due to overflow
         private readonly char[] m_ReadOverflowChar = new char[2];   // First character that was lost
         private bool m_ReadOverflowUtf32;        // Indicates if two UTF16 overflowed or not.
+
+        /// <summary>
+        /// Occurs when the user adds data to the buffer that we can send data out.
+        /// </summary>
+        public event EventHandler<SerialBufferEventArgs> ReadEvent;
+
+        private void OnReadEvent(object sender, SerialBufferEventArgs args)
+        {
+            EventHandler<SerialBufferEventArgs> handler = ReadEvent;
+            if (handler != null) {
+                handler(sender, args);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the byte encoding for pre- and post-transmission conversion of text.
@@ -326,11 +344,22 @@ namespace RJCP.IO.Ports.Serial
             }
         }
 
+        /// <summary>
+        /// Called when a read operation is finished, that derived classes can perform additional actions.
+        /// </summary>
+        /// <param name="bytes">The number of bytes that were just read and consumed.</param>
         protected override void OnRead(int bytes)
         {
-            if (bytes > 0) CharReset(false);
+            if (bytes > 0) {
+                CharReset(false);
+                OnReadEvent(this, new SerialBufferEventArgs(bytes));
+            }
         }
 
+        /// <summary>
+        /// Called when <see cref="MemoryReadBuffer.Reset" /> is requested.
+        /// </summary>
+        /// <remarks>Allows a safe way that derived classes can reset their state.</remarks>
         protected override void OnReset()
         {
             m_ReadCache.Reset();
