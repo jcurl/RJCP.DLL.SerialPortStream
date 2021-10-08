@@ -2,7 +2,8 @@
   "omnisharp.enableEditorConfigSupport": true,
   "omnisharp.enableRoslynAnalyzers": true,
   "editor.rulers": [
+    80,
     120
   ],
-  "rewrap.wrappingColumn": 120
+  "rewrap.wrappingColumn": 80
 }

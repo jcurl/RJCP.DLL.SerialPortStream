@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net40;net45;netstandard2.1</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <Configurations>Debug;Release</Configurations>
+    <NeutralLanguage>en-US</NeutralLanguage>
+
+    <AssemblyName>RJCP.SerialPortStream.Virtual</AssemblyName>
+    <AssemblyTitle>SerialPortStream.Virtual</AssemblyTitle>
+    <Product>RJCP.SerialPortStream</Product>
+    <RootNamespace>RJCP.IO.Ports</RootNamespace>
+
+    <Authors>Jason Curl</Authors>
+    <Copyright>(C) 2021, Jason Curl</Copyright>
+    <Company></Company>
+    <PackageId>SerialPortStream.Virtual</PackageId>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/jcurl/serialportstream</PackageProjectUrl>
+    <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability. Provides methods to support testing with a virtual native serial port instance.</Description>
+    <Version>3.0.0</Version>
+
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>Default</AnalysisMode>
+    <AnalysisLevel>latest</AnalysisLevel>
+
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
+    <ProjectReference Include="..\..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serial\IVirtualSerialBuffer.cs" />
+    <Compile Include="Serial\VirtualSerialReadBuffer.cs" />
+    <Compile Include="Serial\VirtualSerialWriteBuffer.cs" />
+    <Compile Include="Serial\VirtualNativeSerial.cs" />
+    <Compile Include="Serial\VirtualSerialBuffer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

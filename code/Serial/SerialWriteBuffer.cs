@@ -7,7 +7,13 @@ namespace RJCP.IO.Ports.Serial
     using System;
     using Buffer;
 
-    internal sealed class SerialWriteBuffer : MemoryWriteBuffer, ISerialWriteBuffer
+    /// <summary>
+    /// Provides buffer management for writing to the serial port.
+    /// </summary>
+    /// <remarks>
+    /// Extends functionality from <see cref="MemoryWriteBuffer"/>.
+    /// </remarks>
+    public class SerialWriteBuffer : MemoryWriteBuffer, ISerialWriteBuffer
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SerialWriteBuffer"/> class.

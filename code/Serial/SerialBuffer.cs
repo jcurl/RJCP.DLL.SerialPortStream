@@ -30,7 +30,7 @@ namespace RJCP.IO.Ports.Serial
     /// frequently called methods.
     /// </para>
     /// </remarks>
-    public sealed class SerialBuffer : IDisposable
+    public class SerialBuffer : IDisposable
     {
         private readonly bool m_Pinned;
         private SerialReadBuffer m_ReadBuffer;
@@ -222,16 +222,36 @@ namespace RJCP.IO.Ports.Serial
             if (m_ReadBuffer != null && m_ReadBuffer.Buffer.Length == ReadBufferSize) {
                 m_ReadBuffer.Reset();
             } else {
-                m_ReadBuffer = new SerialReadBuffer(ReadBufferSize, m_Pinned) {
-                    Encoding = Encoding
-                };
+                m_ReadBuffer = GetSerialReadBuffer(m_Pinned);
             }
 
             if (m_WriteBuffer != null && m_WriteBuffer.Buffer.Length == WriteBufferSize) {
                 m_WriteBuffer.Reset();
             } else {
-                m_WriteBuffer = new SerialWriteBuffer(WriteBufferSize, m_Pinned);
+                m_WriteBuffer = GetSerialWriteBuffer(m_Pinned);
             }
+        }
+
+        /// <summary>
+        /// Gets a new instance of the serial read buffer.
+        /// </summary>
+        /// <param name="pinned">If set to <see langword="true"/> then the memory should be pinned.</param>
+        /// <returns>A new instance of <see cref="SerialReadBuffer"/>.</returns>
+        protected virtual SerialReadBuffer GetSerialReadBuffer(bool pinned)
+        {
+            return new SerialReadBuffer(ReadBufferSize, pinned) {
+                Encoding = Encoding
+            };
+        }
+
+        /// <summary>
+        /// Gets a new instance of the serial write buffer.
+        /// </summary>
+        /// <param name="pinned">If set to <see langword="true"/> then the memory should be pinned.</param>
+        /// <returns>A new instance of <see cref="SerialWriteBuffer"/>.</returns>
+        protected virtual SerialWriteBuffer GetSerialWriteBuffer(bool pinned)
+        {
+            return new SerialWriteBuffer(WriteBufferSize, pinned);
         }
 
         /// <summary>
@@ -253,12 +273,28 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// Set to <see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to
+        /// release only unmanaged resources.
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (IsDisposed) return;
 
-            if (m_ReadBuffer != null) m_ReadBuffer.Dispose();
-            if (m_WriteBuffer != null) m_WriteBuffer.Dispose();
-            m_ReadBuffer = null;
-            m_WriteBuffer = null;
+            if (disposing) {
+                if (m_ReadBuffer != null) m_ReadBuffer.Dispose();
+                if (m_WriteBuffer != null) m_WriteBuffer.Dispose();
+                m_ReadBuffer = null;
+                m_WriteBuffer = null;
+            }
+
             IsDisposed = true;
         }
     }
