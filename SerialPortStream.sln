@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream.Virtual", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream.VirtualTest", "test\SerialPortStream.VirtualTest\SerialPortStream.VirtualTest.csproj", "{A395E4DB-EBED-4B88-9CEB-99BD226E3617}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamManualTest", "test\SerialPortStreamManualTest\SerialPortStreamManualTest.csproj", "{292E266D-62D7-43DD-AC1C-72BF15DFB795}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamNativeTest", "test\SerialPortStreamNativeTest\SerialPortStreamNativeTest.csproj", "{1F58865F-3865-4072-9355-12F30D316D86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,12 +45,22 @@ Global
 		{A395E4DB-EBED-4B88-9CEB-99BD226E3617}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A395E4DB-EBED-4B88-9CEB-99BD226E3617}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A395E4DB-EBED-4B88-9CEB-99BD226E3617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{292E266D-62D7-43DD-AC1C-72BF15DFB795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{292E266D-62D7-43DD-AC1C-72BF15DFB795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{292E266D-62D7-43DD-AC1C-72BF15DFB795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{292E266D-62D7-43DD-AC1C-72BF15DFB795}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F58865F-3865-4072-9355-12F30D316D86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F58865F-3865-4072-9355-12F30D316D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F58865F-3865-4072-9355-12F30D316D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F58865F-3865-4072-9355-12F30D316D86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E} = {A9039DFD-D69C-4759-9668-AD8769C3F877}
+		{292E266D-62D7-43DD-AC1C-72BF15DFB795} = {A9039DFD-D69C-4759-9668-AD8769C3F877}
+		{1F58865F-3865-4072-9355-12F30D316D86} = {A9039DFD-D69C-4759-9668-AD8769C3F877}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0669B6F2-2B30-4F57-908F-5F99AADEE232}

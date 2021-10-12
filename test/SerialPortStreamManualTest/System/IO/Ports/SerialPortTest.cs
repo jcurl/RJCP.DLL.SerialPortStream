@@ -10,8 +10,9 @@ namespace System.IO.Ports
     using NUnit.Framework;
     using RJCP.IO.Ports;
 
-    [TestFixture(Category = "ManualTest")]
-    [Explicit("Framework Test")]
+    [TestFixture]
+    [Category("ManualTest")]
+    [Explicit("Operating System Framework Test")]
     public class SerialPortTest
     {
         // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
@@ -61,7 +62,7 @@ namespace System.IO.Ports
                 while (bufferCount > 0) {
                     serialSource.Write(buffer, 0, buffer.Length);
                     bufferCount -= buffer.Length;
-                    Console.WriteLine("{0}", bufferCount);
+                    Console.WriteLine($"{bufferCount}");
                 }
 
                 serial.Wait();
@@ -98,7 +99,7 @@ namespace System.IO.Ports
                 while (bufferCount > 0) {
                     serialSource.Write(buffer, 0, buffer.Length);
                     bufferCount -= buffer.Length;
-                    Console.WriteLine("{0}", bufferCount);
+                    Console.WriteLine($"{bufferCount}");
                 }
 
                 serial.Wait();

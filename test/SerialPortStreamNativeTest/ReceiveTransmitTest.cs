@@ -19,13 +19,11 @@ namespace RJCP.IO.Ports
     /// <remarks>
     /// You will need to have two serial ports connected to each other on the same computer using a NULL modem cable.
     /// Alternatively, you can use a software emulated serial port, such as com0com for tests.
-    /// <para>
-    /// You need to update the variables c_SourcePort and c_DestPort to be the names of the two serial ports.
-    /// </para>
+    /// <para>You need to update the variables SourcePort and DestPort to be the names of the two serial ports.</para>
     /// </remarks>
-    [TestFixture(Category = "SerialPortStream")]
+    [TestFixture]
     [Timeout(10000)]
-    public class SerialPortStreamRxTxTest
+    public class ReceiveTransmitTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
         private readonly string DestPort = SerialConfiguration.DestPort;
@@ -61,7 +59,7 @@ namespace RJCP.IO.Ports
                 int c = 0;
                 byte[] rcvbuf = new byte[sendbuf.Length + 10];
                 while (rcv < rcvbuf.Length) {
-                    Console.WriteLine("Begin Receive: Offset=" + rcv + "; Count=" + (rcvbuf.Length - rcv));
+                    Console.WriteLine($"Begin Receive: Offset={rcv}; Count={rcvbuf.Length - rcv}");
                     int b = dst.Read(rcvbuf, rcv, rcvbuf.Length - rcv);
                     if (b == 0) {
                         if (c == 0) break;
@@ -74,12 +72,12 @@ namespace RJCP.IO.Ports
 
                 bool dump = false;
                 if (rcv != sendbuf.Length) {
-                    Console.WriteLine("Read length not the same as the amount of data sent (got " + rcv + " bytes)");
+                    Console.WriteLine($"Read length not the same as the amount of data sent (got {rcv} bytes)");
                     dump = true;
                 }
                 for (int i = 0; i < sendbuf.Length; i++) {
                     if (sendbuf[i] != rcvbuf[i]) {
-                        Console.WriteLine("Comparison failure at " + i);
+                        Console.WriteLine($"Comparison failure at {i}");
                         dump = true;
                         break;
                     }
@@ -155,7 +153,7 @@ namespace RJCP.IO.Ports
             if (bytes != 0) {
                 state.rcv += bytes;
                 if (state.rcv < state.recvBuf.Length) {
-                    Console.WriteLine("Begin Receive: Offset=" + state.rcv + "; Count=" + (state.recvBuf.Length - state.rcv));
+                    Console.WriteLine($"Begin Receive: Offset={state.rcv}; Count={state.recvBuf.Length - state.rcv}");
                     state.dst.BeginRead(state.recvBuf, state.rcv, state.recvBuf.Length - state.rcv, SendReceiveAsyncReadComplete, state);
                 } else {
                     state.finished.Set();
@@ -164,7 +162,7 @@ namespace RJCP.IO.Ports
             } else {
                 if (state.rcv != state.sendBuf.Length) {
                     state.finished.Set();
-                    Assert.Fail("Received more/less data than expected: {0} expected; {1} received", state.sendBuf.Length, state.rcv);
+                    Assert.Fail($"Received more/less data than expected: {state.sendBuf.Length} expected; {state.rcv} received");
                 }
                 state.finished.Set();
             }
@@ -235,7 +233,7 @@ namespace RJCP.IO.Ports
                 int r;
                 do {
                     r = dst.Read(ddata, 0, ddata.Length);
-                    Console.WriteLine("Read: {0} bytes", r);
+                    Console.WriteLine($"Read: {r} bytes");
                 } while (r > 0);
             }
         }
@@ -432,7 +430,7 @@ namespace RJCP.IO.Ports
                 while (size - position > bufferSize) {
                     positions.Add(position);
                     if (position >= sp.WriteBufferSize - bufferSize) {
-                        Console.WriteLine("data[{0:x}] = {1:x}", position, data[position]);
+                        Console.WriteLine($"data[{position:x}] = {data[position]:x}");
                     }
                     sp.Write(data, position, bufferSize);
                     position += bufferSize;
@@ -500,7 +498,7 @@ namespace RJCP.IO.Ports
                     int pos = 0;
                     while (pos < 3) {
                         int r = await serialPortStreamRead.ReadAsync(buffer, pos, buffer.Length - pos);
-                        Console.WriteLine("Got: {0}", r);
+                        Console.WriteLine($"Got: {r}");
                         pos += r;
                     }
 
@@ -509,7 +507,7 @@ namespace RJCP.IO.Ports
                         // Print out contents to help debug that other test
                         // case.
                         for (int i = 0; i < pos; i++) {
-                            Console.WriteLine(" Byte: {0} = {1}", i, buffer[i]);
+                            Console.WriteLine($" Byte: {i} = {buffer[i]}");
                         }
                     }
                 });
@@ -526,7 +524,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-        private byte[] ReceiveData(SerialPortStream sp, int size)
+        private static byte[] ReceiveData(SerialPortStream sp, int size)
         {
             var buffer = new byte[size];
             var dataReceived = 0;
@@ -552,10 +550,10 @@ namespace RJCP.IO.Ports
             public string Received { get; set; }
         }
 
-        private bool Compare(byte[] data, byte[] receivedData)
+        private static bool Compare(byte[] data, byte[] receivedData)
         {
             bool equal = data.SequenceEqual(receivedData);
-            Console.WriteLine("Are data the same: {0}", equal);
+            Console.WriteLine($"Are data the same: {equal}");
 
             List<Difference> differences = new List<Difference>();
             for (int i = 0; i < data.Length; i++) {
@@ -567,7 +565,7 @@ namespace RJCP.IO.Ports
             }
 
             foreach (Difference item in differences) {
-                Console.WriteLine("Pos: {0}, Tx: {1}, Rx: {2}", item.Position, item.Received, item.Sent);
+                Console.WriteLine($"Pos: {item.Position}, Tx: {item.Received}, Rx: {item.Sent}");
             }
             return equal;
         }

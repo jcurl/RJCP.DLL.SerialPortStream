@@ -15,13 +15,11 @@ namespace RJCP.IO.Ports
     /// <remarks>
     /// You will need to have two serial ports connected to each other on the same computer using a NULL modem cable.
     /// Alternatively, you can use a software emulated serial port, such as com0com for tests.
-    /// <para>
-    /// You need to update the variables c_SourcePort and c_DestPort to be the names of the two serial ports.
-    /// </para>
+    /// <para>You need to update the variables SourcePort and DestPort to be the names of the two serial ports.</para>
     /// </remarks>
-    [TestFixture(Category = "SerialPortStream")]
+    [TestFixture]
     [Timeout(10000)]
-    public class SerialPortStreamCharTest
+    public class ReadCharTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
         private readonly string DestPort = SerialConfiguration.DestPort;
@@ -91,11 +89,11 @@ namespace RJCP.IO.Ports
                 while (cread < 3 && counter < 5) {
                     cread += dst.Read(recv, cread, recv.Length - cread);
                     counter++;
-                    Console.WriteLine("dst.Read. Got cread={0} bytes in {1} loops", cread, counter);
+                    Console.WriteLine($"dst.Read. Got cread={cread} bytes in {counter} loops");
                 }
 
                 for (int i = 0; i < cread; i++) {
-                    Console.WriteLine("cread[{0}] = {1}", i, recv[i]);
+                    Console.WriteLine($"cread[{i}] = {recv[i]}");
                 }
 
                 Assert.That(cread, Is.EqualTo(3));
@@ -289,7 +287,7 @@ namespace RJCP.IO.Ports
                         if (e is TimeoutException) err = true;
                     }
                     if (i < send.Length - 1) {
-                        Assert.That(err, Is.True, "No timeout exception occurred when waiting for " + send[i] + " (position " + i + ")");
+                        Assert.That(err, Is.True, $"No timeout exception occurred when waiting for {send[i]} (position {i})");
                     }
                 }
                 Assert.That(s, Is.EqualTo("A Brief History Of Time"));
@@ -322,7 +320,7 @@ namespace RJCP.IO.Ports
                         if (e is TimeoutException) err = true;
                     }
                     if (i < buf.Length - 1) {
-                        Assert.That(err, Is.True, "No timeout exception occurred when waiting for " + buf[i].ToString("X2") + " (position " + i + ")");
+                        Assert.That(err, Is.True, $"No timeout exception occurred when waiting for {buf[i]:X2} (position {i})");
                     }
                 }
                 Assert.That(s, Is.EqualTo("ABCDEFGHIJ€"));

@@ -6,8 +6,8 @@ namespace System.Text
 {
     using NUnit.Framework;
 
-    [TestFixture(Category = "ManualTest")]
-    [Explicit("Framework Test")]
+    [TestFixture]
+    [Explicit(".NET Framework Test")]
     public class EncodingTest
     {
         // NOTE: This test is expected to fail on Windows and Mono.
