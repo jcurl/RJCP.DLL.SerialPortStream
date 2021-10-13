@@ -12,30 +12,19 @@ namespace RJCP.IO.Ports.Trace
 
     internal static class GlobalLogger
     {
-        private static readonly object s_LoggerFactoryLock = new object();
-        private static ILoggerFactory s_LoggerFactory;
-
-        private static ILoggerFactory GetLoggerFactory()
+        static GlobalLogger()
         {
-            if (s_LoggerFactory == null) {
-                lock (s_LoggerFactoryLock) {
-                    if (s_LoggerFactory == null) {
-                        s_LoggerFactory = LoggerFactory.Create(builder => {
-                            builder
-                                .AddFilter("Microsoft", LogLevel.Warning)
-                                .AddFilter("System", LogLevel.Warning)
-                                .AddFilter("RJCP", LogLevel.Debug)
-                                .AddNUnitLogger();
-                        });
-                    }
-                }
-            }
-            return s_LoggerFactory;
+            ILoggerFactory factory = LoggerFactory.Create(builder => {
+                builder
+                    .AddFilter("Microsoft", LogLevel.Warning)
+                    .AddFilter("System", LogLevel.Warning)
+                    .AddFilter("RJCP", LogLevel.Debug)
+                    .AddNUnitLogger();
+            });
+            LogSource.SetLoggerFactory(factory);
         }
 
-        public static void Initialize()
-        {
-            LogSource.SetLoggerFactory(GetLoggerFactory());
-        }
+        // Just calling this method will result in the static constructor being executed.
+        public static void Initialize() { }
     }
 }
