@@ -4,7 +4,7 @@
 
 namespace RJCP.IO.Ports.Native.Unix
 {
-    internal partial class LibNSerial
+    internal static partial class LibNSerial
     {
         /// <summary>
         /// Mapped C-Library errors to constants for Managed Code

@@ -8,10 +8,10 @@ namespace RJCP.IO.Ports.Native.Unix
     using System.Runtime.InteropServices;
     using System.Security;
 
-    internal partial class LibNSerial
+    internal static partial class LibNSerial
     {
         [SuppressUnmanagedCodeSecurity]
-        public static class Dll
+        private static class Dll
         {
             [DllImport("libnserial.so.1")]
             internal static extern IntPtr serial_version();

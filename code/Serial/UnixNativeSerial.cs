@@ -16,7 +16,6 @@ namespace RJCP.IO.Ports.Serial
     /// </summary>
     public class UnixNativeSerial : INativeSerial
     {
-        private readonly LibNSerial m_Dll;
         private readonly LibNSerial.SafeSerialHandle m_Handle;
         private readonly IntPtr m_HandlePtr;
         private readonly LogSource m_Log;
@@ -42,8 +41,7 @@ namespace RJCP.IO.Ports.Serial
             m_Log = log;
 
             m_Buffer = new SerialBuffer();
-            m_Dll = new LibNSerial();
-            m_Handle = m_Dll.serial_init();
+            m_Handle = LibNSerial.serial_init();
             if (m_Handle.IsInvalid) {
                 throw new PlatformNotSupportedException("Can't initialise platform library");
             }
@@ -53,7 +51,7 @@ namespace RJCP.IO.Ports.Serial
             // On NetStandard 2.1, we must have proper exception handling
             try {
                 // These methods were first added in libnserial 1.1
-                m_Dll.netfx_errno(0);
+                LibNSerial.netfx_errno(0);
             } catch (EntryPointNotFoundException) {
                 throw new PlatformNotSupportedException("Must have libnserial 1.1.0 or later on .NET Core");
             }
@@ -68,8 +66,8 @@ namespace RJCP.IO.Ports.Serial
             string sysDescription;
             try {
                 // These methods were first added in libnserial 1.1
-                managedErrNo = m_Dll.netfx_errno(m_Dll.errno);
-                sysDescription = m_Dll.netfx_errstring(m_Dll.errno);
+                managedErrNo = LibNSerial.netfx_errno(LibNSerial.errno);
+                sysDescription = LibNSerial.netfx_errstring(LibNSerial.errno);
             } catch (EntryPointNotFoundException) {
 #if NETSTANDARD
                 ThrowExceptionNetStandard();
@@ -78,10 +76,10 @@ namespace RJCP.IO.Ports.Serial
 #endif
                 throw;
             }
-            string libDescription = m_Dll.serial_error(m_Handle);
+            string libDescription = LibNSerial.serial_error(m_Handle);
 
             string description = string.Format("{0} ({1}; {2})",
-                libDescription, m_Dll.errno, sysDescription);
+                libDescription, LibNSerial.errno, sysDescription);
 
             switch (managedErrNo) {
             case LibNSerial.SysErrNo.NETFX_OK:
@@ -113,8 +111,8 @@ namespace RJCP.IO.Ports.Serial
         // For compatibility with libnserial 1.0 only.
         private void ThrowExceptionMono()
         {
-            Mono.Unix.Native.Errno errno = Mono.Unix.Native.NativeConvert.ToErrno(m_Dll.errno);
-            string description = m_Dll.serial_error(m_Handle);
+            Mono.Unix.Native.Errno errno = Mono.Unix.Native.NativeConvert.ToErrno(LibNSerial.errno);
+            string description = LibNSerial.serial_error(m_Handle);
             switch (errno) {
             case Mono.Unix.Native.Errno.EINVAL:
                 throw new ArgumentException(description);
@@ -130,8 +128,8 @@ namespace RJCP.IO.Ports.Serial
         // For compatibility with libnserial 1.0 only.
         private void ThrowExceptionNetStandard()
         {
-            string description = m_Dll.serial_error(m_Handle);
-            throw new Exception(string.Format("Error {0}: {1}", m_Dll.errno, description));
+            string description = LibNSerial.serial_error(m_Handle);
+            throw new Exception(string.Format($"Error {LibNSerial.errno}: {description}"));
         }
 #endif
 
@@ -143,7 +141,7 @@ namespace RJCP.IO.Ports.Serial
         /// </value>
         public string Version
         {
-            get { return m_Dll.serial_version(); }
+            get { return LibNSerial.serial_version(); }
         }
 
         /// <summary>
@@ -156,13 +154,13 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                string deviceName = m_Dll.serial_getdevicename(m_Handle);
+                string deviceName = LibNSerial.serial_getdevicename(m_Handle);
                 if (deviceName == null) ThrowException();
                 return deviceName;
             }
             set
             {
-                if (m_Dll.serial_setdevicename(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setdevicename(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -174,7 +172,7 @@ namespace RJCP.IO.Ports.Serial
         {
             PortDescription[] ports;
             try {
-                ports = m_Dll.serial_getports(m_Handle);
+                ports = LibNSerial.serial_getports(m_Handle);
             } catch (EntryPointNotFoundException) {
                 // libnserial is version < 1.1.0
                 ports = null;
@@ -201,7 +199,7 @@ namespace RJCP.IO.Ports.Serial
         {
             PortDescription[] ports;
             try {
-                ports = m_Dll.serial_getports(m_Handle);
+                ports = LibNSerial.serial_getports(m_Handle);
             } catch (EntryPointNotFoundException) {
                 ports = null;
             }
@@ -231,12 +229,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getbaud(m_Handle, out int baud) == -1) ThrowException();
+                if (LibNSerial.serial_getbaud(m_Handle, out int baud) == -1) ThrowException();
                 return baud;
             }
             set
             {
-                if (m_Dll.serial_setbaud(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setbaud(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -250,12 +248,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getdatabits(m_Handle, out int databits) == -1) ThrowException();
+                if (LibNSerial.serial_getdatabits(m_Handle, out int databits) == -1) ThrowException();
                 return databits;
             }
             set
             {
-                if (m_Dll.serial_setdatabits(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setdatabits(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -269,12 +267,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getparity(m_Handle, out Parity parity) == -1) ThrowException();
+                if (LibNSerial.serial_getparity(m_Handle, out Parity parity) == -1) ThrowException();
                 return parity;
             }
             set
             {
-                if (m_Dll.serial_setparity(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setparity(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -288,12 +286,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getstopbits(m_Handle, out StopBits stopbits) == -1) ThrowException();
+                if (LibNSerial.serial_getstopbits(m_Handle, out StopBits stopbits) == -1) ThrowException();
                 return stopbits;
             }
             set
             {
-                if (m_Dll.serial_setstopbits(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setstopbits(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -307,12 +305,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getdiscardnull(m_Handle, out bool discardNull) == -1) ThrowException();
+                if (LibNSerial.serial_getdiscardnull(m_Handle, out bool discardNull) == -1) ThrowException();
                 return discardNull;
             }
             set
             {
-                if (m_Dll.serial_setdiscardnull(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setdiscardnull(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -326,12 +324,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getparityreplace(m_Handle, out int parityReplace) == -1) ThrowException();
+                if (LibNSerial.serial_getparityreplace(m_Handle, out int parityReplace) == -1) ThrowException();
                 return (byte)parityReplace;
             }
             set
             {
-                if (m_Dll.serial_setparityreplace(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setparityreplace(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -350,12 +348,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_gettxcontinueonxoff(m_Handle, out bool txContinueOnXOff) == -1) ThrowException();
+                if (LibNSerial.serial_gettxcontinueonxoff(m_Handle, out bool txContinueOnXOff) == -1) ThrowException();
                 return txContinueOnXOff;
             }
             set
             {
-                if (m_Dll.serial_settxcontinueonxoff(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_settxcontinueonxoff(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -369,12 +367,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getxofflimit(m_Handle, out int xoffLimit) == -1) ThrowException();
+                if (LibNSerial.serial_getxofflimit(m_Handle, out int xoffLimit) == -1) ThrowException();
                 return xoffLimit;
             }
             set
             {
-                if (m_Dll.serial_setxofflimit(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setxofflimit(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -388,12 +386,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getxonlimit(m_Handle, out int xonLimit) == -1) ThrowException();
+                if (LibNSerial.serial_getxonlimit(m_Handle, out int xonLimit) == -1) ThrowException();
                 return xonLimit;
             }
             set
             {
-                if (m_Dll.serial_setxonlimit(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setxonlimit(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -407,12 +405,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getbreak(m_Handle, out bool breakState) == -1) ThrowException();
+                if (LibNSerial.serial_getbreak(m_Handle, out bool breakState) == -1) ThrowException();
                 return breakState;
             }
             set
             {
-                if (m_Dll.serial_setbreak(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setbreak(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -472,7 +470,7 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getdcd(m_Handle, out bool cdHolding) == -1) ThrowException();
+                if (LibNSerial.serial_getdcd(m_Handle, out bool cdHolding) == -1) ThrowException();
                 return cdHolding;
             }
         }
@@ -487,7 +485,7 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getcts(m_Handle, out bool ctsHolding) == -1) ThrowException();
+                if (LibNSerial.serial_getcts(m_Handle, out bool ctsHolding) == -1) ThrowException();
                 return ctsHolding;
             }
         }
@@ -502,7 +500,7 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getdsr(m_Handle, out bool dsrHolding) == -1) ThrowException();
+                if (LibNSerial.serial_getdsr(m_Handle, out bool dsrHolding) == -1) ThrowException();
                 return dsrHolding;
             }
         }
@@ -517,7 +515,7 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getri(m_Handle, out bool ringHolding) == -1) ThrowException();
+                if (LibNSerial.serial_getri(m_Handle, out bool ringHolding) == -1) ThrowException();
                 return ringHolding;
             }
         }
@@ -535,12 +533,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getdtr(m_Handle, out bool dtrEnable) == -1) ThrowException();
+                if (LibNSerial.serial_getdtr(m_Handle, out bool dtrEnable) == -1) ThrowException();
                 return dtrEnable;
             }
             set
             {
-                if (m_Dll.serial_setdtr(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setdtr(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -557,12 +555,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_getrts(m_Handle, out bool rtsEnable) == -1) ThrowException();
+                if (LibNSerial.serial_getrts(m_Handle, out bool rtsEnable) == -1) ThrowException();
                 return rtsEnable;
             }
             set
             {
-                if (m_Dll.serial_setrts(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_setrts(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -576,12 +574,12 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_gethandshake(m_Handle, out Handshake handshake) == -1) ThrowException();
+                if (LibNSerial.serial_gethandshake(m_Handle, out Handshake handshake) == -1) ThrowException();
                 return handshake;
             }
             set
             {
-                if (m_Dll.serial_sethandshake(m_Handle, value) == -1) ThrowException();
+                if (LibNSerial.serial_sethandshake(m_Handle, value) == -1) ThrowException();
             }
         }
 
@@ -599,7 +597,7 @@ namespace RJCP.IO.Ports.Serial
         {
             get
             {
-                if (m_Dll.serial_isopen(m_Handle, out bool isOpen) == -1) ThrowException();
+                if (LibNSerial.serial_isopen(m_Handle, out bool isOpen) == -1) ThrowException();
                 return isOpen;
             }
         }
@@ -609,7 +607,7 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public void DiscardInBuffer()
         {
-            if (m_Dll.serial_discardinbuffer(m_Handle) == -1) ThrowException();
+            if (LibNSerial.serial_discardinbuffer(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
@@ -628,7 +626,7 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public void GetPortSettings()
         {
-            if (m_Dll.serial_getproperties(m_Handle) == -1) ThrowException();
+            if (LibNSerial.serial_getproperties(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
@@ -636,7 +634,7 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public void SetPortSettings()
         {
-            if (m_Dll.serial_setproperties(m_Handle) == -1) ThrowException();
+            if (LibNSerial.serial_setproperties(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
@@ -647,7 +645,7 @@ namespace RJCP.IO.Ports.Serial
         /// </remarks>
         public void Open()
         {
-            if (m_Dll.serial_open(m_Handle) == -1) ThrowException();
+            if (LibNSerial.serial_open(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
@@ -661,7 +659,7 @@ namespace RJCP.IO.Ports.Serial
         {
             if (IsOpen) Stop();
             m_Buffer.Close();
-            if (m_Dll.serial_close(m_Handle) == -1) ThrowException();
+            if (LibNSerial.serial_close(m_Handle) == -1) ThrowException();
         }
 
         /// <summary>
@@ -731,7 +729,7 @@ namespace RJCP.IO.Ports.Serial
                 if (m_MonitorPins) {
                     if (m_Log.ShouldTrace(TraceEventType.Verbose))
                         m_Log.TraceEvent(TraceEventType.Verbose, $"{m_Name}: PinChangeThread: Stopping Thread");
-                    m_Dll.serial_abortwaitformodemevent(m_Handle);
+                    LibNSerial.serial_abortwaitformodemevent(m_Handle);
                 }
                 if (m_Log.ShouldTrace(TraceEventType.Verbose))
                     m_Log.TraceEvent(TraceEventType.Verbose, $"{m_Name}: PinChangeThread: Waiting for Thread");
@@ -778,7 +776,7 @@ namespace RJCP.IO.Ports.Serial
                     continue;
                 case 1: // Clear write buffers
                     m_Buffer.SerialWrite.Purge();
-                    m_Dll.serial_discardoutbuffer(m_Handle);
+                    LibNSerial.serial_discardoutbuffer(m_Handle);
                     m_WriteClearDoneEvent.Set();
                     continue;
                 }
@@ -792,11 +790,11 @@ namespace RJCP.IO.Ports.Serial
                     rwevent |= LibNSerial.SerialReadWriteEvent.WriteEvent;
                 }
 
-                LibNSerial.SerialReadWriteEvent result = m_Dll.serial_waitforevent(m_Handle, rwevent, 500);
+                LibNSerial.SerialReadWriteEvent result = LibNSerial.serial_waitforevent(m_Handle, rwevent, 500);
                 if (result == LibNSerial.SerialReadWriteEvent.Error) {
                     if (m_Log.ShouldTrace(TraceEventType.Error))
                         m_Log.TraceEvent(TraceEventType.Error,
-                            $"{m_Name}: ReadWriteThread: Error waiting for event; errno={m_Dll.errno}; description={m_Dll.serial_error(m_Handle)}");
+                            $"{m_Name}: ReadWriteThread: Error waiting for event; errno={LibNSerial.errno}; description={LibNSerial.serial_error(m_Handle)}");
                     m_IsRunning = false;
                     continue;
                 } else if (m_Log.ShouldTrace(TraceEventType.Verbose)) {
@@ -813,11 +811,11 @@ namespace RJCP.IO.Ports.Serial
                             bo = b + m_Buffer.SerialRead.BufferEnd;
                             length = m_Buffer.SerialRead.BufferWriteLength;
                         }
-                        rresult = m_Dll.serial_read(m_Handle, (IntPtr)bo, length);
+                        rresult = LibNSerial.serial_read(m_Handle, (IntPtr)bo, length);
                         if (rresult < 0) {
                             if (m_Log.ShouldTrace(TraceEventType.Error))
                                 m_Log.TraceEvent(TraceEventType.Error,
-                                    $"{m_Name}: ReadWriteThread: Error reading data; errno={m_Dll.errno}; description={m_Dll.serial_error(m_Handle)}");
+                                    $"{m_Name}: ReadWriteThread: Error reading data; errno={LibNSerial.errno}; description={LibNSerial.serial_error(m_Handle)}");
                             m_IsRunning = false;
                             continue;
                         } else {
@@ -843,11 +841,11 @@ namespace RJCP.IO.Ports.Serial
                             bo = b + m_Buffer.SerialWrite.BufferStart;
                             length = m_Buffer.SerialWrite.BufferReadLength;
                         }
-                        wresult = m_Dll.serial_write(m_Handle, (IntPtr)bo, length);
+                        wresult = LibNSerial.serial_write(m_Handle, (IntPtr)bo, length);
                         if (wresult < 0) {
                             if (m_Log.ShouldTrace(TraceEventType.Error))
                                 m_Log.TraceEvent(TraceEventType.Error,
-                                    $"{m_Name}: ReadWriteThread: Error writing data; errno={m_Dll.errno}; description={m_Dll.serial_error(m_Handle)}");
+                                    $"{m_Name}: ReadWriteThread: Error writing data; errno={LibNSerial.errno}; description={LibNSerial.serial_error(m_Handle)}");
                             m_IsRunning = false;
                         } else {
                             if (m_Log.ShouldTrace(TraceEventType.Verbose))
@@ -876,11 +874,11 @@ namespace RJCP.IO.Ports.Serial
         private void InterruptReadWriteLoop()
         {
             if (m_IsRunning && !m_Handle.IsInvalid) {
-                int result = m_Dll.serial_abortwaitforevent(m_Handle);
+                int result = LibNSerial.serial_abortwaitforevent(m_Handle);
                 if (result == -1) {
                     if (m_Log.ShouldTrace(TraceEventType.Error))
                         m_Log.TraceEvent(TraceEventType.Error,
-                            $"{m_Name}: ReadWriteThread: Error aborting event; errno={m_Dll.errno}; description={m_Dll.serial_error(m_Handle)}");
+                            $"{m_Name}: ReadWriteThread: Error aborting event; errno={LibNSerial.errno}; description={LibNSerial.serial_error(m_Handle)}");
                 } else {
                     if (m_Log.ShouldTrace(TraceEventType.Verbose))
                         m_Log.TraceEvent(TraceEventType.Verbose,
@@ -906,11 +904,11 @@ namespace RJCP.IO.Ports.Serial
                 if (m_Log.ShouldTrace(TraceEventType.Verbose))
                     m_Log.TraceEvent(TraceEventType.Verbose,
                         $"{m_Name}: PinChangeThread: Waiting");
-                LibNSerial.WaitForModemEvent mevent = m_Dll.serial_waitformodemevent(m_Handle, c_ModemEvents);
+                LibNSerial.WaitForModemEvent mevent = LibNSerial.serial_waitformodemevent(m_Handle, c_ModemEvents);
                 if (mevent == LibNSerial.WaitForModemEvent.Error) {
                     if (m_Log.ShouldTrace(TraceEventType.Error))
                         m_Log.TraceEvent(TraceEventType.Error,
-                            $"{m_Name}: PinChangeThread: Error aborting event; errno={m_Dll.errno}; description={m_Dll.serial_error(m_Handle)}");
+                            $"{m_Name}: PinChangeThread: Error aborting event; errno={LibNSerial.errno}; description={LibNSerial.serial_error(m_Handle)}");
                     m_MonitorPins = false;
                     return;
                 }
@@ -925,7 +923,7 @@ namespace RJCP.IO.Ports.Serial
 
                     if (m_Log.ShouldTrace(TraceEventType.Verbose))
                         m_Log.TraceEvent(TraceEventType.Verbose,
-                            "{0}: PinChangeThread: Event Received: {1}", m_Name, mevent);
+                            $"{m_Name}: PinChangeThread: Event Received: {mevent}");
                     OnPinChanged(this, new SerialPinChangedEventArgs(pins));
                 }
             }

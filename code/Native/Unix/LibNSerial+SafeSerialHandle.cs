@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports.Native.Unix
     using System;
     using System.Runtime.InteropServices;
 
-    internal partial class LibNSerial
+    internal static partial class LibNSerial
     {
         public class SafeSerialHandle : SafeHandle
         {

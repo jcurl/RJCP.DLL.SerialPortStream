@@ -6,7 +6,7 @@ namespace RJCP.IO.Ports.Native.Unix
 {
     using System;
 
-    internal partial class LibNSerial
+    internal static partial class LibNSerial
     {
         [Flags]
         public enum SerialReadWriteEvent
