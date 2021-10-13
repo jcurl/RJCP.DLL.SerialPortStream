@@ -59,7 +59,11 @@
 
   <ItemGroup>
     <None Include="App.config" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ReadCharsTest.cs" />
+    <Compile Include="ReadWriteBytesTest.cs" />
     <Compile Include="..\Common\SerialConfiguration.cs" Link="SerialConfiguration.cs" />
+    <Compile Include="SerialPortStreamDriverTest.cs" />
     <Compile Include="SerialPortStreamSimpleTest.cs" />
     <None Include="..\Common\Trace\GlobalLogger.cs" Link="Trace\GlobalLogger.cs" />
   </ItemGroup>

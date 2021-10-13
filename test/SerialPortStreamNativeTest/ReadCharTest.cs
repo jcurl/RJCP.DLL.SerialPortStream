@@ -34,18 +34,6 @@ namespace RJCP.IO.Ports
 #endif
 
         [Test]
-        public void NewLine()
-        {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
-                Assert.That(() => src.NewLine = string.Empty, Throws.Exception.TypeOf<ArgumentException>(),
-                    "Expected exception when setting newline to empty string");
-
-                Assert.That(() => src.NewLine = null, Throws.Exception.TypeOf<ArgumentNullException>(),
-                    "Expected exception when setting newline to null");
-            }
-        }
-
-        [Test]
         public void ReadChars()
         {
             using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
@@ -194,10 +182,8 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                string s;
                 src.WriteLine("TestString");
-                s = dst.ReadLine();
-                Assert.That(s, Is.EqualTo("TestString"));
+                Assert.That(dst.ReadLine(), Is.EqualTo("TestString"));
             }
         }
 
@@ -211,14 +197,13 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                string s;
-
                 src.Write("TestString");
-                Assert.Throws<TimeoutException>(() => { s = dst.ReadLine(); }, "No timeout exception occurred");
+                Assert.That(() => {
+                    _ = dst.ReadLine();
+                }, Throws.TypeOf<TimeoutException>());
 
                 src.WriteLine("");
-                s = dst.ReadLine();
-                Assert.That(s, Is.EqualTo("TestString"));
+                Assert.That(dst.ReadLine(), Is.EqualTo("TestString"));
             }
         }
 
@@ -232,14 +217,13 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                string s;
-
                 src.Write("Test");
-                Assert.Throws<TimeoutException>(() => { s = dst.ReadLine(); }, "No timeout exception occurred");
+                Assert.That(() => {
+                    _ = dst.ReadLine();
+                }, Throws.TypeOf<TimeoutException>());
 
                 src.WriteLine("String");
-                s = dst.ReadLine();
-                Assert.That(s, Is.EqualTo("TestString"));
+                Assert.That(dst.ReadLine(), Is.EqualTo("TestString"));
             }
         }
 
@@ -253,14 +237,13 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                string s;
                 src.Write("Line1\nLine2\n");
-                s = dst.ReadLine();
-                Assert.That(s, Is.EqualTo("Line1"));
-                s = dst.ReadLine();
-                Assert.That(s, Is.EqualTo("Line2"));
+                Assert.That(dst.ReadLine(), Is.EqualTo("Line1"));
+                Assert.That(dst.ReadLine(), Is.EqualTo("Line2"));
 
-                Assert.Throws<TimeoutException>(() => { s = dst.ReadLine(); }, "No timeout exception occurred");
+                Assert.That(() => {
+                    _ = dst.ReadLine();
+                }, Throws.TypeOf<TimeoutException>());
             }
         }
 
@@ -283,7 +266,7 @@ namespace RJCP.IO.Ports
                     src.Write(send[i].ToString());
                     try {
                         s = dst.ReadLine();
-                    } catch (System.Exception e) {
+                    } catch (Exception e) {
                         if (e is TimeoutException) err = true;
                     }
                     if (i < send.Length - 1) {
@@ -316,7 +299,7 @@ namespace RJCP.IO.Ports
                     src.Write(buf, i, 1);
                     try {
                         s = dst.ReadLine();
-                    } catch (System.Exception e) {
+                    } catch (Exception e) {
                         if (e is TimeoutException) err = true;
                     }
                     if (i < buf.Length - 1) {
@@ -337,18 +320,17 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                string s;
-
                 src.Write("foobar");
-                Assert.Throws<TimeoutException>(() => { s = dst.ReadTo("baz"); }, "No timeout exception occurred when reading 'baz'");
+                Assert.That(() => {
+                    _ = dst.ReadTo("baz");
+                }, Throws.TypeOf<TimeoutException>());
 
-                s = dst.ReadTo("foo");
-                Assert.That(s, Is.EqualTo(""));
+                Assert.That(dst.ReadTo("foo"), Is.EqualTo(""));
+                Assert.That(dst.ReadTo("bar"), Is.EqualTo(""));
 
-                s = dst.ReadTo("bar");
-                Assert.That(s, Is.EqualTo(""));
-
-                Assert.Throws<TimeoutException>(() => { s = dst.ReadTo("baz"); }, "No timeout exception occurred when reading 'baz' when empty");
+                Assert.That(() => {
+                    _ = dst.ReadTo("baz");
+                }, Throws.TypeOf<TimeoutException>());
             }
         }
 
@@ -362,17 +344,13 @@ namespace RJCP.IO.Ports
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                string s;
-
                 src.Write("superfoobar");
-                s = dst.ReadTo("foo");
-                Assert.That(s, Is.EqualTo("super"));
+                Assert.That(dst.ReadTo("foo"), Is.EqualTo("super"));
 
                 // Sleep for 100ms to allow all data to be sent and received. Else we might not receive the
                 // entire string, and sometimes only get it partially.
                 Thread.Sleep(100);
-                s = dst.ReadExisting();
-                Assert.That(s, Is.EqualTo("bar"));
+                Assert.That(dst.ReadExisting(), Is.EqualTo("bar"));
             }
         }
 
