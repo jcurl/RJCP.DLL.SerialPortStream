@@ -11,7 +11,7 @@ namespace RJCP.IO.Ports
     /// </summary>
     public class SerialPinChangedEventArgs : EventArgs
     {
-        private SerialPinChange m_EventType;
+        private readonly SerialPinChange m_EventType;
 
         /// <summary>
         /// Constructor.

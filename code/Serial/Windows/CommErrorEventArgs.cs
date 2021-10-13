@@ -9,7 +9,7 @@ namespace RJCP.IO.Ports.Serial.Windows
 
     internal class CommErrorEventArgs : EventArgs
     {
-        private Kernel32.ComStatErrors m_EventType;
+        private readonly Kernel32.ComStatErrors m_EventType;
 
         /// <summary>
         /// Constructor.

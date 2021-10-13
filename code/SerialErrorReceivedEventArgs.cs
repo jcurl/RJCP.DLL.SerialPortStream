@@ -11,7 +11,7 @@ namespace RJCP.IO.Ports
     /// </summary>
     public class SerialErrorReceivedEventArgs : EventArgs
     {
-        private SerialError m_EventType;
+        private readonly SerialError m_EventType;
 
         /// <summary>
         /// Constructor

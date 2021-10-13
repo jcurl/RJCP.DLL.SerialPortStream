@@ -9,7 +9,7 @@ namespace RJCP.IO.Ports.Serial.Windows
 
     internal class CommEventArgs : EventArgs
     {
-        private Kernel32.SerialEventMask m_EventType;
+        private readonly Kernel32.SerialEventMask m_EventType;
 
         /// <summary>
         /// Constructor.

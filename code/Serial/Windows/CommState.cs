@@ -14,7 +14,7 @@ namespace RJCP.IO.Ports.Serial.Windows
     /// </summary>
     internal sealed class CommState
     {
-        private SafeFileHandle m_ComPortHandle;
+        private readonly SafeFileHandle m_ComPortHandle;
         private Kernel32.DCB m_Dcb = new Kernel32.DCB();
 
         /// <summary>

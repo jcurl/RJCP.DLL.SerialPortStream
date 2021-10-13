@@ -14,7 +14,7 @@ namespace RJCP.IO.Ports.Serial.Windows
     /// </summary>
     internal sealed class CommProperties
     {
-        private SafeFileHandle m_ComPortHandle;
+        private readonly SafeFileHandle m_ComPortHandle;
         private Kernel32.CommProp m_CommProp = new Kernel32.CommProp();
 
         internal CommProperties(SafeFileHandle handle)

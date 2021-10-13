@@ -93,7 +93,7 @@ namespace RJCP.IO.Ports.Serial.Windows
         /// </remarks>
         private bool m_ReadByteEof;
 
-        private LogSource m_Log;
+        private readonly LogSource m_Log;
 
         private string m_Name;
         #endregion

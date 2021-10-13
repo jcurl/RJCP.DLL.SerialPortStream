@@ -16,10 +16,10 @@ namespace RJCP.IO.Ports.Serial
     /// </summary>
     public class UnixNativeSerial : INativeSerial
     {
-        private LibNSerial m_Dll;
-        private LibNSerial.SafeSerialHandle m_Handle;
-        private IntPtr m_HandlePtr;
-        private LogSource m_Log;
+        private readonly LibNSerial m_Dll;
+        private readonly LibNSerial.SafeSerialHandle m_Handle;
+        private readonly IntPtr m_HandlePtr;
+        private readonly LogSource m_Log;
         private readonly SerialBuffer m_Buffer;
 
         private readonly AutoResetEvent m_WriteClearEvent = new AutoResetEvent(false);
@@ -62,8 +62,7 @@ namespace RJCP.IO.Ports.Serial
 
         private void ThrowException()
         {
-            if (m_Dll == null)
-                return;
+            if (m_IsDisposed) return;
 
             LibNSerial.SysErrNo managedErrNo;
             string sysDescription;
@@ -211,7 +210,7 @@ namespace RJCP.IO.Ports.Serial
             return ports;
         }
 
-        private PortDescription[] GetRuntimePortDescriptions()
+        private static PortDescription[] GetRuntimePortDescriptions()
         {
             string[] ports = System.IO.Ports.SerialPort.GetPortNames();
             PortDescription[] portdescs = new PortDescription[ports.Length];
@@ -679,7 +678,7 @@ namespace RJCP.IO.Ports.Serial
         private string m_Name;
         private volatile bool m_IsRunning;
         private volatile bool m_MonitorPins;
-        private ManualResetEvent m_StopRunning = new ManualResetEvent(false);
+        private readonly ManualResetEvent m_StopRunning = new ManualResetEvent(false);
 
         /// <summary>
         /// Start the monitor thread, that will watch over the serial port.
@@ -1020,16 +1019,14 @@ namespace RJCP.IO.Ports.Serial
         protected virtual void Dispose(bool disposing)
         {
             if (m_IsDisposed) return;
+            m_IsDisposed = true;
 
             if (disposing) {
                 if (IsOpen) Close();
                 m_Handle.Dispose();
                 m_WriteClearEvent.Dispose();
                 m_WriteClearDoneEvent.Dispose();
-                m_Dll = null;
                 m_StopRunning.Dispose();
-                m_StopRunning = null;
-                m_IsDisposed = true;
             }
         }
         #endregion

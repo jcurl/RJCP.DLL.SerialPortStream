@@ -1,7 +1,7 @@
 ﻿namespace System.IO.Ports
 {
     /// <summary>
-    /// Class SerialPort compatibility layer for .NET Stanard 1.5
+    /// SerialPort compatibility layer for .NET Standard 2.1
     /// </summary>
     internal class SerialPort
     {
@@ -10,12 +10,11 @@
         /// </summary>
         /// <returns>An empty array.</returns>
         /// <remarks>
-        /// As .NET Standard doesn't contain this functionality, we provide it for the
-        /// compiler and do nothing.
+        /// As .NET Standard doesn't contain this functionality, we provide it for the compiler and do nothing.
         /// </remarks>
         public static string[] GetPortNames()
         {
-            return new string[0];
+            return Array.Empty<string>();
         }
     }
 }
