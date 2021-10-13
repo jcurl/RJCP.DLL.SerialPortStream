@@ -456,6 +456,7 @@ namespace RJCP.IO.Ports
         public async Task ReadAndWriteAsyncInDifferentThreadsAtSameTime()
         {
             SerialPortStream serial = null;
+            Task readTask = null;
             try {
                 serial = new SerialPortStream(SourcePort) {
                     BaudRate = 115200,
@@ -470,7 +471,7 @@ namespace RJCP.IO.Ports
                 serial.Open();
 
                 var buffer = new byte[1024];
-                var readTask = Task.Run(async () => await serial.ReadAsync(buffer, 0, buffer.Length));
+                readTask = Task.Run(async () => await serial.ReadAsync(buffer, 0, buffer.Length));
 
                 await Task.Run(async () => {
                     var bytes = new byte[] { 0x01, 0x02, 0x03 };
@@ -481,6 +482,13 @@ namespace RJCP.IO.Ports
                 await Task.Delay(100);
             } finally {
                 if (serial != null) serial.Dispose();
+            }
+
+            // The readTask is blocked on a read forever, and should abort when the serial port is closed.
+            try {
+                await readTask;
+            } catch (ObjectDisposedException) {
+                // Ignore that the object was disposed of.
             }
         }
 

@@ -3,7 +3,7 @@
     /// <summary>
     /// SerialPort compatibility layer for .NET Standard 2.1
     /// </summary>
-    internal class SerialPort
+    internal static class SerialPort
     {
         /// <summary>
         /// Gets the port names.
