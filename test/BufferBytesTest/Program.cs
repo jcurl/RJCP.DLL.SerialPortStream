@@ -25,6 +25,7 @@ namespace RJCP.IO.Ports
             Random r = new Random();
             r.NextBytes(buffer);
 
+            Task monitor = null;
             try {
                 Console.WriteLine($"Testing port {options.Port} at Baud {options.Baud}");
                 using (SerialPortStream port = new SerialPortStream(options.Port, options.Baud)) {
@@ -32,7 +33,7 @@ namespace RJCP.IO.Ports
 
                     // Monitor the number of bytes to write and print when it changes. On Windows, it depends on the
                     // internal buffer and the number of bytes to write provided by the driver.
-                    Task monitor = new TaskFactory().StartNew(() => {
+                    monitor = new TaskFactory().StartNew(() => {
                         int prevBytesToWrite = -1;
                         int bytesToWrite;
                         while (port.IsOpen) {
@@ -60,6 +61,19 @@ namespace RJCP.IO.Ports
             } catch (Exception ex) {
                 Console.WriteLine($"Error: {ex.Message}");
             }
+
+            try {
+                if (monitor != null)
+                    monitor.Wait();
+            } catch (ObjectDisposedException) {
+            } catch (AggregateException ex) {
+                if (ex.InnerExceptions.Count > 0) {
+                    if (!(ex.InnerExceptions[0] is ObjectDisposedException)) {
+                        throw ex.InnerExceptions[0];
+                    }
+                }
+            }
+
             return 0;
         }
     }
