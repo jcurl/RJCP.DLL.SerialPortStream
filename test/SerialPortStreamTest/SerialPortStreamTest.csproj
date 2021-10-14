@@ -64,7 +64,9 @@
     <Compile Include="ReadWriteBytesTest.cs" />
     <Compile Include="..\Common\SerialConfiguration.cs" Link="SerialConfiguration.cs" />
     <Compile Include="SerialPortStreamDriverTest.cs" />
+    <Compile Include="SerialPortStreamFactoryTest.cs" />
     <Compile Include="SerialPortStreamSimpleTest.cs" />
+    <Compile Include="WinSerialPortStreamTest.cs" />
     <None Include="..\Common\Trace\GlobalLogger.cs" Link="Trace\GlobalLogger.cs" />
   </ItemGroup>
 

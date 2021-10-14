@@ -19,7 +19,6 @@ namespace RJCP.IO.Ports
     using Timer;
 
 #if NETSTANDARD
-    using System.Runtime.ExceptionServices;
     using Microsoft.Extensions.Logging;
 #endif
 
@@ -188,6 +187,12 @@ namespace RJCP.IO.Ports
             if (Platform.IsWinNT()) return new WinNativeSerial(log);
             return null;
         }
+
+        /// <summary>
+        /// Gets the native serial driver used for the <see cref="SerialPortStream"/>.
+        /// </summary>
+        /// <value>The native serial driver.</value>
+        protected INativeSerial NativeSerial { get { return m_NativeSerial; } }
 
         /// <summary>
         /// Get the version of this assembly (or components driving this assembly).
@@ -2104,7 +2109,6 @@ namespace RJCP.IO.Ports
                 m_EventProcessing.Dispose();
 
                 m_NativeSerial.Dispose();
-                m_NativeSerial = null;
             }
             base.Dispose(disposing);
         }

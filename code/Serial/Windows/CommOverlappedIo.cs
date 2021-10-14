@@ -2,8 +2,6 @@
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
-#define PL2303_WORKAROUNDS
-
 namespace RJCP.IO.Ports.Serial.Windows
 {
     using System;
@@ -93,6 +91,11 @@ namespace RJCP.IO.Ports.Serial.Windows
         /// </remarks>
         private bool m_ReadByteEof;
 
+        /// <summary>
+        /// Configuration settings specific for Windows.
+        /// </summary>
+        private readonly WinNativeSettings m_Settings;
+
         private readonly LogSource m_Log;
 
         private string m_Name;
@@ -103,12 +106,16 @@ namespace RJCP.IO.Ports.Serial.Windows
         /// Initializes a new instance of the <see cref="CommOverlappedIo"/> class.
         /// </summary>
         /// <param name="handle">The serial port handle.</param>
+        /// <param name="settings">Settings that should be used for Windows serial ports.</param>
         /// <param name="log">The <see cref="LogSource"/> which should be used for logging.</param>
-        public CommOverlappedIo(SafeFileHandle handle, LogSource log)
+        public CommOverlappedIo(SafeFileHandle handle, WinNativeSettings settings, LogSource log)
         {
             if (log == null) throw new ArgumentNullException(nameof(log));
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
             m_Log = log;
             m_ComPortHandle = handle;
+            m_Settings = settings;
         }
         #endregion
 
@@ -209,21 +216,11 @@ namespace RJCP.IO.Ports.Serial.Windows
             try {
                 // Set the time outs
                 Kernel32.COMMTIMEOUTS timeouts = new Kernel32.COMMTIMEOUTS() {
-                    // We read only the data that is buffered
-#if PL2303_WORKAROUNDS
-                    // Time out if data hasn't arrived in 10ms, or if the read takes longer than 100ms in total
-                    ReadIntervalTimeout = 10,
-                    ReadTotalTimeoutConstant = 100,
-                    ReadTotalTimeoutMultiplier = 0,
-#else
-                    // Non-asynchronous behaviour
-                    ReadIntervalTimeout = System.Threading.Timeout.Infinite,
-                    ReadTotalTimeoutConstant = 0,
-                    ReadTotalTimeoutMultiplier = 0,
-#endif
-                    // We have no time outs when writing
-                    WriteTotalTimeoutMultiplier = 0,
-                    WriteTotalTimeoutConstant = 500
+                    ReadIntervalTimeout = m_Settings.ReadIntervalTimeout,
+                    ReadTotalTimeoutConstant = m_Settings.ReadTotalTimeoutConstant,
+                    ReadTotalTimeoutMultiplier = m_Settings.ReadTotalTimeoutMultiplier,
+                    WriteTotalTimeoutMultiplier = m_Settings.WriteTotalTimeoutMultiplier,
+                    WriteTotalTimeoutConstant = m_Settings.WriteTotalTimeoutConstant
                 };
 
                 bool result = Kernel32.SetCommTimeouts(m_ComPortHandle, ref timeouts);
@@ -353,7 +350,6 @@ namespace RJCP.IO.Ports.Serial.Windows
                 handles.Add(m_StopRunning);
                 handles.Add(m_WriteClearEvent);
 
-#if PL2303_WORKAROUNDS
                 // - - - - - - - - - - - - - - - - - - - - - - - - -
                 // PROLIFIC PL23030 WORKAROUND
                 // - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -374,9 +370,6 @@ namespace RJCP.IO.Ports.Serial.Windows
                         m_ReadByteEof |= eofReceived;
                     }
                 }
-#else
-                Kernel32.SetCommMask(m_ComPortHandle, maskRead);
-#endif
 
                 // commEventMask is on the stack, and is therefore fixed
                 if (!serialCommError) {

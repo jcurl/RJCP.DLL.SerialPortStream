@@ -24,7 +24,7 @@ namespace RJCP.IO.Ports.Serial
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
-    public class WinNativeSerial : INativeSerial
+    public class WinNativeSerial : INativeSerial<IWinNativeSettings>
     {
         private SafeFileHandle m_ComPortHandle;
         private CommProperties m_CommProperties;
@@ -33,6 +33,7 @@ namespace RJCP.IO.Ports.Serial
         private CommOverlappedIo m_CommOverlappedIo;
         private readonly SerialBuffer m_Buffer;
         private readonly LogSource m_Log;
+        private readonly WinNativeSettings m_Settings = new WinNativeSettings();
 
         private string m_Version;
 
@@ -288,6 +289,12 @@ namespace RJCP.IO.Ports.Serial
                 if (IsOpen) SetPortSettings();
             }
         }
+
+        /// <summary>
+        /// Gets a reference to the configurable settings for the serial port.
+        /// </summary>
+        /// <value>The configurable settings for the serial port.</value>
+        public IWinNativeSettings Settings { get { return m_Settings; } }
 
         private bool m_DiscardNull;
 
@@ -912,7 +919,7 @@ namespace RJCP.IO.Ports.Serial
             m_CommState = new CommState(m_ComPortHandle);
             m_CommProperties = new CommProperties(m_ComPortHandle);
             m_CommModemStatus = new CommModemStatus(m_ComPortHandle);
-            m_CommOverlappedIo = new CommOverlappedIo(m_ComPortHandle, m_Log);
+            m_CommOverlappedIo = new CommOverlappedIo(m_ComPortHandle, m_Settings, m_Log);
             RegisterEvents();
         }
 
