@@ -270,10 +270,6 @@ namespace RJCP.IO.Ports.Serial.Windows
             Kernel32.SerialEventMask.EV_RLSD |
             Kernel32.SerialEventMask.EV_RXCHAR |
             Kernel32.SerialEventMask.EV_TXEMPTY |
-            Kernel32.SerialEventMask.EV_EVENT1 |
-            Kernel32.SerialEventMask.EV_EVENT2 |
-            Kernel32.SerialEventMask.EV_PERR |
-            Kernel32.SerialEventMask.EV_RX80FULL |
             Kernel32.SerialEventMask.EV_RXFLAG;
 
         private const Kernel32.SerialEventMask maskReadPending =
@@ -283,10 +279,7 @@ namespace RJCP.IO.Ports.Serial.Windows
             Kernel32.SerialEventMask.EV_ERR |
             Kernel32.SerialEventMask.EV_RING |
             Kernel32.SerialEventMask.EV_RLSD |
-            Kernel32.SerialEventMask.EV_TXEMPTY |
-            Kernel32.SerialEventMask.EV_EVENT1 |
-            Kernel32.SerialEventMask.EV_EVENT2 |
-            Kernel32.SerialEventMask.EV_PERR;
+            Kernel32.SerialEventMask.EV_TXEMPTY;
 
         private void OverlappedIoThread()
         {
