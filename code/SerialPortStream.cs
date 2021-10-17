@@ -715,34 +715,39 @@ namespace RJCP.IO.Ports
 
 #if NETSTANDARD || NET45_OR_GREATER
         /// <summary>
-        /// Asynchronously reads a sequence of bytes from the current stream and advances the
-        /// position within the stream by the number of bytes read.
+        /// Asynchronously reads a sequence of bytes from the current stream and advances the position within the stream
+        /// by the number of bytes read.
         /// </summary>
         /// <param name="buffer">The buffer to read the data into.</param>
         /// <param name="offset">
-        /// The byte offset in <paramref name="buffer"/> at which to begin writing data read from
-        /// the stream.
+        /// The byte offset in <paramref name="buffer"/> at which to begin writing data read from the stream.
         /// </param>
         /// <param name="count">The maximum number of bytes to read.</param>
-        /// <param name="cancellationToken">
-        /// Using a cancellation token is not supported and will be ignored.
-        /// </param>
+        /// <param name="cancellationToken">The cancellation token to abort the operation</param>
         /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation.</returns>
-        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
+        /// <exception cref="IOException">Device monitoring thread has died.</exception>
+        public async override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             ReadCheck(buffer, offset, count);
 
-            TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
-            InternalBeginRead(buffer, offset, count, iar => {
-                try {
-                    tcs.TrySetResult(InternalEndRead(iar));
-                } catch (OperationCanceledException) {
-                    tcs.TrySetCanceled();
-                } catch (Exception ex) {
-                    tcs.TrySetException(ex);
+            if (m_NativeSerial.IsRunning) {
+                bool ready = await m_NativeSerial.Buffer.ReadStream.WaitForReadAsync(m_ReadTimeout, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException(cancellationToken);
+
+                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                if (!ready) {
+                    ReadCheckDeviceError();
+                    return 0;
                 }
-            }, null);
-            return tcs.Task;
+            }
+
+            return InternalRead(buffer, offset, count);
         }
 #endif
 
@@ -1179,8 +1184,7 @@ namespace RJCP.IO.Ports
         /// <exception cref="TimeoutException">
         /// Not enough buffer space was made available before the time out expired.
         /// </exception>
-        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush
-        /// operation.</exception>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
@@ -1245,23 +1249,26 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="InvalidOperationException">Serial port not open.</exception>
-        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
+        public async override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (!WriteCheck(buffer, offset, count))
-                return Task.FromResult((object)null);
+                return;
+            if (count == 0) return;
 
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-            InternalBeginWrite(buffer, offset, count, iar => {
-                try {
-                    InternalEndWrite(iar);
-                    tcs.TrySetResult(null);
-                } catch (OperationCanceledException) {
-                    tcs.TrySetCanceled();
-                } catch (Exception ex) {
-                    tcs.TrySetException(ex);
-                }
-            }, null);
-            return tcs.Task;
+            bool ready = await m_NativeSerial.Buffer.WriteStream.WaitForWriteAsync(count, m_WriteTimeout, cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                throw new OperationCanceledException(cancellationToken);
+
+            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (!m_NativeSerial.IsOpen) throw new IOException("SerialPortStream was closed during write operation");
+
+            if (!ready) {
+                WriteCheckDeviceError();
+                throw new TimeoutException("Couldn't write into buffer");
+            }
+            InternalWrite(buffer, offset, count);
+            WriteCheckDeviceError();
         }
 #endif
 
