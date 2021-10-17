@@ -204,7 +204,7 @@ namespace RJCP.IO.Ports.Serial
         }
 
         [Test]
-        [Repeat(2)]
+        [Repeat(20)]
         [Timeout(2000)]
         public void VirtualNativeClosed()
         {

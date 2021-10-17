@@ -677,8 +677,8 @@ namespace RJCP.IO.Ports.Serial
         /// </remarks>
         public virtual void StopMonitor()
         {
-            m_Buffer.Close();
             IsRunning = false;
+            m_Buffer.Close();
         }
 
         private bool m_IsRunning;
