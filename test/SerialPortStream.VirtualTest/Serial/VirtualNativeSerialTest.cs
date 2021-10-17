@@ -223,14 +223,14 @@ namespace RJCP.IO.Ports.Serial
                 int read = stream.Read(buffer, 0, buffer.Length);
 
                 Assert.That(read, Is.EqualTo(0));
+
+                serialTask.Wait();
                 Assert.That(serial.IsRunning, Is.False);
 
                 // Because we stopped the monitor thread, a second read will raise an exception.
                 Assert.That(() => {
                     stream.Read(buffer, 0, buffer.Length);
                 }, Throws.TypeOf<System.IO.IOException>());
-
-                serialTask.Wait();
             }
         }
     }
