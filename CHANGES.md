@@ -1,15 +1,71 @@
 # List of Changes with Releases
 
-## Version 2.3.2-beta (libnserial 1.1.4)
+## Version 3.0.0 (libnserial 1.1.4) - 18/Oct/2021
 
 Features
+
+* DOTNET-328: Add logging/debugging support for .NET Core
+* DOTNET-404, DOTNET-405: Expose the `INativeSerial` to user code for simulating
+  serial ports. add a new `SerialPortStream.Virtual` library to show how this
+  works, that can be used in user code testing.
+* DOTNET-410: Expose CommTimeout properties on Windows in the
+  `WinSerialPortStream` class. Provide a factory `SerialPortStreamFactory` that
+  automatically instantiates the correct stream object depending on the OS. If
+  you don't need this, you can still instantiate the `SerialPortStream` as
+  before.
+* DOTNET-407: Provide Authenticode signing and GIT information in the build with
+  `RJCP.MSBuildTasks`.
+* DOTNET-426: Properly implement `ReadAsync` and `WriteAsync` with
+  `CancellationToken`, based on RJCP.IO.Buffer.
+
+Fixes
+
+* DOTNET-333: The `ISerialPortStream` interface for NETSTANDARD as well as .NET
+  4.5
+* DOTNET-423: Fix potential data corruption on Linux as buffers aren't locked.
+* DOTNET-422: `DiscardOutBuffer` should clear memory buffers in addition to the
+  driver buffers.
+* DOTNET-425: BytesToWrite shouldn't return more bytes than what was requested
+  to write.
+* DOTNET-428: Name of properties are used when raising exceptions, instead of
+  "value".
+* DOTNET-433: Don't request unneeded events on Windows.
+
+Refactoring:
 
 * DOTNET-329: Migrate to .NET SDK Project
   * DOTNET-330: with .NET 4.0, 4.5
   * DOTNET-331: with .NET Core (API .NET Standard 1.5)
   * DOTNET-334: Unit Test cases for .NET Core 3.1 (tests .NET Standard)
+  * DOTNET-401: Upgrade from .NET Standard 1.5 to 2.1 and remove compatibility
+    code
+  * DOTNET-420: Ensure Mono assets are not deployed / referenced.
 * DOTNET-185: Port test cases to NUnit 3.x
-* DOTNET-328: Add logging/debugging support for .NET Core
+* Remove unneeded references for .NET Standard
+* DOTNET-398: Clean up and remove code analysis suppressions and rework
+* Clean up exception usage (parameter names, variable names, etc.)
+* DOTNET-408: Refactor P/Invokes into individual classes
+* DOTNET-399: Use the NuGet package RJCP.IO.BufferIO. Removes
+  `InternalsVisibleTo`.
+  * DOTNET-399: CircularBuffer
+  * DOTNET-409: TimerExpiry
+  * DOTNET-400: AsyncResult
+  * DOTNET-416: MemoryReadBuffer, MemoryWriteBuffer.
+* DOTNET-402: Use RJCP.Trace for `LogSource` classes (tracing for .NET 4.0 and
+  .NET Core).
+* DOTNET-418: Use Timeout.Infinite (-1) from framework, instead of our own
+  constant.
+* Remove internal `SerialBuffer.IsPinnedBuffer` as it's not used.
+* Remove unneeded implementation of `SerialData.Reset(bool)`.
+* Test cases should use `TaskFactory().StartNew()` to not crash test
+  cases in .NET Core.
+* DOTNET-404: Remove `INativeSerialDll` internal implementation.
+* DOTNET-435: LibNSerial for Unix is now static. Original intent was to handle
+  multiple "bitness", but this appears to be handled properly already on Linux,
+  and 64-bit seems to be the standard now.
+* DOTNET-403: Better testing with `SerialPortStream.Virtual` to abstract
+  hardware. Separate unit tests and integration tests.
+* DOTNET-429: Simplify logging for test cases slightly.
 
 Source
 

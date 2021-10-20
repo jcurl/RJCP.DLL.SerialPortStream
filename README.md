@@ -4,25 +4,27 @@ SerialPortStream is an independent implementation of
 `System.IO.Ports.SerialPort` and `SerialStream` for better reliability and
 maintainability, and now for portability to Mono on Linux systems.
 
-The `SerialPortStream` is a ground up implementation of a Stream that buffers
-data to and from a serial port. It uses low level Win32API (on Windows) or POSIX
-(on Linux) for managing events and asynchronous I/O, using a programming model
-as in the MSDN
+The `SerialPortStream` is a ground up implementation of a `Stream` that buffers
+data to and from a serial port. It uses low level Win32API (on Windows) for
+managing events and asynchronous I/O, using a programming model as in the MSDN
 [PipeServer](http://msdn.microsoft.com/en-us/library/windows/desktop/aa365603.aspx)
 example.
 
-These notes are for version 2.x, which is a new design based on version 1.x that
-enhances portability and fixes bugs. See the end of these notes for differences.
+On Linux, it uses a support library to interface with Posix OS calls for an
+event loop.
+
+These notes are for version 3.x, which is a refactoring of v2.x for better
+maintainability. See the end of these notes for differences.
 
 * 1.0 Why another Serial Port implementation
 * 2.0 Goals
   * 2.1 Issues with MS Serial Port
+  * 2.2 Differences to the MS Serial Port
 * 3.0 System Requirements
-  * 3.1 Tested
+  * 3.1 Testing
   * 3.2 Compatibility
     * 3.2.1 .NET Frameworks (Windows)
     * 3.2.2 Mono Framework (Linux Only)
-    * 3.2.3 Microsoft Compact Framework (not supported)
 * 4.0 Installation
   * 4.1 Windows
   * 4.2 Linux
@@ -52,14 +54,11 @@ enhances portability and fixes bugs. See the end of these notes for differences.
 
 ## 1.0 Why another Serial Port implementation
 
-Microsoft and Mono already provides a reasonable implementation for accessing
-the serial port. Unfortunately, documentation is sparse. When one tries to find
-information about how to program the serial port one comes across instead many
-blogs and forums describing the issues that they've observed.
-
-Through the implementation of `SerialPortStream`, I've used
-[ILSpy](http://ilspy.net/) to reverse engineer how the Microsoft implementation
-works, discovering many other subtle, but noteworthy implementation issues.
+Microsoft and Mono already provided a reasonable implementation for accessing
+the serial port. Today the main goal is to provide a buffered solution that can
+be used on various operating systems, the the ability to also abstract hardware.
+Along the way, various issues with the original implementation in .NET Framework
+are resolved in this library (see the next section).
 
 ## 2.0 Goals
 
@@ -103,20 +102,29 @@ The `SerialPortStream` tries to solve the following issues observed:
   not abort the write operation. This implementation will abort with an
   `System.IO.IOException` type.
 
+### 2.2 Differences to the MS Serial Port
+
+The goal is to provide a `Stream`, not an API compatible replacement to the
+`SerialPort`.
+
+All data is buffered internally in memory, captured using an I/O thread. The
+extra buffering adds delays by reading the bytes, then performing a context
+switch for the user code to read the buffer. This can slow down your software.
+
+Buffering solves the problem however, that data is read from the serial port in
+an arbitrary sized memory buffer, and not dependent on the driver, so a
+likelihood of driver underruns and overruns are reduced. This was an important
+aspect when writing this library.
+
 ## 3.0 System Requirements
 
-### 3.1 Tested
+### 3.1 Testing
 
 Software has been tested and developed using:
 
-* .NET Standard 1.5 on Windows 10 Pro x64
+* .NET Standard 2.1 on Windows 10 Pro x64, .NET SDK 5.x
 * .NET 4.8 on Windows 10 Pro x64
-* .NET 4.5 on Windows 8 Pro x64 and Windows 8.1 Pro x64.
-* .NET 4.5 on Windows 7 x86 and x64.
-* Mono 6.x from Xamarin on Ubuntu 18.04 (64-bit)
-
-I use this software for automation in another system (Windows) that runs for
-multiple days and it appears stable.
+* Mono 6.x from Xamarin on Ubuntu 20.04 (64-bit)
 
 See later in these notes for known issues and changes.
 
@@ -126,7 +134,7 @@ See later in these notes for known issues and changes.
 
 The software is written originally for .NET 4.0 and should work on those
 platforms. It is extended for .NET 4.5 features. A version targets .NET Core
-with API level .NET Standard 1.5, so should work on .NET Core 2.1, 3.1 and .NET
+with API level .NET Standard 2.1, so should work on .NET Core 2.1, 3.1 and .NET
 5.0 and later.
 
 Windows XP SP3 and later should work when using .NET 4.0. It's not possible to
@@ -135,7 +143,7 @@ run the unit tests on Windows XP since the unit tests have migrated to NUnit
 
 #### 3.2.2 Mono Framework (Linux Only)
 
-The SerialPortStream should work on Linux, and it should be possible to import
+The `SerialPortStream` should work on Linux, and it should be possible to import
 the assembly into your code when running on Linux.
 
 When using the Mono Framework, you should reference the .NET 4.0 or .NET 4.5
@@ -143,10 +151,6 @@ projects.
 
 It has been tested to compile and unit test cases pass with the `dotnet` command
 on Linux.
-
-#### 3.2.3 Microsoft Compact Framework (not supported)
-
-SerialPortStream is not designed for the Compact Framework.
 
 ## 4.0 Installation
 
@@ -299,28 +303,20 @@ using RJCP.Diagnostics.Trace;
 
 internal static class GlobalLogger
 {
-  private static readonly object s_LoggerFactoryLock = new object();
-  private static ILoggerFactory s_LoggerFactory;
-
-  private static ILoggerFactory GetLoggerFactory() {
-    if (s_LoggerFactory == null) {
-      lock (s_LoggerFactoryLock) {
-        if (s_LoggerFactory == null) {
-          s_LoggerFactory = LoggerFactory.Create(builder => {
-            builder
-              .AddFilter("Microsoft", LogLevel.Warning)
-              .AddFilter("System", LogLevel.Warning)
-              .AddFilter("RJCP", LogLevel.Debug)
-              .AddNUnitLogger();
-            });
-          }
-        }
-      }
-      return s_LoggerFactory;
+  static GlobalLogger() {
+    ILoggerFactory factory = LoggerFactory.Create(builder => {
+      builder
+        .AddFilter("Microsoft", LogLevel.Warning)
+        .AddFilter("System", LogLevel.Warning)
+        .AddFilter("RJCP", LogLevel.Debug)
+        .AddNUnitLogger();
+      });
+    LogSource.SetLoggerFactory(factory);
   }
 
   public static void Initialize() {
-    LogSource.SetLoggerFactory(GetLoggerFactory());
+    /* Intentially empty. By calling this method, the static constructor
+       will be automatically called */
   }
 }
 ```
@@ -352,28 +348,29 @@ will create this object and log all debug level events to the NUnit logger.
 #### 7.1.1 ReadTo
 
 The implementation of `ReadTo` and other character based read events with the
-SerialPortStream is buggy since version 1.x until the current version, with
-some unit test cases occasionally failing.
+`SerialPortStream` is slow. It tries to calculate the size (in bytes) of each
+individual character, in case the user decides to read bytes in-between. The
+purpose of this was to prevent possible data loss in when a read of bytes is
+mixed with a read of characters. It's recommended not to use the character based
+APIs.
 
-The `ReadTo` and other character based implementations are rather inefficient,
-as it tries to calculate the size (in bytes) of each individual character, in
-case the user decides to read bytes in-between. The purpose of this was to
-prevent possible data loss in when a read of bytes is mixed with a read of
-characters.
+Some test cases are failing and needs to be investigated (although it's not
+clear if this is a bug in the library or in the test case).
 
 ### 7.2 Windows
 
 The following issues are known:
 
-* This is not an issue, but when using the `Com0Com` for running unit tests,
-  some specific test cases for Parity will fail. That is because Com0Com doesn't
-  emulate data at a bit level.
-* .NET 4.0 to .NET 4.8 has a minor bug in `System.Text.Decoder` that in a
-  special circumstance it will consume too many bytes. The `PeekChar()` method
-  is therefore a slower implementation than what it could be. Please refer to
-  the Xamarin bug [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002).
-  Found against Mono 4.2.3.4 and later tested to be present since .NET 4.0 on
-  Windows XP also.
+* This is not an issue in the library, but when using the `Com0Com` for running
+  unit tests, some specific test cases for Parity will fail. That is because
+  Com0Com doesn't emulate data at a bit level. Using real serial hardware with a
+  NULL modem adapter works as expected.
+* .NET 4.0 to .NET 4.8 and .NET Core has a minor issue in `System.Text.Decoder`
+  that in a special circumstance it will consume too many bytes. The
+  `PeekChar()` method is therefore a slower implementation than what it could
+  be. Please refer to the Xamarin bug
+  [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found against
+  Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows XP also.
 
 #### 7.2.1 Driver Specific Issues on Windows
 
@@ -382,14 +379,14 @@ The following issues are known:
 Using the FTDI chipset on Windows 10 x64 (FTDI 2.12.16.0 dated 09/Mar/2016) flow
 control (RTS/CTS) doesn't work as expected. For writing small amounts of data
 (1024 bytes) with CTS off, the FTDI driver will still send data. See the test
-case ClosedWhenFlushBlocked, change the buffer from 8192 bytes to 1024 and the
+case `ClosedWhenFlushBlocked`, change the buffer from 8192 bytes to 1024 and the
 test case now fails. This problem is not observable with com0com 3.0. You can
 see the effect in logs, there is a TX-EMPTY event that occurs, which should
 never be there if no data is ever sent.
 
 ##### 7.2.1.2 BytesToWrite
 
-On Windows, the SerialPortStream returns the bigger of either the internal
+On Windows, the `SerialPortStream` returns the bigger of either the internal
 write buffer, or the amount of data in the output queue of the driver. Drivers
 don't report the number of bytes that are in the output queue before the next
 write begins, and may return sooner. This leads to the effects:
@@ -440,11 +437,13 @@ is still to be written, so a user may think it is complete, when it is not.
 
 ### 7.3 Linux
 
-SerialPortStream was tested on Ubuntu 14.04 and Ubuntu 16.04. Feedback welcome
-for other distributions!
+The `SerialPortStream` was tested on Ubuntu 14.04 to 20.04. Feedback welcome for
+other distributions!
 
-The main functionality on Linux is provided by a support C library. The issues
-are observed:
+The main functionality on Linux is provided by a support C library that
+abstracts the Posix system call `select()`.
+
+Issues in the current implementation are:
 
 * Custom baud rates are not supported. To know what baud rates are supported on
   your system, look at the file `config.h` after building.
@@ -455,25 +454,19 @@ Patches are welcome to implement these features!
 
 #### 7.3.1 Mono on non-Windows Platforms
 
-Ubuntu 14.04 ships with Mono 3.2.8. This is known to not work.
+Use the currently supported versions of Mono provided by the Mono project for
+your Linux distribution. For example, Ubuntu 14.04 ships with Mono 3.2.8 which
+is known to not work.
 
 * [[Mono-Dev] Mono 3.2.8 incompatibility with .NET 4.0 on Windows
   7-10](http://lists.ximian.com/pipermail/mono-devel-list/2015-December/043423.html).
   The System.Text implementation for converting bytes to UTF8 don't work. If you
   don't use the character based methods, it may work. But the software has not
   been tested against this framework.
-* The DataReceived event doesn't fire for the EOF character (0x1A). On Windows
-  it does, as this is managed by the driver itself.
-* The test case for opening two serial ports simultaneously on Mono fails,
-  meaning that it's possible to open the same device twice, which on Windows
-  raises an `UnauthorizedAccessException()`.
-* ListPorts is not implemented on Mono and uses the SerialPort implementation.
-* Mono 4.2.3.4 (tested) has a minor bug in System.Text.Decoder as in the .NET
-  references, that in a special circumstance it will consume too many bytes. The
-  PeekChar() method is slower when this bug is detected. Please refer to the
-  Xamarin bug [40002](https://bugzilla.xamarin.com/show_bug.cgi?id=40002). Found
-  against Mono 4.2.3.4 and later tested to be present since .NET 4.0 on Windows
-  XP also.
+* The `DataReceived` event doesn't fire for the EOF character (0x1A). On Windows
+  it does, as this is managed by the driver itself and not emulated by the
+  C-Library.
+* Linux doesn't implement DSR.
 
 #### 7.3.2 Driver Specific Issues on Linux
 

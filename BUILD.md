@@ -28,17 +28,24 @@ better integration with .NET Core projects, and to allow better unit testing.
 
 ### 1.1 Dependencies
 
-From Verson 3.0 and onwards, the SerialPortStream library is being split into multiple libraries that some code
-originally came from other projects and is also useful in other contexts. This allows for simpler maintenance.
+From Verson 3.0 and onwards, the `SerialPortStream` library is being split into
+multiple libraries that some code originally came from other projects and is
+also useful in other contexts. This allows for simpler maintenance.
 
 The following other projects are needed in parallel
 
 | Path             | GIT Repository                |
 | ---------------- | ----------------------------- |
 | serialportstream | RJCP.DLL.SerialPortStream.git |
-| bufferio         | RJCP.DLL.BufferIO             |
+| bufferio         | RJCP.DLL.BufferIO.git         |
+| trace            | RJCP.DLL.Trace.git            |
 
 ### 1.2 Building
+
+The project depends on the RJCP.MSBuildTasks NuGet package, which extends
+MSBuild to provide Authenticode signing and get information about the GIT
+repository when building. You'll need to have `signtool.exe` (Windows only) and
+`git.exe` in your path.
 
 To build the software, ensure to be in the working directory where the
 `SerialPortStream.sln` file is kept.
@@ -57,6 +64,10 @@ To build the software, ensure to be in the working directory where the
   PS1> dotnet build -c Release
   ```
 
+Building the library is normally done on the top level project that references
+this and other projects via GIT submodules. See the instructions there for
+building the entire framework suite (not just this library).
+
 ### 1.3 Packaging
 
 To build the package for upload (see building for the sign key) to NuGet:
@@ -67,6 +78,11 @@ PS1> dotnet pack -c release --include-source .\code\SerialPortStream.csproj
 ```
 
 I generally upload the symbols version that also includes the sources.
+
+To packages are built:
+
+* SerialPortStream
+* SerialPortStream.Virtual
 
 ### 1.4 Unit Tests
 
@@ -157,7 +173,7 @@ Ubuntu](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
 
 ### 2.2 Building the libnserial Library
 
-You should install the latest version of libnserial. The package for Ubuntu is
+You should install the latest version of `libnserial`. The package for Ubuntu is
 given on the release pages. For other Operating Systems, build and install from
 sources (see the folder `dll\serialunix` for more information).
 
@@ -179,6 +195,8 @@ sources (see the folder `dll\serialunix` for more information).
   * [libnserial-1.1.4 eoan 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.2.0/libnserial-1.1.4-0ubuntu1.eoan1.zip)
   * [libnserial-1.1.4 focal 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.2.0/libnserial-1.1.4-0ubuntu1.focal1.zip)
   * [libnserial-1.1.4 groovy 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.2.2.0/libnserial-1.1.4-0ubuntu1.groovy1.zip)
+  * [libnserial-1.1.4 hirsute 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.3.1.0/libnserial-1.1.4-0ubuntu1.hirsute1.zip)
+  * [libnserial-1.1.4 impish 64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.3.1.0/libnserial-1.1.4-0ubuntu1.impish1.zip)
 * 1.1.2
   * [libnserial-1.1.2-precise 32/64-bit](https://github.com/jcurl/SerialPortStream/releases/download/release%2F2.1.2.0/libnserial_1.1.2-0ubuntu1.precise1.zip)
 
@@ -249,12 +267,6 @@ but provided on Windows. Linux doesn't provide this functionality natively.
 * `WaitForCtsChangedEvent`
 * `WaitForDsrChangedEvent`
 
-The following tests occasionally fail
-
-* `ReadToWithMbcs`
-* `ReadToResetWithMbcs2`
-* `WriteLineReadLineTimeout1`
-
 ## 3.0 Developer
 
 ### 3.1 .NET Framework SDK Project
@@ -272,16 +284,16 @@ When adding files, you'll need to look and modify the `.csproj` files directly,
 Visual Studio 2019 will likely not be able to put the files in the correct
 `<ItemGroup/>`.
 
-### 3.2 .NET Standard 1.5
+### 3.2 .NET Standard 2.1
 
-This project also targets .NET Standard 1.5. There are some features that are
-available in .NET 4.x that are not available in .NET Standard 1.5, and so there
+This project also targets .NET Standard 2,1. There are some features that are
+available in .NET 4.x that are not available in .NET Standard 2.1, and so there
 are replacement libraries in the `System` folder, which are not otherwise
 needed.
 
 #### 3.2.1 Logging in Unit Tests
 
-The Unit Tests for .NET Standard 1.5 is run by compiling for .NET Core App 3.1.
+The Unit Tests for .NET Standard 2.1 is run by compiling for .NET Core App 3.1.
 In .NET Framework, logging is done using the `TraceSource` which doesn't work
-well in .NET Core, and so the unit test cases come with its own implementation.
-See the files under the `SerialPortStreamTest\Trace` folder.
+well in .NET Core, and so the unit test cases obtain a solution from the project
+`RJCP.DLL.Trace` with its own implementation and can log using the NUnit Logger.
