@@ -373,12 +373,12 @@ namespace RJCP.IO.Ports
 
                 // Wait for the data to be received
                 src.Write(sdata, 0, sdata.Length);
-                src.Write("EOF");
+                src.Write("eof");
                 while (dst.BytesToRead < sdata.Length) {
                     Thread.Sleep(100);
                 }
 
-                string result = dst.ReadTo("EOF");
+                string result = dst.ReadTo("eof");
                 Assert.That(dst.BytesToRead, Is.EqualTo(0));
                 Assert.That(result.Length, Is.EqualTo(1024 - 3));
                 int offset = sdata.Length - result.Length;
