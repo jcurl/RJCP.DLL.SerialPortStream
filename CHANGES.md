@@ -30,6 +30,8 @@ Fixes
 * DOTNET-428: Name of properties are used when raising exceptions, instead of
   "value".
 * DOTNET-433: Don't request unneeded events on Windows.
+* DOTNET-443: Minor exceptions fixes, raise Argument exceptions on `PortNames`,
+  `HandShake`, `ReadTo()`.
 
 Refactoring:
 

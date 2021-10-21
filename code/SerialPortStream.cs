@@ -23,14 +23,16 @@ namespace RJCP.IO.Ports
 #endif
 
     /// <summary>
-    /// The SerialPortStream is a stream class to communicate with serial port based devices.
+    /// The <see cref="SerialPortStream"/> is a stream class to communicate with serial port based devices.
     /// </summary>
     /// <remarks>
-    /// This implementation is a ground up reimplementation of the Microsoft SerialPort class
-    /// but one that is a stream. There are numerous small issues with the Microsoft .NET 4.0
-    /// implementation (and assumed earlier) that this class attempts to resolve.
-    /// <para>For detailed information about serial port programming, refer to the site:
-    /// http://msdn.microsoft.com/en-us/library/ms810467.aspx</para>
+    /// This implementation is a ground up reimplementation of the Microsoft SerialPort class but one that is a stream.
+    /// There are numerous small issues with the Microsoft .NET 4.0 implementation (and assumed earlier) that this class
+    /// attempts to resolve.
+    /// <para>
+    /// For detailed information about serial port programming, refer to the site:
+    /// http://msdn.microsoft.com/en-us/library/ms810467.aspx
+    /// </para>
     /// <para>When instantiating.</para>
     /// </remarks>
     public class SerialPortStream : Stream, ISerialPortStream
@@ -55,6 +57,13 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Constructor. Create a stream that doesn't connect to any port.
         /// </summary>
+        /// <param name="serial">
+        /// A reference to an instantiated (but not open or running) native serial port implementation.
+        /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="serial"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="serial"/> is in an invalid state (it is open or running).
+        /// </exception>
         /// <remarks>
         /// This constructor initialises a stream object, but doesn't assign it to any COM port. The properties then
         /// assume default settings. No COM port is opened and queried.
@@ -153,7 +162,9 @@ namespace RJCP.IO.Ports
         /// implementation.
         /// </summary>
         /// <param name="logger">The logger instance to log to.</param>
-        /// <param name="serial">The native serial implementation to use.</param>
+        /// <param name="serial">
+        /// A reference to an instantiated (but not open or running) native serial port implementation.
+        /// </param>
         /// <remarks>
         /// This constructor initialises a stream object, but doesn't assign it to any COM port. The properties then
         /// assume default settings. No COM port is opened and queried.
@@ -206,6 +217,10 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets the port for communications, including but not limited to all available COM ports.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentNullException">The <see cref="PortName"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The <see cref="PortName"/> is empty.</exception>
+        /// <exception cref="InvalidOperationException">The serial port is already opened.</exception>
         /// <remarks>
         /// A list of valid port names can be obtained using the <see cref="GetPortNames"/> method.
         /// <para>
@@ -229,6 +244,7 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                if (value == null) throw new ArgumentNullException(nameof(PortName));
                 if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Must provide a valid name for a COM port", nameof(PortName));
                 if (m_NativeSerial.IsOpen && value != m_NativeSerial.PortName) throw new InvalidOperationException("Serial Port already opened");
 
@@ -238,7 +254,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Update properties based on the current port, overwriting already existing properties.
         /// </summary>
-        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <exception cref="InvalidOperationException">Serial Port already opened.</exception>
         /// <remarks>
         /// This method opens the serial port and retrieves the current settings from Windows.
@@ -290,7 +306,7 @@ namespace RJCP.IO.Ports
         /// Opens a new serial port connection with control if the port settings are initialised or not.
         /// </summary>
         /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
-        /// <exception cref="InvalidOperationException">Serial Port already opened</exception>
+        /// <exception cref="InvalidOperationException">Serial Port already opened.</exception>
         /// <remarks>
         /// Opens a connection to the serial port provided by the constructor or the <see cref="PortName"/> property. If
         /// this object is already managing a serial port, this object raises an exception.
@@ -334,14 +350,15 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets a value indicating the open or closed status of the SerialPortStream object.
         /// </summary>
-        /// <remarks>
-        /// The <see cref="IsOpen"/> property tracks whether the port is open for use by the caller, not whether the
-        /// port is open by any application on the machine.
-        /// </remarks>
         /// <value>
         /// <see langword="true"/> if the serial port is open; otherwise, <see langword="false"/>. The default is
         /// <see langword="false"/>.
         /// </value>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <remarks>
+        /// The <see cref="IsOpen"/> property tracks whether the port is open for use by the caller, not whether the
+        /// port is open by any application on the machine.
+        /// </remarks>
         public bool IsOpen
         {
             get
@@ -404,11 +421,12 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the byte encoding for pre- and post-transmission conversion of text.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentNullException">The <see cref="Encoding"/> is <see langword="null"/>.</exception>
         /// <remarks>
-        /// The encoding is used for encoding string information to byte format when sending
-        /// over the serial port, or receiving data via the serial port. It is only used
-        /// with the read/write functions that accept strings (and not used for byte based
-        /// reading and writing).
+        /// The encoding is used for encoding string information to byte format when sending over the serial port, or
+        /// receiving data via the serial port. It is only used with the read/write functions that accept strings (and
+        /// not used for byte based reading and writing).
         /// </remarks>
         public Encoding Encoding
         {
@@ -427,10 +445,10 @@ namespace RJCP.IO.Ports
         /// Gets or sets the value used to interpret the end of a call to the <see cref="ReadLine"/> and
         /// <see cref="WriteLine"/> methods.
         /// </summary>
-        /// <remarks>A value that represents the end of a line. The default is a line feed, (NewLine).</remarks>
         /// <exception cref="ObjectDisposedException">The object is disposed.</exception>
         /// <exception cref="ArgumentNullException">The <see cref="NewLine"/> cannot be <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The <see cref="NewLine"/> may not be empty.</exception>
+        /// <remarks>A value that represents the end of a line. The default is a line feed, (NewLine).</remarks>
         public string NewLine
         {
             get { return m_NewLine; }
@@ -448,6 +466,8 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Specify the driver In Queue at the time it is opened.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="InvalidOperationException">Serial Port already opened.</exception>
         /// <remarks>
         /// This provides the driver a recommended internal input buffer, in bytes.
         /// </remarks>
@@ -469,6 +489,8 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Specify the driver Out Queue at the time it is opened.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="InvalidOperationException">Serial Port already opened.</exception>
         /// <remarks>
         /// This provides the driver a recommended internal output buffer, in bytes.
         /// </remarks>
@@ -511,6 +533,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Define the time out when reading data from the stream.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// This defines the time out when data arrives in the buffered memory of this
         /// stream, that is, when the driver indicates that data has arrived to the
@@ -536,6 +559,14 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the size of the SerialPortStream input buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The <see cref="ReadBufferSize"/> must be zero or greater.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// An attempt was used to change the size of the buffer while the port is open (and therefore buffering is
+        /// active).
+        /// </exception>
         /// <remarks>
         /// Sets the amount of buffering to use when reading data from the serial port. Data is read locally into this
         /// buffered stream through another port.
@@ -545,10 +576,6 @@ namespace RJCP.IO.Ports
         /// and independent of the low level driver.
         /// </para>
         /// </remarks>
-        /// <exception cref="InvalidOperationException">
-        /// An attempt was used to change the size of the buffer while the port is open (and therefore buffering is
-        /// active).
-        /// </exception>
         public int ReadBufferSize
         {
             get { return m_NativeSerial.Buffer.ReadBufferSize; }
@@ -568,6 +595,16 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the number of bytes in the read buffer before a DataReceived event occurs.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The <see cref="ReceivedBytesThreshold"/> must be zero or greater.
+        /// <para>- or -</para>
+        /// The <see cref="ReceivedBytesThreshold"/> must be less or equal to <see cref="ReadBufferSize"/>.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// An attempt was used to change the size of the buffer while the port is open (and therefore buffering is
+        /// active).
+        /// </exception>
         public int ReceivedBytesThreshold
         {
             get
@@ -595,6 +632,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets the number of bytes of data in the receive buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// This method returns the number of bytes available in the input read buffer. Bytes that are cached by the
         /// driver itself are not accounted for, as they haven't yet been read by the local thread.
@@ -763,6 +801,10 @@ namespace RJCP.IO.Ports
         /// <param name="callback">An optional asynchronous callback, to be called when the read is complete.</param>
         /// <param name="state">A user-provided object that distinguishes this particular asynchronous read request from other requests.</param>
         /// <returns>An <see cref="IAsyncResult"/> object to be used with <see cref="EndRead"/>.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             ReadCheck(buffer, offset, count);
@@ -853,6 +895,7 @@ namespace RJCP.IO.Ports
         /// Synchronously reads one byte from the SerialPort input buffer.
         /// </summary>
         /// <returns>The byte, cast to an <see langword="int"/>, or -1 if the end of the stream has been read.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         public override int ReadByte()
         {
@@ -871,19 +914,22 @@ namespace RJCP.IO.Ports
         }
 
         /// <summary>
-        /// Reads a number of characters from the SerialPortStream input buffer and writes
-        /// them into an array of characters at a given offset.
+        /// Reads a number of characters from the SerialPortStream input buffer and writes them into an array of
+        /// characters at a given offset.
         /// </summary>
         /// <param name="buffer">The character array to write the input to.</param>
         /// <param name="offset">Offset into the buffer where to start putting the data.</param>
         /// <param name="count">Maximum number of bytes to read into the buffer.</param>
         /// <returns>The actual number of bytes copied into the buffer, 0 if there was a time out.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <remarks>
-        /// This function converts the data in the local buffer to characters based on the
-        /// encoding defined by the encoding property. The encoder used may buffer data between
-        /// calls if characters may require more than one byte of data for its interpretation
-        /// as a character.
+        /// This function converts the data in the local buffer to characters based on the encoding defined by the
+        /// encoding property. The encoder used may buffer data between calls if characters may require more than one
+        /// byte of data for its interpretation as a character.
         /// </remarks>
         public int Read(char[] buffer, int offset, int count)
         {
@@ -911,6 +957,8 @@ namespace RJCP.IO.Ports
         /// Synchronously reads one character from the SerialPortStream input buffer.
         /// </summary>
         /// <returns>The character that was read. -1 indicates no data was available within the time out.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         public int ReadChar()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -938,7 +986,7 @@ namespace RJCP.IO.Ports
         /// a NewLine value.</returns>
         /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
-        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         public string ReadLine()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -970,12 +1018,15 @@ namespace RJCP.IO.Ports
         /// </remarks>
         /// <param name="text">The text to indicate where the read operation stops.</param>
         /// <returns>The contents of the input buffer up to the specified <paramref name="text"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="text"/> is empty.</exception>
         /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
-        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         public string ReadTo(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (text == null) throw new ArgumentNullException(nameof(text));
             if (string.IsNullOrEmpty(text)) throw new ArgumentException("Parameter text shall not be null or empty", nameof(text));
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
             if (ReadCheckDeviceError()) return null;
@@ -995,6 +1046,9 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Reads all immediately available bytes.
         /// </summary>
+        /// <returns>The contents of the stream and the input buffer of the <see cref="SerialPortStream"/>.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <remarks>
         /// Reads all data in the current buffer. If there is no data available, then no data is returned. This is
         /// different to the Microsoft implementation, that will read all data, and if there is no data, then it waits
@@ -1009,7 +1063,6 @@ namespace RJCP.IO.Ports
         /// operation, as we have a dedicated thread to reading data that is running independently.
         /// </para>
         /// </remarks>
-        /// <returns>The contents of the stream and the input buffer of the <see cref="SerialPortStream"/>.</returns>
         public string ReadExisting()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -1022,6 +1075,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Discards data from the serial driver's receive buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <remarks>
         /// This function will discard the receive buffer of the <see cref="SerialPortStream"/>.
         /// </remarks>
@@ -1052,6 +1106,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Define the time out when writing data to the local buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <remarks>
         /// This defines the time out when writing data to the local buffer. No guarantees are given to when the data
         /// will actually be transferred over to the serial port as this is dependent on the hardware configuration and
@@ -1085,6 +1140,14 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the size of the serial port output buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// An attempt was used to change the size of the buffer while the port is open (and therefore buffering is
+        /// active).
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The <see cref="WriteBufferSize"/> must be zero or greater.
+        /// </exception>
         /// <remarks>
         /// Defines the size of the buffered stream write buffer, used to send data to the serial port. It does not
         /// affect the buffers in the serial port hardware itself.
@@ -1094,10 +1157,6 @@ namespace RJCP.IO.Ports
         /// and independent of the low level driver.
         /// </para>
         /// </remarks>
-        /// <exception cref="InvalidOperationException">
-        /// An attempt was used to change the size of the buffer while the port is open (and therefore buffering is
-        /// active).
-        /// </exception>
         public int WriteBufferSize
         {
             get { return m_NativeSerial.Buffer.WriteBufferSize; }
@@ -1114,6 +1173,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets the number of bytes of data in the send buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The send buffer includes the serial driver's send buffer as well as internal buffering in the
         /// <see cref="SerialPortStream"/> itself.
@@ -1195,9 +1255,16 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
         /// <exception cref="IOException">
-        /// Serial Port was closed during the flush operation; or there was a device error.
+        /// Serial Port was closed during the write operation; or there was a device error.
+        /// </exception>
+        /// <exception cref="TimeoutException">
+        /// The write operation did not complete before the timeout <see cref="WriteTimeout"/>.
         /// </exception>
         /// <remarks>
         /// Data is copied from the array provided into the local stream buffer. It does not guarantee that data will be
@@ -1252,11 +1319,22 @@ namespace RJCP.IO.Ports
         /// <param name="count">The maximum number of bytes to write.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A task that represents the asynchronous write operation.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
         /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the write operation; or there was a device error.
+        /// </exception>
+        /// <exception cref="TimeoutException">
+        /// The write operation did not complete before the timeout <see cref="WriteTimeout"/>.
+        /// </exception>
         public async override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (!WriteCheck(buffer, offset, count))
@@ -1287,12 +1365,20 @@ namespace RJCP.IO.Ports
         /// <param name="offset">The byte offset in buffer from which to begin writing.</param>
         /// <param name="count">The maximum number of bytes to write.</param>
         /// <param name="callback">An optional asynchronous callback, to be called when the write is complete.</param>
-        /// <param name="state">A user-provided object that distinguishes this particular asynchronous write request from other requests.</param>
+        /// <param name="state">
+        /// A user-provided object that distinguishes this particular asynchronous write request from other requests.
+        /// </param>
         /// <returns>An IAsyncResult that represents the asynchronous write, which could still be pending.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
+        /// <exception cref="IOException">there was a device error.</exception>
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             WriteCheck(buffer, offset, count);
@@ -1304,14 +1390,14 @@ namespace RJCP.IO.Ports
         /// Ends an asynchronous write operation.
         /// </summary>
         /// <param name="asyncResult">A reference to the outstanding asynchronous I/O request.</param>
-        /// <exception cref="TimeoutException">Not enough buffer space was made available
-        /// before the time out expired.</exception>
-        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
-        /// <exception cref="IOException">Serial Port was closed during the flush operation;
-        /// or there was a device error.</exception>
-        /// <remarks>
-        /// EndWrite must be called exactly once on every IAsyncResult from BeginWrite.
-        /// </remarks>
+        /// <exception cref="TimeoutException">
+        /// Not enough buffer space was made available before the time out expired.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the write operation; or there was a device error.
+        /// </exception>
+        /// <remarks>EndWrite must be called exactly once on every IAsyncResult from BeginWrite.</remarks>
         public override void EndWrite(IAsyncResult asyncResult)
         {
             if (asyncResult == null) throw new ArgumentNullException(nameof(asyncResult));
@@ -1379,13 +1465,17 @@ namespace RJCP.IO.Ports
         /// <exception cref="TimeoutException">
         /// Not enough buffer space was made available before the time out expired.
         /// </exception>
-        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
         /// <exception cref="IOException">
-        /// Serial Port was closed during the flush operation; or there was a device error.
+        /// Serial Port was closed during the write operation; or there was a device error.
         /// </exception>
         public void Write(char[] buffer, int offset, int count)
         {
@@ -1408,12 +1498,16 @@ namespace RJCP.IO.Ports
         /// <param name="text">The string for output.</param>
         /// <exception cref="TimeoutException">Not enough buffer space was made available
         /// before the time out expired.</exception>
-        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="IOException">Serial Port was closed during the flush operation;
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
+        /// <exception cref="IOException">Serial Port was closed during the write operation;
         /// or there was a device error.</exception>
         public void Write(string text)
         {
@@ -1433,12 +1527,12 @@ namespace RJCP.IO.Ports
         /// <param name="text">The string to write to the output buffer.</param>
         /// <exception cref="TimeoutException">Not enough buffer space was made available
         /// before the time out expired.</exception>
-        /// <exception cref="ObjectDisposedException">Object is disposed, or disposed during flush operation.</exception>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="InvalidOperationException">Serial port not open.</exception>
-        /// <exception cref="IOException">Serial Port was closed during the flush operation;
+        /// <exception cref="IOException">Serial Port was closed during the write operation;
         /// or there was a device error.</exception>
         public void WriteLine(string text)
         {
@@ -1448,6 +1542,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Discards data from the serial driver's transmit buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// Clears the local buffer for data not yet sent to the serial port, as well as
         /// attempting to clear the buffers in the driver itself.
@@ -1467,6 +1562,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets the state of the Carrier Detect line for the port.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// This property can be used to monitor the state of the carrier detection
         /// line for a port. No carrier usually indicates that the receiver has hung
@@ -1486,6 +1582,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets the state of the Clear-to-Send line.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The Clear-to-Send (CTS) line is used in Request to Send/Clear to Send
         /// (RTS/CTS) hardware handshaking. The CTS line is queried by a port before
@@ -1503,6 +1600,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets the state of the Data Set Ready (DSR) signal.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// This property is used in Data Set Ready/Data Terminal Ready (DSR/DTR) handshaking.
         /// The Data Set Ready (DSR) signal is usually sent by a modem to a port to indicate that
@@ -1520,6 +1618,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets the state of the Ring line signal.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The ring line is a separate line from a modem that indicates if there is an incoming
         /// call.
@@ -1538,6 +1637,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the serial baud rate.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The stream doesn't impose any arbitrary limits on setting the baud rate. It is passed
         /// directly to the driver and it is up to the driver to determine if the baud rate is
@@ -1563,6 +1663,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the standard length of data bits per byte.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The range of values for this property is from 5 through 8 and 16. A check is made by setting
         /// this property against the advertised capabilities of the driver. That is, a driver lists
@@ -1592,6 +1693,8 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the standard number of stop bits per byte.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The enumeration value is unknown.</exception>
         /// <remarks>
         /// Gets or sets the stop bits that should be used when transmitting and receiving data over the serial
         /// port. If the serial driver doesn't support setting the stop bits, setting this property is silently ignored
@@ -1617,6 +1720,8 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the parity-checking protocol.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The enumeration value is unknown.</exception>
         /// <remarks>
         /// Parity is an error-checking procedure in which the number of 1s must always be the same — either
         /// even or odd — for each group of bits that is transmitted without error. In modem-to-modem
@@ -1643,6 +1748,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the byte that replaces invalid bytes in a data stream when a parity error occurs.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// If the value is set to the nul character, parity replacement is disabled. This property
         /// only has an effect if the Parity property is not Parity.None.
@@ -1665,6 +1771,7 @@ namespace RJCP.IO.Ports
         /// Gets or sets a value indicating whether null bytes are ignored when transmitted
         /// between the port and the receive buffer.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// This value should normally be set to <see langword="false"/>, especially for binary transmissions. Setting
         /// this property to <see langword="true"/> can cause unexpected results for UTF32- and UTF16-encoded bytes.
@@ -1687,6 +1794,7 @@ namespace RJCP.IO.Ports
         /// Gets or sets a value that enables the Data Terminal Ready (DTR) signal
         /// during serial communication.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// Data Terminal Ready (DTR) is typically enabled during XON/XOFF software handshaking and
         /// Request to Send/Clear to Send (RTS/CTS) hardware handshaking, and modem communications.
@@ -1709,6 +1817,7 @@ namespace RJCP.IO.Ports
         /// Gets or sets a value indicating whether the Request to Send (RTS) signal is
         /// enabled during serial communication.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The Request to Transmit (RTS) signal is typically used in Request to Send/Clear
         /// to Send (RTS/CTS) hardware handshaking.
@@ -1731,23 +1840,28 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the handshaking protocol for serial port transmission of data.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The enumeration value is unknown.</exception>
         /// <remarks>
-        /// Enables handshaking on the serial port. We support three types of handshaking:
-        /// RTS/CTS; XON/XOFF; and DTR/DTS. The Microsoft implementation SerialPort only supports
-        /// RTS/CTS and XON/XOFF.
-        /// <para>This method is not 100% compatible with the Microsoft implementation. By disabling
-        /// RTS flow control, it sets behaviour so that the RTS line is enabled. You must set the
-        /// property RtsEnable as appropriate. Although the Microsoft implementation doesn't support
-        /// DSR/DTR at all, setting this property will also set the DTR line to enabled. You must
-        /// set the property DtrEnable as appropriate.</para>
-        /// <para>When enabling DTR flow control, the DsrSensitivity flag is set, so the driver
-        /// ignores any bytes received, unless the DSR modem input line is high. Otherwise, if DTR
-        /// flow control is disabled, the DSR line is ignored. For more detailed information about
-        /// how windows works with flow control, see the site:
-        /// http://msdn.microsoft.com/en-us/library/ms810467.aspx. When DTR flow control is specified,
-        /// the fOutxDsrFlow is set along with fDsrSensitivity.</para>
-        /// <para>Note, the windows feature RTS_CONTROL_TOGGLE is not supported by this class. This
-        /// is also not supported by the Microsoft implementation.</para>
+        /// Enables handshaking on the serial port. We support three types of handshaking: RTS/CTS; XON/XOFF; and
+        /// DTR/DTS. The Microsoft implementation SerialPort only supports RTS/CTS and XON/XOFF.
+        /// <para>
+        /// This method is not 100% compatible with the Microsoft implementation. By disabling RTS flow control, it sets
+        /// behaviour so that the RTS line is enabled. You must set the property RtsEnable as appropriate. Although the
+        /// Microsoft implementation doesn't support DSR/DTR at all, setting this property will also set the DTR line to
+        /// enabled. You must set the property DtrEnable as appropriate.
+        /// </para>
+        /// <para>
+        /// When enabling DTR flow control, the DsrSensitivity flag is set, so the driver ignores any bytes received,
+        /// unless the DSR modem input line is high. Otherwise, if DTR flow control is disabled, the DSR line is
+        /// ignored. For more detailed information about how windows works with flow control, see the site:
+        /// http://msdn.microsoft.com/en-us/library/ms810467.aspx. When DTR flow control is specified, the fOutxDsrFlow
+        /// is set along with fDsrSensitivity.
+        /// </para>
+        /// <para>
+        /// Note, the windows feature RTS_CONTROL_TOGGLE is not supported by this class. This is also not supported by
+        /// the Microsoft implementation.
+        /// </para>
         /// </remarks>
         public Handshake Handshake
         {
@@ -1759,6 +1873,8 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                if (!Enum.IsDefined(typeof(Handshake), value))
+                    throw new ArgumentOutOfRangeException(nameof(Handshake), "Unknown setting for Handshake");
                 m_NativeSerial.Handshake = value;
             }
         }
@@ -1766,6 +1882,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Define the limit of actual bytes in the transmit buffer when XON is sent.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The XOFF character (19 or ^S) is sent when the input buffer comes within <see cref="XOffLimit"/> bytes of being full,
         /// and the XON character (17 or ^Q) is sent when the input buffer comes within <see cref="XOnLimit"/> bytes of being empty.
@@ -1787,6 +1904,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Define the limit of free bytes in the buffer before XOFF is sent.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// The XOFF character (19 or ^S) is sent when the input buffer comes within <see cref="XOffLimit"/> bytes of being full,
         /// and the XON character (17 or ^Q) is sent when the input buffer comes within <see cref="XOnLimit"/> bytes of being empty.
@@ -1808,6 +1926,7 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Enable or Disable transmit of data when software flow control is enabled.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
         /// <remarks>
         /// MSDN documentation states this flag as follows:
         /// <para>If this member is <see langword="true"/>, transmission continues after the input buffer
@@ -1842,6 +1961,8 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Gets or sets the break signal state.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="InvalidOperationException">SerialPortStream is not open.</exception>
         /// <remarks>
         /// The break signal state occurs when a transmission is suspended and the line is placed in a break state (all
         /// low, no stop bit) until released. To enter a break state, set this property to <see langword="true"/>. If
