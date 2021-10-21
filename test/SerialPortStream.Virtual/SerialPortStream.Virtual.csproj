@@ -30,6 +30,9 @@
 
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <RevisionControl>git</RevisionControl>
+    <RevisionControlLabel>release/v$(Version)</RevisionControlLabel>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
@@ -45,6 +48,12 @@
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
