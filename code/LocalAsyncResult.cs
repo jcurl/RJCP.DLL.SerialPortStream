@@ -99,6 +99,12 @@ namespace RJCP.IO
         }
 
         /// <summary>
+        /// Gets or sets the exception if one occurred.
+        /// </summary>
+        /// <value>The exception.</value>
+        public Exception Exception { get; set; }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing,
         /// releasing, or resetting unmanaged resources.
         /// </summary>

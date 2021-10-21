@@ -826,6 +826,19 @@ namespace RJCP.IO.Ports
 
         private IAsyncResult InternalBeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
+            try {
+                // If there was a device error, then an exception is raised, or it immediately returns with zero bytes.
+                if (ReadCheckDeviceError()) count = 0;
+            } catch (Exception ex) {
+                LocalAsync<int> ar = new LocalAsync<int>(state);
+                ar.Exception = ex;
+                ar.Result = 0;
+                ar.IsCompleted = true;
+                ar.CompletedSynchronously = true;
+                if (callback != null) callback(ar);
+                return ar;
+            }
+
             if (m_Buffer == null || count == 0 || m_Buffer.Stream.WaitForRead(0)) {
                 // Data in the buffer, we can return immediately
                 LocalAsync<int> ar = new LocalAsync<int>(state);
@@ -876,6 +889,7 @@ namespace RJCP.IO.Ports
             if (asyncResult is LocalAsync<int> localAsync) {
                 if (!localAsync.IsCompleted) localAsync.AsyncWaitHandle.WaitOne(Timeout.Infinite);
                 localAsync.Dispose();
+                if (localAsync.Exception != null) throw localAsync.Exception;
                 if (localAsync.Result == 0) ReadCheckDeviceError();
                 return localAsync.Result;
             } else {
