@@ -390,16 +390,15 @@ namespace RJCP.IO.Ports.Serial
         /// <value>
         /// The XOn buffer limit.
         /// </value>
-        /// <exception cref="ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">XOnLimit must be positive.</exception>
         public int XOnLimit
         {
             get { return m_XOnLimit; }
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) {
-                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOffLimit must be positive");
-                }
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOnLimit must be positive");
                 m_XOnLimit = value;
                 if (IsOpen) SetPortSettings();
             }

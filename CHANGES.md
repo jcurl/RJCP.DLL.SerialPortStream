@@ -32,6 +32,8 @@ Fixes
 * DOTNET-433: Don't request unneeded events on Windows.
 * DOTNET-443: Minor exceptions fixes, raise Argument exceptions on `PortNames`,
   `HandShake`, `ReadTo()`.
+* DOTNET-444: Write for characters and strings raise now IOException when the
+  native driver is dead (was formerly `InvalidOperationException`).
 
 Refactoring:
 

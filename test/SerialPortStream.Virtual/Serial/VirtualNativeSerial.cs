@@ -255,9 +255,8 @@ namespace RJCP.IO.Ports.Serial
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) {
+                if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(XOffLimit), "XOffLimit must be positive");
-                }
                 m_XOffLimit = value;
             }
         }
@@ -268,7 +267,7 @@ namespace RJCP.IO.Ports.Serial
         /// Gets or sets the XOn limit when the input buffer is below when the XOn character should be sent.
         /// </summary>
         /// <value>The XOn buffer limit.</value>
-        /// <exception cref="ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">XOnLimit must be positive.</exception>
         /// <remarks>This property has no effect for <see cref="VirtualNativeSerial"/>.</remarks>
         public virtual int XOnLimit
         {
@@ -276,9 +275,8 @@ namespace RJCP.IO.Ports.Serial
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) {
-                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOffLimit must be positive");
-                }
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOnLimit must be positive");
                 m_XOnLimit = value;
             }
         }

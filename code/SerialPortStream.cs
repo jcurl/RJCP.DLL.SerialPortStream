@@ -1485,7 +1485,8 @@ namespace RJCP.IO.Ports
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
             if (count == 0) return;
-            if (!m_NativeSerial.IsRunning) throw new InvalidOperationException("Serial I/O Thread not running");
+            if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial port is not open");
+            WriteCheckDeviceError();
 
             byte[] bbuffer = Encoding.GetBytes(buffer, offset, count);
             if (bbuffer.Length > WriteBufferSize) throw new InvalidOperationException("Insufficient buffer for the data requested");
@@ -1514,7 +1515,8 @@ namespace RJCP.IO.Ports
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (text.Length == 0) return;
-            if (!m_NativeSerial.IsRunning) throw new InvalidOperationException("Serial I/O Thread not running");
+            if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial port is not open");
+            WriteCheckDeviceError();
 
             byte[] bbuffer = Encoding.GetBytes(text);
             if (bbuffer.Length > WriteBufferSize) throw new InvalidOperationException("Insufficient buffer for the data requested");
@@ -1883,6 +1885,7 @@ namespace RJCP.IO.Ports
         /// Define the limit of actual bytes in the transmit buffer when XON is sent.
         /// </summary>
         /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">XOnLimit must be positive.</exception>
         /// <remarks>
         /// The XOFF character (19 or ^S) is sent when the input buffer comes within <see cref="XOffLimit"/> bytes of being full,
         /// and the XON character (17 or ^Q) is sent when the input buffer comes within <see cref="XOnLimit"/> bytes of being empty.
@@ -1897,6 +1900,8 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOffLimit must be positive");
                 m_NativeSerial.XOnLimit = value;
             }
         }
@@ -1905,6 +1910,7 @@ namespace RJCP.IO.Ports
         /// Define the limit of free bytes in the buffer before XOFF is sent.
         /// </summary>
         /// <exception cref="ObjectDisposedException">SerialPortStream is disposed of.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
         /// <remarks>
         /// The XOFF character (19 or ^S) is sent when the input buffer comes within <see cref="XOffLimit"/> bytes of being full,
         /// and the XON character (17 or ^Q) is sent when the input buffer comes within <see cref="XOnLimit"/> bytes of being empty.
@@ -1919,6 +1925,8 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(XOffLimit), "XOffLimit must be positive");
                 m_NativeSerial.XOffLimit = value;
             }
         }
