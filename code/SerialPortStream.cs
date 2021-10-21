@@ -734,6 +734,8 @@ namespace RJCP.IO.Ports
         public async override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             ReadCheck(buffer, offset, count);
+            if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
+            if (ReadCheckDeviceError()) return 0;
 
             if (m_NativeSerial.IsRunning) {
                 bool ready = await m_NativeSerial.Buffer.ReadStream.WaitForReadAsync(m_ReadTimeout, cancellationToken);
@@ -801,9 +803,14 @@ namespace RJCP.IO.Ports
             public void Process(SerialPortStream stream, byte[] buffer, int offset, int count, bool synchronous)
             {
                 try {
+                    if (!stream.m_NativeSerial.Buffer.IsBufferAllocated || stream.ReadCheckDeviceError() || count == 0) {
+                        SetResult(0);
+                        Complete(null, true);
+                        return;
+                    }
+
                     if (synchronous) {
-                        if (buffer != null && count > 0)
-                            SetResult(stream.InternalRead(buffer, offset, count));
+                        SetResult(stream.InternalRead(buffer, offset, count));
                         Complete(null, true);
                     } else {
                         Task.Factory.StartNew(() => {
