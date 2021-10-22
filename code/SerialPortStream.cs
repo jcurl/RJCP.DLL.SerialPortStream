@@ -521,11 +521,20 @@ namespace RJCP.IO.Ports
         /// Check if this stream supports reading.
         /// </summary>
         /// <remarks>
-        /// Supported so long as the stream is not disposed.
+        /// Supported so long as the stream is not disposed. If the property <see cref="ThrowOnReadError"/> is set, this
+        /// property will return <see langword="false"/> when the port is not open. Otherwise, if the port is not open
+        /// and the default behaviour of <see cref="ThrowOnReadError"/> as not set, this property is
+        /// <see langword="true"/> as the <see cref="Read(byte[], int, int)"/> and related methods would return 0,
+        /// indicating end of stream.
         /// </remarks>
         public override bool CanRead
         {
-            get { return !IsDisposed; }
+            get
+            {
+                if (IsDisposed) return false;
+                if (ThrowOnReadError) return IsOpen;
+                return true;
+            }
         }
 
         private int m_ReadTimeout = Timeout.Infinite;
@@ -555,6 +564,20 @@ namespace RJCP.IO.Ports
                 }
             }
         }
+
+        /// <summary>
+        /// Gets or sets behaviour if there is a read timeout.
+        /// </summary>
+        /// <value>
+        /// If <see langword="true"/>, enables throwing a <see cref="TimeoutException"/> on timeout, and
+        /// <see cref="InvalidOperationException"/> if the port is closed. If <see langword="false"/> for the behaviour
+        /// as in <see cref="SerialPortStream"/> version 2.x and earlier.
+        /// </value>
+        /// <remarks>
+        /// The default behaviour is <see langword="false"/>, to not throw timeout exceptions. Setting this property to
+        /// <see langword="true"/> represents behaviour similar to Microsoft's original SerialPort implementation.
+        /// </remarks>
+        public bool ThrowOnReadError { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the size of the SerialPortStream input buffer.
@@ -659,6 +682,7 @@ namespace RJCP.IO.Ports
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 
         private void ReadCheck(char[] buffer, int offset, int count)
@@ -668,6 +692,7 @@ namespace RJCP.IO.Ports
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 
         private bool m_ReadCheckDeviceErrorNotified;
@@ -682,6 +707,8 @@ namespace RJCP.IO.Ports
             if (m_NativeSerial.Buffer.IsBufferAllocated &&
                 m_NativeSerial.IsOpen && !m_NativeSerial.IsRunning && m_NativeSerial.Buffer.ReadStream.BytesToRead == 0) {
                 if (immediate || m_ReadCheckDeviceErrorNotified) {
+                    m_ReadCheckDeviceErrorNotified = true;
+
                     // This should only happen if the monitoring/buffering threads
                     // have died without explicitly closing the serial port.
                     throw new IOException("Device Error");
@@ -704,23 +731,34 @@ namespace RJCP.IO.Ports
         /// </summary>
         /// <param name="buffer">
         /// An array of bytes. When this method returns, the buffer contains the specified byte array with the values
-        /// between <paramref name="offset" /> and (<paramref name="offset" /> + <paramref name="count" /> - 1) replaced
+        /// between <paramref name="offset"/> and ( <paramref name="offset"/> + <paramref name="count"/> - 1) replaced
         /// by the bytes read from the current source.
         /// </param>
         /// <param name="offset">
-        /// The zero-based byte offset in <paramref name="buffer" /> at which to begin storing the data read from the
+        /// The zero-based byte offset in <paramref name="buffer"/> at which to begin storing the data read from the
         /// current stream.
         /// </param>
         /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
-        /// <exception cref="ObjectDisposedException"/>
-        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer provided.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Negative offset provided, or negative count provided.</exception>
-        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <returns>
         /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that
-        /// many bytes are not currently available, or zero (0) if the end of the stream has been reached.
+        /// many bytes are not currently available, or zero (0) if the end of the stream has been reached, or zero (0)
+        /// if there was a time out from <see cref="ReadTimeout"/> and <see cref="ThrowOnReadError"/> is
+        /// <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer provided.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Negative offset provided, or negative count provided.
+        /// </exception>
+        /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout) and if
+        /// <see cref="ThrowOnReadError"/> is set. Otherwise, zero bytes ar returned.
+        /// </exception>
         public override int Read(byte[] buffer, int offset, int count)
         {
             ReadCheck(buffer, offset, count);
@@ -738,6 +776,8 @@ namespace RJCP.IO.Ports
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (!ready) {
                     ReadCheckDeviceError();
+                    if (m_NativeSerial.IsRunning && ThrowOnReadError)
+                        throw new TimeoutException();
                     return 0;
                 }
             }
@@ -767,8 +807,15 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
         /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
         /// <exception cref="IOException">Device monitoring thread has died.</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout) and if
+        /// <see cref="ThrowOnReadError"/> is set. Otherwise, zero bytes are returned.
+        /// </exception>
         public async override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             ReadCheck(buffer, offset, count);
@@ -783,6 +830,8 @@ namespace RJCP.IO.Ports
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (!ready) {
                     ReadCheckDeviceError();
+                    if (m_NativeSerial.IsRunning && ThrowOnReadError)
+                        throw new TimeoutException();
                     return 0;
                 }
             }
@@ -796,15 +845,22 @@ namespace RJCP.IO.Ports
         /// Begins an asynchronous read operation.
         /// </summary>
         /// <param name="buffer">The buffer to read the data into.</param>
-        /// <param name="offset">The byte offset in <paramref name="buffer"/> at which to begin writing data read from the stream.</param>
+        /// <param name="offset">
+        /// The byte offset in <paramref name="buffer"/> at which to begin writing data read from the stream.
+        /// </param>
         /// <param name="count">The maximum number of bytes to read.</param>
         /// <param name="callback">An optional asynchronous callback, to be called when the read is complete.</param>
-        /// <param name="state">A user-provided object that distinguishes this particular asynchronous read request from other requests.</param>
+        /// <param name="state">
+        /// A user-provided object that distinguishes this particular asynchronous read request from other requests.
+        /// </param>
         /// <returns>An <see cref="IAsyncResult"/> object to be used with <see cref="EndRead"/>.</returns>
         /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             ReadCheck(buffer, offset, count);
@@ -897,15 +953,25 @@ namespace RJCP.IO.Ports
         /// <returns>The byte, cast to an <see langword="int"/>, or -1 if the end of the stream has been read.</returns>
         /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout) and if
+        /// <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Port is not open and <see cref="ThrowOnReadError"/> is set to <see langword="true"/>.
+        /// </exception>
         public override int ReadByte()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return -1;
             if (ReadCheckDeviceError()) return -1;
 
             if (m_NativeSerial.IsRunning) {
                 if (!m_NativeSerial.Buffer.ReadStream.WaitForRead(m_ReadTimeout)) {
                     ReadCheckDeviceError();
+                    if (m_NativeSerial.IsRunning && ThrowOnReadError)
+                        throw new TimeoutException();
                     return -1;
                 }
             }
@@ -925,7 +991,14 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Negative offset or negative count provided.</exception>
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout) and if
+        /// <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
         /// <remarks>
         /// This function converts the data in the local buffer to characters based on the encoding defined by the
         /// encoding property. The encoder used may buffer data between calls if characters may require more than one
@@ -946,6 +1019,8 @@ namespace RJCP.IO.Ports
                 if (chars == 0) {
                     if (!m_NativeSerial.Buffer.ReadStream.WaitForRead(te.Timeout)) {
                         ReadCheckDeviceError();
+                        if (m_NativeSerial.IsRunning && ThrowOnReadError)
+                            throw new TimeoutException();
                         return 0;
                     }
                 }
@@ -959,9 +1034,17 @@ namespace RJCP.IO.Ports
         /// <returns>The character that was read. -1 indicates no data was available within the time out.</returns>
         /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout) and if
+        /// <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Port is not open and <see cref="ThrowOnReadError"/> is set to <see langword="true"/>.
+        /// </exception>
         public int ReadChar()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return -1;
             if (ReadCheckDeviceError()) return -1;
 
@@ -972,6 +1055,8 @@ namespace RJCP.IO.Ports
                 if (chars == -1) {
                     if (!m_NativeSerial.Buffer.ReadStream.WaitForRead(te.Timeout)) {
                         ReadCheckDeviceError();
+                        if (m_NativeSerial.IsRunning && ThrowOnReadError)
+                            throw new TimeoutException();
                         return -1;
                     }
                 }
@@ -987,6 +1072,9 @@ namespace RJCP.IO.Ports
         /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
         /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
         public string ReadLine()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -996,6 +1084,17 @@ namespace RJCP.IO.Ports
         /// <summary>
         /// Reads a string up to the specified <i>text</i> in the input buffer.
         /// </summary>
+        /// <param name="text">The text to indicate where the read operation stops.</param>
+        /// <returns>The contents of the input buffer up to the specified <paramref name="text"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="text"/> is empty.</exception>
+        /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
+        /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
         /// <remarks>
         /// The ReadTo() function will read text from the byte buffer up to a predetermined limit (1024 characters) when
         /// looking for the string <paramref name="text"/>. If <paramref name="text"/> is not found within this limit,
@@ -1016,18 +1115,12 @@ namespace RJCP.IO.Ports
         /// returns, you have valid data.
         /// </para>
         /// </remarks>
-        /// <param name="text">The text to indicate where the read operation stops.</param>
-        /// <returns>The contents of the input buffer up to the specified <paramref name="text"/>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="text"/> is empty.</exception>
-        /// <exception cref="TimeoutException">Data was not available in the timeout specified.</exception>
-        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
-        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         public string ReadTo(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (string.IsNullOrEmpty(text)) throw new ArgumentException("Parameter text shall not be null or empty", nameof(text));
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
             if (ReadCheckDeviceError()) return null;
 
@@ -1049,6 +1142,9 @@ namespace RJCP.IO.Ports
         /// <returns>The contents of the stream and the input buffer of the <see cref="SerialPortStream"/>.</returns>
         /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
         /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
         /// <remarks>
         /// Reads all data in the current buffer. If there is no data available, then no data is returned. This is
         /// different to the Microsoft implementation, that will read all data, and if there is no data, then it waits
@@ -1066,6 +1162,7 @@ namespace RJCP.IO.Ports
         public string ReadExisting()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
             if (ReadCheckDeviceError()) return null;
 

@@ -15,7 +15,7 @@ namespace RJCP.IO.Ports
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
 
-#if NETCOREAPP3_1
+#if NETCOREAPP
         [SetUp]
         public void InitLogging()
         {
