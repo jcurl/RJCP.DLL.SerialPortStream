@@ -691,16 +691,5 @@ namespace RJCP.IO.Ports
                 Assert.That(decodedString, Is.EqualTo("TestString"));
             }
         }
-
-        [Test]
-        public void Template()
-        {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
-                stream.PortName = "COM";
-                stream.Open();
-
-            }
-        }
     }
 }
