@@ -885,7 +885,6 @@ namespace RJCP.IO.Ports
 
             return InternalEndRead(asyncResult);
         }
-#endif
 
         private class ReadAsyncResult : AsyncResult<int>
         {
@@ -946,6 +945,7 @@ namespace RJCP.IO.Ports
             if (bytes == 0) ReadCheckDeviceError();
             return bytes;
         }
+#endif
 
         /// <summary>
         /// Synchronously reads one byte from the SerialPort input buffer.
@@ -1501,7 +1501,6 @@ namespace RJCP.IO.Ports
 
             InternalEndWrite(asyncResult);
         }
-#endif
 
         private class WriteAsyncResult : AsyncResult
         {
@@ -1552,6 +1551,7 @@ namespace RJCP.IO.Ports
         {
             AsyncResult.End(asyncResult, this, "Write");
         }
+#endif
 
         /// <summary>
         /// Writes a specified number of characters to the serial port using data from a buffer.
