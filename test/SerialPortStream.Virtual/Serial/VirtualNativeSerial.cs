@@ -792,6 +792,7 @@ namespace RJCP.IO.Ports.Serial
 
             if (disposing) {
                 if (IsOpen) Close();
+                m_Buffer.Dispose();
             }
 
             IsDisposed = true;

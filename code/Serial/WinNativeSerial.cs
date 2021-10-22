@@ -1129,6 +1129,7 @@ namespace RJCP.IO.Ports.Serial
 
             if (disposing) {
                 if (IsOpen) Close();
+                m_Buffer.Dispose();
             }
 
             // Note: the SafeFileHandle will close the object itself when finalising, so
