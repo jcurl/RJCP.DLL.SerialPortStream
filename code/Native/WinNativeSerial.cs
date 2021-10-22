@@ -357,7 +357,7 @@ namespace RJCP.IO.Ports.Native
         /// <value>
         /// The XOn buffer limit.
         /// </value>
-        /// <exception cref="ArgumentOutOfRangeException">XOffLimit must be positive.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">XOnLimit must be positive.</exception>
         public int XOnLimit
         {
             get { return m_XOnLimit; }
@@ -365,7 +365,7 @@ namespace RJCP.IO.Ports.Native
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
                 if (value < 0) {
-                    throw new ArgumentOutOfRangeException(nameof(value), "XOffLimit must be positive");
+                    throw new ArgumentOutOfRangeException(nameof(value), "XOnLimit must be positive");
                 }
                 m_XOnLimit = value;
                 if (IsOpen) SetPortSettings();

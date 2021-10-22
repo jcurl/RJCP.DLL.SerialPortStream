@@ -1848,6 +1848,9 @@ namespace RJCP.IO.Ports
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                if (!Enum.IsDefined(typeof(Handshake), value))
+                    throw new ArgumentOutOfRangeException(nameof(value), "Unknown setting for Handshake");
+
                 m_NativeSerial.Handshake = value;
             }
         }
