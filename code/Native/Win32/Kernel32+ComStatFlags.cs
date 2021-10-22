@@ -4,8 +4,11 @@
 
 namespace RJCP.IO.Ports.Native.Win32
 {
+    using System;
+
     internal static partial class Kernel32
     {
+        [Flags]
         public enum ComStatFlags
         {
             CtsHold = 0x01,
