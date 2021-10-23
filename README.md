@@ -51,6 +51,8 @@ maintainability. See the end of these notes for differences.
       * 7.3.2.2 Garbage Data on Open
       * 7.3.2.3 Monitoring Pins and Timing Resolution
       * 7.3.2.4 Close Times with Flow Control
+      * 7.3.2.5 Opening Ports (and some unit test case failures)
+  * 7.4 Guidelines on Serial Protocols
 
 ## 1.0 Why another Serial Port implementation
 
@@ -548,7 +550,7 @@ and workarounds are in place. In particular, the chips PL2303H, PL2303RA do not
 support the `ioctl(TIOCGICOUNT)`, so on a pin toggle, we cannot reliably detect
 if they have changed if the pulse is too short. For 16550A and FTDI chips, this
 `ioctl()` does work and so we can always detect a change. To check if your
-driver supports the TIOCGICOUNT `ioctl()` call, run the small test program
+driver supports the `ioctl(TIOCGICOUNT)` call, run the small test program
 `comptest/icount`.
 
 ```sh
@@ -585,3 +587,67 @@ The .NET Test Cases that show this behaviour are (blocking on write):
 
 This issue is not reproducible with the 16550A UART when it is write blocked. In
 this case, the times for closing are usually not more than 20ms.
+
+##### 7.3.2.5 Opening Ports (and some unit test case failures)
+
+When testing continuously to open a port, send data, and then receive on another
+port using a NULL-modem cable, minor issues can occur that result in test case
+failures. These issues would also be visible in real-world programs and are
+driver dependent.
+
+The test scenario is on Linux (Ubuntu 20.04) with various USB serial port
+devices. The test case `ReadToWithMbcs` from SerialPortStreamNativeTest is
+modified to run 2000 times with `[Repeat(2000)]`. The command to run the test
+after building is then:
+
+```cmd
+dotnet test RJCP.SerialPortStreamNativeTest.dll --filter Name=ReadToWithMbcs
+```
+
+(please note, not only this test case is affected, but it is easy to reproduce.)
+
+* *FTDI*: After opening the serial port, in about 1% of the cases, data is not
+  sent (observed using .NET Mono 4.0 and 4.5). It is confirmed that the system
+  call `write()` was called, and all data was given to the kernel via the
+  library `libnserial`. However, on the other serial port, data is never
+  received. Waiting 15ms after opening would resolve the problem - this
+  workaround will not be part of the `SerialPortStream` as it appears to be very
+  specific to this driver and similar behaviour is not observed on other
+  drivers.
+* *PL2303H*: Sometimes on connecting the serial port, a spurios 0xFF is sent.
+  This causes the test case to fail, as data that was not sent is received and
+  affects the output.
+* *PL2303RA*: The test cases appear to run about 10x slower than any other
+  driver, but no errors were observed.
+* *CP2101*: Seems to work flawlessly.
+
+### 7.4 Guidelines on Serial Protocols
+
+Given the issues listed in this section, one can come up with the following
+recommendations for protocol design over the serial port:
+
+* Assume that at Layer 2 (the serial port bus), data can be inserted, modified,
+  or deleted.
+* Define data as frames. There should be a marker byte indicating the start of
+  a frame, a length to know how much data should be received, and a checksum
+  (at least a CRC16) that can be used to check the integrity of the frame.
+* Define the protocol to be able to resend data in case of lost data if needed,
+  or can continue if data is lost.
+
+I recommend to not use hardware or software flow control, but define in the
+serial protocol frames, like a link control protocol (LCP) that can manage this.
+Do not use parity, and instead opt to use checksum bytes within a frame.
+
+* Hardware flow control can lead to deadlocks in software. No flow control just
+  means data can be lost, and can be replaced using a LCP. Software flow control
+  can also cause complications in the protocol, which can be more generically
+  handled using a LCP.
+* Parity can insert arbitrary bytes and corrupted data, especially with USB
+  serial devices. Use frame checksums (FCS) instead.
+
+Allow bundling of frames one after the other, and decode separately. Lots of
+small frames that need to be acknowledged can lead to delays between frames, and
+longer transmission times for an already "slow" bus speed. The
+`SerialPortStream` is buffered, so performance is impacted by lots of context
+switches between sending data, and waiting for a response, as there is a buffer
+thread used in-between.
