@@ -536,6 +536,30 @@ namespace RJCP.IO.Ports
         /// </returns>
         int Read(byte[] buffer, int offset, int count);
 
+#if NETSTANDARD
+        /// <summary>
+        /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number
+        /// of bytes read.
+        /// </summary>
+        /// <param name="buffer">
+        /// A region of memory. When this method returns, the contents of this region are replaced by the bytes read
+        /// from the current source.
+        /// </param>
+        /// <returns>
+        /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that
+        /// many bytes are not currently available, or zero (0) if the end of the stream has been reached, or zero (0)
+        /// if there was a time out.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer provided.</exception>
+        /// <exception cref="InvalidOperationException">The port is not open.</exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout).
+        /// </exception>
+        int Read(Span<byte> buffer);
+#endif
+
         /// <summary>
         /// Synchronously reads one byte from the SerialPort input buffer.
         /// </summary>
@@ -678,6 +702,45 @@ namespace RJCP.IO.Ports
         /// </para>
         /// </remarks>
         void Write(byte[] buffer, int offset, int count);
+
+#if NETSTANDARD
+        /// <summary>
+        /// Write the given data into the buffered serial stream for sending over the serial port.
+        /// </summary>
+        /// <param name="buffer">The buffer containing data to send.</param>
+        /// <exception cref="TimeoutException">
+        /// Not enough buffer space was made available before the time out expired.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the write operation; or there was a device error.
+        /// </exception>
+        /// <exception cref="TimeoutException">
+        /// The write operation did not complete before the timeout <see cref="WriteTimeout"/>.
+        /// </exception>
+        /// <remarks>
+        /// Data is copied from the array provided into the local stream buffer. It does not guarantee that data will be
+        /// sent over the serial port. So long as there is enough local buffer space to accept the write of count bytes,
+        /// this function will succeed. In case that the buffered serial stream doesn't have enough data, the function
+        /// will wait up to <see cref="WriteTimeout"/> milliseconds for enough buffer data to become available. In case
+        /// that there is not enough space before the write time out expires, no data is copied to the local stream and
+        /// the function fails with an exception.
+        /// <para>
+        /// For reliability, this function will only write data to the write buffer if the complete set of data
+        /// requested can be written. This implies that length of <paramref name="buffer"/> be less or equal to the
+        /// number of bytes that are available in the write buffer. Equivalently, you must make sure that you have a
+        /// write buffer with at least the length of <paramref name="buffer"/> allocated bytes or this function will
+        /// always raise an exception.
+        /// </para>
+        /// </remarks>
+        void Write(ReadOnlySpan<byte> buffer);
+#endif
 
         /// <summary>
         /// Writes a specified number of characters to the serial port using data from a buffer.
@@ -891,6 +954,26 @@ namespace RJCP.IO.Ports
         /// </returns>
         Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken);
 
+#if NETSTANDARD
+        /// <summary>
+        /// Asynchronously reads a sequence of bytes from the current stream and advances the position within the stream
+        /// by the number of bytes read.
+        /// </summary>
+        /// <param name="buffer">The buffer to read the data into.</param>
+        /// <param name="cancellationToken">
+        /// The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.
+        /// </param>
+        /// <returns>A <see cref="ValueTask{T}"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="InvalidOperationException">The port is not open.</exception>
+        /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
+        /// <exception cref="IOException">Device monitoring thread has died.</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout).
+        /// </exception>
+        ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
+#endif
+
         /// <summary>
         /// Writes the asynchronous.
         /// </summary>
@@ -918,6 +1001,33 @@ namespace RJCP.IO.Ports
         /// <exception cref="ArgumentException">Offset and count exceed buffer boundaries.</exception>
         /// <exception cref="InvalidOperationException">Serial port not open.</exception>
         Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken);
+
+#if NETSTANDARD
+        /// <summary>
+        /// Asynchronously writes a sequence of bytes to the current stream, advances the current position within this
+        /// stream by the number of bytes written, and monitors cancellation requests.
+        /// </summary>
+        /// <param name="buffer">The buffer to write data from.</param>
+        /// <param name="cancellationToken">
+        /// The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.
+        /// </param>
+        /// <returns>A task that represents the asynchronous write operation.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
+        /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the write operation; or there was a device error.
+        /// </exception>
+        /// <exception cref="TimeoutException">
+        /// The write operation did not complete before the timeout <see cref="WriteTimeout"/>.
+        /// </exception>
+        ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default);
+#endif
+
 #endif
     }
 }

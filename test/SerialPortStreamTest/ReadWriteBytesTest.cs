@@ -71,6 +71,64 @@ namespace RJCP.IO.Ports
         }
 #endif
 
+#if NETCOREAPP
+        [Test]
+        public void ReadLargeDataBlockSpan()
+        {
+            Random rnd = new Random();
+            byte[] receiveData = new byte[262144];
+            rnd.NextBytes(receiveData);
+
+            using (VirtualNativeSerial serial = new VirtualNativeSerial())
+            using (SerialPortStream stream = new SerialPortStream(serial)) {
+                stream.PortName = "COM";
+
+                // The task simulates receiving data
+                Task driverTask = ReadLargeDataBlockDriver(serial, receiveData);
+
+                // Receive the data, as if it had arrived from a serial port
+                byte[] receiveBuffer = new byte[receiveData.Length];
+                Span<byte> span = receiveBuffer;
+                stream.Open();
+                int r = 0;
+                while (r < receiveBuffer.Length) {
+                    r += stream.Read(span[r..]);
+                }
+
+                driverTask.Wait();
+                Assert.That(receiveBuffer, Is.EqualTo(receiveData));
+            }
+        }
+
+        [Test]
+        public async Task ReadLargeDataBlockSpanAsync()
+        {
+            Random rnd = new Random();
+            byte[] receiveData = new byte[262144];
+            rnd.NextBytes(receiveData);
+
+            using (VirtualNativeSerial serial = new VirtualNativeSerial())
+            using (SerialPortStream stream = new SerialPortStream(serial)) {
+                stream.PortName = "COM";
+
+                // The task simulates receiving data
+                Task driverTask = ReadLargeDataBlockDriver(serial, receiveData);
+
+                // Receive the data, as if it had arrived from a serial port
+                byte[] receiveBuffer = new byte[receiveData.Length];
+                Memory<byte> mem = receiveBuffer;
+                stream.Open();
+                int r = 0;
+                while (r < receiveBuffer.Length) {
+                    r += await stream.ReadAsync(mem[r..]);
+                }
+
+                await driverTask;
+                Assert.That(receiveBuffer, Is.EqualTo(receiveData));
+            }
+        }
+#endif
+
         private static Task ReadLargeDataBlockDriver(VirtualNativeSerial serial, byte[] receiveData)
         {
             return new TaskFactory().StartNew(() => {
@@ -150,7 +208,79 @@ namespace RJCP.IO.Ports
                 while (s < sendData.Length) {
                     int q = Math.Min(l.Next(1, 2048), sendData.Length - s);
                     await stream.WriteAsync(sendData, s, q);
-                    Console.WriteLine($"Stream.Write(sendData, {s}, {q})");
+                    Console.WriteLine($"Stream.WriteAsync(sendData, {s}, {q})");
+                    s += q;
+                    if (writeDelay > 0) Thread.Sleep(writeDelay);
+                }
+
+                await driverTask;
+                Assert.That(sentData, Is.EqualTo(sendData));
+            }
+        }
+#endif
+
+#if NETCOREAPP
+        [TestCase(0)]
+        [TestCase(1)]
+        public void WriteLargeDataBlockSpan(int writeDelay)
+        {
+            Random rnd = new Random();
+            byte[] sendData = new byte[262144];
+            rnd.NextBytes(sendData);
+            ReadOnlySpan<byte> span = sendData;
+
+            using (VirtualNativeSerial serial = new VirtualNativeSerial())
+            using (SerialPortStream stream = new SerialPortStream(serial)) {
+                stream.PortName = "COM";
+
+                // The task simulates receiving data
+                byte[] sentData = new byte[sendData.Length];
+                Task driverTask = WriteLargeDataBlockDriver(serial, sentData);
+
+                // Receive the data, as if it had arrived from a serial port
+                stream.Open();
+                int s = 0;
+                Random l = new Random();
+
+                while (s < sendData.Length) {
+                    int q = Math.Min(l.Next(1, 2048), sendData.Length - s);
+                    stream.Write(span[s..(s + q)]);
+                    Console.WriteLine($"Stream.Write(span[{s}..{s + q}])");
+                    s += q;
+                    if (writeDelay > 0) Thread.Sleep(writeDelay);
+                }
+
+                driverTask.Wait();
+                Assert.That(sentData, Is.EqualTo(sendData));
+            }
+        }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        public async Task WriteLargeDataBlockSpanAsync(int writeDelay)
+        {
+            Random rnd = new Random();
+            byte[] sendData = new byte[262144];
+            rnd.NextBytes(sendData);
+            ReadOnlyMemory<byte> mem = sendData;
+
+            using (VirtualNativeSerial serial = new VirtualNativeSerial())
+            using (SerialPortStream stream = new SerialPortStream(serial)) {
+                stream.PortName = "COM";
+
+                // The task simulates receiving data
+                byte[] sentData = new byte[sendData.Length];
+                Task driverTask = WriteLargeDataBlockDriver(serial, sentData);
+
+                // Receive the data, as if it had arrived from a serial port
+                stream.Open();
+                int s = 0;
+                Random l = new Random();
+
+                while (s < sendData.Length) {
+                    int q = Math.Min(l.Next(1, 2048), sendData.Length - s);
+                    await stream.WriteAsync(mem[s..(s + q)]);
+                    Console.WriteLine($"Stream.WriteAsync(mem[{s}..{s + q}])");
                     s += q;
                     if (writeDelay > 0) Thread.Sleep(writeDelay);
                 }

@@ -1,6 +1,6 @@
 # List of Changes with Releases
 
-## Version 3.0.0 (libnserial 1.1.4) - 18/Oct/2021
+## Version 3.0.0 (libnserial 1.1.4) - 25/Oct/2021
 
 Features
 
@@ -17,6 +17,8 @@ Features
   `RJCP.MSBuildTasks`.
 * DOTNET-426: Properly implement `ReadAsync` and `WriteAsync` with
   `CancellationToken`, based on RJCP.IO.Buffer.
+* DOTNET-341: Implement `Read(Span<byte>)`, `Write(ReadOnlySpan<byte>)` and
+  related asynchronous methods.
 
 Fixes
 

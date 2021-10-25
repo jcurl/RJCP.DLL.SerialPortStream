@@ -695,6 +695,21 @@ namespace RJCP.IO.Ports
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 
+#if NETSTANDARD
+        private void ReadCheck(Span<byte> buffer)
+        {
+            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
+        }
+
+        private void ReadCheck()
+        {
+            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
+        }
+#endif
+
         private bool m_ReadCheckDeviceErrorNotified;
 
         private bool ReadCheckDeviceError()
@@ -766,10 +781,50 @@ namespace RJCP.IO.Ports
             if (ReadCheckDeviceError()) return 0;
 
             if (count == 0) return 0;
-            return InternalBlockingRead(buffer, offset, count);
+            if (!WaitForRead()) return 0;
+
+            return m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count);
         }
 
-        private int InternalBlockingRead(byte[] buffer, int offset, int count)
+#if NETSTANDARD
+        /// <summary>
+        /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number
+        /// of bytes read.
+        /// </summary>
+        /// <param name="buffer">
+        /// A region of memory. When this method returns, the contents of this region are replaced by the bytes read
+        /// from the current source.
+        /// </param>
+        /// <returns>
+        /// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that
+        /// many bytes are not currently available, or zero (0) if the end of the stream has been reached, or zero (0)
+        /// if there was a time out from <see cref="ReadTimeout"/> and <see cref="ThrowOnReadError"/> is
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer provided.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
+        /// <exception cref="IOException">Device Error (e.g. device removed).</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout) and if
+        /// <see cref="ThrowOnReadError"/> is set. Otherwise, zero bytes ar returned.
+        /// </exception>
+        public override int Read(Span<byte> buffer)
+        {
+            ReadCheck(buffer);
+            if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
+            if (ReadCheckDeviceError()) return 0;
+
+            if (buffer.Length == 0) return 0;
+            if (!WaitForRead()) return 0;
+
+            return m_NativeSerial.Buffer.ReadStream.Read(buffer);
+        }
+#endif
+
+        private bool WaitForRead()
         {
             if (m_NativeSerial.IsRunning) {
                 bool ready = m_NativeSerial.Buffer.ReadStream.WaitForRead(m_ReadTimeout);
@@ -778,17 +833,10 @@ namespace RJCP.IO.Ports
                     ReadCheckDeviceError();
                     if (m_NativeSerial.IsRunning && ThrowOnReadError)
                         throw new TimeoutException();
-                    return 0;
+                    return false;
                 }
             }
-
-            return InternalRead(buffer, offset, count);
-        }
-
-        private int InternalRead(byte[] buffer, int offset, int count)
-        {
-            int bytes = m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count);
-            return bytes;
+            return true;
         }
 
 #if NETSTANDARD || NET45_OR_GREATER
@@ -822,6 +870,43 @@ namespace RJCP.IO.Ports
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
             if (ReadCheckDeviceError()) return 0;
 
+            if (!await WaitForReadAsync(cancellationToken)) return 0;
+            return m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count);
+        }
+
+#if NETSTANDARD
+        /// <summary>
+        /// Asynchronously reads a sequence of bytes from the current stream and advances the position within the stream
+        /// by the number of bytes read.
+        /// </summary>
+        /// <param name="buffer">The buffer to read the data into.</param>
+        /// <param name="cancellationToken">
+        /// The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.
+        /// </param>
+        /// <returns>A <see cref="ValueTask{T}"/> representing the asynchronous operation.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The port is not open. Is only raised when <see cref="ThrowOnReadError"/> is set.
+        /// </exception>
+        /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
+        /// <exception cref="IOException">Device monitoring thread has died.</exception>
+        /// <exception cref="TimeoutException">
+        /// This exception is thrown if data didn't arrive in time (a read timeout) and if
+        /// <see cref="ThrowOnReadError"/> is set. Otherwise, zero bytes are returned.
+        /// </exception>
+        public async override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            ReadCheck();
+            if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
+            if (ReadCheckDeviceError()) return 0;
+
+            if (!await WaitForReadAsync(cancellationToken)) return 0;
+            return m_NativeSerial.Buffer.ReadStream.Read(buffer.Span);
+        }
+#endif
+
+        private async Task<bool> WaitForReadAsync(CancellationToken cancellationToken)
+        {
             if (m_NativeSerial.IsRunning) {
                 bool ready = await m_NativeSerial.Buffer.ReadStream.WaitForReadAsync(m_ReadTimeout, cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
@@ -832,11 +917,11 @@ namespace RJCP.IO.Ports
                     ReadCheckDeviceError();
                     if (m_NativeSerial.IsRunning && ThrowOnReadError)
                         throw new TimeoutException();
-                    return 0;
+                    return false;
                 }
             }
 
-            return InternalRead(buffer, offset, count);
+            return true;
         }
 #endif
 
@@ -907,13 +992,16 @@ namespace RJCP.IO.Ports
                     }
 
                     if (synchronous) {
-                        SetResult(stream.InternalRead(buffer, offset, count));
+                        SetResult(stream.m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count));
                         Complete(null, true);
                     } else {
                         Task.Factory.StartNew(() => {
                             try {
-                                int result = stream.InternalBlockingRead(buffer, offset, count);
-                                SetResult(result);
+                                if (stream.WaitForRead()) {
+                                    SetResult(stream.m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count));
+                                } else {
+                                    SetResult(0);
+                                }
                                 Complete(null, false);
                             } catch (Exception ex) {
                                 Complete(ex, false);
@@ -1331,6 +1419,37 @@ namespace RJCP.IO.Ports
             return true;
         }
 
+#if NETSTANDARD
+        private bool WriteCheck(ReadOnlySpan<byte> buffer)
+        {
+            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+            if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port is closed");
+            WriteCheckDeviceError();
+
+            // Check that count is less than the total size of the buffer, else raise
+            // an exception immediately that the local buffer is too small.
+            if (buffer.Length > WriteBufferSize) {
+                throw new InvalidOperationException("Insufficient buffer for the data requested");
+            }
+            return true;
+        }
+
+        private bool WriteCheck(ReadOnlyMemory<byte> buffer)
+        {
+            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port is closed");
+            WriteCheckDeviceError();
+
+            // Check that count is less than the total size of the buffer, else raise
+            // an exception immediately that the local buffer is too small.
+            if (buffer.Length > WriteBufferSize) {
+                throw new InvalidOperationException("Insufficient buffer for the data requested");
+            }
+            return true;
+        }
+#endif
+
         private void WriteCheckDeviceError()
         {
             if (m_NativeSerial.Buffer.IsBufferAllocated &&
@@ -1382,10 +1501,60 @@ namespace RJCP.IO.Ports
         {
             if (!WriteCheck(buffer, offset, count)) return;
             if (count == 0) return;
-            InternalBlockingWrite(buffer, offset, count);
+
+            WaitForWrite(count);
+            m_NativeSerial.Buffer.WriteStream.Write(buffer, offset, count);
+            WriteCheckDeviceError();
         }
 
-        private void InternalBlockingWrite(byte[] buffer, int offset, int count)
+#if NETSTANDARD
+        /// <summary>
+        /// Write the given data into the buffered serial stream for sending over the serial port.
+        /// </summary>
+        /// <param name="buffer">The buffer containing data to send.</param>
+        /// <exception cref="TimeoutException">
+        /// Not enough buffer space was made available before the time out expired.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="ArgumentNullException"><see langword="null"/> buffer was provided.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the write operation; or there was a device error.
+        /// </exception>
+        /// <exception cref="TimeoutException">
+        /// The write operation did not complete before the timeout <see cref="WriteTimeout"/>.
+        /// </exception>
+        /// <remarks>
+        /// Data is copied from the array provided into the local stream buffer. It does not guarantee that data will be
+        /// sent over the serial port. So long as there is enough local buffer space to accept the write of count bytes,
+        /// this function will succeed. In case that the buffered serial stream doesn't have enough data, the function
+        /// will wait up to <see cref="WriteTimeout"/> milliseconds for enough buffer data to become available. In case
+        /// that there is not enough space before the write time out expires, no data is copied to the local stream and
+        /// the function fails with an exception.
+        /// <para>
+        /// For reliability, this function will only write data to the write buffer if the complete set of data
+        /// requested can be written. This implies that length of <paramref name="buffer"/> be less or equal to the
+        /// number of bytes that are available in the write buffer. Equivalently, you must make sure that you have a
+        /// write buffer with at least the length of <paramref name="buffer"/> allocated bytes or this function will
+        /// always raise an exception.
+        /// </para>
+        /// </remarks>
+        public override void Write(ReadOnlySpan<byte> buffer)
+        {
+            if (!WriteCheck(buffer)) return;
+            if (buffer.Length == 0) return;
+
+            WaitForWrite(buffer.Length);
+            m_NativeSerial.Buffer.WriteStream.Write(buffer);
+            WriteCheckDeviceError();
+        }
+#endif
+
+        private void WaitForWrite(int count)
         {
             bool ready = m_NativeSerial.Buffer.WriteStream.WaitForWrite(count, m_WriteTimeout);
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -1395,13 +1564,6 @@ namespace RJCP.IO.Ports
                 WriteCheckDeviceError();
                 throw new TimeoutException("Couldn't write into buffer");
             }
-            InternalWrite(buffer, offset, count);
-            WriteCheckDeviceError();
-        }
-
-        private void InternalWrite(byte[] buffer, int offset, int count)
-        {
-            m_NativeSerial.Buffer.WriteStream.Write(buffer, offset, count);
         }
 
 #if NETSTANDARD || NET45_OR_GREATER
@@ -1438,6 +1600,47 @@ namespace RJCP.IO.Ports
                 return;
             if (count == 0) return;
 
+            await WaitForWriteAsync(count, cancellationToken);
+            m_NativeSerial.Buffer.WriteStream.Write(buffer, offset, count);
+            WriteCheckDeviceError();
+        }
+
+#if NETSTANDARD
+        /// <summary>
+        /// Asynchronously writes a sequence of bytes to the current stream, advances the current position within this
+        /// stream by the number of bytes written, and monitors cancellation requests.
+        /// </summary>
+        /// <param name="buffer">The buffer to write data from.</param>
+        /// <param name="cancellationToken">
+        /// The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.
+        /// </param>
+        /// <returns>A task that represents the asynchronous write operation.</returns>
+        /// <exception cref="ObjectDisposedException">Object is disposed.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Serial port not open.
+        /// <para>- or -</para>
+        /// Insufficient buffer size to perform the write when initialized with <see cref="WriteBufferSize"/>.
+        /// </exception>
+        /// <exception cref="OperationCanceledException">Operation has been cancelled.</exception>
+        /// <exception cref="IOException">
+        /// Serial Port was closed during the write operation; or there was a device error.
+        /// </exception>
+        /// <exception cref="TimeoutException">
+        /// The write operation did not complete before the timeout <see cref="WriteTimeout"/>.
+        /// </exception>
+        public async override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            if (!WriteCheck(buffer)) return;
+            if (buffer.Length == 0) return;
+
+            await WaitForWriteAsync(buffer.Length, cancellationToken);
+            m_NativeSerial.Buffer.WriteStream.Write(buffer.Span);
+            WriteCheckDeviceError();
+        }
+#endif
+
+        private async Task WaitForWriteAsync(int count, CancellationToken cancellationToken)
+        {
             bool ready = await m_NativeSerial.Buffer.WriteStream.WaitForWriteAsync(count, m_WriteTimeout, cancellationToken);
             if (cancellationToken.IsCancellationRequested)
                 throw new OperationCanceledException(cancellationToken);
@@ -1449,8 +1652,6 @@ namespace RJCP.IO.Ports
                 WriteCheckDeviceError();
                 throw new TimeoutException("Couldn't write into buffer");
             }
-            InternalWrite(buffer, offset, count);
-            WriteCheckDeviceError();
         }
 #endif
 
@@ -1518,12 +1719,14 @@ namespace RJCP.IO.Ports
                 try {
                     if (synchronous) {
                         if (count > 0)
-                            stream.InternalWrite(buffer, offset, count);
+                            stream.m_NativeSerial.Buffer.WriteStream.Write(buffer, offset, count);
                         Complete(null, true);
                     } else {
                         Task.Factory.StartNew(() => {
                             try {
-                                stream.InternalBlockingWrite(buffer, offset, count);
+                                stream.WaitForWrite(count);
+                                stream.m_NativeSerial.Buffer.WriteStream.Write(buffer, offset, count);
+                                stream.WriteCheckDeviceError();
                                 Complete(null, false);
                             } catch (Exception ex) {
                                 Complete(ex, false);
@@ -1587,7 +1790,10 @@ namespace RJCP.IO.Ports
 
             byte[] bbuffer = Encoding.GetBytes(buffer, offset, count);
             if (bbuffer.Length > WriteBufferSize) throw new InvalidOperationException("Insufficient buffer for the data requested");
-            InternalBlockingWrite(bbuffer, 0, bbuffer.Length);
+
+            WaitForWrite(bbuffer.Length);
+            m_NativeSerial.Buffer.WriteStream.Write(bbuffer, 0, bbuffer.Length);
+            WriteCheckDeviceError();
         }
 
         /// <summary>
@@ -1617,7 +1823,10 @@ namespace RJCP.IO.Ports
 
             byte[] bbuffer = Encoding.GetBytes(text);
             if (bbuffer.Length > WriteBufferSize) throw new InvalidOperationException("Insufficient buffer for the data requested");
-            InternalBlockingWrite(bbuffer, 0, bbuffer.Length);
+
+            WaitForWrite(bbuffer.Length);
+            m_NativeSerial.Buffer.WriteStream.Write(bbuffer, 0, bbuffer.Length);
+            WriteCheckDeviceError();
         }
 
         /// <summary>
