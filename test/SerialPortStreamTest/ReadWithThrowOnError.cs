@@ -187,7 +187,6 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NETFRAMEWORK
         [TestCase(true, TestName = "BeginReadWhenClosedThrowOnError")]
         [TestCase(false, TestName = "BeginReadWhenClosed")]
         public void BeginReadWhenClosedThrowOnError(bool throwOnError)
@@ -207,7 +206,6 @@ namespace RJCP.IO.Ports
                 }
             }
         }
-#endif
 
         [TestCase(true, TestName = "ReadBytesTimeoutThrowOnError")]
         [TestCase(false, TestName = "ReadBytesTimeout")]
@@ -370,7 +368,6 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NETFRAMEWORK
         [TestCase(true, TestName = "BeginReadTimeoutThrowOnError")]
         [TestCase(false, TestName = "BeginReadTimeout")]
         public void BeginReadTimeout(bool throwOnError)
@@ -394,6 +391,5 @@ namespace RJCP.IO.Ports
                 }
             }
         }
-#endif
     }
 }

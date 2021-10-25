@@ -925,7 +925,6 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NETFRAMEWORK
         /// <summary>
         /// Begins an asynchronous read operation.
         /// </summary>
@@ -1033,7 +1032,6 @@ namespace RJCP.IO.Ports
             if (bytes == 0) ReadCheckDeviceError();
             return bytes;
         }
-#endif
 
         /// <summary>
         /// Synchronously reads one byte from the SerialPort input buffer.
@@ -1655,7 +1653,6 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NETFRAMEWORK
         /// <summary>
         /// Begins an asynchronous write operation.
         /// </summary>
@@ -1754,7 +1751,6 @@ namespace RJCP.IO.Ports
         {
             AsyncResult.End(asyncResult, this, "Write");
         }
-#endif
 
         /// <summary>
         /// Writes a specified number of characters to the serial port using data from a buffer.

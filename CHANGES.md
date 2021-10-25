@@ -19,6 +19,8 @@ Features
   `CancellationToken`, based on RJCP.IO.Buffer.
 * DOTNET-341: Implement `Read(Span<byte>)`, `Write(ReadOnlySpan<byte>)` and
   related asynchronous methods.
+* DOTNET-449: Put back `BeginRead`, `EndRead`, `BeginWrite` and `EndWrite` for
+  .NET Standard 2.1 code (.NET Core).
 
 Fixes
 
