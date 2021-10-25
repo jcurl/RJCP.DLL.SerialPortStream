@@ -5,6 +5,7 @@
 namespace RJCP.IO.Ports
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -657,5 +658,85 @@ namespace RJCP.IO.Ports
                 }, Throws.TypeOf<TimeoutException>());
             }
         }
+
+        [Test]
+        public void CopyTo()
+        {
+            Random r = new Random();
+            byte[] receivedData = new byte[65536];
+            r.NextBytes(receivedData);
+
+            using (MemoryStream memStream = new MemoryStream())
+            using (VirtualNativeSerial serial = new VirtualNativeSerial())
+            using (SerialPortStream stream = new SerialPortStream(serial)) {
+                stream.PortName = "COM";
+                stream.WriteBufferSize = 2048;
+                stream.WriteTimeout = 100;
+                stream.ReadTimeout = 1000;
+                stream.Open();
+
+                Task driver = new TaskFactory().StartNew(() => {
+                    // Write 80 * 64kb = 5MB
+                    for (int i = 0; i < 80; i++) {
+                        serial.VirtualBuffer.WriteReceivedData(receivedData, 0, receivedData.Length);
+                        Thread.Sleep(10);
+                    }
+                });
+
+                stream.CopyTo(memStream);
+                Assert.That(memStream.Length, Is.EqualTo(receivedData.Length * 80));
+
+                // Now test the contents
+                CopyToTest(receivedData, memStream, 80);
+            }
+        }
+
+        private void CopyToTest(byte[] receivedData, MemoryStream memStream, int blocks)
+        {
+            memStream.Seek(0, SeekOrigin.Begin);
+            byte[] memBuffer = new byte[receivedData.Length];
+            for (int i = 0; i < blocks; i++) {
+                int p = 0;
+                while (p < receivedData.Length) {
+                    int r = memStream.Read(memBuffer, p, receivedData.Length - p);
+                    p += r;
+                }
+                Assert.That(memBuffer, Is.EqualTo(receivedData));
+            }
+        }
+
+#if NET45_OR_GREATER || NETCOREAPP
+        [Test]
+        public async Task CopyToAsync()
+        {
+            Random r = new Random();
+            byte[] receivedData = new byte[65536];
+            r.NextBytes(receivedData);
+
+            using (MemoryStream memStream = new MemoryStream())
+            using (VirtualNativeSerial serial = new VirtualNativeSerial())
+            using (SerialPortStream stream = new SerialPortStream(serial)) {
+                stream.PortName = "COM";
+                stream.WriteBufferSize = 2048;
+                stream.WriteTimeout = 100;
+                stream.ReadTimeout = 1000;
+                stream.Open();
+
+                Task driver = new TaskFactory().StartNew(() => {
+                    // Write 80 * 64kb = 5MB
+                    for (int i = 0; i < 80; i++) {
+                        serial.VirtualBuffer.WriteReceivedData(receivedData, 0, receivedData.Length);
+                        Thread.Sleep(10);
+                    }
+                });
+
+                await stream.CopyToAsync(memStream);
+                Assert.That(memStream.Length, Is.EqualTo(receivedData.Length * 80));
+
+                // Now test the contents
+                CopyToTest(receivedData, memStream, 80);
+            }
+        }
+#endif
     }
 }
