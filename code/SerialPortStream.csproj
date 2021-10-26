@@ -155,4 +155,9 @@
     <Compile Include="System\IO\Ports\SerialPort.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>
