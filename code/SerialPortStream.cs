@@ -2128,49 +2128,65 @@ namespace RJCP.IO.Ports
                 }
 
                 if (handleEvent) {
-                    if (m_Log.ShouldTrace(TraceEventType.Verbose))
-                        m_Log.TraceEvent(TraceEventType.Verbose, "{0}: HandleEvent: {1}; {2}; {3};", m_NativeSerial.PortName, serialDataFlags, serialErrorFlags, serialPinChange);
+                    try {
+                        if (m_Log.ShouldTrace(TraceEventType.Verbose))
+                            m_Log.TraceEvent(TraceEventType.Verbose, "{0}: HandleEvent: {1}; {2}; {3};", m_NativeSerial.PortName, serialDataFlags, serialErrorFlags, serialPinChange);
 
-                    // Received Data
-                    bool aboveThreshold = m_Buffer.Stream.BytesToRead >= m_RxThreshold;
-                    if (aboveThreshold) {
-                        OnDataReceived(this, new SerialDataReceivedEventArgs(serialDataFlags));
-                    } else if ((serialDataFlags & SerialData.Eof) != 0) {
-                        OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Eof));
-                    }
+                        // Received Data
+                        bool aboveThreshold = m_Buffer.Stream.BytesToRead >= m_RxThreshold;
+                        if (aboveThreshold) {
+                            OnDataReceived(this, new SerialDataReceivedEventArgs(serialDataFlags));
+                        } else if ((serialDataFlags & SerialData.Eof) != 0) {
+                            OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Eof));
+                        }
 
-                    // Modem Pin States
-                    if ((serialPinChange & SerialPinChange.CtsChanged) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
-                    }
-                    if ((serialPinChange & SerialPinChange.Ring) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Ring));
-                    }
-                    if ((serialPinChange & SerialPinChange.CDChanged) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
-                    }
-                    if ((serialPinChange & SerialPinChange.DsrChanged) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
-                    }
-                    if ((serialPinChange & SerialPinChange.Break) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Break));
-                    }
+                        // Modem Pin States
+                        if ((serialPinChange & SerialPinChange.CtsChanged) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
+                        }
+                        if ((serialPinChange & SerialPinChange.Ring) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Ring));
+                        }
+                        if ((serialPinChange & SerialPinChange.CDChanged) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
+                        }
+                        if ((serialPinChange & SerialPinChange.DsrChanged) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
+                        }
+                        if ((serialPinChange & SerialPinChange.Break) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Break));
+                        }
 
-                    // Error States
-                    if ((serialErrorFlags & SerialError.TXFull) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.TXFull));
-                    }
-                    if ((serialErrorFlags & SerialError.Frame) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Frame));
-                    }
-                    if ((serialErrorFlags & SerialError.RXParity) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXParity));
-                    }
-                    if ((serialErrorFlags & SerialError.Overrun) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Overrun));
-                    }
-                    if ((serialErrorFlags & SerialError.RXOver) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXOver));
+                        // Error States
+                        if ((serialErrorFlags & SerialError.TXFull) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.TXFull));
+                        }
+                        if ((serialErrorFlags & SerialError.Frame) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Frame));
+                        }
+                        if ((serialErrorFlags & SerialError.RXParity) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXParity));
+                        }
+                        if ((serialErrorFlags & SerialError.Overrun) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Overrun));
+                        }
+                        if ((serialErrorFlags & SerialError.RXOver) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXOver));
+                        }
+                    } catch (Exception ex) {
+                        if (m_Log.ShouldTrace(TraceEventType.Warning)) {
+#if DEBUG
+                            m_Log.TraceEvent(TraceEventType.Warning, "{0}: HandleEvent: {1};", m_NativeSerial.PortName, ex.ToString());
+#else
+                            m_Log.TraceEvent(TraceEventType.Warning, "{0}: HandleEvent: {1};", m_NativeSerial.PortName, ex.Message);
+#endif
+                        }
+                        lock (m_EventLock) {
+                            handleEvent = false;
+                            m_SerialDataFlags = SerialData.NoData;
+                            m_SerialErrorFlags = SerialError.NoError;
+                            m_SerialPinChange = SerialPinChange.NoChange;
+                        }
                     }
                 }
             } while (handleEvent);
