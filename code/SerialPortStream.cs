@@ -2471,45 +2471,68 @@ namespace RJCP.IO.Ports
                         m_Log.TraceEvent(TraceEventType.Verbose, $"{m_NativeSerial.PortName}: HandleEvent: {serialDataFlags}; {serialErrorFlags}; {serialPinChange};");
 
                     // Received Data
-                    bool aboveThreshold = m_NativeSerial.Buffer.ReadStream.BytesToRead >= m_RxThreshold;
-                    if (aboveThreshold) {
-                        OnDataReceived(this, new SerialDataReceivedEventArgs(serialDataFlags));
-                    } else if ((serialDataFlags & SerialData.Eof) != 0) {
-                        OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Eof));
-                    }
+                    try {
+                        bool aboveThreshold = m_NativeSerial.Buffer.IsBufferAllocated &&
+                            m_NativeSerial.Buffer.ReadStream.BytesToRead >= m_RxThreshold;
+                        if (aboveThreshold) {
+                            OnDataReceived(this, new SerialDataReceivedEventArgs(serialDataFlags));
+                        } else if ((serialDataFlags & SerialData.Eof) != 0) {
+                            OnDataReceived(this, new SerialDataReceivedEventArgs(SerialData.Eof));
+                        }
 
-                    // Modem Pin States
-                    if ((serialPinChange & SerialPinChange.CtsChanged) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
-                    }
-                    if ((serialPinChange & SerialPinChange.Ring) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Ring));
-                    }
-                    if ((serialPinChange & SerialPinChange.CDChanged) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
-                    }
-                    if ((serialPinChange & SerialPinChange.DsrChanged) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
-                    }
-                    if ((serialPinChange & SerialPinChange.Break) != 0) {
-                        OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Break));
-                    }
+                        // Modem Pin States
+                        if ((serialPinChange & SerialPinChange.CtsChanged) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CtsChanged));
+                        }
+                        if ((serialPinChange & SerialPinChange.Ring) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Ring));
+                        }
+                        if ((serialPinChange & SerialPinChange.CDChanged) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.CDChanged));
+                        }
+                        if ((serialPinChange & SerialPinChange.DsrChanged) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.DsrChanged));
+                        }
+                        if ((serialPinChange & SerialPinChange.Break) != 0) {
+                            OnPinChanged(this, new SerialPinChangedEventArgs(SerialPinChange.Break));
+                        }
 
-                    // Error States
-                    if ((serialErrorFlags & SerialError.TXFull) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.TXFull));
-                    }
-                    if ((serialErrorFlags & SerialError.Frame) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Frame));
-                    }
-                    if ((serialErrorFlags & SerialError.RXParity) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXParity));
-                    }
-                    if ((serialErrorFlags & SerialError.Overrun) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Overrun));
-                    }
-                    if ((serialErrorFlags & SerialError.RXOver) != 0) {
-                        OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXOver));
+                        // Error States
+                        if ((serialErrorFlags & SerialError.TXFull) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.TXFull));
+                        }
+                        if ((serialErrorFlags & SerialError.Frame) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Frame));
+                        }
+                        if ((serialErrorFlags & SerialError.RXParity) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXParity));
+                        }
+                        if ((serialErrorFlags & SerialError.Overrun) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.Overrun));
+                        }
+                        if ((serialErrorFlags & SerialError.RXOver) != 0) {
+                            OnCommError(this, new SerialErrorReceivedEventArgs(SerialError.RXOver));
+                        }
+                    } catch (Exception ex) {
+                        if (m_Log.ShouldTrace(TraceEventType.Warning)) {
+#if DEBUG
+                            m_Log.TraceEvent(TraceEventType.Warning, $"{m_NativeSerial.PortName}: HandleEvent Exception: {ex}");
+#else
+                            // In release mode, just print the message, not the stack, which may otherwise expose
+                            // unwanted information
+                            m_Log.TraceEvent(TraceEventType.Warning, $"{m_NativeSerial.PortName}: HandleEvent Exception: {ex.Message}");
+#endif
+                        }
+
+                        lock (m_EventLock) {
+                            // In case there is an exception, we stop processing. In .NET Core, if an exception occurs, the
+                            // program crashes completely.
+                            handleEvent = false;
+
+                            m_SerialDataFlags = SerialData.NoData;
+                            m_SerialErrorFlags = SerialError.NoError;
+                            m_SerialPinChange = SerialPinChange.NoChange;
+                        }
                     }
                 }
             } while (handleEvent);
@@ -2519,7 +2542,7 @@ namespace RJCP.IO.Ports
                 m_EventProcessing.Reset();
             }
         }
-        #endregion
+#endregion
 
         private volatile bool m_IsDisposed;
 

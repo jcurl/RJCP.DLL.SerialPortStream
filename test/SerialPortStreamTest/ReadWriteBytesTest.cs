@@ -691,7 +691,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-        private void CopyToTest(byte[] receivedData, MemoryStream memStream, int blocks)
+        private static void CopyToTest(byte[] receivedData, MemoryStream memStream, int blocks)
         {
             memStream.Seek(0, SeekOrigin.Begin);
             byte[] memBuffer = new byte[receivedData.Length];
