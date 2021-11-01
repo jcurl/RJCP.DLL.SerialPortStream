@@ -19,7 +19,7 @@
     <PackageId>SerialPortStream.Virtual</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageProjectUrl>https://github.com/jcurl/serialportstream</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/jcurl/RJCP.DLL.SerialPortStream</PackageProjectUrl>
     <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability. Provides methods to support testing with a virtual native serial port instance.</Description>
     <Version>3.0.0</Version>
 
