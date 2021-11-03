@@ -9,14 +9,14 @@
     <NeutralLanguage>en-US</NeutralLanguage>
 
     <AssemblyName>RJCP.SerialPortStream.Virtual</AssemblyName>
-    <AssemblyTitle>SerialPortStream.Virtual</AssemblyTitle>
+    <AssemblyTitle>RJCP.SerialPortStream.Virtual</AssemblyTitle>
     <Product>RJCP.SerialPortStream</Product>
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
     <Copyright>(C) 2021, Jason Curl</Copyright>
     <Company></Company>
-    <PackageId>SerialPortStream.Virtual</PackageId>
+    <PackageId>RJCP.SerialPortStream.Virtual</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/jcurl/RJCP.DLL.SerialPortStream</PackageProjectUrl>

@@ -7,14 +7,14 @@
     <NeutralLanguage>en-US</NeutralLanguage>
 
     <AssemblyName>RJCP.SerialPortStream</AssemblyName>
-    <AssemblyTitle>SerialPortStream</AssemblyTitle>
+    <AssemblyTitle>RJCP.SerialPortStream</AssemblyTitle>
     <Product>RJCP.SerialPortStream</Product>
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
     <Copyright>(C) Jason Curl, 2012-2021</Copyright>
     <Company></Company>
-    <PackageId>SerialPortStream</PackageId>
+    <PackageId>RJCP.SerialPortStream</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/jcurl/RJCP.DLL.SerialPortStream</PackageProjectUrl>
