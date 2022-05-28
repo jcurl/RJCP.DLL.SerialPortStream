@@ -660,6 +660,7 @@ namespace RJCP.IO.Ports
         }
 
         [Test]
+        [Timeout(30000)]
         public void CopyTo()
         {
             Random r = new Random();
@@ -688,6 +689,7 @@ namespace RJCP.IO.Ports
 
                 // Now test the contents
                 CopyToTest(receivedData, memStream, 80);
+                driver.Wait();
             }
         }
 
@@ -707,6 +709,7 @@ namespace RJCP.IO.Ports
 
 #if NET45_OR_GREATER || NETCOREAPP
         [Test]
+        [Timeout(30000)]
         public async Task CopyToAsync()
         {
             Random r = new Random();
@@ -735,6 +738,7 @@ namespace RJCP.IO.Ports
 
                 // Now test the contents
                 CopyToTest(receivedData, memStream, 80);
+                driver.Wait();
             }
         }
 #endif
