@@ -2542,7 +2542,7 @@ namespace RJCP.IO.Ports
                 m_EventProcessing.Reset();
             }
         }
-#endregion
+        #endregion
 
         private volatile bool m_IsDisposed;
 
