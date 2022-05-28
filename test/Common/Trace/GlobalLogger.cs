@@ -25,6 +25,9 @@ namespace RJCP.IO.Ports.Trace
         }
 
         // Just calling this method will result in the static constructor being executed.
-        public static void Initialize() { }
+        public static void Initialize()
+        {
+            /* No code necessary. Accessing this method will execute static constructor automatically */
+        }
     }
 }
