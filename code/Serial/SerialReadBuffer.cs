@@ -283,7 +283,11 @@ namespace RJCP.IO.Ports.Serial
                             int p = lbuffer.IndexOf(text, StringComparison.Ordinal);
                             if (p != -1) {
                                 // It does exist, so consume up to the buffered portion
+#if NETFRAMEWORK
                                 line = lbuffer.Substring(0, p);
+#else
+                                line = lbuffer[..p];
+#endif
                                 int l = p + text.Length;
                                 ReadToConsume(l);
                                 return true;
