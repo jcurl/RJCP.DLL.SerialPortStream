@@ -39,15 +39,15 @@ namespace RJCP.IO.Ports.Serial
         /// <summary>
         /// Called when the user wants to write.
         /// </summary>
-        /// <param name="bytes">The number of bytes the user wrote to the buffer.</param>
+        /// <param name="count">The number of bytes the user wrote to the buffer.</param>
         /// <remarks>
         /// The write occurs from the user layer, but the driver layer may need to be notified. Override this class and
         /// provide your own implementation for notification.
         /// </remarks>
-        protected override void OnWrite(int bytes)
+        protected override void OnWrite(int count)
         {
-            if (bytes > 0) {
-                OnWriteEvent(this, new SerialBufferEventArgs(bytes));
+            if (count > 0) {
+                OnWriteEvent(this, new SerialBufferEventArgs(count));
             }
         }
     }
