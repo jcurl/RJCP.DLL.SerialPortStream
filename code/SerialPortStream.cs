@@ -909,8 +909,7 @@ namespace RJCP.IO.Ports
         {
             if (m_NativeSerial.IsRunning) {
                 bool ready = await m_NativeSerial.Buffer.ReadStream.WaitForReadAsync(m_ReadTimeout, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                    throw new OperationCanceledException(cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
 
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (!ready) {
@@ -1640,8 +1639,7 @@ namespace RJCP.IO.Ports
         private async Task WaitForWriteAsync(int count, CancellationToken cancellationToken)
         {
             bool ready = await m_NativeSerial.Buffer.WriteStream.WaitForWriteAsync(count, m_WriteTimeout, cancellationToken);
-            if (cancellationToken.IsCancellationRequested)
-                throw new OperationCanceledException(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
             if (!m_NativeSerial.IsOpen) throw new IOException("SerialPortStream was closed during write operation");
