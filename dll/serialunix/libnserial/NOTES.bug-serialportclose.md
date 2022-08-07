@@ -1,16 +1,16 @@
+# BUGS on Closing the Serial Port
+
 This file contains some notes during the development of nserial software
 library.
 
-Opening and Closing the Serial Port
-===================================
+## Opening and Closing the Serial Port
 
-Some drivers don't behave too well if you exit your program without closing
-the serial port (with either the serial_close() or serial_terminate() call).
+Some drivers don't behave too well if you exit your program without closing the
+serial port (with either the serial_close() or serial_terminate() call).
 
 The test case involves setting up two serial ports with a single process. A
-large amount of data is sent (up to 256000 bytes) and only 1024 bytes is
-read. The program exits without closing the FD associated with the serial
-port.
+large amount of data is sent (up to 256000 bytes) and only 1024 bytes is read.
+The program exits without closing the FD associated with the serial port.
 
 The test case that originally showed this problem was SerialSendReceiveTest,
 found in the file 'sendreceivesimple.cpp'. It would send data and stop after
@@ -24,6 +24,7 @@ port receiving the data, and then flush for the data to be synchronised again.
 So the original code in DoTransfer is pasted below, with the workaround
 commented out (serial_write()).
 
+```c
 int SerialReadWrite::DoTransfer(Buffer *sendBuffer)
 {
   if (sendBuffer == NULL) {
@@ -95,17 +96,18 @@ int SerialReadWrite::DoTransfer(Buffer *sendBuffer)
       readfinished = true;
     }
   }
+```
 
-This problem was observed on FTDI USB to Serial adapters and PL2303H USB
-Serial Adapters. It wasn't visible with PL2303RA or a normal 16550A COM port.
+This problem was observed on FTDI USB to Serial adapters and PL2303H USB Serial
+Adapters. It wasn't visible with PL2303RA or a normal 16550A COM port.
 
 Even though I believe this is a bug in the Linux kernel (tested was Ubuntu
 14.04.3 with kernel:
 
- Linux leon-ubuntu 3.19.0-49-generic #55~14.04.1-Ubuntu SMP Fri Jan 22
- 11:23:34 UTC 2016 i686 i686 i686 GNU/Linux
+`Linux leon-ubuntu 3.19.0-49-generic #55~14.04.1-Ubuntu SMP Fri Jan 22 11:23:34
+UTC 2016 i686 i686 i686 GNU/Linux`
 
 the solution is simple. Before the program ends (or the test case executable
 exits), ensure that you close the serial port. Then your code will work as
-expected. The workaround was removed, along with the comments and this note
-was made in its place as a bit of a reminder.
+expected. The workaround was removed, along with the comments and this note was
+made in its place as a bit of a reminder.
