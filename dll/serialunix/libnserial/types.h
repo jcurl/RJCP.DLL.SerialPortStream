@@ -24,9 +24,11 @@
 #include <inttypes.h>
 #endif
 
+#ifndef HAVE_STDLIB_MIN
 #define SIZEOF_ARRAY(array) (sizeof(array)/sizeof(array[0]))
 #define min(a,b) ((a)>(b)?(a):(b))
 #define max(a,b) ((a)<(b)?(a):(b))
+#endif
 
 // Somehow, somewhere Darwin defines TRUE. So we should check for it, and only
 // define it if it is necessary. We should check for this in the configure

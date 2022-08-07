@@ -7,6 +7,9 @@
 #define NSERIAL_VERSION_MINOR @VERSION_MINOR@
 #define NSERIAL_VERSION_PATCH @VERSION_PATCH@
 
+/* System Types */
+#cmakedefine HAVE_STDLIB_MIN
+
 /* serialoptions.cmake */
 #cmakedefine HAVE_TERMIOS_B0
 #cmakedefine HAVE_TERMIOS_B50

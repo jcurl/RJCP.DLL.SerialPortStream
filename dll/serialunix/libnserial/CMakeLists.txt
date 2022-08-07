@@ -1,6 +1,7 @@
 project(libnserial C CXX)
 include(${CMAKE_MODULE_PATH}/doxygen.cmake)
 include(${CMAKE_MODULE_PATH}/serial.cmake)
+include(${CMAKE_MODULE_PATH}/types.cmake)
 include(GNUInstallDirs)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
