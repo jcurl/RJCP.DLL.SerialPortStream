@@ -130,31 +130,22 @@ namespace RJCP.IO.Ports.Native
             }
 
 #if !NETSTANDARD1_5
-            ManagementObjectCollection objects;
             // Look for standard serial ports
             using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_SerialPort")) {
-                objects = q.Get();
-                using (ManagementObjectCollection.ManagementObjectEnumerator enumerator = objects.GetEnumerator()) {
-                    while (enumerator.MoveNext()) {
-                        ManagementObject current = (ManagementObject)enumerator.Current;
-                        string k = current["DeviceID"].ToString();
-                        if (list.ContainsKey(k)) {
-                            list[k].Description = current["Name"].ToString();
-                        }
+                foreach (ManagementObject mObj in q.Get()) {
+                    string k = mObj["DeviceID"].ToString();
+                    if (list.ContainsKey(k)) {
+                        list[k].Description = mObj["Name"].ToString();
                     }
                 }
             }
 
             // Look for any modems that are attached to COM ports that aren't listed above
             using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_POTSModem")) {
-                objects = q.Get();
-                using (ManagementObjectCollection.ManagementObjectEnumerator enumerator = objects.GetEnumerator()) {
-                    while (enumerator.MoveNext()) {
-                        ManagementObject current = (ManagementObject)enumerator.Current;
-                        string k = current["AttachedTo"].ToString();
-                        if (list.ContainsKey(k)) {
-                            list[k].Description = current["Name"].ToString();
-                        }
+                foreach (ManagementObject mObj in q.Get()) {
+                    string k = mObj["AttachedTo"].ToString();
+                    if (list.ContainsKey(k)) {
+                        list[k].Description = mObj["Name"].ToString();
                     }
                 }
             }
