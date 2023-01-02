@@ -66,6 +66,7 @@ namespace RJCP.IO.Ports
                 if (monitor != null)
                     monitor.Wait();
             } catch (ObjectDisposedException) {
+                /* Ignore */
             } catch (AggregateException ex) {
                 if (ex.InnerExceptions.Count > 0) {
                     if (!(ex.InnerExceptions[0] is ObjectDisposedException)) {
