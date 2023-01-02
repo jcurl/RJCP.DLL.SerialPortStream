@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -235,7 +235,8 @@ namespace RJCP.IO.Ports
         {
             var buffer = new byte[65536];
 
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortReceive.IdleReceive(DestPort, serialSource)) {
                 serialSource.Open();
                 serialSource.Write(buffer, 0, buffer.Length);
                 serialSource.DiscardOutBuffer();
