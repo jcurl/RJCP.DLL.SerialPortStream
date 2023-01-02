@@ -57,6 +57,7 @@
     <None Include="appsettings.json" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="SerialConfiguration.cs" />
+    <Compile Include="SerialPortReceive.cs" />
     <Compile Include="SerialPortStreamCharTest.cs" />
     <None Include="SerialPortStreamLoggerTest.cs" />
     <Compile Include="SerialPortStreamManualTest.cs" />

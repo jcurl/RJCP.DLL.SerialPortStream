@@ -437,7 +437,8 @@ namespace RJCP.IO.Ports
         {
             var buffer = new byte[65536];
 
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortReceive.IdleReceive(DestPort, serialSource)) {
                 serialSource.Open();
                 serialSource.Write(buffer, 0, buffer.Length);
                 serialSource.DiscardOutBuffer();
