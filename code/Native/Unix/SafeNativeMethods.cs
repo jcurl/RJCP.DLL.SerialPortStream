@@ -7,7 +7,6 @@
 #if !NETSTANDARD1_5
     [SuppressUnmanagedCodeSecurity]
 #endif
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "P/Invoke")]
     internal static class SafeNativeMethods
     {
         [DllImport("libnserial.so.1")]

@@ -5,4 +5,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+[assembly: SuppressMessage("Style", "IDE0031:Use null propagation", Justification = ".NET Framework / Core compatibility")]
+[assembly: SuppressMessage("Style", "IDE0056:Use index operator", Justification = ".NET Framework / Core compatibility")]
+[assembly: SuppressMessage("Style", "IDE0074:Use compound assignment", Justification = ".NET Framework / Core compatibility")]
 [assembly: SuppressMessage("Blocker Code Smell", "S2699:Tests should include assertions", Justification = "Not required")]
+

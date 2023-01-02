@@ -65,7 +65,6 @@ namespace RJCP.IO.Ports.Native.Windows
             [MarshalAs(UnmanagedType.U4)]
             public DcbFlags Flags;
 
-
             /// <summary>
             /// Not currently used
             /// </summary>

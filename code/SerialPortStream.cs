@@ -830,11 +830,12 @@ namespace RJCP.IO.Ports
                 // If there was a device error, then an exception is raised, or it immediately returns with zero bytes.
                 if (ReadCheckDeviceError()) count = 0;
             } catch (Exception ex) {
-                LocalAsync<int> ar = new LocalAsync<int>(state);
-                ar.Exception = ex;
-                ar.Result = 0;
-                ar.IsCompleted = true;
-                ar.CompletedSynchronously = true;
+                LocalAsync<int> ar = new LocalAsync<int>(state) {
+                    Exception = ex,
+                    Result = 0,
+                    IsCompleted = true,
+                    CompletedSynchronously = true
+                };
                 if (callback != null) callback(ar);
                 return ar;
             }
