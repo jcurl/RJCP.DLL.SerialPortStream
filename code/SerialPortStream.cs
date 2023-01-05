@@ -962,7 +962,7 @@ namespace RJCP.IO.Ports
             return InternalEndRead(asyncResult);
         }
 
-        private class ReadAsyncResult : AsyncResult<int>
+        private sealed class ReadAsyncResult : AsyncResult<int>
         {
             public ReadAsyncResult(AsyncCallback callback, object state, object owner, string operation)
                 : base(callback, state, owner, operation) { }
@@ -1690,7 +1690,7 @@ namespace RJCP.IO.Ports
             InternalEndWrite(asyncResult);
         }
 
-        private class WriteAsyncResult : AsyncResult
+        private sealed class WriteAsyncResult : AsyncResult
         {
 
             public WriteAsyncResult(AsyncCallback callback, object state, object owner, string operation)
