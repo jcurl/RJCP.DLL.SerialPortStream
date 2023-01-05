@@ -111,7 +111,7 @@
     <Compile Include="Native\Win32\Kernel32+SettableParams.cs" />
     <Compile Include="Native\Win32\Kernel32+SettableStopParity.cs" />
     <Compile Include="Native\Win32\Kernel32.cs" />
-    <Compile Include="Native\Win32\Kernel32_DcbFlags.cs" />
+    <Compile Include="Native\Win32\Kernel32+DcbFlags.cs" />
     <Compile Include="Native\Win32\WinError.cs" />
     <Compile Include="Parity.cs" />
     <Compile Include="PortDescription.cs" />

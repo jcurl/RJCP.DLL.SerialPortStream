@@ -155,8 +155,7 @@ namespace RJCP.IO.Ports.Serial.Windows
             bytesInRecvQueue = 0;
             eofReceived = false;
 
-            Kernel32.COMSTAT comStat = new Kernel32.COMSTAT();
-            bool result = Kernel32.ClearCommError(m_ComPortHandle, out Kernel32.ComStatErrors cErr, ref comStat);
+            bool result = Kernel32.ClearCommError(m_ComPortHandle, out Kernel32.ComStatErrors cErr, out Kernel32.COMSTAT comStat);
             if (!result) {
                 int w32err = Marshal.GetLastWin32Error();
                 int hr = Marshal.GetHRForLastWin32Error();
@@ -182,8 +181,7 @@ namespace RJCP.IO.Ports.Serial.Windows
         {
             get
             {
-                Kernel32.COMSTAT comStat = new Kernel32.COMSTAT();
-                bool result = Kernel32.ClearCommError(m_ComPortHandle, out _, ref comStat);
+                bool result = Kernel32.ClearCommError(m_ComPortHandle, out _, out Kernel32.COMSTAT comStat);
                 if (result) return (int)comStat.cbOutQue;
                 return 0;
             }
