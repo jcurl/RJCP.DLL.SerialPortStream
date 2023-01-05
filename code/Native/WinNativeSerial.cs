@@ -14,11 +14,7 @@ namespace RJCP.IO.Ports.Native
     using Trace;
     using Windows;
 
-#if !NETSTANDARD1_5
-    using System.Management;
-    using System.Xml.Linq;
-    using System.Linq;
-#else
+#if NETSTANDARD1_5
     using System.Reflection;
 #endif
 
@@ -135,18 +131,6 @@ namespace RJCP.IO.Ports.Native
             // works since Windows XP.
             QueryDevices(list);
 
-#if !NETSTANDARD1_5
-            // Look for any modems that are attached to COM ports that aren't listed above
-            using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_POTSModem")) {
-                foreach (ManagementObject mObj in q.Get().Cast<ManagementObject>()) {
-                    string k = mObj["AttachedTo"].ToString();
-                    if (list.ContainsKey(k)) {
-                        list[k].Description = mObj["Name"].ToString();
-                    }
-                }
-            }
-#endif
-
             // Get the array and return it
             int i = 0;
             PortDescription[] ports = new PortDescription[list.Count];
@@ -183,7 +167,7 @@ namespace RJCP.IO.Ports.Native
         {
             CfgMgr32.CONFIGRET ret = CfgMgr32.CM_Get_DevNode_Registry_Property(
                 devInst, deviceProperty, out int _, out string buffer);
-            if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS) 
+            if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS)
                 return string.Empty;
 
             return buffer;
@@ -194,7 +178,7 @@ namespace RJCP.IO.Ports.Native
             CfgMgr32.CONFIGRET ret = CfgMgr32.CM_Open_DevNode_Key(
                 devInst, Kernel32.REGSAM.KEY_READ, 0, CfgMgr32.RegDisposition.OpenExisting,
                 out SafeRegistryHandle key, 0);
-            if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS) 
+            if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS)
                 return null;
             if (key.IsInvalid || key.IsClosed)
                 return null;
@@ -1002,7 +986,7 @@ namespace RJCP.IO.Ports.Native
             throw new IOException(string.Format("Unknown error 0x{0}: {1}", e.ToString("X"), PortName), e);
         }
 
-#region Event Handling
+        #region Event Handling
         private void RegisterEvents()
         {
             m_CommOverlappedIo.CommEvent += CommOverlappedIo_CommEvent;
@@ -1101,9 +1085,9 @@ namespace RJCP.IO.Ports.Native
                 handler(sender, args);
             }
         }
-#endregion
+        #endregion
 
-#region IDisposable Support
+        #region IDisposable Support
         private bool m_IsDisposed;
 
         /// <summary>
@@ -1133,6 +1117,6 @@ namespace RJCP.IO.Ports.Native
             // with an IntPtr however.
             m_IsDisposed = true;
         }
-#endregion
+        #endregion
     }
 }
