@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -8,7 +8,7 @@ namespace RJCP.IO.Ports.Native.Windows
 
     internal class CommErrorEventArgs : EventArgs
     {
-        private NativeMethods.ComStatErrors m_EventType;
+        private readonly NativeMethods.ComStatErrors m_EventType;
 
         /// <summary>
         /// Constructor.

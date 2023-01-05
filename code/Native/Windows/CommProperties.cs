@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -13,7 +13,7 @@ namespace RJCP.IO.Ports.Native.Windows
     /// </summary>
     internal sealed class CommProperties
     {
-        private SafeFileHandle m_ComPortHandle;
+        private readonly SafeFileHandle m_ComPortHandle;
         private NativeMethods.CommProp m_CommProp = new NativeMethods.CommProp();
 
         internal CommProperties(SafeFileHandle handle)

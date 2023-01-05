@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -45,7 +45,7 @@ namespace RJCP.IO.Ports
         private INativeSerial m_NativeSerial;
         private SerialBuffer m_Buffer;
         private ReadToCache m_ReadTo;
-        private LogSource m_Log;
+        private readonly LogSource m_Log;
 
         #region Public constants
         /// <summary>
@@ -2012,7 +2012,7 @@ namespace RJCP.IO.Ports
 
         #region Event Handling and Abstraction
         private readonly object m_EventLock = new object();
-        private ManualResetEvent m_EventProcessing = new ManualResetEvent(false);
+        private readonly ManualResetEvent m_EventProcessing = new ManualResetEvent(false);
         private SerialData m_SerialDataFlags = SerialData.NoData;
         private SerialError m_SerialErrorFlags = SerialError.NoError;
         private SerialPinChange m_SerialPinChange = SerialPinChange.NoChange;

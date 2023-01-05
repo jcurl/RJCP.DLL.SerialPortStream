@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -25,9 +25,13 @@ namespace RJCP.IO.Ports.Trace
     /// </remarks>
     internal sealed class LogSource : IDisposable
     {
-        private string m_Name;
+        private readonly string m_Name;
         private TraceSource m_TraceSource;
+#if NETSTANDARD1_5
         private long m_TraceLevels;
+#else
+        private readonly long m_TraceLevels;
+#endif
 
         public LogSource()
         {

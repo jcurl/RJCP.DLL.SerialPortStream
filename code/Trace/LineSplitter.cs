@@ -1,4 +1,4 @@
-// Copyright © Jason Curl 2019-2021
+// Copyright © Jason Curl 2019-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -12,7 +12,7 @@ namespace RJCP.IO.Ports.Trace
 
     internal sealed class LineSplitter : IEnumerable<string>
     {
-        private StringBuilder m_Line = new StringBuilder();
+        private readonly StringBuilder m_Line = new StringBuilder();
         private List<string> m_Lines = new List<string>();
 
         public bool IsCached { get { return m_Line.Length > 0; } }

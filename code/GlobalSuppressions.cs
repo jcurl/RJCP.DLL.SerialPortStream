@@ -7,8 +7,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "<Pending>")]
 [assembly: SuppressMessage("Style", "IDE0031:Use null propagation", Justification = ".NET Framework / Core compatibility")]
+[assembly: SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "P/Invoke", Scope = "namespaceanddescendants", Target = "~N:RJCP.IO.Ports.Native")]
 [assembly: SuppressMessage("Style", "IDE0056:Use index operator", Justification = ".NET Framework / Core compatibility")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "P/Invoke", Scope = "namespaceanddescendants", Target = "~N:RJCP.IO.Ports.Native")]
 [assembly: SuppressMessage("Major Code Smell", "S1066:Collapsible \"if\" statements should be merged", Justification = "No benefit")]

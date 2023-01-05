@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -94,7 +94,7 @@ namespace RJCP.IO.Ports.Native.Windows
         private bool m_ReadByteEof;
 
         private string m_Name;
-        private LogSource m_Log;
+        private readonly LogSource m_Log;
         #endregion
 
         #region Constructors

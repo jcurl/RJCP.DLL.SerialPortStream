@@ -1,7 +1,7 @@
 ﻿namespace System.IO.Ports
 {
     /// <summary>
-    /// Class SerialPort compatibility layer for .NET Stanard 1.5
+    /// Class SerialPort compatibility layer for .NET Standard 1.5
     /// </summary>
     internal class SerialPort
     {

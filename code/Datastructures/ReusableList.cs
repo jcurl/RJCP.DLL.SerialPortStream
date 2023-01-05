@@ -15,9 +15,9 @@
     internal class ReusableList<T> : IList<T> where T : class
     {
         private int m_Count;
-        private int m_MinCapacity;
-        private T[] m_ReusableList;
-        private T[][] m_ReusableListCache;
+        private readonly int m_MinCapacity;
+        private readonly T[] m_ReusableList;
+        private readonly T[][] m_ReusableListCache;
 
         public ReusableList(int minCapacity, int maxCapacity)
         {
@@ -87,7 +87,7 @@
 
         private sealed class ArrayEnumerator : IEnumerator<T>
         {
-            private ReusableList<T> m_Parent;
+            private readonly ReusableList<T> m_Parent;
             private int m_Index;
 
             public ArrayEnumerator(ReusableList<T> parent)

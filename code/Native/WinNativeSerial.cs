@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -32,7 +32,7 @@ namespace RJCP.IO.Ports.Native
         private CommOverlappedIo m_CommOverlappedIo;
 
         private string m_Version;
-        private LogSource m_Log;
+        private readonly LogSource m_Log;
 
         public WinNativeSerial() : this(new LogSource()) { }
 

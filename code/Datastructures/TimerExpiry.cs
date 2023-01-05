@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -49,7 +49,7 @@ namespace RJCP.Datastructures
     /// </remarks>
     internal sealed class TimerExpiry
     {
-        private Stopwatch m_StopWatch = new Stopwatch();
+        private readonly Stopwatch m_StopWatch = new Stopwatch();
         private int m_Milliseconds;
 
         /// <summary>

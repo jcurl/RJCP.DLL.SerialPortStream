@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -288,7 +288,7 @@ namespace RJCP.IO.Ports.Native
             }
         }
 
-        private WaitHandle[] m_BufferStreamWaitForWriteCountHandles;
+        private readonly WaitHandle[] m_BufferStreamWaitForWriteCountHandles;
 
         bool ISerialBufferStreamData.WaitForWrite(int count, int timeout)
         {
@@ -352,7 +352,7 @@ namespace RJCP.IO.Ports.Native
             }
         }
 
-        private WaitHandle[] m_BufferStreamFlushHandles;
+        private readonly WaitHandle[] m_BufferStreamFlushHandles;
 
         bool ISerialBufferStreamData.Flush(int timeout)
         {

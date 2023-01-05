@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -34,7 +34,7 @@ namespace RJCP.Datastructures
         /// Circular buffer itself. Exposed by property "Array".
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private T[] m_Array;
+        private readonly T[] m_Array;
 
         /// <summary>
         /// Start index into the buffer. Exposed by property "Start".
