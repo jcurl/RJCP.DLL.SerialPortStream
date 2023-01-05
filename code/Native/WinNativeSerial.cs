@@ -169,15 +169,10 @@ namespace RJCP.IO.Ports.Native
                     if (devKey != null) {
                         if (devKey.GetValue("PortName") is string portName &&
                             list.TryGetValue(portName, out PortDescription port)) {
-                            string description = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.DEVICEDESC);
-                            if (string.IsNullOrEmpty(description))
-                                description = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.FRIENDLYNAME);
-                            string mfg = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.MFG);
-                            if (string.IsNullOrEmpty(mfg)) {
-                                port.Description = description;
-                            } else {
-                                port.Description = $"{description} [{mfg}]";
-                            }
+                            port.Description = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.FRIENDLYNAME) ?? string.Empty;
+                            if (string.IsNullOrEmpty(port.Description))
+                                port.Description = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.DEVICEDESC) ?? string.Empty;
+                            port.Manufacturer = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.MFG) ?? string.Empty;
                         }
                     }
                 }

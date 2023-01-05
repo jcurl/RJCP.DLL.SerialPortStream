@@ -389,14 +389,14 @@ namespace RJCP.IO.Ports
 
             PortDescription[] portDescs = SerialPortStream.GetPortDescriptions();
             foreach (PortDescription desc in portDescs) {
-                Console.WriteLine($"GetPortDescriptions: {desc.Port}; Description: {desc.Description}");
+                Console.WriteLine($"GetPortDescriptions: {desc}");
                 ports1.Add(desc.Port, false);
                 ports2.Add(desc.Port, false);
             }
 
             string[] portNames = SerialPortStream.GetPortNames();
             foreach (string c in portNames) {
-                Console.WriteLine("GetPortNames: " + c);
+                Console.WriteLine($"GetPortNames: {c}");
                 if (ports1.ContainsKey(c)) {
                     ports1[c] = true;
                 } else {

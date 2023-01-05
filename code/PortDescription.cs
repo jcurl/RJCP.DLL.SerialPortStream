@@ -20,6 +20,12 @@ namespace RJCP.IO.Ports
         public string Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the manufacturer of the driver if available.
+        /// </summary>
+        /// <value>The manufacturer of the driver if available.</value>
+        public string Manufacturer { get; set; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="port">The name of the port.</param>
@@ -28,6 +34,18 @@ namespace RJCP.IO.Ports
         {
             Port = port;
             Description = description;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="string"/> that represents this instance.
+        /// </summary>
+        /// <returns>A <see cref="string"/> that represents this instance.</returns>
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(Manufacturer)) {
+                return Description;
+            }
+            return $"{Description} [{Manufacturer}]";
         }
     }
 }
