@@ -25,7 +25,7 @@ namespace RJCP.IO.Ports.Native.Windows
 
         public void GetCommProperties()
         {
-            if (!Kernel32.GetCommProperties(m_ComPortHandle, ref m_CommProp)) {
+            if (!Kernel32.GetCommProperties(m_ComPortHandle, out m_CommProp)) {
                 throw new IOException("Unable to get Serial Port properties", Marshal.GetLastWin32Error());
             }
         }
