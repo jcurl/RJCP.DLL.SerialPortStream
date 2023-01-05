@@ -696,13 +696,6 @@ namespace RJCP.IO.Ports
         }
 
 #if NETSTANDARD
-        private void ReadCheck(Span<byte> buffer)
-        {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
-            if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
-        }
-
         private void ReadCheck()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -813,7 +806,7 @@ namespace RJCP.IO.Ports
         /// </exception>
         public override int Read(Span<byte> buffer)
         {
-            ReadCheck(buffer);
+            ReadCheck();
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
             if (ReadCheckDeviceError()) return 0;
 
@@ -1420,7 +1413,6 @@ namespace RJCP.IO.Ports
         private bool WriteCheck(ReadOnlySpan<byte> buffer)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port is closed");
             WriteCheckDeviceError();
 
