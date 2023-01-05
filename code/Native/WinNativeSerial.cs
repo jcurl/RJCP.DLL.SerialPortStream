@@ -16,6 +16,8 @@ namespace RJCP.IO.Ports.Native
 
 #if !NETSTANDARD1_5
     using System.Management;
+    using System.Xml.Linq;
+    using System.Linq;
 #else
     using System.Reflection;
 #endif
@@ -129,20 +131,14 @@ namespace RJCP.IO.Ports.Native
                 }
             }
 
-#if !NETSTANDARD1_5
-            // Look for standard serial ports
-            using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_SerialPort")) {
-                foreach (ManagementObject mObj in q.Get()) {
-                    string k = mObj["DeviceID"].ToString();
-                    if (list.ContainsKey(k)) {
-                        list[k].Description = mObj["Name"].ToString();
-                    }
-                }
-            }
+            // Use the Windows CfgMgr API to get the device names. This is faster and more reliable than using WMI. It
+            // works since Windows XP.
+            QueryDevices(list);
 
+#if !NETSTANDARD1_5
             // Look for any modems that are attached to COM ports that aren't listed above
             using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_POTSModem")) {
-                foreach (ManagementObject mObj in q.Get()) {
+                foreach (ManagementObject mObj in q.Get().Cast<ManagementObject>()) {
                     string k = mObj["AttachedTo"].ToString();
                     if (list.ContainsKey(k)) {
                         list[k].Description = mObj["Name"].ToString();
@@ -158,6 +154,57 @@ namespace RJCP.IO.Ports.Native
                 ports[i++] = p;
             }
             return ports;
+        }
+
+        private static void QueryDevices(Dictionary<string, PortDescription> list)
+        {
+            CfgMgr32.CONFIGRET ret = CfgMgr32.CM_Get_Device_ID_List(null, out string[] instances);
+            if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS) return;
+
+            foreach (string device in instances) {
+                ret = CfgMgr32.CM_Locate_DevNode(out CfgMgr32.SafeDevInst devInst, device, CfgMgr32.CM_LOCATE_DEVINST.NORMAL);
+                if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS) continue;
+
+                using (RegistryKey devKey = GetDeviceKey(devInst)) {
+                    if (devKey != null) {
+                        if (devKey.GetValue("PortName") is string portName &&
+                            list.TryGetValue(portName, out PortDescription port)) {
+                            string description = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.DEVICEDESC);
+                            if (string.IsNullOrEmpty(description))
+                                description = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.FRIENDLYNAME);
+                            string mfg = GetDeviceProperty(devInst, CfgMgr32.CM_DRP.MFG);
+                            if (string.IsNullOrEmpty(mfg)) {
+                                port.Description = description;
+                            } else {
+                                port.Description = $"{description} [{mfg}]";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static string GetDeviceProperty(CfgMgr32.SafeDevInst devInst, CfgMgr32.CM_DRP deviceProperty)
+        {
+            CfgMgr32.CONFIGRET ret = CfgMgr32.CM_Get_DevNode_Registry_Property(
+                devInst, deviceProperty, out int _, out string buffer);
+            if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS) 
+                return string.Empty;
+
+            return buffer;
+        }
+
+        private static RegistryKey GetDeviceKey(CfgMgr32.SafeDevInst devInst)
+        {
+            CfgMgr32.CONFIGRET ret = CfgMgr32.CM_Open_DevNode_Key(
+                devInst, Kernel32.REGSAM.KEY_READ, 0, CfgMgr32.RegDisposition.OpenExisting,
+                out SafeRegistryHandle key, 0);
+            if (ret != CfgMgr32.CONFIGRET.CR_SUCCESS) 
+                return null;
+            if (key.IsInvalid || key.IsClosed)
+                return null;
+
+            return RegistryKey.FromHandle(key);
         }
 
         private int m_Baud = 115200;
@@ -960,7 +1007,7 @@ namespace RJCP.IO.Ports.Native
             throw new IOException(string.Format("Unknown error 0x{0}: {1}", e.ToString("X"), PortName), e);
         }
 
-        #region Event Handling
+#region Event Handling
         private void RegisterEvents()
         {
             m_CommOverlappedIo.CommEvent += CommOverlappedIo_CommEvent;
@@ -1059,9 +1106,9 @@ namespace RJCP.IO.Ports.Native
                 handler(sender, args);
             }
         }
-        #endregion
+#endregion
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool m_IsDisposed;
 
         /// <summary>
@@ -1091,6 +1138,6 @@ namespace RJCP.IO.Ports.Native
             // with an IntPtr however.
             m_IsDisposed = true;
         }
-        #endregion
+#endregion
     }
 }

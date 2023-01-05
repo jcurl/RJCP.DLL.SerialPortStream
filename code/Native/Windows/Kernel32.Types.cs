@@ -11,10 +11,6 @@ namespace RJCP.IO.Ports.Native.Windows
     internal static partial class Kernel32
     {
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2344:Enumeration type names should not have \"Flags\" or \"Enum\" suffixes",
-            Justification = "P/Invoke")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2346:Flags enumerations zero-value members should be named \"None\"",
-            Justification = "P/Invoke")]
         public enum DcbFlags
         {
             Binary = 0x0001,
@@ -43,10 +39,6 @@ namespace RJCP.IO.Ports.Native.Windows
         /// Defines the control setting for a serial communications device
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed",
-            Justification = "P/Invoke")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S101:Types should be named in PascalCase",
-            Justification = "P/Invoke")]
         public struct DCB
         {
             /// <summary>
@@ -127,8 +119,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4070:Non-flags enums should not be marked with \"FlagsAttribute\"",
-            Justification = "P/Invoke")]
         public enum FileAccess
         {
             #region Standard Access Rights
@@ -355,8 +345,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2346:Flags enumerations zero-value members should be named \"None\"",
-            Justification = "P/Invoke")]
         public enum FileShare
         {
             /// <summary>
@@ -435,8 +423,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4070:Non-flags enums should not be marked with \"FlagsAttribute\"",
-            Justification = "P/Invoke")]
         public enum FileAttributes
         {
             /// <summary>
@@ -1072,8 +1058,6 @@ namespace RJCP.IO.Ports.Native.Windows
         /// Contains information about a communications driver
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed",
-            Justification = "P/Invoke")]
         public struct CommProp
         {
             /// <summary>
@@ -1335,8 +1319,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S101:Types should be named in PascalCase",
-            Justification = "P/Invoke")]
         public struct COMMTIMEOUTS
         {
             public int ReadIntervalTimeout;
@@ -1363,8 +1345,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2344:Enumeration type names should not have \"Flags\" or \"Enum\" suffixes",
-            Justification = "P/Invoke")]
         public enum ComStatFlags
         {
             CtsHold = 0x01,
@@ -1377,8 +1357,6 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S101:Types should be named in PascalCase",
-            Justification = "P/Invoke")]
         public struct COMSTAT
         {
             [MarshalAs(UnmanagedType.U4)]
@@ -1388,14 +1366,60 @@ namespace RJCP.IO.Ports.Native.Windows
         }
 
         [Flags]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2344:Enumeration type names should not have \"Flags\" or \"Enum\" suffixes",
-            Justification = "P/Invoke")]
         public enum PurgeFlags
         {
             PURGE_TXABORT = 0x0001,
             PURGE_RXABORT = 0x0002,
             PURGE_TXCLEAR = 0x0004,
             PURGE_RXCLEAR = 0x0008
+        }
+
+        [Flags]
+        public enum REGSAM
+        {
+            DELETE = 0x00010000,
+            READ_CONTROL = 0x00020000,
+            WRITE_DAC = 0x00040000,
+            WRITE_OWNER = 0x00080000,
+            SYNCHRONIZE = 0x00100000,
+            STANDARD_RIGHTS_REQUIRED = 0x000F0000,
+            STANDARD_RIGHTS_READ = READ_CONTROL,
+            STANDARD_RIGHTS_WRITE = READ_CONTROL,
+            STANDARD_RIGHTS_EXECUTE = READ_CONTROL,
+            STANDARD_RIGHTS_ALL = 0x001F0000,
+
+            KEY_QUERY_VALUE = 0x0001,
+            KEY_SET_VALUE = 0x0002,
+            KEY_CREATE_SUB_KEY = 0x0004,
+            KEY_ENUMERATE_SUB_KEYS = 0x0008,
+            KEY_NOTIFY = 0x0010,
+            KEY_CREATE_LINK = 0x0020,
+            KEY_WOW64_32KEY = 0x0200,
+            KEY_WOW64_64KEY = 0x0100,
+            KEY_WOW64_RES = 0x0300,
+
+            KEY_READ = (STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS | KEY_NOTIFY) & (~SYNCHRONIZE),
+            KEY_WRITE = (STANDARD_RIGHTS_WRITE | KEY_SET_VALUE | KEY_CREATE_SUB_KEY) & (~SYNCHRONIZE),
+            KEY_EXECUTE = KEY_READ & (~SYNCHRONIZE),
+            KEY_ALL_ACCESS = (STANDARD_RIGHTS_ALL | KEY_QUERY_VALUE | KEY_SET_VALUE | KEY_CREATE_SUB_KEY | KEY_ENUMERATE_SUB_KEYS | KEY_NOTIFY | KEY_CREATE_LINK) & (~SYNCHRONIZE)
+        }
+
+        public enum REG_DATATYPE
+        {
+            REG_NONE = 0, // No value type
+            REG_SZ = 1, // Unicode nul terminated string
+            REG_EXPAND_SZ = 2, // Unicode nul terminated string
+            REG_BINARY = 3, // Free form binary
+            REG_DWORD = 4, // 32-bit number
+            REG_DWORD_LITTLE_ENDIAN = 4, // 32-bit number (same as REG_DWORD)
+            REG_DWORD_BIG_ENDIAN = 5, // 32-bit number
+            REG_LINK = 6, // Symbolic Link (unicode)
+            REG_MULTI_SZ = 7, // Multiple Unicode strings
+            REG_RESOURCE_LIST = 8, // Resource list in the resource map
+            REG_FULL_RESOURCE_DESCRIPTOR = 9, // Resource list in the hardware description
+            REG_RESOURCE_REQUIREMENTS_LIST = 10,
+            REG_QWORD = 11, // 64-bit number
+            REG_QWORD_LITTLE_ENDIAN = 11, // 64-bit number (same as REG_QWORD)
         }
     }
 }

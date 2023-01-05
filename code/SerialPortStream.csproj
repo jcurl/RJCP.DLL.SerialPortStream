@@ -92,6 +92,8 @@
     <Compile Include="Native\Unix\WaitForModemEvent.cs" />
     <Compile Include="Native\Unix\UnsafeNativeMethods.cs" />
     <Compile Include="Native\UnixNativeSerial.cs" />
+    <Compile Include="Native\Windows\CfgMgr32.cs" />
+    <Compile Include="Native\Windows\CfgMgr32.Types.cs" />
     <Compile Include="Native\Windows\CommErrorEventArgs.cs" />
     <Compile Include="Native\Windows\CommEventArgs.cs" />
     <Compile Include="Native\Windows\CommOverlappedIo.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="Native\Windows\CommModemStatus.cs" />
     <Compile Include="Native\Windows\DtrControl.cs" />
     <Compile Include="Native\Windows\Kernel32.Types.cs" />
+    <Compile Include="Native\Windows\Marshalling.cs" />
     <Compile Include="Native\Windows\RtsControl.cs" />
     <Compile Include="Native\Windows\Kernel32.cs" />
     <Compile Include="Native\Windows\WinError.cs" />
