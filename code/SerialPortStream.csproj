@@ -51,7 +51,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Mono.Posix" Version="4.0.0.0" >
+    <PackageReference Include="Mono.Posix" Version="4.0.0.0">
       <PrivateAssets>all</PrivateAssets>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -99,10 +99,9 @@
     <Compile Include="Native\Windows\CommProperties.cs" />
     <Compile Include="Native\Windows\CommModemStatus.cs" />
     <Compile Include="Native\Windows\DtrControl.cs" />
-    <Compile Include="Native\Windows\NativeMethods.cs" />
+    <Compile Include="Native\Windows\Kernel32.Types.cs" />
     <Compile Include="Native\Windows\RtsControl.cs" />
-    <Compile Include="Native\Windows\SafeNativeMethods.cs" />
-    <Compile Include="Native\Windows\UnsafeNativeMethods.cs" />
+    <Compile Include="Native\Windows\Kernel32.cs" />
     <Compile Include="Native\Windows\WinError.cs" />
     <Compile Include="Native\WinNativeSerial.cs" />
     <Compile Include="Parity.cs" />

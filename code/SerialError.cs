@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -16,7 +16,7 @@ namespace RJCP.IO.Ports
     public enum SerialError
     {
         // NOTE: Do not change the values of this enum, as it should be the same
-        // as Native.Windows.NativeMethods.ComStatErrors.
+        // as Native.Windows.Kernel32.ComStatErrors.
 
         /// <summary>
         /// Indicates no error.

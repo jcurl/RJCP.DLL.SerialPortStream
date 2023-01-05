@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2016
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -8,7 +8,7 @@ namespace RJCP.IO.Ports.Native.Windows
     using System.Collections.Specialized;
     using System.Runtime.InteropServices;
 
-    internal static class NativeMethods
+    internal static partial class Kernel32
     {
         [Flags]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2344:Enumeration type names should not have \"Flags\" or \"Enum\" suffixes",
@@ -1383,8 +1383,8 @@ namespace RJCP.IO.Ports.Native.Windows
         {
             [MarshalAs(UnmanagedType.U4)]
             public ComStatFlags Flags;
-            public UInt32 cbInQue;
-            public UInt32 cbOutQue;
+            public uint cbInQue;
+            public uint cbOutQue;
         }
 
         [Flags]

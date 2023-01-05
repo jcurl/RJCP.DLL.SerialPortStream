@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -389,7 +389,7 @@ namespace RJCP.IO.Ports
 
             PortDescription[] portDescs = SerialPortStream.GetPortDescriptions();
             foreach (PortDescription desc in portDescs) {
-                Console.WriteLine("GetPortDescriptions: " + desc.Port + "; Description: " + desc.Description);
+                Console.WriteLine($"GetPortDescriptions: {desc.Port}; Description: {desc.Description}");
                 ports1.Add(desc.Port, false);
                 ports2.Add(desc.Port, false);
             }
@@ -400,13 +400,13 @@ namespace RJCP.IO.Ports
                 if (ports1.ContainsKey(c)) {
                     ports1[c] = true;
                 } else {
-                    Console.WriteLine("GetPortNames() shows " + c + ", but not GetPortDescriptions()");
+                    Console.WriteLine($"GetPortNames() shows {c}, but not GetPortDescriptions()");
                     result = false;
                 }
             }
             foreach (string c in ports1.Keys) {
                 if (!ports1[c]) {
-                    Console.WriteLine("GetPortDescriptions() shows " + c + ", but not GetPortnames()");
+                    Console.WriteLine($"GetPortDescriptions() shows {c}, but not GetPortnames()");
                     result = false;
                 }
             }

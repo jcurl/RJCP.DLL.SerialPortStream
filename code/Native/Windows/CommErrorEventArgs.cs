@@ -8,21 +8,21 @@ namespace RJCP.IO.Ports.Native.Windows
 
     internal class CommErrorEventArgs : EventArgs
     {
-        private readonly NativeMethods.ComStatErrors m_EventType;
+        private readonly Kernel32.ComStatErrors m_EventType;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="eventType"><see cref="NativeMethods.ComStatErrors"/> result.</param>
-        public CommErrorEventArgs(NativeMethods.ComStatErrors eventType)
+        /// <param name="eventType"><see cref="Kernel32.ComStatErrors"/> result.</param>
+        public CommErrorEventArgs(Kernel32.ComStatErrors eventType)
         {
             m_EventType = eventType;
         }
 
         /// <summary>
-        /// <see cref="NativeMethods.ComStatErrors"/> result.
+        /// <see cref="Kernel32.ComStatErrors"/> result.
         /// </summary>
-        public NativeMethods.ComStatErrors EventType
+        public Kernel32.ComStatErrors EventType
         {
             get { return m_EventType; }
         }

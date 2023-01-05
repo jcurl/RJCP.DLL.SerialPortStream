@@ -8,13 +8,13 @@ namespace RJCP.IO.Ports.Native.Windows
 
     internal class CommEventArgs : EventArgs
     {
-        private readonly NativeMethods.SerialEventMask m_EventType;
+        private readonly Kernel32.SerialEventMask m_EventType;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="eventType">The event results.</param>
-        public CommEventArgs(NativeMethods.SerialEventMask eventType)
+        public CommEventArgs(Kernel32.SerialEventMask eventType)
         {
             m_EventType = eventType;
         }
@@ -22,7 +22,7 @@ namespace RJCP.IO.Ports.Native.Windows
         /// <summary>
         /// The event bit field.
         /// </summary>
-        public NativeMethods.SerialEventMask EventType
+        public Kernel32.SerialEventMask EventType
         {
             get { return m_EventType; }
         }
