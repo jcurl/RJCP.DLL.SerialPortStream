@@ -12,7 +12,7 @@
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) Jason Curl, 2012-2021</Copyright>
+    <Copyright>(C) Jason Curl, 2012-2023</Copyright>
     <Company></Company>
     <PackageId>RJCP.SerialPortStream</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
@@ -72,6 +72,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
     <ProjectReference Include="..\..\trace\Trace\RJCP.Diagnostics.Trace.csproj" />
+    <ProjectReference Include="..\..\devicemgr\DeviceMgr\RJCP.IO.DeviceMgr.csproj" />
   </ItemGroup>
 
   <ItemGroup>

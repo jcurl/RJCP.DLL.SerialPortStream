@@ -252,7 +252,7 @@ namespace RJCP.IO.Ports
 
                 string[] portNames = serialPort.GetPortNames();
                 foreach (string c in portNames) {
-                    Console.WriteLine("GetPortNames: " + c);
+                    Console.WriteLine($"GetPortNames: {c}");
                     if (ports1.ContainsKey(c)) {
                         ports1[c] = true;
                     } else {

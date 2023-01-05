@@ -1,4 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
+﻿// Copyright © Jason Curl 2012-2023
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -14,10 +14,9 @@ namespace RJCP.IO.Ports.Serial
     using Windows;
     using Native.Win32;
     using RJCP.Diagnostics.Trace;
+    using RJCP.IO.DeviceMgr;
 
-#if NETFRAMEWORK
-    using System.Management;
-#else
+#if NETSTANDARD
     using System.Reflection;
 #endif
 
@@ -156,27 +155,7 @@ namespace RJCP.IO.Ports.Serial
                 }
             }
 
-#if NETFRAMEWORK
-            // Look for standard serial ports
-            using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_SerialPort")) {
-                foreach (ManagementObject mObj in q.Get()) {
-                    string k = mObj["DeviceID"].ToString();
-                    if (list.ContainsKey(k)) {
-                        list[k].Description = mObj["Name"].ToString();
-                    }
-                }
-            }
-
-            // Look for any modems that are attached to COM ports that aren't listed above
-            using (ManagementObjectSearcher q = new ManagementObjectSearcher("select * from Win32_POTSModem")) {
-                foreach (ManagementObject mObj in q.Get()) {
-                    string k = mObj["AttachedTo"].ToString();
-                    if (list.ContainsKey(k)) {
-                        list[k].Description = mObj["Name"].ToString();
-                    }
-                }
-            }
-#endif
+            QueryDevices(list);
 
             // Get the array and return it
             int i = 0;
@@ -185,6 +164,24 @@ namespace RJCP.IO.Ports.Serial
                 ports[i++] = p;
             }
             return ports;
+        }
+
+        private static void QueryDevices(Dictionary<string, PortDescription> list)
+        {
+            IList<DeviceInstance> devices = DeviceInstance.GetList(LocateMode.Normal);
+            foreach (DeviceInstance device in devices) {
+                if (!device.HasProblem &&
+                    device.GetDeviceProperty("PortName") is string portName &&
+                    list.TryGetValue(portName, out PortDescription port)) {
+                    string description = device.DeviceDescription;
+                    if (string.IsNullOrEmpty(description)) description = device.FriendlyName;
+                    if (string.IsNullOrEmpty(device.Manufacturer)) {
+                        port.Description = description;
+                    } else {
+                        port.Description = $"{description} [{device.Manufacturer}]";
+                    }
+                }
+            }
         }
 
         private int m_Baud = 115200;
