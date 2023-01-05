@@ -173,13 +173,9 @@ namespace RJCP.IO.Ports.Serial
                 if (!device.HasProblem &&
                     device.GetDeviceProperty("PortName") is string portName &&
                     list.TryGetValue(portName, out PortDescription port)) {
-                    string description = device.DeviceDescription;
-                    if (string.IsNullOrEmpty(description)) description = device.FriendlyName;
-                    if (string.IsNullOrEmpty(device.Manufacturer)) {
-                        port.Description = description;
-                    } else {
-                        port.Description = $"{description} [{device.Manufacturer}]";
-                    }
+                    port.Description = device.FriendlyName;
+                    if (string.IsNullOrEmpty(port.Description)) port.Description = device.DeviceDescription;
+                    port.Manufacturer = device.Manufacturer;
                 }
             }
         }

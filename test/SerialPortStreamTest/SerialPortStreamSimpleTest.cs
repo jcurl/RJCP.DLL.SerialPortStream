@@ -245,7 +245,7 @@ namespace RJCP.IO.Ports
             using (SerialPortStream serialPort = new SerialPortStream()) {
                 PortDescription[] portDescs = serialPort.GetPortDescriptions();
                 foreach (PortDescription desc in portDescs) {
-                    Console.WriteLine($"GetPortDescriptions: {desc.Port}; Description: {desc.Description}");
+                    Console.WriteLine($"GetPortDescriptions: {desc}");
                     ports1.Add(desc.Port, false);
                     ports2.Add(desc.Port, false);
                 }
