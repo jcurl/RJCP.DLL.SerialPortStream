@@ -1,5 +1,16 @@
 # List of Changes with Releases
 
+## Version 2.4.1 (libnserial 1.1.4)
+
+Features
+
+* DOTNET-698: Get port descriptions from Windows CfgMgr32. Now works on .NET
+  Standard as well as .NET Framework
+
+Bugfixes
+
+* DOTENT-714: Rework P/Invoke against best practices.
+
 ## Version 2.4.0 (libnserial 1.1.4)
 
 Features
