@@ -27,7 +27,6 @@ namespace RJCP.IO.Ports.Native.Win32
             /// <summary>
             /// Various flags that define operation.
             /// </summary>
-            [MarshalAs(UnmanagedType.U4)]
             public DcbFlags Flags;
 
             /// <summary>

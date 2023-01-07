@@ -12,10 +12,9 @@ namespace RJCP.IO.Ports.Native.Win32
         [StructLayout(LayoutKind.Sequential)]
         public struct COMSTAT
         {
-            [MarshalAs(UnmanagedType.U4)]
             public ComStatFlags Flags;
-            public UInt32 cbInQue;
-            public UInt32 cbOutQue;
+            public uint cbInQue;
+            public uint cbOutQue;
         }
     }
 }
