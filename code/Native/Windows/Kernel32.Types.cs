@@ -54,7 +54,6 @@ namespace RJCP.IO.Ports.Native.Windows
             /// <summary>
             /// Various flags that define operation
             /// </summary>
-            [MarshalAs(UnmanagedType.U4)]
             public DcbFlags Flags;
 
             /// <summary>
@@ -1101,7 +1100,6 @@ namespace RJCP.IO.Ports.Native.Windows
             /// <summary>
             /// The communications-provider type
             /// </summary>
-            [MarshalAs(UnmanagedType.U4)]
             public ProvSubType dwProvSubType;
 
             /// <summary>
@@ -1359,7 +1357,6 @@ namespace RJCP.IO.Ports.Native.Windows
         [StructLayout(LayoutKind.Sequential)]
         public struct COMSTAT
         {
-            [MarshalAs(UnmanagedType.U4)]
             public ComStatFlags Flags;
             public uint cbInQue;
             public uint cbOutQue;
