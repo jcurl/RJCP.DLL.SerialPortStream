@@ -4,8 +4,8 @@
 
 namespace RJCP.IO.Ports
 {
-    using System;
     using System.Configuration;
+    using RJCP.Core.Environment;
 
     public static class SerialConfiguration
     {
@@ -68,12 +68,10 @@ namespace RJCP.IO.Ports
         {
             get
             {
-                int p = (int)Environment.OSVersion.Platform;
-                if (p == (int)PlatformID.Win32NT) {
+                if (Platform.IsWinNT())
                     return "Win32";
-                } else if (p == 4 || p == 8 || p == 128) {
+                if (Platform.IsUnix())
                     return "Linux";
-                }
                 return string.Empty;
             }
         }

@@ -122,7 +122,6 @@
     <Compile Include="Serial\ISerialReadBuffer.cs" />
     <Compile Include="Serial\ISerialWriteBuffer.cs" />
     <Compile Include="Serial\IWinNativeSettings.cs" />
-    <Compile Include="Serial\Platform.cs" />
     <Compile Include="Serial\SerialBuffer.cs" />
     <Compile Include="Serial\SerialBufferEventArgs.cs" />
     <Compile Include="Serial\SerialReadBuffer.cs" />

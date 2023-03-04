@@ -5,6 +5,7 @@
 namespace RJCP.IO.Ports
 {
     using System;
+    using RJCP.Core.Environment;
     using Serial;
 
     /// <summary>

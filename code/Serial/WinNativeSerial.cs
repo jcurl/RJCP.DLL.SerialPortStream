@@ -11,10 +11,10 @@ namespace RJCP.IO.Ports.Serial
     using System.Runtime.InteropServices;
     using Microsoft.Win32;
     using Microsoft.Win32.SafeHandles;
-    using Windows;
     using Native.Win32;
     using RJCP.Diagnostics.Trace;
     using RJCP.IO.DeviceMgr;
+    using Windows;
 
 #if NETSTANDARD
     using System.Reflection;

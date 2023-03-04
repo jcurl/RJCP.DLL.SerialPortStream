@@ -14,6 +14,7 @@ namespace RJCP.IO.Ports
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using RJCP.Core.Environment;
     using RJCP.Diagnostics.Trace;
     using Serial;
     using Timer;

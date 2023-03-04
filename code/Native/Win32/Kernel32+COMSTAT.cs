@@ -4,7 +4,6 @@
 
 namespace RJCP.IO.Ports.Native.Win32
 {
-    using System;
     using System.Runtime.InteropServices;
 
     internal static partial class Kernel32
