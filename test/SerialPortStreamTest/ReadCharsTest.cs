@@ -350,7 +350,7 @@ namespace RJCP.IO.Ports
 
                 string result = stream.ReadTo("eof");
                 Assert.That(stream.BytesToRead, Is.EqualTo(0));
-                Assert.That(result.Length, Is.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
+                Assert.That(result, Has.Length.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
                 int offset = sdata.Length - result.Length;
                 for (int i = 0; i < result.Length; i++) {
                     Assert.That((int)result[i], Is.EqualTo(sdata[offset + i]));
@@ -386,7 +386,7 @@ namespace RJCP.IO.Ports
 
                 string result = stream.ReadTo("eof");
                 Assert.That(stream.BytesToRead, Is.EqualTo(0));
-                Assert.That(result.Length, Is.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
+                Assert.That(result, Has.Length.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
                 int offset = sdata.Length - result.Length;
                 for (int i = 0; i < result.Length; i++) {
                     Assert.That((int)result[i], Is.EqualTo(sdata[offset + i]));
@@ -428,7 +428,7 @@ namespace RJCP.IO.Ports
 
                 string result = stream.ReadTo("eof");
                 Assert.That(stream.BytesToRead, Is.EqualTo(0));
-                Assert.That(result.Length, Is.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
+                Assert.That(result, Has.Length.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
                 int offset = sdata.Length - result.Length;
                 for (int i = 0; i < result.Length; i++) {
                     Assert.That((int)result[i], Is.EqualTo(sdata[offset + i]));
@@ -467,7 +467,7 @@ namespace RJCP.IO.Ports
 
                 string result = stream.ReadTo("eof");
                 Assert.That(stream.BytesToRead, Is.EqualTo(0));
-                Assert.That(result.Length, Is.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
+                Assert.That(result, Has.Length.EqualTo(1024 - eof.Length));  // The maximum line length is 1024
                 int offset = sdata.Length - result.Length;
                 for (int i = 0; i < result.Length; i++) {
                     Assert.That((int)result[i], Is.EqualTo(sdata[offset + i]));
@@ -606,7 +606,7 @@ namespace RJCP.IO.Ports
 
                 string line = stream.ReadLine();
                 Assert.That(line[0], Is.EqualTo('K'));
-                Assert.That(line.Length, Is.EqualTo(1023));   // Is 1024 - Length('\n').
+                Assert.That(line, Has.Length.EqualTo(1023));   // Is 1024 - Length('\n').
             }
         }
 
