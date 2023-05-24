@@ -44,6 +44,8 @@
 
   <PropertyGroup>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>SerialPortStream.csproj</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
