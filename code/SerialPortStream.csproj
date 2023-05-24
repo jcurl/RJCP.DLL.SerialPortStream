@@ -45,7 +45,8 @@
   <PropertyGroup>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>SerialPortStream.csproj</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+    <AssemblyOriginatorKeyFile>SerialPortStream.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
@@ -68,6 +69,10 @@
     <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="SerialPortStream.snk" />
   </ItemGroup>
 
   <ItemGroup>
@@ -135,10 +140,6 @@
     <Compile Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\LoggerTraceListener.cs" />
     <Compile Include="Trace\LogSourceFactory.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="rjcp_serialportstream.snk" />
   </ItemGroup>
 
 </Project>
