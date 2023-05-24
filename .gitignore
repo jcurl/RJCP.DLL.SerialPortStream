@@ -9,5 +9,4 @@ TestResults/
 *.user
 *.userprefs
 *.GhostDoc.xml
-*.snk
 *.exe
