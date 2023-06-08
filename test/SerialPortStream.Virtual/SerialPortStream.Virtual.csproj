@@ -32,7 +32,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <RevisionControl>git</RevisionControl>
-    <RevisionControlLabel>release/v$(Version)</RevisionControlLabel>
+    <RevisionControlLabel>release/virt/v$(Version)</RevisionControlLabel>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
