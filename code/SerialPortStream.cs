@@ -36,7 +36,7 @@ namespace RJCP.IO.Ports
     /// </para>
     /// <para>When instantiating.</para>
     /// </remarks>
-    public class SerialPortStream : Stream, ISerialPortStream
+    public class SerialPortStream : Stream
     {
         private INativeSerial m_NativeSerial;
         private readonly LogSource m_Log;
