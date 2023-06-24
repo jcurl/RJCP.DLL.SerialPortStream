@@ -3,7 +3,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;net45;netstandard21</TargetFrameworks>
+    <TargetFrameworks>net40;net462;netstandard2.1</TargetFrameworks>
     <OutputType>Library</OutputType>
     <Configurations>Debug;Release</Configurations>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -67,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.2">
+    <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.3">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
