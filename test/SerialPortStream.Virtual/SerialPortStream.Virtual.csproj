@@ -14,14 +14,15 @@
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) 2021, Jason Curl</Copyright>
+    <Copyright>(C) 2021-2023, Jason Curl</Copyright>
     <Company></Company>
     <PackageId>RJCP.SerialPortStream.Virtual</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/jcurl/RJCP.DLL.SerialPortStream</PackageProjectUrl>
     <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability. Provides methods to support testing with a virtual native serial port instance.</Description>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
 
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
