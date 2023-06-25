@@ -1,5 +1,6 @@
 bin/
 obj/
+legacy/
 TestResults/
 /distribute/
 /packages/

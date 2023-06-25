@@ -1,4 +1,4 @@
-// Copyright © Jason Curl 2012-2021
+// Copyright ï¿½ Jason Curl 2012-2021
 // Sources at https://github.com/jcurl/SerialPortStream
 // Licensed under the Microsoft Public License (Ms-PL)
 
@@ -8,7 +8,7 @@ namespace RJCP.IO.Ports
     using NUnit.Framework;
     using Serial;
 
-#if NET45_OR_GREATER || NETCOREAPP
+#if !NET40_LEGACY
     using System.Threading.Tasks;
 #endif
 
@@ -166,7 +166,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NET45_OR_GREATER || NETCOREAPP
+#if !NET40_LEGACY
         [TestCase(true, TestName = "ReadAsyncWhenClosedThrowOnError")]
         [TestCase(false, TestName = "ReadAsyncWhenClosed")]
         public async Task ReadAsyncWhenClosedThrowOnError(bool throwOnError)
@@ -344,7 +344,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NET45_OR_GREATER || NETCOREAPP
+#if !NET40_LEGACY
         [TestCase(true, TestName = "ReadAsyncTimeoutThrowOnError")]
         [TestCase(false, TestName = "ReadAsyncTimeout")]
         public async Task ReadAsyncTimeout(bool throwOnError)

@@ -43,7 +43,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NET45_OR_GREATER || NETCOREAPP
+#if !NET40_LEGACY
         [Test]
         public async Task ReadLargeDataBlockAsync()
         {
@@ -184,7 +184,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NET45_OR_GREATER || NETCOREAPP
+#if !NET40_LEGACY
         [TestCase(0)]
         [TestCase(1)]
         public async Task WriteLargeDataBlockAsync(int writeDelay)
@@ -340,7 +340,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NET45_OR_GREATER || NETCOREAPP
+#if !NET40_LEGACY
         [Test]
         public async Task WriteFullBufferAsync()
         {
@@ -707,7 +707,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NET45_OR_GREATER || NETCOREAPP
+#if !NET40_LEGACY
         [Test]
         [Timeout(30000)]
         public async Task CopyToAsync()
