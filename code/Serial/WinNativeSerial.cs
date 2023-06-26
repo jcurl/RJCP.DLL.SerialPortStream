@@ -106,7 +106,7 @@ namespace RJCP.IO.Ports.Serial
         {
             using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
                 if (local == null) {
-#if NETFRAMEWORK
+#if NET40
                     return new string[0];
 #else
                     return Array.Empty<string>();
@@ -122,7 +122,7 @@ namespace RJCP.IO.Ports.Serial
                     return ports;
                 }
 
-#if NETFRAMEWORK
+#if NET40
                 return new string[0];
 #else
                 return Array.Empty<string>();

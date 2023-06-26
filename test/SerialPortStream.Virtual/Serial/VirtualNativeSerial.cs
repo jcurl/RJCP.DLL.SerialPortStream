@@ -73,7 +73,7 @@ namespace RJCP.IO.Ports.Serial
         /// <returns>An array of serial port names.</returns>
         public virtual string[] GetPortNames()
         {
-#if NETFRAMEWORK
+#if NET40
             return new string[0];
 #else
             return Array.Empty<string>();
@@ -91,7 +91,7 @@ namespace RJCP.IO.Ports.Serial
         /// <returns>An array of serial ports.</returns>
         public virtual PortDescription[] GetPortDescriptions()
         {
-#if NETFRAMEWORK
+#if NET40
             return new PortDescription[0];
 #else
             return Array.Empty<PortDescription>();
