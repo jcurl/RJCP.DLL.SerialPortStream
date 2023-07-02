@@ -3,9 +3,10 @@
 <Project>
   <!-- Implicit top import required explicitly to change build output path -->
   <PropertyGroup>
-    <MSBuildProjectExtensionsPath>legacy</MSBuildProjectExtensionsPath>
-    <BaseIntermediateOutputPath>$(MSBuildProjectExtensionsPath)\obj</BaseIntermediateOutputPath>
-    <OutputPath Condition="'$(Configuration)' != ''">$(MSBuildProjectExtensionsPath)\bin\$(Configuration)</OutputPath>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <MSBuildProjectExtensionsPath>legacy\obj</MSBuildProjectExtensionsPath>
+    <BaseIntermediateOutputPath>legacy\obj</BaseIntermediateOutputPath>
+    <OutputPath>legacy\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
