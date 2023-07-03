@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports
     using NUnit.Framework;
     using Trace;
 
-    [TestFixture(Category = "SerialPortStream")]
+    [TestFixture]
     public class SerialPortStreamLoggerTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
