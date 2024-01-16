@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream", "code\SerialPortStream.csproj", "{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTest", "IntegrationTest", "{A9039DFD-D69C-4759-9668-AD8769C3F877}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BufferBytesTest", "test\BufferBytesTest\BufferBytesTest.csproj", "{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}"
@@ -15,15 +13,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamNativeTest"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{C22339A2-14BB-4927-B316-71A3C2E50C70}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamTest", "test\SerialPortStreamTest\SerialPortStreamTest.csproj", "{7FC71C44-4761-4FAF-8EB5-6857490B7047}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamTest.Legacy", "test\SerialPortStreamTest\SerialPortStreamTest.Legacy.csproj", "{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream.Virtual", "test\SerialPortStream.Virtual\SerialPortStream.Virtual.csproj", "{33147876-4C8A-43C9-9179-E4CBF5EF4450}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream.VirtualTest", "test\SerialPortStream.VirtualTest\SerialPortStream.VirtualTest.csproj", "{A395E4DB-EBED-4B88-9CEB-99BD226E3617}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream.VirtualTest.Legacy", "test\SerialPortStream.VirtualTest\SerialPortStream.VirtualTest.Legacy.csproj", "{63CCFADA-0C41-42B0-9A18-BE214E9E61C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamTest", "test\SerialPortStreamTest\SerialPortStreamTest.csproj", "{7FC71C44-4761-4FAF-8EB5-6857490B7047}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStreamTest.Legacy", "test\SerialPortStreamTest\SerialPortStreamTest.Legacy.csproj", "{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerialPortStream", "code\SerialPortStream.csproj", "{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +31,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,14 +43,6 @@ Global
 		{1F58865F-3865-4072-9355-12F30D316D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F58865F-3865-4072-9355-12F30D316D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F58865F-3865-4072-9355-12F30D316D86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33147876-4C8A-43C9-9179-E4CBF5EF4450}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33147876-4C8A-43C9-9179-E4CBF5EF4450}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33147876-4C8A-43C9-9179-E4CBF5EF4450}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -67,6 +55,18 @@ Global
 		{63CCFADA-0C41-42B0-9A18-BE214E9E61C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63CCFADA-0C41-42B0-9A18-BE214E9E61C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63CCFADA-0C41-42B0-9A18-BE214E9E61C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FC71C44-4761-4FAF-8EB5-6857490B7047}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEA01148-CD2E-4F29-B455-B557B9B4C6D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,11 +75,11 @@ Global
 		{FB06FE0F-F84F-4924-8BB4-EC297B02AB4E} = {A9039DFD-D69C-4759-9668-AD8769C3F877}
 		{292E266D-62D7-43DD-AC1C-72BF15DFB795} = {A9039DFD-D69C-4759-9668-AD8769C3F877}
 		{1F58865F-3865-4072-9355-12F30D316D86} = {A9039DFD-D69C-4759-9668-AD8769C3F877}
-		{7FC71C44-4761-4FAF-8EB5-6857490B7047} = {C22339A2-14BB-4927-B316-71A3C2E50C70}
-		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C} = {C22339A2-14BB-4927-B316-71A3C2E50C70}
 		{33147876-4C8A-43C9-9179-E4CBF5EF4450} = {C22339A2-14BB-4927-B316-71A3C2E50C70}
 		{A395E4DB-EBED-4B88-9CEB-99BD226E3617} = {C22339A2-14BB-4927-B316-71A3C2E50C70}
 		{63CCFADA-0C41-42B0-9A18-BE214E9E61C6} = {C22339A2-14BB-4927-B316-71A3C2E50C70}
+		{7FC71C44-4761-4FAF-8EB5-6857490B7047} = {C22339A2-14BB-4927-B316-71A3C2E50C70}
+		{8AD2C9B3-8AE0-4CB1-9866-34FE4163C16C} = {C22339A2-14BB-4927-B316-71A3C2E50C70}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0669B6F2-2B30-4F57-908F-5F99AADEE232}
