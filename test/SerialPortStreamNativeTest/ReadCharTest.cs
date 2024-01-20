@@ -380,7 +380,7 @@ namespace RJCP.IO.Ports
 
                 string result = dst.ReadTo("eof");
                 Assert.That(dst.BytesToRead, Is.EqualTo(0));
-                Assert.That(result.Length, Is.EqualTo(1024 - 3));
+                Assert.That(result, Has.Length.EqualTo(1024 - 3));
                 int offset = sdata.Length - result.Length;
                 for (int i = 0; i < result.Length; i++) {
                     Assert.That((int)result[i], Is.EqualTo(sdata[offset + i]));
@@ -511,7 +511,7 @@ namespace RJCP.IO.Ports
                 src.Write(writeData, 0, writeData.Length);
                 string line = dst.ReadLine();
                 Assert.That(line[0], Is.EqualTo('K'));
-                Assert.That(line.Length, Is.EqualTo(1023));   // Is 1024 - Length('\n').
+                Assert.That(line, Has.Length.EqualTo(1023));   // Is 1024 - Length('\n').
             }
         }
     }
