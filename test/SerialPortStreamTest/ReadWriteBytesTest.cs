@@ -87,7 +87,8 @@ namespace RJCP.IO.Ports
                 // The task simulates receiving data
                 Task driverTask = ReadLargeDataBlockDriver(serial, receiveData);
 
-                // Receive the data, as if it had arrived from a serial port
+                // Receive the data, as if it had arrived from a serial port. Note, we can't use 'Span<>' inside an
+                // 'async' method.
                 byte[] receiveBuffer = new byte[receiveData.Length];
                 Span<byte> span = receiveBuffer;
                 stream.Open();
@@ -130,24 +131,24 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-        private static Task ReadLargeDataBlockDriver(VirtualNativeSerial serial, byte[] receiveData)
+        private static async Task ReadLargeDataBlockDriver(VirtualNativeSerial serial, byte[] receiveData)
         {
-            return new TaskFactory().StartNew(() => {
-                Random l = new Random();
+            await Task.Yield();
 
-                while (!serial.IsRunning) {
-                    Thread.Sleep(1);
-                }
+            Random l = new Random();
 
-                int p = 0;
-                while (p < receiveData.Length) {
-                    int q = Math.Min(l.Next(1, 768), receiveData.Length - p);
-                    int w = serial.VirtualBuffer.WriteReceivedData(receiveData, p, q);
-                    Console.WriteLine($"VirtualBuffer.WriteReceivedData(receiveData, {p}, {q}) = {w}");
-                    p += w;
-                    Thread.Sleep(1);
-                }
-            });
+            while (!serial.IsRunning) {
+                Thread.Sleep(1);
+            }
+
+            int p = 0;
+            while (p < receiveData.Length) {
+                int q = Math.Min(l.Next(1, 768), receiveData.Length - p);
+                int w = serial.VirtualBuffer.WriteReceivedData(receiveData, p, q);
+                Console.WriteLine($"VirtualBuffer.WriteReceivedData(receiveData, {p}, {q}) = {w}");
+                p += w;
+                await Task.Yield();
+            }
         }
 
         [TestCase(0)]
@@ -176,7 +177,11 @@ namespace RJCP.IO.Ports
                     stream.Write(sendData, s, q);
                     Console.WriteLine($"Stream.Write(sendData, {s}, {q})");
                     s += q;
-                    if (writeDelay > 0) Thread.Sleep(writeDelay);
+                    if (writeDelay > 0) {
+                        // Only wait half the time, to make the test case faster.
+                        if (writeDelay > 0 && l.Next(0, 10) < 5)
+                            Thread.Sleep(writeDelay);
+                    }
                 }
 
                 driverTask.Wait();
@@ -211,7 +216,9 @@ namespace RJCP.IO.Ports
                     await stream.WriteAsync(sendData, s, q);
                     Console.WriteLine($"Stream.WriteAsync(sendData, {s}, {q})");
                     s += q;
-                    if (writeDelay > 0) Thread.Sleep(writeDelay);
+                    // Only wait half the time, to make the test case faster.
+                    if (writeDelay > 0 && l.Next(0, 10) < 5)
+                        Thread.Sleep(writeDelay);
                 }
 
                 await driverTask;
@@ -248,7 +255,8 @@ namespace RJCP.IO.Ports
                     stream.Write(span[s..(s + q)]);
                     Console.WriteLine($"Stream.Write(span[{s}..{s + q}])");
                     s += q;
-                    if (writeDelay > 0) Thread.Sleep(writeDelay);
+                    if (writeDelay > 0 && rnd.Next(0, 10) < 5)
+                        Thread.Sleep(writeDelay);
                 }
 
                 driverTask.Wait();
@@ -283,7 +291,8 @@ namespace RJCP.IO.Ports
                     await stream.WriteAsync(mem[s..(s + q)]);
                     Console.WriteLine($"Stream.WriteAsync(mem[{s}..{s + q}])");
                     s += q;
-                    if (writeDelay > 0) Thread.Sleep(writeDelay);
+                    if (writeDelay > 0 && rnd.Next(0, 10) < 5)
+                        Thread.Sleep(writeDelay);
                 }
 
                 await driverTask;
@@ -292,21 +301,21 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-        private static Task WriteLargeDataBlockDriver(VirtualNativeSerial serial, byte[] sentData)
+        private static async Task WriteLargeDataBlockDriver(VirtualNativeSerial serial, byte[] sentData)
         {
-            return new TaskFactory().StartNew(() => {
-                while (!serial.IsRunning) {
-                    Thread.Sleep(1);
-                }
+            await Task.Yield();
 
-                int p = 0;
-                while (p < sentData.Length) {
-                    int r = serial.VirtualBuffer.ReadSentData(sentData, p, sentData.Length - p);
-                    Console.WriteLine($"VirtualBuffer.ReadSentData(sentData, {p}, {sentData.Length - p}) = {r}");
-                    p += r;
-                    Thread.Sleep(1);
-                }
-            });
+            while (!serial.IsRunning) {
+                Thread.Sleep(1);
+            }
+
+            int p = 0;
+            while (p < sentData.Length) {
+                int r = serial.VirtualBuffer.ReadSentData(sentData, p, sentData.Length - p);
+                Console.WriteLine($"VirtualBuffer.ReadSentData(sentData, {p}, {sentData.Length - p}) = {r}");
+                p += r;
+                await Task.Yield();
+            }
         }
 
         [Test]
@@ -623,7 +632,7 @@ namespace RJCP.IO.Ports
 
                 Task driverTask = new TaskFactory().StartNew(() => {
                     byte[] buffer = new byte[128];
-                    Thread.Sleep(100);
+                    Thread.Sleep(1);
 
                     while (!serial.IsRunning) {
                         Thread.Sleep(1);
@@ -680,7 +689,8 @@ namespace RJCP.IO.Ports
                     // Write 80 * 64kb = 5MB
                     for (int i = 0; i < 80; i++) {
                         serial.VirtualBuffer.WriteReceivedData(receivedData, 0, receivedData.Length);
-                        Thread.Sleep(10);
+                        if (r.Next(0, 10) < 5)
+                            Thread.Sleep(1);
                     }
                 });
 
@@ -725,11 +735,11 @@ namespace RJCP.IO.Ports
                 stream.ReadTimeout = 1000;
                 stream.Open();
 
-                Task driver = new TaskFactory().StartNew(() => {
+                Task driver = new TaskFactory().StartNew(async () => {
                     // Write 80 * 64kb = 5MB
                     for (int i = 0; i < 80; i++) {
                         serial.VirtualBuffer.WriteReceivedData(receivedData, 0, receivedData.Length);
-                        Thread.Sleep(10);
+                        await Task.Yield();
                     }
                 });
 
