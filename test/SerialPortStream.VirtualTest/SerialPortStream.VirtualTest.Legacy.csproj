@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Project>
   <!-- Implicit top import required explicitly to change build output path -->
   <PropertyGroup>
@@ -23,7 +22,7 @@
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) Jason Curl, 2012-2023</Copyright>
+    <Copyright>(C) 2012-2024, Jason Curl</Copyright>
     <Company></Company>
     <Description>Test Harness for SerialPortStream Tests</Description>
     <Version>1.0.0</Version>
@@ -32,16 +31,15 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>Default</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
-
     <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -49,10 +47,6 @@
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Serial\VirtualNativeSerialTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,6 +64,10 @@
     <ProjectReference Include="..\..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj">
       <SetTargetFramework>TargetFramework=net40</SetTargetFramework>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Serial\VirtualNativeSerialTest.cs" />
   </ItemGroup>
 
   <!-- Implicit top import required explicitly to change build output path -->

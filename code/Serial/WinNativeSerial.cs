@@ -16,7 +16,7 @@ namespace RJCP.IO.Ports.Serial
     using RJCP.IO.DeviceMgr;
     using Windows;
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
     using System.Reflection;
 #endif
 
@@ -66,8 +66,8 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_Version != null) return m_Version;
 
-#if NETSTANDARD
-                var assembly = typeof(WinNativeSerial).GetTypeInfo().Assembly;
+#if NET6_0_OR_GREATER
+                System.Reflection.Assembly assembly = typeof(WinNativeSerial).GetTypeInfo().Assembly;
 #else
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 #endif
@@ -876,7 +876,7 @@ namespace RJCP.IO.Ports.Serial
             bool validOverride = false;
             if (t != Kernel32.FileType.FILE_TYPE_CHAR && t != Kernel32.FileType.FILE_TYPE_UNKNOWN) {
                 foreach (string port in GetPortNames()) {
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
                     if (port.Equals(PortName, StringComparison.OrdinalIgnoreCase)) {
                         validOverride = true;
                         break;

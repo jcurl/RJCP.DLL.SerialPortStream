@@ -72,7 +72,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         [Test]
         public void ReadLargeDataBlockSpan()
         {
@@ -227,7 +227,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         [TestCase(0)]
         [TestCase(1)]
         public void WriteLargeDataBlockSpan(int writeDelay)

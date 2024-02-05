@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net40;net462;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net40;net462;net60</TargetFrameworks>
     <OutputType>Library</OutputType>
     <Configurations>Debug;Release</Configurations>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -14,7 +12,7 @@
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) Jason Curl, 2012-2023</Copyright>
+    <Copyright>(C) 2012-2024, Jason Curl</Copyright>
     <Company></Company>
     <PackageId>RJCP.SerialPortStream</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
@@ -55,22 +53,12 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'">
-    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
-    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Overlapped" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" />
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.4" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
     <ProjectReference Include="..\..\trace\Trace\RJCP.Diagnostics.Trace.csproj" />
     <ProjectReference Include="..\..\devicemgr\DeviceMgr\RJCP.IO.DeviceMgr.csproj" />
@@ -151,7 +139,7 @@
     <None Include="System\IO\Ports\SerialPort.cs" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'">
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
     <Compile Include="System\IO\Ports\SerialPort.cs" />
   </ItemGroup>
 
@@ -159,5 +147,4 @@
     <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
     <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-
 </Project>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net462;net60</TargetFrameworks>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <Configurations>Debug;Release</Configurations>
@@ -14,7 +12,7 @@
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) Jason Curl, 2012-2023</Copyright>
+    <Copyright>(C) 2012-2024, Jason Curl</Copyright>
     <Company></Company>
     <Description>Test Harness for SerialPortStream Tests</Description>
     <Version>1.0.0</Version>
@@ -23,16 +21,15 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>Default</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
-
     <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -55,5 +52,4 @@
     <ProjectReference Include="..\SerialPortStream.Virtual\SerialPortStream.Virtual.csproj" />
     <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
   </ItemGroup>
-
 </Project>

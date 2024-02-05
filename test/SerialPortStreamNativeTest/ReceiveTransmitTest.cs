@@ -8,7 +8,7 @@ namespace RJCP.IO.Ports
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-#if NET45_OR_GREATER || NETCOREAPP3_1
+#if NET45_OR_GREATER || NET6_0_OR_GREATER
     using System.Threading.Tasks;
 #endif
     using NUnit.Framework;
@@ -29,7 +29,7 @@ namespace RJCP.IO.Ports
         private readonly string DestPort = SerialConfiguration.DestPort;
         private const int TimeOut = 300;
 
-#if NETCOREAPP3_1
+#if NET6_0_OR_GREATER
         [SetUp]
         public void InitLogging()
         {
@@ -450,7 +450,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NET45_OR_GREATER || NETCOREAPP3_1
+#if NET45_OR_GREATER || NET6_0_OR_GREATER
         [Test]
         [Timeout(10000)]
         public async Task ReadAndWriteAsyncInDifferentThreadsAtSameTime()

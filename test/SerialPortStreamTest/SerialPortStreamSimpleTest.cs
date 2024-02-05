@@ -15,7 +15,7 @@ namespace RJCP.IO.Ports
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
 
-#if NETCOREAPP
+#if NET6_0_OR_GREATER
         [SetUp]
         public void InitLogging()
         {

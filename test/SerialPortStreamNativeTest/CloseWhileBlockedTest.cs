@@ -28,7 +28,7 @@ namespace RJCP.IO.Ports
 
         private const int SleepDelay = 1000;
 
-#if NETCOREAPP3_1
+#if NET6_0_OR_GREATER
         [SetUp]
         public void InitLogging()
         {

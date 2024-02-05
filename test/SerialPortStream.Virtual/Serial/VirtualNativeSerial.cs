@@ -35,7 +35,7 @@ namespace RJCP.IO.Ports.Serial
             {
                 if (m_Version != null) return m_Version;
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
                 var assembly = typeof(VirtualNativeSerial).GetTypeInfo().Assembly;
 #else
                 Assembly assembly = Assembly.GetExecutingAssembly();

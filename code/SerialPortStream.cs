@@ -19,7 +19,7 @@ namespace RJCP.IO.Ports
     using Serial;
     using Timer;
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
     using Microsoft.Extensions.Logging;
 #endif
 
@@ -138,7 +138,7 @@ namespace RJCP.IO.Ports
             m_NativeSerial.StopBits = stopbits;
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Constructor. Create a stream that doesn't connect to any port. Specify the logger.
         /// </summary>
@@ -696,7 +696,7 @@ namespace RJCP.IO.Ports
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         private void ReadCheck()
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -780,7 +780,7 @@ namespace RJCP.IO.Ports
             return m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count);
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number
         /// of bytes read.
@@ -833,7 +833,7 @@ namespace RJCP.IO.Ports
             return true;
         }
 
-#if NETSTANDARD || NET45_OR_GREATER
+#if NET6_0_OR_GREATER || NET45_OR_GREATER
         /// <summary>
         /// Asynchronously reads a sequence of bytes from the current stream and advances the position within the stream
         /// by the number of bytes read.
@@ -868,7 +868,7 @@ namespace RJCP.IO.Ports
             return m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count);
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Asynchronously reads a sequence of bytes from the current stream and advances the position within the stream
         /// by the number of bytes read.
@@ -1410,7 +1410,7 @@ namespace RJCP.IO.Ports
             return true;
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         private bool WriteCheck(ReadOnlySpan<byte> buffer)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
@@ -1497,7 +1497,7 @@ namespace RJCP.IO.Ports
             WriteCheckDeviceError();
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Write the given data into the buffered serial stream for sending over the serial port.
         /// </summary>
@@ -1556,7 +1556,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-#if NETSTANDARD || NET45_OR_GREATER
+#if NET6_0_OR_GREATER || NET45_OR_GREATER
         /// <summary>
         /// Asynchronously writes a sequence of bytes to the current stream, advances the current position within this
         /// stream by the number of bytes written, and monitors cancellation requests.
@@ -1595,7 +1595,7 @@ namespace RJCP.IO.Ports
             WriteCheckDeviceError();
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Asynchronously writes a sequence of bytes to the current stream, advances the current position within this
         /// stream by the number of bytes written, and monitors cancellation requests.

@@ -23,7 +23,7 @@ namespace RJCP.IO.Ports
         private readonly string SourcePort = SerialConfiguration.SourcePort;
         private readonly string DestPort = SerialConfiguration.DestPort;
 
-#if NETCOREAPP3_1
+#if NET6_0_OR_GREATER
         [SetUp]
         public void InitLogging()
         {

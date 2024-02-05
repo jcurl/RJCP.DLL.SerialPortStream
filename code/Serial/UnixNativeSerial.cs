@@ -47,7 +47,7 @@ namespace RJCP.IO.Ports.Serial
             }
             m_HandlePtr = m_Handle.DangerousGetHandle();
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
             // On NetStandard 2.1, we must have proper exception handling
             try {
                 // These methods were first added in libnserial 1.1
@@ -69,7 +69,7 @@ namespace RJCP.IO.Ports.Serial
                 managedErrNo = LibNSerial.netfx_errno(LibNSerial.errno);
                 sysDescription = LibNSerial.netfx_errstring(LibNSerial.errno);
             } catch (EntryPointNotFoundException) {
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
                 ThrowExceptionNetStandard();
 #else
                 ThrowExceptionMono();
@@ -107,7 +107,7 @@ namespace RJCP.IO.Ports.Serial
             }
         }
 
-#if !NETSTANDARD
+#if !NET6_0_OR_GREATER
         // For compatibility with libnserial 1.0 only.
         private void ThrowExceptionMono()
         {
@@ -124,7 +124,7 @@ namespace RJCP.IO.Ports.Serial
         }
 #endif
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         // For compatibility with libnserial 1.0 only.
         private void ThrowExceptionNetStandard()
         {

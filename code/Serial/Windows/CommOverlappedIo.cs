@@ -302,7 +302,7 @@ namespace RJCP.IO.Ports.Serial.Windows
             bool serialCommError = false;
             m_SerialCommEvent.Reset();
             NativeOverlapped serialCommOverlapped = new NativeOverlapped();
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
             serialCommOverlapped.EventHandle = m_SerialCommEvent.GetSafeWaitHandle().DangerousGetHandle();
 #else
             serialCommOverlapped.EventHandle = m_SerialCommEvent.SafeWaitHandle.DangerousGetHandle();
@@ -311,7 +311,7 @@ namespace RJCP.IO.Ports.Serial.Windows
             bool readPending = false;
             m_ReadEvent.Reset();
             NativeOverlapped readOverlapped = new NativeOverlapped();
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
             readOverlapped.EventHandle = m_ReadEvent.GetSafeWaitHandle().DangerousGetHandle();
 #else
             readOverlapped.EventHandle = m_ReadEvent.SafeWaitHandle.DangerousGetHandle();
@@ -321,7 +321,7 @@ namespace RJCP.IO.Ports.Serial.Windows
             m_WriteEvent.Reset();
             NativeOverlapped writeOverlapped = new NativeOverlapped();
             m_ReadByteAvailable = false;
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
             writeOverlapped.EventHandle = m_WriteEvent.GetSafeWaitHandle().DangerousGetHandle();
 #else
             writeOverlapped.EventHandle = m_WriteEvent.SafeWaitHandle.DangerousGetHandle();

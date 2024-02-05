@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net40;net462;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net40;net462;net60</TargetFrameworks>
     <OutputType>Library</OutputType>
     <Configurations>Debug;Release</Configurations>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -14,7 +12,7 @@
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) 2021-2023, Jason Curl</Copyright>
+    <Copyright>(C) 2021-2024, Jason Curl</Copyright>
     <Company></Company>
     <PackageId>RJCP.SerialPortStream.Virtual</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
@@ -28,7 +26,6 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>Default</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
-
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
@@ -36,12 +33,12 @@
     <RevisionControlLabel>release/virt/v$(Version)</RevisionControlLabel>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release'">
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -53,9 +50,6 @@
 
   <ItemGroup>
     <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.4" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
     <ProjectReference Include="..\..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
   </ItemGroup>
@@ -73,5 +67,4 @@
     <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-
 </Project>

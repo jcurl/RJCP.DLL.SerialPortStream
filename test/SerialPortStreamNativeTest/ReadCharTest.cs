@@ -25,7 +25,7 @@ namespace RJCP.IO.Ports
         private readonly string DestPort = SerialConfiguration.DestPort;
         private const int TimeOut = 300;
 
-#if NETCOREAPP3_1
+#if NET6_0_OR_GREATER
         [SetUp]
         public void InitLogging()
         {

@@ -7,7 +7,7 @@ namespace RJCP.IO.Ports
     using System;
     using Serial;
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
     using Microsoft.Extensions.Logging;
 #endif
 
@@ -103,7 +103,7 @@ namespace RJCP.IO.Ports
             NativeSerial.StopBits = stopbits;
         }
 
-#if NETSTANDARD
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Constructor. Create a stream that doesn't connect to any port. Specify the logger.
         /// </summary>
