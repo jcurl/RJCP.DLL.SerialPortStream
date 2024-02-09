@@ -7,6 +7,9 @@ namespace RJCP.IO.Ports.Native.Unix
     using System;
     using System.Runtime.InteropServices;
     using System.Security;
+#if NETFRAMEWORK
+    using System.Runtime.ConstrainedExecution;
+#endif
 
     internal static partial class LibNSerial
     {
@@ -27,6 +30,9 @@ namespace RJCP.IO.Ports.Native.Unix
             [DllImport("libnserial.so.1", SetLastError = true)]
             internal static extern SafeSerialHandle serial_init();
 
+#if NETFRAMEWORK
+            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+#endif
             [DllImport("libnserial.so.1")]
             internal static extern void serial_terminate(IntPtr handle);
 

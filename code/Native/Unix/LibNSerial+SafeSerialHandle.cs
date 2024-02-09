@@ -6,6 +6,9 @@ namespace RJCP.IO.Ports.Native.Unix
 {
     using System;
     using System.Runtime.InteropServices;
+#if NETFRAMEWORK
+    using System.Runtime.ConstrainedExecution;
+#endif
 
     internal static partial class LibNSerial
     {
@@ -21,6 +24,9 @@ namespace RJCP.IO.Ports.Native.Unix
                 }
             }
 
+#if NETFRAMEWORK
+            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
             protected override bool ReleaseHandle()
             {
                 Dll.serial_terminate(handle);
