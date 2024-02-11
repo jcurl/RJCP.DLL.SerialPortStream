@@ -4,11 +4,13 @@
 
 namespace RJCP.IO.Ports
 {
+    using System.Runtime.Versioning;
     using Serial;
 
     /// <summary>
     /// A Windows specific Serial Port Stream object that provides configurable settings.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public class WinSerialPortStream : SerialPortStream<IWinNativeSettings>
     {
         /// <summary>

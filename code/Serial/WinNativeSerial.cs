@@ -9,6 +9,7 @@ namespace RJCP.IO.Ports.Serial
     using System.Diagnostics;
     using System.IO;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
     using Microsoft.Win32;
     using Microsoft.Win32.SafeHandles;
     using Native.Win32;
@@ -23,6 +24,7 @@ namespace RJCP.IO.Ports.Serial
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public class WinNativeSerial : INativeSerial<IWinNativeSettings>
     {
         private SafeFileHandle m_ComPortHandle;

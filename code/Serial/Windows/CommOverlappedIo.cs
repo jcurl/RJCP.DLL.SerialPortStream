@@ -7,12 +7,14 @@ namespace RJCP.IO.Ports.Serial.Windows
     using System;
     using System.IO;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
     using System.Threading;
     using Datastructures;
     using Microsoft.Win32.SafeHandles;
     using Native.Win32;
     using RJCP.Diagnostics.Trace;
 
+    [SupportedOSPlatform("windows")]
     internal class CommOverlappedIo : IDisposable
     {
         #region Local variables

@@ -4,6 +4,7 @@
 
 namespace RJCP.IO.Ports
 {
+    using System.Runtime.Versioning;
     using NUnit.Framework;
 
     [TestFixture]
@@ -13,6 +14,7 @@ namespace RJCP.IO.Ports
 
         [Test]
         [Platform(Include = "Win")]
+        [SupportedOSPlatform("windows")]
         public void InstantiateWinSerialPortStream()
         {
             using (SerialPortStream stream = SerialPortStreamFactory.Factory.Create(SourcePort)) {
@@ -22,6 +24,7 @@ namespace RJCP.IO.Ports
 
         [Test]
         [Platform(Exclude = "Win")]
+        [SupportedOSPlatform("windows")]
         public void InstantiateSerialPortStream()
         {
             using (SerialPortStream stream = SerialPortStreamFactory.Factory.Create(SourcePort)) {

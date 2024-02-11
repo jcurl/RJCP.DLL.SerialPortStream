@@ -4,10 +4,12 @@
 
 namespace RJCP.IO.Ports
 {
+    using System.Runtime.Versioning;
     using NUnit.Framework;
 
     [TestFixture]
     [Platform(Include = "Win")]
+    [SupportedOSPlatform("windows")]
     public class WinSerialPortStreamTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;

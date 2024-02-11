@@ -6,6 +6,7 @@ namespace RJCP.IO.Ports
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.Versioning;
     using System.Threading;
     using NUnit.Framework;
     using Serial;
@@ -273,6 +274,7 @@ namespace RJCP.IO.Ports
 
         [Test]
         [Platform(Include = "Win")]
+        [SupportedOSPlatform("windows")]
         public void SerialPortStreamNativeSerialWindows()
         {
             INativeSerial serial = new WinNativeSerial();
@@ -285,6 +287,7 @@ namespace RJCP.IO.Ports
 
         [Test]
         [Platform(Include = "Linux")]
+        [SupportedOSPlatform("linux")]
         public void SerialPortStreamNativeSerialLinux()
         {
             INativeSerial serial = new UnixNativeSerial();
