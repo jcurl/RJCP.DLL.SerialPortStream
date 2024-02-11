@@ -7,6 +7,7 @@ namespace RJCP.IO.Ports.Serial
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Runtime.Versioning;
     using System.Threading;
     using Native.Unix;
     using RJCP.Diagnostics.Trace;
@@ -14,6 +15,7 @@ namespace RJCP.IO.Ports.Serial
     /// <summary>
     /// Windows implementation for a Native Serial connection.
     /// </summary>
+    [SupportedOSPlatform("linux")]
     public class UnixNativeSerial : INativeSerial
     {
         private readonly LibNSerial.SafeSerialHandle m_Handle;

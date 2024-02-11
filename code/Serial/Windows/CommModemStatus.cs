@@ -6,12 +6,14 @@ namespace RJCP.IO.Ports.Serial.Windows
 {
     using System.IO;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
     using Microsoft.Win32.SafeHandles;
     using Native.Win32;
 
     /// <summary>
     /// Abstracts the Win32 API GetCommModemStatus().
     /// </summary>
+    [SupportedOSPlatform("windows")]
     internal sealed class CommModemStatus
     {
         private readonly SafeFileHandle m_ComPortHandle;

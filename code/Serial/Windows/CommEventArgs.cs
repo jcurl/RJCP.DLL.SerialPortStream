@@ -5,8 +5,10 @@
 namespace RJCP.IO.Ports.Serial.Windows
 {
     using System;
+    using System.Runtime.Versioning;
     using Native.Win32;
 
+    [SupportedOSPlatform("windows")]
     internal class CommEventArgs : EventArgs
     {
         private readonly Kernel32.SerialEventMask m_EventType;

@@ -5,7 +5,9 @@
 namespace RJCP.IO.Ports.Serial.Windows
 {
     using System;
+    using System.Runtime.Versioning;
 
+    [SupportedOSPlatform("windows")]
     internal class WinNativeSettings : IWinNativeSettings
     {
         private int m_ReadIntervalTimeout = 10;

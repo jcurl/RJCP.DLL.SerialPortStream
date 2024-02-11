@@ -6,11 +6,13 @@ namespace RJCP.IO.Ports.Native.Win32
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
     using System.Security;
     using System.Threading;
     using Microsoft.Win32.SafeHandles;
 
     [SuppressUnmanagedCodeSecurity]
+    [SupportedOSPlatform("windows")]
     internal static partial class Kernel32
     {
         /// <summary>

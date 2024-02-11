@@ -6,7 +6,9 @@ namespace RJCP.IO.Ports.Native.Unix
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Runtime.Versioning;
 
+    [SupportedOSPlatform("linux")]
     internal static partial class LibNSerial
     {
         [ThreadStatic]
