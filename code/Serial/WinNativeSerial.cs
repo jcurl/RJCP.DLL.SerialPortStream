@@ -1,8 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2023
-// Sources at https://github.com/jcurl/SerialPortStream
-// Licensed under the Microsoft Public License (Ms-PL)
-
-namespace RJCP.IO.Ports.Serial
+﻿namespace RJCP.IO.Ports.Serial
 {
     using System;
     using System.Collections.Generic;

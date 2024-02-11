@@ -1,8 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
-// Sources at https://github.com/jcurl/SerialPortStream
-// Licensed under the Microsoft Public License (Ms-PL)
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 // Setting ComVisible to false makes the types in this assembly not visible

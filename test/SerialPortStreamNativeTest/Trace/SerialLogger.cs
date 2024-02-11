@@ -1,9 +1,3 @@
-// Copyright © Jason Curl 2021
-// Sources at https://github.com/jcurl/SerialPortStream
-// Licensed under the Microsoft Public License (Ms-PL)
-
-// This file is only for .NET Core
-
 namespace RJCP.IO.Ports.Trace
 {
     using System;

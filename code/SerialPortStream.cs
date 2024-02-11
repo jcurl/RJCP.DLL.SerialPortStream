@@ -1,12 +1,4 @@
-﻿// Copyright © Jason Curl 2012-2021
-// Sources at https://github.com/jcurl/SerialPortStream
-// Licensed under the Microsoft Public License (Ms-PL)
-
-// Enable the following define to enable behaviour in the number of bytes similar to the MS
-// implementation. It's recommended not to do this, as it's not consistent with the rest of
-// this implementation.
-
-namespace RJCP.IO.Ports
+﻿namespace RJCP.IO.Ports
 {
     using System;
     using System.Diagnostics;
