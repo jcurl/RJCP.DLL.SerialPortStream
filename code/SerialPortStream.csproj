@@ -137,11 +137,6 @@
     <Compile Include="SerialPortStreamFactory.cs" />
     <Compile Include="StopBits.cs" />
     <Compile Include="WinSerialPortStream.cs" />
-    <None Include="System\IO\Ports\SerialPort.cs" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
-    <Compile Include="System\IO\Ports\SerialPort.cs" />
   </ItemGroup>
 
   <ItemGroup>
