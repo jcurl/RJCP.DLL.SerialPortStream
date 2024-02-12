@@ -51,7 +51,6 @@
       <PrivateAssets>all</PrivateAssets>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\..\environment\SysCompat\RJCP.Core.SysCompat.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
@@ -60,6 +59,7 @@
 
   <ItemGroup>
     <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.4" PrivateAssets="all" />
+    <ProjectReference Include="..\..\environment\SysCompat\RJCP.Core.SysCompat.csproj" />
     <ProjectReference Include="..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
     <ProjectReference Include="..\..\trace\Trace\RJCP.Diagnostics.Trace.csproj" />
     <ProjectReference Include="..\..\devicemgr\DeviceMgr\RJCP.IO.DeviceMgr.csproj" />

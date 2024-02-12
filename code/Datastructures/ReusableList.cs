@@ -76,7 +76,7 @@
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array);
             if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex), "arrayIndex is less than lower bound of array");
             if (array.Rank != 1) throw new ArgumentException("array is multidimensional", nameof(array));
             if (m_Count + arrayIndex > array.Length) throw new ArgumentException("The number of elements in source array is greater than available elements from index to the end of the destination array");

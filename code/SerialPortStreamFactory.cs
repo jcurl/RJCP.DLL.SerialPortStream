@@ -3,6 +3,7 @@
     using System;
     using RJCP.Core.Environment;
     using Serial;
+    using static System.Net.Mime.MediaTypeNames;
 
     /// <summary>
     /// A Factory for <see cref="SerialPortStream"/> objects, based on the runtime environment.
@@ -46,7 +47,7 @@
             }
             set
             {
-                if (value == null) throw new ArgumentNullException(nameof(Factory));
+                ThrowHelper.ThrowIfNull(value);
 
                 lock (s_FactoryLock) {
                     s_Factory = value;

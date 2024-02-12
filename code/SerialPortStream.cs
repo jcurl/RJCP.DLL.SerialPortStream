@@ -13,6 +13,7 @@
 
 #if NET6_0_OR_GREATER
     using Microsoft.Extensions.Logging;
+    using static System.Net.Mime.MediaTypeNames;
 #endif
 
     /// <summary>
@@ -63,8 +64,7 @@
         /// </remarks>
         public SerialPortStream(INativeSerial serial)
         {
-            if (serial == null)
-                throw new ArgumentNullException(nameof(serial));
+            ThrowHelper.ThrowIfNull(serial);
             if (serial.IsOpen || serial.IsRunning)
                 throw new ArgumentException("Serial object in invalid state", nameof(serial));
 
@@ -169,7 +169,7 @@
         [CLSCompliant(false)]
         public SerialPortStream(ILogger logger, INativeSerial serial)
         {
-            if (serial == null) throw new ArgumentNullException(nameof(serial));
+            ThrowHelper.ThrowIfNull(serial);
 
             m_Log = new LogSource(Log.SerialPortStream, logger);
             Initialize(serial);
@@ -237,7 +237,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value == null) throw new ArgumentNullException(nameof(PortName));
+                ThrowHelper.ThrowIfNull(value);
                 if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Must provide a valid name for a COM port", nameof(PortName));
                 if (m_NativeSerial.IsOpen && value != m_NativeSerial.PortName) throw new InvalidOperationException("Serial Port already opened");
 
@@ -427,7 +427,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value == null) throw new ArgumentNullException(nameof(Encoding));
+                ThrowHelper.ThrowIfNull(value);
                 m_NativeSerial.Buffer.Encoding = value;
             }
         }
@@ -448,7 +448,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value == null) throw new ArgumentNullException(nameof(NewLine));
+                ThrowHelper.ThrowIfNull(value);
                 if (string.IsNullOrEmpty(value)) throw new ArgumentException("Newline may not be empty", nameof(NewLine));
                 m_NewLine = value;
             }
@@ -671,7 +671,7 @@
         private void ReadCheck(byte[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+            ThrowHelper.ThrowIfNull(buffer);
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
@@ -681,7 +681,7 @@
         private void ReadCheck(char[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+            ThrowHelper.ThrowIfNull(buffer);
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
@@ -950,7 +950,7 @@
         /// </returns>
         public override int EndRead(IAsyncResult asyncResult)
         {
-            if (asyncResult == null) throw new ArgumentNullException(nameof(asyncResult));
+            ThrowHelper.ThrowIfNull(asyncResult);
 
             return InternalEndRead(asyncResult);
         }
@@ -1189,7 +1189,7 @@
         public string ReadTo(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (text == null) throw new ArgumentNullException(nameof(text));
+            ThrowHelper.ThrowIfNull(text);
             if (string.IsNullOrEmpty(text)) throw new ArgumentException("Parameter text shall not be null or empty", nameof(text));
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
@@ -1386,7 +1386,7 @@
         private bool WriteCheck(byte[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+            ThrowHelper.ThrowIfNull(buffer);
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
@@ -1678,7 +1678,7 @@
         /// <remarks>EndWrite must be called exactly once on every IAsyncResult from BeginWrite.</remarks>
         public override void EndWrite(IAsyncResult asyncResult)
         {
-            if (asyncResult == null) throw new ArgumentNullException(nameof(asyncResult));
+            ThrowHelper.ThrowIfNull(asyncResult);
 
             InternalEndWrite(asyncResult);
         }
@@ -1759,7 +1759,7 @@
         public void Write(char[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+            ThrowHelper.ThrowIfNull(buffer);
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
             if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
@@ -1795,7 +1795,7 @@
         public void Write(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            if (text == null) throw new ArgumentNullException(nameof(text));
+            ThrowHelper.ThrowIfNull(text);
             if (text.Length == 0) return;
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial port is not open");
             WriteCheckDeviceError();

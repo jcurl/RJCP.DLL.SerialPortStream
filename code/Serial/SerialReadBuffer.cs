@@ -66,12 +66,9 @@
             get { return m_Encoding; }
             set
             {
-                if (value != null) {
-                    m_Encoding = value;
-                    Decoder = m_Encoding.GetDecoder();
-                } else {
-                    throw new ArgumentNullException(nameof(Encoding));
-                }
+                ThrowHelper.ThrowIfNull(value);
+                m_Encoding = value;
+                Decoder = m_Encoding.GetDecoder();
             }
         }
 

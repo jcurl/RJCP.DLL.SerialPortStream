@@ -35,7 +35,7 @@ namespace RJCP.IO.Ports.Serial
         /// <exception cref="PlatformNotSupportedException">Can't initialise platform library.</exception>
         public UnixNativeSerial(LogSource log)
         {
-            if (log == null) throw new ArgumentNullException(nameof(log));
+            ThrowHelper.ThrowIfNull(log);
             m_Log = log;
 
             m_Buffer = new SerialBuffer();

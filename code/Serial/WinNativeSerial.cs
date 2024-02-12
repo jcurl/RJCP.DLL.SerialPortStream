@@ -46,7 +46,7 @@
         /// <exception cref="System.ArgumentNullException"><paramref name="log"/> is <see langword="null"/>.</exception>
         public WinNativeSerial(LogSource log)
         {
-            if (log == null) throw new ArgumentNullException(nameof(log));
+            ThrowHelper.ThrowIfNull(log);
             m_Log = log;
 
             m_Buffer = new SerialBuffer(true);

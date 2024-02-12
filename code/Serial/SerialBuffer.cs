@@ -83,8 +83,7 @@
             }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(Encoding));
+                ThrowHelper.ThrowIfNull(value);
                 if (ReadChars != null) ReadChars.Encoding = value;
                 m_Encoding = value;
             }

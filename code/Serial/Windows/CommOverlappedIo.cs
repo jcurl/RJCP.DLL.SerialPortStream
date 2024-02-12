@@ -108,8 +108,8 @@
         /// <param name="log">The <see cref="LogSource"/> which should be used for logging.</param>
         public CommOverlappedIo(SafeFileHandle handle, WinNativeSettings settings, LogSource log)
         {
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            ThrowHelper.ThrowIfNull(log);
+            ThrowHelper.ThrowIfNull(settings);
 
             m_Log = log;
             m_ComPortHandle = handle;
