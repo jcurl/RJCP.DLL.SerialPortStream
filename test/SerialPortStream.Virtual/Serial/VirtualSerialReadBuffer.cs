@@ -45,7 +45,7 @@
         protected virtual void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
             EventHandler<SerialDataReceivedEventArgs> handler = DataReceived;
-            if (handler != null) handler(sender, args);
+            if (handler is not null) handler(sender, args);
         }
 
         /// <summary>

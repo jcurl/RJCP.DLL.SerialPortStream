@@ -37,11 +37,11 @@
         {
             byte[] buffer = new byte[1024];
 
-            SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One);
+            SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One);
             Task testTask;
 
-            using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent disposedEvent = new(false))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
@@ -87,9 +87,9 @@
         {
             byte[] buffer = new byte[1024];
 
-            using (ManualResetEvent closedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent closedEvent = new(false))
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
@@ -134,9 +134,9 @@
         {
             byte[] buffer = new byte[1024];
 
-            using (ManualResetEvent closedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent closedEvent = new(false))
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
@@ -187,11 +187,11 @@
         {
             byte[] buffer = new byte[8192];
 
-            SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One);
+            SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One);
             Task testTask;
 
-            using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent disposedEvent = new(false))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
@@ -236,9 +236,9 @@
         {
             byte[] buffer = new byte[8192];
 
-            using (ManualResetEvent closedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent closedEvent = new(false))
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
@@ -282,11 +282,11 @@
         {
             byte[] buffer = new byte[1024];
 
-            SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One);
+            SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One);
             Task testTask;
 
-            using (ManualResetEvent disposedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent disposedEvent = new(false))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 
@@ -320,9 +320,9 @@
         {
             byte[] buffer = new byte[1024];
 
-            using (ManualResetEvent closedEvent = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent closedEvent = new(false))
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 

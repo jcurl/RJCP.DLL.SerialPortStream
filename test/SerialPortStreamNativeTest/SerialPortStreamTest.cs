@@ -30,7 +30,7 @@
         [Test]
         public void GetSettings()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 Assert.That(src.PortName, Is.EqualTo(SourcePort));
                 src.GetPortSettings();
                 Console.WriteLine($"    PortName: {src.PortName}");
@@ -53,7 +53,7 @@
         [Test]
         public void GetSettingsWithSetProperties()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 Assert.That(src.PortName, Is.EqualTo(SourcePort));
                 src.GetPortSettings();
                 Console.WriteLine($"    PortName: {src.PortName}");
@@ -76,7 +76,7 @@
         [Test]
         public void OpenCloseBasicProperties()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = 100;
                 src.ReadTimeout = 100;
 
@@ -143,10 +143,10 @@
         [Test]
         public void OpenInUse()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open();
 
-                using (SerialPortStream s2 = new SerialPortStream(SourcePort, 9600, 8, Parity.None, StopBits.One)) {
+                using (SerialPortStream s2 = new(SourcePort, 9600, 8, Parity.None, StopBits.One)) {
                     // The port is already open by src, and should be an exclusive resource.
                     Assert.That(() => s2.Open(), Throws.Exception.InstanceOf<UnauthorizedAccessException>());
                 }
@@ -156,8 +156,8 @@
         [Test]
         public void ModemSignals()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort))
-            using (SerialPortStream dst = new SerialPortStream(DestPort)) {
+            using (SerialPortStream src = new(SourcePort))
+            using (SerialPortStream dst = new(DestPort)) {
                 src.Handshake = Handshake.None;
                 dst.Handshake = Handshake.None;
 
@@ -182,8 +182,8 @@
         public void ModemSignalsWithSleep10()
         {
             // On some chipsets (PL2303H Win7 x86), need small delays for this test case to work properly.
-            using (SerialPortStream src = new SerialPortStream(SourcePort))
-            using (SerialPortStream dst = new SerialPortStream(DestPort)) {
+            using (SerialPortStream src = new(SourcePort))
+            using (SerialPortStream dst = new(DestPort)) {
                 src.Handshake = Handshake.None;
                 dst.Handshake = Handshake.None;
 
@@ -211,7 +211,7 @@
         [Test]
         public void DiscardInBuffer()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialSource.DiscardInBuffer();
             }
@@ -220,7 +220,7 @@
         [Test]
         public void DiscardOutBuffer()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialSource.DiscardOutBuffer();
             }
@@ -231,7 +231,7 @@
         {
             var buffer = new byte[65536];
 
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
             using (SerialPortReceive.IdleReceive(DestPort, serialSource)) {
                 serialSource.Open();
                 serialSource.Write(buffer, 0, buffer.Length);
@@ -259,7 +259,7 @@
                 serial.Open();
                 Assert.That(serial.RtsEnable, Is.True);
             } finally {
-                if (serial != null) serial.Dispose();
+                if (serial is not null) serial.Dispose();
             }
         }
 
@@ -281,7 +281,7 @@
                 serial.Open();
                 Assert.That(serial.RtsEnable, Is.False);
             } finally {
-                if (serial != null) serial.Dispose();
+                if (serial is not null) serial.Dispose();
             }
         }
 
@@ -303,7 +303,7 @@
                 serial.Open();
                 Assert.That(serial.DtrEnable, Is.True);
             } finally {
-                if (serial != null) serial.Dispose();
+                if (serial is not null) serial.Dispose();
             }
         }
 
@@ -325,7 +325,7 @@
                 serial.Open();
                 Assert.That(serial.DtrEnable, Is.False);
             } finally {
-                if (serial != null) serial.Dispose();
+                if (serial is not null) serial.Dispose();
             }
         }
     }

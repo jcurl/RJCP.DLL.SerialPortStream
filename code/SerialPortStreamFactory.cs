@@ -14,7 +14,7 @@
     public class SerialPortStreamFactory : ISerialPortStreamFactory
     {
         private static ISerialPortStreamFactory s_Factory;
-        private static readonly object s_FactoryLock = new object();
+        private static readonly object s_FactoryLock = new();
 
         /// <summary>
         /// Gets or sets the factory to get a <see cref="SerialPortStream"/> object.
@@ -36,11 +36,9 @@
         {
             get
             {
-                if (s_Factory == null) {
+                if (s_Factory is null) {
                     lock (s_FactoryLock) {
-                        if (s_Factory == null) {
-                            s_Factory = new SerialPortStreamFactory();
-                        }
+                        s_Factory ??= new SerialPortStreamFactory();
                     }
                 }
                 return s_Factory;

@@ -63,7 +63,7 @@
         /// </remarks>
         public bool IsBufferAllocated
         {
-            get { return m_ReadBuffer != null; }
+            get { return m_ReadBuffer is not null; }
         }
 
         /// <summary>
@@ -78,13 +78,13 @@
         {
             get
             {
-                if (ReadChars != null) return ReadChars.Encoding;
+                if (ReadChars is not null) return ReadChars.Encoding;
                 return m_Encoding;
             }
             set
             {
                 ThrowHelper.ThrowIfNull(value);
-                if (ReadChars != null) ReadChars.Encoding = value;
+                if (ReadChars is not null) ReadChars.Encoding = value;
                 m_Encoding = value;
             }
         }
@@ -106,7 +106,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
-                if (m_ReadBuffer != null) throw new InvalidOperationException("Buffer already allocated");
+                if (m_ReadBuffer is not null) throw new InvalidOperationException("Buffer already allocated");
                 if (value <= 0) throw new ArgumentOutOfRangeException(nameof(ReadBufferSize), "Must be a positive integer");
 
                 m_ReadBufferSize = (value < 1024) ? 1024 : value;
@@ -130,7 +130,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
-                if (m_WriteBuffer != null) throw new InvalidOperationException("Buffer already allocated");
+                if (m_WriteBuffer is not null) throw new InvalidOperationException("Buffer already allocated");
                 if (value <= 0) throw new ArgumentOutOfRangeException(nameof(WriteBufferSize), "Must be a positive integer");
 
                 m_WriteBufferSize = (value < 1024) ? 1024 : value;
@@ -214,13 +214,13 @@
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
 
-            if (m_ReadBuffer != null && m_ReadBuffer.Buffer.Length == ReadBufferSize) {
+            if (m_ReadBuffer is not null && m_ReadBuffer.Buffer.Length == ReadBufferSize) {
                 m_ReadBuffer.Reset();
             } else {
                 m_ReadBuffer = GetSerialReadBuffer(m_Pinned);
             }
 
-            if (m_WriteBuffer != null && m_WriteBuffer.Buffer.Length == WriteBufferSize) {
+            if (m_WriteBuffer is not null && m_WriteBuffer.Buffer.Length == WriteBufferSize) {
                 m_WriteBuffer.Reset();
             } else {
                 m_WriteBuffer = GetSerialWriteBuffer(m_Pinned);
@@ -256,8 +256,8 @@
         {
             if (IsDisposed) return;
 
-            if (m_ReadBuffer != null) m_ReadBuffer.DeviceDead();
-            if (m_WriteBuffer != null) m_WriteBuffer.DeviceDead();
+            if (m_ReadBuffer is not null) m_ReadBuffer.DeviceDead();
+            if (m_WriteBuffer is not null) m_WriteBuffer.DeviceDead();
         }
 
         private bool IsDisposed { get; set; }
@@ -284,8 +284,8 @@
             if (IsDisposed) return;
 
             if (disposing) {
-                if (m_ReadBuffer != null) m_ReadBuffer.Dispose();
-                if (m_WriteBuffer != null) m_WriteBuffer.Dispose();
+                if (m_ReadBuffer is not null) m_ReadBuffer.Dispose();
+                if (m_WriteBuffer is not null) m_WriteBuffer.Dispose();
                 m_ReadBuffer = null;
                 m_WriteBuffer = null;
             }

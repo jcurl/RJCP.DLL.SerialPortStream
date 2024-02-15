@@ -26,8 +26,8 @@
         // guarantee we can always read into the cache. So you'll also see free space checks that we always need at
         // least two chars before conversion.
         private const int c_MaxLine = 1024;
-        private readonly CircularBuffer<char> m_ReadCache = new CircularBuffer<char>(c_MaxLine + 1);
-        private readonly CircularBuffer<int> m_ReadOffsets = new CircularBuffer<int>(c_MaxLine + 1);
+        private readonly CircularBuffer<char> m_ReadCache = new(c_MaxLine + 1);
+        private readonly CircularBuffer<int> m_ReadOffsets = new(c_MaxLine + 1);
 
         private int m_ReadOffset;    // Offset into byte buffer for next character
         private int m_LastChar;      // Position of m_ReadOffset on last successful character read
@@ -48,7 +48,7 @@
         private void OnReadEvent(object sender, SerialBufferEventArgs args)
         {
             EventHandler<SerialBufferEventArgs> handler = ReadEvent;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -323,7 +323,7 @@
         public string ReadExisting()
         {
             try {
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 if (IsOverflowed) CharReset(true);
                 sb.Append(m_ReadCache.GetString());
                 CharReset(false);

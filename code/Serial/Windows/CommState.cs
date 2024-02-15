@@ -13,7 +13,7 @@
     internal sealed class CommState
     {
         private readonly SafeFileHandle m_ComPortHandle;
-        private Kernel32.DCB m_Dcb = new Kernel32.DCB();
+        private Kernel32.DCB m_Dcb = new();
 
         /// <summary>
         /// Constructor for a DCB, prefilled with data from the handle provided.

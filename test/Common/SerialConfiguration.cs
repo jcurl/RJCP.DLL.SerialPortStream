@@ -5,7 +5,7 @@
 
     public static class SerialConfiguration
     {
-        private static readonly object m_SyncLock = new object();
+        private static readonly object m_SyncLock = new();
         private static string s_SourcePort = null;
         private static string s_DestPort = null;
 
@@ -34,9 +34,9 @@
         {
             get
             {
-                if (s_SourcePort == null) {
+                if (s_SourcePort is null) {
                     lock (m_SyncLock) {
-                        if (s_SourcePort == null) {
+                        if (s_SourcePort is null) {
                             s_SourcePort = AppSettings.Settings[OSPrefix + "SourcePort"].Value;
                         }
                     }
@@ -49,9 +49,9 @@
         {
             get
             {
-                if (s_DestPort == null) {
+                if (s_DestPort is null) {
                     lock (m_SyncLock) {
-                        if (s_DestPort == null) {
+                        if (s_DestPort is null) {
                             s_DestPort = AppSettings.Settings[OSPrefix + "DestPort"].Value;
                         }
                     }

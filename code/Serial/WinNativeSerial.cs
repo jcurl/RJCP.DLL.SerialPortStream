@@ -30,7 +30,7 @@
         private CommOverlappedIo m_CommOverlappedIo;
         private readonly SerialBuffer m_Buffer;
         private readonly LogSource m_Log;
-        private readonly WinNativeSettings m_Settings = new WinNativeSettings();
+        private readonly WinNativeSettings m_Settings = new();
 
         private string m_Version;
 
@@ -62,7 +62,7 @@
         {
             get
             {
-                if (m_Version != null) return m_Version;
+                if (m_Version is not null) return m_Version;
 
 #if NET6_0_OR_GREATER
                 System.Reflection.Assembly assembly = typeof(WinNativeSerial).GetTypeInfo().Assembly;
@@ -103,7 +103,7 @@
         public string[] GetPortNames()
         {
             using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
-                if (local == null) {
+                if (local is null) {
 #if NET40
                     return new string[0];
 #else
@@ -142,9 +142,9 @@
         /// <returns>An array of serial ports.</returns>
         public PortDescription[] GetPortDescriptions()
         {
-            Dictionary<string, PortDescription> list = new Dictionary<string, PortDescription>();
+            Dictionary<string, PortDescription> list = new();
             using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
-                if (local != null) {
+                if (local is not null) {
                     string[] k = local.GetValueNames();
                     foreach (string p in k) {
                         string n = local.GetValue(p) as string;
@@ -217,7 +217,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if ((value < 5 || value > 8) && value != 16) {
+                if (value is (< 5 or > 8) and not 16) {
                     throw new ArgumentOutOfRangeException(nameof(DataBits), "May only be 5, 6, 7, 8 or 16");
                 }
                 m_DataBits = value;
@@ -663,7 +663,7 @@
             {
                 if (m_IsDisposed) return false;
                 SafeFileHandle handle = m_ComPortHandle;
-                return handle != null && !handle.IsClosed && !handle.IsInvalid;
+                return handle is not null && !handle.IsClosed && !handle.IsInvalid;
             }
         }
 
@@ -872,7 +872,7 @@
 
             Kernel32.FileType t = Kernel32.GetFileType(m_ComPortHandle);
             bool validOverride = false;
-            if (t != Kernel32.FileType.FILE_TYPE_CHAR && t != Kernel32.FileType.FILE_TYPE_UNKNOWN) {
+            if (t is not Kernel32.FileType.FILE_TYPE_CHAR and not Kernel32.FileType.FILE_TYPE_UNKNOWN) {
                 foreach (string port in GetPortNames()) {
 #if NET6_0_OR_GREATER
                     if (port.Equals(PortName, StringComparison.OrdinalIgnoreCase)) {
@@ -1046,7 +1046,7 @@
         protected virtual void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
             EventHandler<SerialDataReceivedEventArgs> handler = DataReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -1064,7 +1064,7 @@
         protected virtual void OnCommError(object sender, SerialErrorReceivedEventArgs args)
         {
             EventHandler<SerialErrorReceivedEventArgs> handler = ErrorReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -1082,7 +1082,7 @@
         protected virtual void OnPinChanged(object sender, SerialPinChangedEventArgs args)
         {
             EventHandler<SerialPinChangedEventArgs> handler = PinChanged;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }

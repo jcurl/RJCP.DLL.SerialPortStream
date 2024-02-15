@@ -82,7 +82,7 @@
         /// </remarks>
         public SerialPortStream(string port) : this()
         {
-            if (port != null) m_NativeSerial.PortName = port;
+            if (port is not null) m_NativeSerial.PortName = port;
         }
 
         /// <summary>
@@ -178,7 +178,7 @@
 
         private void Initialize(INativeSerial serial)
         {
-            if (serial == null)
+            if (serial is null)
                 throw new NotSupportedException("SerialPortStream is not supported on this platform");
 
             m_NativeSerial = serial;
@@ -363,7 +363,7 @@
             }
         }
 
-        private readonly object m_CloseLock = new object();
+        private readonly object m_CloseLock = new();
 
         /// <summary>
         /// Closes the port connection, sets the <see cref="IsOpen"/> property to <see langword="false"/>. Does not
@@ -1000,7 +1000,7 @@
 
         private IAsyncResult InternalBeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            ReadAsyncResult ar = new ReadAsyncResult(callback, state, this, "Read");
+            ReadAsyncResult ar = new(callback, state, this, "Read");
             if (!m_NativeSerial.Buffer.IsBufferAllocated || count == 0 || m_NativeSerial.Buffer.ReadStream.WaitForRead(0)) {
                 // Data in the buffer, we can return immediately
                 ar.Process(this, buffer, offset, count, true);
@@ -1083,7 +1083,7 @@
 
             if (count == 0) return 0;
 
-            TimerExpiry te = new TimerExpiry(m_ReadTimeout);
+            TimerExpiry te = new(m_ReadTimeout);
             int chars;
             do {
                 chars = m_NativeSerial.Buffer.ReadChars.Read(buffer, offset, count);
@@ -1119,7 +1119,7 @@
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return -1;
             if (ReadCheckDeviceError()) return -1;
 
-            TimerExpiry te = new TimerExpiry(m_ReadTimeout);
+            TimerExpiry te = new(m_ReadTimeout);
             int chars;
             do {
                 chars = m_NativeSerial.Buffer.ReadChars.ReadChar();
@@ -1195,7 +1195,7 @@
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
             if (ReadCheckDeviceError()) return null;
 
-            TimerExpiry te = new TimerExpiry(m_ReadTimeout);
+            TimerExpiry te = new(m_ReadTimeout);
             bool dataAvailable;
             do {
                 if (m_NativeSerial.Buffer.ReadChars.ReadTo(text, out string line)) return line;
@@ -1721,7 +1721,7 @@
 
         private IAsyncResult InternalBeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            WriteAsyncResult ar = new WriteAsyncResult(callback, state, this, "Write");
+            WriteAsyncResult ar = new(callback, state, this, "Write");
             if (count == 0 || m_NativeSerial.Buffer.WriteStream.WaitForWrite(count, 0)) {
                 ar.Process(this, buffer, offset, count, true);
             } else {
@@ -2332,8 +2332,8 @@
         #endregion
 
         #region Event Handling and Abstraction
-        private readonly object m_EventLock = new object();
-        private readonly ManualResetEvent m_EventProcessing = new ManualResetEvent(false);
+        private readonly object m_EventLock = new();
+        private readonly ManualResetEvent m_EventProcessing = new(false);
         private SerialData m_SerialDataFlags = SerialData.NoData;
         private SerialError m_SerialErrorFlags = SerialError.NoError;
         private SerialPinChange m_SerialPinChange = SerialPinChange.NoChange;
@@ -2358,7 +2358,7 @@
         protected virtual void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
             EventHandler<SerialDataReceivedEventArgs> handler = DataReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -2376,7 +2376,7 @@
         protected virtual void OnCommError(object sender, SerialErrorReceivedEventArgs args)
         {
             EventHandler<SerialErrorReceivedEventArgs> handler = ErrorReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -2394,7 +2394,7 @@
         protected virtual void OnPinChanged(object sender, SerialPinChangedEventArgs args)
         {
             EventHandler<SerialPinChangedEventArgs> handler = PinChanged;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }

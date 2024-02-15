@@ -27,7 +27,7 @@
         private void OnWriteEvent(object sender, SerialBufferEventArgs args)
         {
             EventHandler<SerialBufferEventArgs> handler = WriteEvent;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }

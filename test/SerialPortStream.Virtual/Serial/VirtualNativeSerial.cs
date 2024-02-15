@@ -29,7 +29,7 @@
         {
             get
             {
-                if (m_Version != null) return m_Version;
+                if (m_Version is not null) return m_Version;
 
 #if NET6_0_OR_GREATER
                 var assembly = typeof(VirtualNativeSerial).GetTypeInfo().Assembly;
@@ -129,7 +129,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(VirtualNativeSerial));
-                if ((value < 5 || value > 8) && value != 16) {
+                if (value is (< 5 or > 8) and not 16) {
                     throw new ArgumentOutOfRangeException(nameof(DataBits), "May only be 5, 6, 7, 8 or 16");
                 }
                 m_DataBits = value;
@@ -719,7 +719,7 @@
         protected virtual void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
             EventHandler<SerialDataReceivedEventArgs> handler = DataReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -737,7 +737,7 @@
         protected virtual void OnCommError(object sender, SerialErrorReceivedEventArgs args)
         {
             EventHandler<SerialErrorReceivedEventArgs> handler = ErrorReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -755,7 +755,7 @@
         protected virtual void OnPinChanged(object sender, SerialPinChangedEventArgs args)
         {
             EventHandler<SerialPinChangedEventArgs> handler = PinChanged;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }

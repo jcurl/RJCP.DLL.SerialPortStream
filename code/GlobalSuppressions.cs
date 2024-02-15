@@ -9,5 +9,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Design", "CA1069:Enums values should not be duplicated", Justification = "Native Methods", Scope = "namespaceanddescendants", Target = "~N:RJCP.IO.Ports.Native.Win32")]
 [assembly: SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Native Methods", Scope = "namespaceanddescendants", Target = "~N:RJCP.IO.Ports.Native.Win32")]
-[assembly: SuppressMessage("Style", "IDE0074:Use compound assignment", Justification = ".NET Core only feature")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "NativeMethods", Scope = "namespaceanddescendants", Target = "~N:RJCP.IO.Ports.Native.Unix")]

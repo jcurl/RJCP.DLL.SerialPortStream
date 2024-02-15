@@ -45,7 +45,7 @@
         {
             byte[] buffer = new byte[1024];
 
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int bytes = serialSource.Read(buffer, 0, buffer.Length);
                 Console.WriteLine($"{bytes} bytes read");
@@ -74,7 +74,7 @@
         {
             byte[] buffer = new byte[1024];
 
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int bytes = serialSource.Read(buffer, 0, buffer.Length);
                 Console.WriteLine($"{bytes} bytes read");
@@ -109,7 +109,7 @@
         {
             char[] buffer = new char[1024];
 
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int bytes = serialSource.Read(buffer, 0, buffer.Length);
                 Console.WriteLine($"{bytes} bytes read");
@@ -138,7 +138,7 @@
         {
             char[] buffer = new char[1024];
 
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int bytes = serialSource.Read(buffer, 0, buffer.Length);
                 Console.WriteLine($"{bytes} bytes read");
@@ -171,7 +171,7 @@
         [Test]
         public void DisconnectOnReadByteBlocked()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int c = serialSource.ReadByte();
                 Console.WriteLine($"{c} byte read");
@@ -198,7 +198,7 @@
         [Test]
         public void DisconnectOnReadByteBlockedReadAgain()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int c = serialSource.ReadByte();
                 Console.WriteLine($"{c} byte read");
@@ -231,7 +231,7 @@
         [Test]
         public void DisconnectOnReadCharBlocked()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int c = serialSource.ReadChar();
                 Console.WriteLine($"{c} char read");
@@ -258,7 +258,7 @@
         [Test]
         public void DisconnectOnReadCharBlockedReadAgain()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 int c = serialSource.ReadChar();
                 Console.WriteLine($"{c} char read");
@@ -291,14 +291,14 @@
         [Test]
         public void DisconnectOnReadLineBlocked()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
 
                 Assert.That(
                     () => {
                         string l = serialSource.ReadLine();
                         Console.WriteLine("line read length={0} ({1})",
-                            l == null ? -1 : l.Length,
+                            l is null ? -1 : l.Length,
                             l ?? string.Empty);
                     }, Throws.InstanceOf<System.IO.IOException>());
 
@@ -325,7 +325,7 @@
         public void ReadUntilDisconnectThenClose()
         {
             byte[] buffer = new byte[8192];
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialSource.Open();
@@ -356,7 +356,7 @@
         public void ReadUntilDisconnectThenDispose()
         {
             byte[] buffer = new byte[8192];
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialSource.Open();
@@ -386,7 +386,7 @@
         public void ReadUntilDisconnectAndReadAgainThenClose()
         {
             byte[] buffer = new byte[8192];
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialSource.Open();
@@ -425,7 +425,7 @@
         public void ReadUntilDisconnectAndReadAgainThenDispose()
         {
             byte[] buffer = new byte[8192];
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialSource.Open();
@@ -468,8 +468,8 @@
         [Test]
         public void WriteByteUntilDisconnected()
         {
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 
@@ -502,8 +502,8 @@
         public void DisconnectOnFlushBlocked()
         {
             byte[] buffer = new byte[8192];
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
@@ -548,8 +548,8 @@
         public void DisconnectOnWriteBlocked()
         {
             byte[] buffer = new byte[8192];
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;
@@ -593,8 +593,8 @@
         public void DisconnectOnBeginWriteBlocked()
         {
             byte[] buffer = new byte[8192];
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = 8192;
                 serialSource.WriteBufferSize = 8192;
                 serialDest.ReadBufferSize = 8192;

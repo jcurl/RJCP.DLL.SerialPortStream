@@ -15,8 +15,8 @@ namespace RJCP.IO.Ports
         [Test]
         public void ThrowOnReadErrorDefaultBehaviour()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
 
                 Assert.That(stream.ThrowOnReadError, Is.False);
             }
@@ -26,8 +26,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "CanReadClosed")]
         public void CanReadClosed(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 Assert.That(stream.CanRead, Is.Not.EqualTo(throwOnError));
@@ -38,8 +38,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadBytesWhenClosed")]
         public void ReadBytesWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 byte[] buffer = new byte[256];
@@ -57,8 +57,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadCharsWhenClosed")]
         public void ReadCharsWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 char[] buffer = new char[256];
@@ -76,8 +76,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadByteWhenClosed")]
         public void ReadByteWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 if (throwOnError) {
@@ -94,8 +94,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadCharWhenClosed")]
         public void ReadCharWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 if (throwOnError) {
@@ -112,8 +112,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadLineWhenClosed")]
         public void ReadLineWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 if (throwOnError) {
@@ -130,8 +130,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadExistingWhenClosed")]
         public void ReadExistingWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 if (throwOnError) {
@@ -148,8 +148,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadToWhenClosed")]
         public void ReadToWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 if (throwOnError) {
@@ -167,8 +167,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadAsyncWhenClosed")]
         public async Task ReadAsyncWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 byte[] buffer = new byte[256];
@@ -187,8 +187,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "BeginReadWhenClosed")]
         public void BeginReadWhenClosedThrowOnError(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
 
                 byte[] buffer = new byte[256];
@@ -207,8 +207,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadBytesTimeout")]
         public void ReadBytesTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -229,8 +229,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadCharsTimeout")]
         public void ReadCharsTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -251,8 +251,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadByteTimeout")]
         public void ReadByteTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -272,8 +272,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadCharTimeout")]
         public void ReadCharTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -293,8 +293,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadLineTimeout")]
         public void ReadLineTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -311,8 +311,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadToTimeout")]
         public void ReadToTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -329,8 +329,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadExistingTimeout")]
         public void ReadExistingTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -345,8 +345,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "ReadAsyncTimeout")]
         public async Task ReadAsyncTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";
@@ -368,8 +368,8 @@ namespace RJCP.IO.Ports
         [TestCase(false, TestName = "BeginReadTimeout")]
         public void BeginReadTimeout(bool throwOnError)
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.ThrowOnReadError = throwOnError;
                 stream.ReadTimeout = 50;
                 stream.PortName = "COM";

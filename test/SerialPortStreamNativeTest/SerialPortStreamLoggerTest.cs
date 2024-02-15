@@ -11,7 +11,7 @@ namespace RJCP.IO.Ports
         [Test]
         public void InjectLogger()
         {
-            using (SerialPortStream src = new SerialPortStream(new SerialLogger()) {
+            using (SerialPortStream src = new(new SerialLogger()) {
                 PortName = SourcePort,
                 BaudRate = 115200,
                 DataBits = 8,

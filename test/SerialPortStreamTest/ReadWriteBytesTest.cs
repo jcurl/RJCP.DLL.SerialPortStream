@@ -15,12 +15,12 @@
         [Test]
         public void ReadLargeDataBlock()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] receiveData = new byte[262144];
             rnd.NextBytes(receiveData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -43,12 +43,12 @@
         [Test]
         public async Task ReadLargeDataBlockAsync()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] receiveData = new byte[262144];
             rnd.NextBytes(receiveData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -72,12 +72,12 @@
         [Test]
         public void ReadLargeDataBlockSpan()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] receiveData = new byte[262144];
             rnd.NextBytes(receiveData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -101,12 +101,12 @@
         [Test]
         public async Task ReadLargeDataBlockSpanAsync()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] receiveData = new byte[262144];
             rnd.NextBytes(receiveData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -131,7 +131,7 @@
         {
             await Task.Yield();
 
-            Random l = new Random();
+            Random l = new();
 
             while (!serial.IsRunning) {
                 Thread.Sleep(1);
@@ -151,12 +151,12 @@
         [TestCase(1)]
         public void WriteLargeDataBlock(int writeDelay)
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] sendData = new byte[262144];
             rnd.NextBytes(sendData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -166,7 +166,7 @@
                 // Receive the data, as if it had arrived from a serial port
                 stream.Open();
                 int s = 0;
-                Random l = new Random();
+                Random l = new();
 
                 while (s < sendData.Length) {
                     int q = Math.Min(l.Next(1, 2048), sendData.Length - s);
@@ -190,12 +190,12 @@
         [TestCase(1)]
         public async Task WriteLargeDataBlockAsync(int writeDelay)
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] sendData = new byte[262144];
             rnd.NextBytes(sendData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -205,7 +205,7 @@
                 // Receive the data, as if it had arrived from a serial port
                 stream.Open();
                 int s = 0;
-                Random l = new Random();
+                Random l = new();
 
                 while (s < sendData.Length) {
                     int q = Math.Min(l.Next(1, 2048), sendData.Length - s);
@@ -228,13 +228,13 @@
         [TestCase(1)]
         public void WriteLargeDataBlockSpan(int writeDelay)
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] sendData = new byte[262144];
             rnd.NextBytes(sendData);
             ReadOnlySpan<byte> span = sendData;
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -244,7 +244,7 @@
                 // Receive the data, as if it had arrived from a serial port
                 stream.Open();
                 int s = 0;
-                Random l = new Random();
+                Random l = new();
 
                 while (s < sendData.Length) {
                     int q = Math.Min(l.Next(1, 2048), sendData.Length - s);
@@ -264,13 +264,13 @@
         [TestCase(1)]
         public async Task WriteLargeDataBlockSpanAsync(int writeDelay)
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] sendData = new byte[262144];
             rnd.NextBytes(sendData);
             ReadOnlyMemory<byte> mem = sendData;
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 // The task simulates receiving data
@@ -280,7 +280,7 @@
                 // Receive the data, as if it had arrived from a serial port
                 stream.Open();
                 int s = 0;
-                Random l = new Random();
+                Random l = new();
 
                 while (s < sendData.Length) {
                     int q = Math.Min(l.Next(1, 2048), sendData.Length - s);
@@ -317,13 +317,13 @@
         [Test]
         public void WriteFullBuffer()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] sendData = new byte[1024];
             byte[] sentData = new byte[1024];
             rnd.NextBytes(sendData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.WriteBufferSize = 1024;
                 stream.ReadBufferSize = 1024;
                 stream.PortName = "COM";
@@ -349,13 +349,13 @@
         [Test]
         public async Task WriteFullBufferAsync()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] sendData = new byte[1024];
             byte[] sentData = new byte[1024];
             rnd.NextBytes(sendData);
 
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.WriteBufferSize = 1024;
                 stream.ReadBufferSize = 1024;
                 stream.PortName = "COM";
@@ -381,15 +381,15 @@
         [Test]
         public void DataReceivedEvent()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] serialBuffer = new byte[256];
             rnd.NextBytes(serialBuffer);
 
             byte[] readBuffer = new byte[256];
 
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -414,15 +414,15 @@
         [Test]
         public void DataReceivedEventThreshold()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] serialBuffer = new byte[256];
             rnd.NextBytes(serialBuffer);
 
             byte[] readBuffer = new byte[256];
 
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReceivedBytesThreshold = 100;
                 stream.Open();
@@ -456,18 +456,18 @@
         [Test]
         public void ReadByte()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             byte[] receiveData = new byte[256];
             rnd.NextBytes(receiveData);
 
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
                 Task driverTask = new TaskFactory().StartNew(() => {
-                    Random l = new Random();
+                    Random l = new();
 
                     while (!serial.IsRunning) {
                         Thread.Sleep(1);
@@ -500,8 +500,8 @@
         [Test]
         public void ReadNotOpen()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 Assert.That(stream.IsOpen, Is.False);
@@ -514,8 +514,8 @@
         [Test]
         public void WriteNotOpen()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
 
                 Assert.That(stream.IsOpen, Is.False);
@@ -530,8 +530,8 @@
         [Test]
         public void DiscardOutBuffer()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -546,8 +546,8 @@
         [Test]
         public void DiscardInBuffer()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -563,8 +563,8 @@
         [Test]
         public void CanTimeout()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 Assert.That(stream.CanTimeout, Is.True);
                 Assert.That(stream.ReadTimeout, Is.EqualTo(Timeout.Infinite));
@@ -575,8 +575,8 @@
         [Test]
         public void ReadTimeout()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 100;
                 stream.Open();
@@ -588,8 +588,8 @@
         [Test]
         public void ReadByteTimeout()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 100;
                 stream.Open();
@@ -601,8 +601,8 @@
         [Test]
         public void WriteTimeout()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.WriteTimeout = 100;
                 stream.WriteBufferSize = 2048;
@@ -618,8 +618,8 @@
         [Test]
         public void Flush()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.WriteBufferSize = 2048;
                 stream.Open();
@@ -648,8 +648,8 @@
         [Test]
         public void FlushTimeout()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.WriteBufferSize = 2048;
                 stream.WriteTimeout = 100;
@@ -668,13 +668,13 @@
         [Timeout(30000)]
         public void CopyTo()
         {
-            Random r = new Random();
+            Random r = new();
             byte[] receivedData = new byte[65536];
             r.NextBytes(receivedData);
 
-            using (MemoryStream memStream = new MemoryStream())
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (MemoryStream memStream = new())
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.WriteBufferSize = 2048;
                 stream.WriteTimeout = 100;
@@ -718,13 +718,13 @@
         [Timeout(30000)]
         public async Task CopyToAsync()
         {
-            Random r = new Random();
+            Random r = new();
             byte[] receivedData = new byte[65536];
             r.NextBytes(receivedData);
 
-            using (MemoryStream memStream = new MemoryStream())
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (MemoryStream memStream = new())
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.WriteBufferSize = 2048;
                 stream.WriteTimeout = 100;

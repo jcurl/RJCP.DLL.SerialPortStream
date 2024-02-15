@@ -13,7 +13,7 @@
         [Test]
         public void DefaultCommTimeOuts()
         {
-            using (WinSerialPortStream stream = new WinSerialPortStream(SourcePort)) {
+            using (WinSerialPortStream stream = new(SourcePort)) {
                 Assert.That(stream.Settings.ReadIntervalTimeout, Is.EqualTo(10));
                 Assert.That(stream.Settings.ReadTotalTimeoutConstant, Is.EqualTo(100));
                 Assert.That(stream.Settings.ReadTotalTimeoutMultiplier, Is.EqualTo(0));

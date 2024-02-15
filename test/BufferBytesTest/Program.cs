@@ -9,7 +9,7 @@ namespace RJCP.IO.Ports
     {
         public static int Main(string[] args)
         {
-            CommandOptions options = new CommandOptions();
+            CommandOptions options = new();
             try {
                 Options.Parse(options, args);
             } catch (OptionException ex) {
@@ -18,13 +18,13 @@ namespace RJCP.IO.Ports
             }
 
             byte[] buffer = new byte[2048];
-            Random r = new Random();
+            Random r = new();
             r.NextBytes(buffer);
 
             Task monitor = null;
             try {
                 Console.WriteLine($"Testing port {options.Port} at Baud {options.Baud}");
-                using (SerialPortStream port = new SerialPortStream(options.Port, options.Baud)) {
+                using (SerialPortStream port = new(options.Port, options.Baud)) {
                     port.Open();
 
                     // Monitor the number of bytes to write and print when it changes. On Windows, it depends on the
@@ -59,13 +59,13 @@ namespace RJCP.IO.Ports
             }
 
             try {
-                if (monitor != null)
+                if (monitor is not null)
                     monitor.Wait();
             } catch (ObjectDisposedException) {
                 /* Ignore */
             } catch (AggregateException ex) {
                 if (ex.InnerExceptions.Count > 0) {
-                    if (!(ex.InnerExceptions[0] is ObjectDisposedException)) {
+                    if (ex.InnerExceptions[0] is not ObjectDisposedException) {
                         throw ex.InnerExceptions[0];
                     }
                 }

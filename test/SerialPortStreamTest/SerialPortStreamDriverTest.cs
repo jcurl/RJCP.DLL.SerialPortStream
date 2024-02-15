@@ -12,8 +12,8 @@
         [Test]
         public void OpenVirtualIsRunning()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 Assert.That(stream.IsOpen, Is.False);
 
                 stream.PortName = "COM";
@@ -57,8 +57,8 @@
         [Test]
         public void VirtualGetPortSettings()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.BaudRate = 115200;
                 stream.GetPortSettings();
@@ -85,8 +85,8 @@
         [Test]
         public void SerialPortStreamSeek()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -102,9 +102,9 @@
         [Test]
         public void OnCtsPinChanged()
         {
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -126,9 +126,9 @@
         [Test]
         public void OnDsrPinChanged()
         {
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -150,9 +150,9 @@
         [Test]
         public void OnRingPinChanged()
         {
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -174,9 +174,9 @@
         [Test]
         public void OnCarrierPinChanged()
         {
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -198,8 +198,8 @@
         [Test]
         public void SetDtrEnable()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -212,8 +212,8 @@
         [Test]
         public void SetRtsEnable()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 

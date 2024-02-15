@@ -30,7 +30,7 @@
         [Test]
         public void SettingsOnOpenParity()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.Odd, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.Odd, StopBits.One)) {
                 Assert.That(src.Parity, Is.EqualTo(Parity.Odd));
                 src.Open();
                 Assert.That(src.Parity, Is.EqualTo(Parity.Odd));
@@ -94,8 +94,8 @@
         [Test]
         public void OddParityLoopback()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 7, Parity.Odd, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 7, Parity.Odd, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
 
@@ -106,8 +106,8 @@
         [Test]
         public void EvenParityLoopback()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 7, Parity.Even, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 7, Parity.Even, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
 
@@ -118,8 +118,8 @@
         [Test]
         public void ParityChangeLoopback()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 7, Parity.Even, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 7, Parity.Even, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 TestEvenParity(src, dst);

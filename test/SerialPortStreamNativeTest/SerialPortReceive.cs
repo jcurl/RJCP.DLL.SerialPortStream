@@ -62,7 +62,7 @@
                 });
                 m_Receiver.Start();
             } catch {
-                if (m_RxPort != null) m_RxPort.Dispose();
+                if (m_RxPort is not null) m_RxPort.Dispose();
                 throw;
             }
         }

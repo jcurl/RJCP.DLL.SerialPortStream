@@ -45,7 +45,7 @@
         public SerialPortStream(INativeSerial<T> serial, string port)
             : base(serial)
         {
-            if (port != null) NativeSerial.PortName = port;
+            if (port is not null) NativeSerial.PortName = port;
         }
 
         /// <summary>
@@ -63,7 +63,7 @@
         /// </remarks>
         public SerialPortStream(INativeSerial<T> serial, string port, int baud)
         {
-            if (port != null) NativeSerial.PortName = port;
+            if (port is not null) NativeSerial.PortName = port;
             NativeSerial.BaudRate = baud;
         }
 
@@ -92,7 +92,7 @@
         /// </remarks>
         public SerialPortStream(INativeSerial<T> serial, string port, int baud, int data, Parity parity, StopBits stopbits)
         {
-            if (port != null) NativeSerial.PortName = port;
+            if (port is not null) NativeSerial.PortName = port;
             NativeSerial.BaudRate = baud;
             NativeSerial.DataBits = data;
             NativeSerial.Parity = parity;

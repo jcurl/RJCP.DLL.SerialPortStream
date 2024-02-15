@@ -19,8 +19,8 @@ namespace RJCP.IO.Ports.Serial
         private readonly LogSource m_Log;
         private readonly SerialBuffer m_Buffer;
 
-        private readonly AutoResetEvent m_WriteClearEvent = new AutoResetEvent(false);
-        private readonly AutoResetEvent m_WriteClearDoneEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent m_WriteClearEvent = new(false);
+        private readonly AutoResetEvent m_WriteClearDoneEvent = new(false);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnixNativeSerial"/> class for Unix systems.
@@ -153,7 +153,7 @@ namespace RJCP.IO.Ports.Serial
             get
             {
                 string deviceName = LibNSerial.serial_getdevicename(m_Handle);
-                if (deviceName == null) ThrowException();
+                if (deviceName is null) ThrowException();
                 return deviceName;
             }
             set
@@ -176,7 +176,7 @@ namespace RJCP.IO.Ports.Serial
                 ports = null;
             }
 
-            if (ports == null)
+            if (ports is null)
 #if NETFRAMEWORK
                 // The implementation, most likely from Mono.
                 return System.IO.Ports.SerialPort.GetPortNames();
@@ -209,7 +209,7 @@ namespace RJCP.IO.Ports.Serial
             } catch (EntryPointNotFoundException) {
                 ports = null;
             }
-            if (ports != null)
+            if (ports is not null)
                 return ports;
 
 #if NETFRAMEWORK
@@ -683,7 +683,7 @@ namespace RJCP.IO.Ports.Serial
         private string m_Name;
         private volatile bool m_IsRunning;
         private volatile bool m_MonitorPins;
-        private readonly ManualResetEvent m_StopRunning = new ManualResetEvent(false);
+        private readonly ManualResetEvent m_StopRunning = new(false);
 
         /// <summary>
         /// Start the monitor thread, that will watch over the serial port.
@@ -730,7 +730,7 @@ namespace RJCP.IO.Ports.Serial
             m_StopRunning.Set();
             InterruptReadWriteLoop();
 
-            if (m_PinThread != null) {
+            if (m_PinThread is not null) {
                 int killcounter = 0;
 
                 if (m_MonitorPins) {
@@ -751,7 +751,7 @@ namespace RJCP.IO.Ports.Serial
                 m_MonitorPins = false;
             }
 
-            if (m_MonitorThread != null) {
+            if (m_MonitorThread is not null) {
                 if (m_Log.ShouldTrace(TraceEventType.Verbose))
                     m_Log.TraceEvent(TraceEventType.Verbose, $"{m_Name}: ReadWriteThread: Waiting for Thread");
                 m_MonitorThread.Join();
@@ -963,7 +963,7 @@ namespace RJCP.IO.Ports.Serial
         protected virtual void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
             EventHandler<SerialDataReceivedEventArgs> handler = DataReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -981,7 +981,7 @@ namespace RJCP.IO.Ports.Serial
         protected virtual void OnCommError(object sender, SerialErrorReceivedEventArgs args)
         {
             EventHandler<SerialErrorReceivedEventArgs> handler = ErrorReceived;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }
@@ -999,7 +999,7 @@ namespace RJCP.IO.Ports.Serial
         protected virtual void OnPinChanged(object sender, SerialPinChangedEventArgs args)
         {
             EventHandler<SerialPinChangedEventArgs> handler = PinChanged;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(sender, args);
             }
         }

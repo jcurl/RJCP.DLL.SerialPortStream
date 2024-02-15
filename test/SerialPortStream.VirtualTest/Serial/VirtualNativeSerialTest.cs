@@ -21,7 +21,7 @@
                 }
                 return serial;
             } catch {
-                if (serial != null) {
+                if (serial is not null) {
                     serial.Dispose();
                 }
                 throw;
@@ -121,8 +121,8 @@
         [Test]
         public void WriteEvent()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 // Your simulated serial port task would wait for when the user writes to the virtual serial port in a loop,
                 // and then it can read the data and process it.
                 int dataWritten = -1;
@@ -144,8 +144,8 @@
         [Test]
         public void ReadEvent()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 // Your simulated serial port task would wait for when the user writes to the virtual serial port in a loop,
                 // and then it can read the data and process it.
                 int dataRead = -1;
@@ -173,9 +173,9 @@
         [Test]
         public void SerialDataOnRead()
         {
-            using (ManualResetEventSlim mre = new ManualResetEventSlim(false))
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (ManualResetEventSlim mre = new(false))
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 byte[] buffer = new byte[1024];
                 int read = 0;
 
@@ -204,8 +204,8 @@
         [Timeout(2000)]
         public void VirtualNativeClosed()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 Task serialTask = new TaskFactory().StartNew(() => {
                     Thread.Sleep(100);
                     serial.StopMonitor();

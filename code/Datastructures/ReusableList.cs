@@ -68,7 +68,7 @@
         public bool Contains(T item)
         {
             for (int i = 0; i < m_Count; i++) {
-                if (item == null) return m_ReusableList[i] == null;
+                if (item is null) return m_ReusableList[i] is null;
                 if (item.Equals(m_ReusableList[i])) return true;
             }
             return false;
@@ -132,8 +132,8 @@
         public int IndexOf(T item)
         {
             for (int i = 0; i < m_Count; i++) {
-                if (item == null && m_ReusableList[i] == null) return i;
-                if (item != null && item.Equals(m_ReusableList[i])) return i;
+                if (item is null && m_ReusableList[i] is null) return i;
+                if (item is not null && item.Equals(m_ReusableList[i])) return i;
             }
             return -1;
         }
@@ -173,7 +173,7 @@
                 result = new T[m_Count];
             } else {
                 int index = m_Count - m_MinCapacity;
-                if (m_ReusableListCache[index] == null) {
+                if (m_ReusableListCache[index] is null) {
                     result = new T[m_Count];
                     m_ReusableListCache[index] = result;
                 } else {

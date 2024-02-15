@@ -23,7 +23,7 @@
         [Test]
         public void SimpleConstructor()
         {
-            SerialPortStream src = new SerialPortStream();
+            SerialPortStream src = new();
             src.Dispose();
             Assert.That(src.IsDisposed, Is.True);
         }
@@ -31,7 +31,7 @@
         [Test]
         public void VersionString()
         {
-            using (SerialPortStream src = new SerialPortStream()) {
+            using (SerialPortStream src = new()) {
                 Assert.That(src.Version, Is.Not.Null.Or.Empty);
                 Console.WriteLine($"Version: {src.Version}");
             }
@@ -40,7 +40,7 @@
         [Test]
         public void ConstructorWithPort()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 Assert.That(src.PortName, Is.EqualTo(SourcePort));
             }
         }
@@ -48,7 +48,7 @@
         [Test]
         public void ConstructorWithPortBaud()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 1200)) {
+            using (SerialPortStream src = new(SourcePort, 1200)) {
                 Assert.That(src.PortName, Is.EqualTo(SourcePort));
                 Assert.That(src.BaudRate, Is.EqualTo(1200));
             }
@@ -57,7 +57,7 @@
         [Test]
         public void ConstructorWithFullConfig()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 1200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 1200, 8, Parity.None, StopBits.One)) {
                 Assert.That(src.PortName, Is.EqualTo(SourcePort));
                 Assert.That(src.BaudRate, Is.EqualTo(1200));
                 Assert.That(src.DataBits, Is.EqualTo(8));
@@ -77,7 +77,7 @@
         [Test]
         public void ConstructorNativeSerialOpen()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial()) {
+            using (VirtualNativeSerial serial = new()) {
                 serial.PortName = "COM";
                 serial.Open();
 
@@ -90,7 +90,7 @@
         [Test]
         public void ConstructorNativeSerialRunning()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial()) {
+            using (VirtualNativeSerial serial = new()) {
                 serial.PortName = "COM";
                 serial.Open();
                 serial.StartMonitor();
@@ -104,7 +104,7 @@
         [Test]
         public void PropertyBaudRate()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.BaudRate = 115200;
                 Assert.That(src.BaudRate, Is.EqualTo(115200));
             }
@@ -113,7 +113,7 @@
         [Test]
         public void PropertyDataBits()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.DataBits = 8;
                 Assert.That(src.DataBits, Is.EqualTo(8));
                 src.DataBits = 7;
@@ -128,7 +128,7 @@
         [Test]
         public void PropertyParity()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.Parity = Parity.None;
                 Assert.That(src.Parity, Is.EqualTo(Parity.None));
                 src.Parity = Parity.Even;
@@ -145,7 +145,7 @@
         [Test]
         public void PropertyStopBits()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.StopBits = StopBits.One;
                 Assert.That(src.StopBits, Is.EqualTo(StopBits.One));
                 src.StopBits = StopBits.Two;
@@ -158,7 +158,7 @@
         [Test]
         public void PropertyDiscardNull()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.DiscardNull = false;
                 Assert.That(src.DiscardNull, Is.EqualTo(false));
                 src.DiscardNull = true;
@@ -169,7 +169,7 @@
         [Test]
         public void PropertyParityReplace()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.ParityReplace = 0;
                 Assert.That(src.ParityReplace, Is.EqualTo(0));
                 src.ParityReplace = (byte)'.';
@@ -184,7 +184,7 @@
         [Test]
         public void PropertyTxContinueOnXOff()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.TxContinueOnXOff = true;
                 Assert.That(src.TxContinueOnXOff, Is.EqualTo(true));
                 src.TxContinueOnXOff = false;
@@ -195,7 +195,7 @@
         [Test]
         public void PropertyXOffLimit()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.XOffLimit = 512;
                 Assert.That(src.XOffLimit, Is.EqualTo(512));
                 src.XOffLimit = 2048;
@@ -210,7 +210,7 @@
         [Test]
         public void PropertyXOnLimit()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort)) {
+            using (SerialPortStream src = new(SourcePort)) {
                 src.XOnLimit = 512;
                 Assert.That(src.XOnLimit, Is.EqualTo(512));
                 src.XOnLimit = 2048;
@@ -225,7 +225,7 @@
         [Test]
         public void GetPortSettingsWithNoPort()
         {
-            using (SerialPortStream sp = new SerialPortStream()) {
+            using (SerialPortStream sp = new()) {
                 Assert.That(() => sp.GetPortSettings(), Throws.Exception);
             }
         }
@@ -236,10 +236,10 @@
         {
             bool result = true;
 
-            Dictionary<string, bool> ports1 = new Dictionary<string, bool>();
-            Dictionary<string, bool> ports2 = new Dictionary<string, bool>();
+            Dictionary<string, bool> ports1 = new();
+            Dictionary<string, bool> ports2 = new();
 
-            using (SerialPortStream serialPort = new SerialPortStream()) {
+            using (SerialPortStream serialPort = new()) {
                 PortDescription[] portDescs = serialPort.GetPortDescriptions();
                 foreach (PortDescription desc in portDescs) {
                     Console.WriteLine($"GetPortDescriptions: {desc}");
@@ -276,7 +276,7 @@
             INativeSerial serial = new WinNativeSerial();
             Assert.That(serial.IsOpen, Is.False);
 
-            using (SerialPortStream winSerial = new SerialPortStream(serial)) {
+            using (SerialPortStream winSerial = new(serial)) {
                 Assert.That(winSerial.IsOpen, Is.False);
             }
         }
@@ -289,7 +289,7 @@
             INativeSerial serial = new UnixNativeSerial();
             Assert.That(serial.IsOpen, Is.False);
 
-            using (SerialPortStream unixSerial = new SerialPortStream(serial)) {
+            using (SerialPortStream unixSerial = new(serial)) {
                 Assert.That(unixSerial.IsOpen, Is.False);
             }
         }

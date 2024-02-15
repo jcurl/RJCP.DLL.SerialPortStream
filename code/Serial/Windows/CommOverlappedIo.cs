@@ -32,32 +32,32 @@
         /// <summary>
         /// Event to abort OverlappedIoThread (for OverlappedIoThread).
         /// </summary>
-        private readonly ManualResetEvent m_StopRunning = new ManualResetEvent(false);
+        private readonly ManualResetEvent m_StopRunning = new(false);
 
         /// <summary>
         /// Overlapped I/O for WaitCommEvent() finished (for OverlappedIoThread).
         /// </summary>
-        private readonly ManualResetEvent m_SerialCommEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent m_SerialCommEvent = new(false);
 
         /// <summary>
         /// Overlapped I/O for ReadFile() finished (for OverlappedIoThread).
         /// </summary>
-        private readonly ManualResetEvent m_ReadEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent m_ReadEvent = new(false);
 
         /// <summary>
         /// Overlapped I/O for WriteFile() finished (for OverlappedIoThread).
         /// </summary>
-        private readonly ManualResetEvent m_WriteEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent m_WriteEvent = new(false);
 
         /// <summary>
         /// Triggered to indicate to purge data in the write buffer by the OverlappedIO thread.
         /// </summary>
-        private readonly AutoResetEvent m_WriteClearEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent m_WriteClearEvent = new(false);
 
         /// <summary>
         /// Triggered when the purge is complete from the OverlappedIO thread.
         /// </summary>
-        private readonly AutoResetEvent m_WriteClearDoneEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent m_WriteClearDoneEvent = new(false);
 
         /// <summary>
         /// Used by the OverlappedIO thread to finalise a purge of the write buffer if a write
@@ -211,7 +211,7 @@
             m_IsRunning = true;
             try {
                 // Set the time outs
-                Kernel32.COMMTIMEOUTS timeouts = new Kernel32.COMMTIMEOUTS() {
+                Kernel32.COMMTIMEOUTS timeouts = new() {
                     ReadIntervalTimeout = m_Settings.ReadIntervalTimeout,
                     ReadTotalTimeoutConstant = m_Settings.ReadTotalTimeoutConstant,
                     ReadTotalTimeoutMultiplier = m_Settings.ReadTotalTimeoutMultiplier,
@@ -238,7 +238,7 @@
         /// </summary>
         private void Stop()
         {
-            if (m_Thread != null) {
+            if (m_Thread is not null) {
                 if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
                     m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: OverlappedIO: Stopping Thread");
                 m_StopRunning.Set();
@@ -299,7 +299,7 @@
             bool serialCommPending = false;
             bool serialCommError = false;
             m_SerialCommEvent.Reset();
-            NativeOverlapped serialCommOverlapped = new NativeOverlapped();
+            NativeOverlapped serialCommOverlapped = new();
 #if NET6_0_OR_GREATER
             serialCommOverlapped.EventHandle = m_SerialCommEvent.GetSafeWaitHandle().DangerousGetHandle();
 #else
@@ -308,7 +308,7 @@
             // ReadFile
             bool readPending = false;
             m_ReadEvent.Reset();
-            NativeOverlapped readOverlapped = new NativeOverlapped();
+            NativeOverlapped readOverlapped = new();
 #if NET6_0_OR_GREATER
             readOverlapped.EventHandle = m_ReadEvent.GetSafeWaitHandle().DangerousGetHandle();
 #else
@@ -317,7 +317,7 @@
             // WriteFile
             bool writePending = false;
             m_WriteEvent.Reset();
-            NativeOverlapped writeOverlapped = new NativeOverlapped();
+            NativeOverlapped writeOverlapped = new();
             m_ReadByteAvailable = false;
 #if NET6_0_OR_GREATER
             writeOverlapped.EventHandle = m_WriteEvent.GetSafeWaitHandle().DangerousGetHandle();
@@ -332,7 +332,7 @@
 
             bool running = true;
             uint bytes;
-            ReusableList<WaitHandle> handles = new ReusableList<WaitHandle>(2, 7);
+            ReusableList<WaitHandle> handles = new(2, 7);
 
             while (running) {
                 handles.Clear();
@@ -791,7 +791,7 @@
                     $"{m_Name}: CommEvent: {args.EventType}");
 
             EventHandler<CommEventArgs> handler = CommEvent;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(this, args);
             }
         }
@@ -807,7 +807,7 @@
                     $"{m_Name}: CommErrorEvent: {args.EventType}");
 
             EventHandler<CommErrorEventArgs> handler = CommErrorEvent;
-            if (handler != null) {
+            if (handler is not null) {
                 handler(this, args);
             }
         }

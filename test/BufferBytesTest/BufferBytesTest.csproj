@@ -25,6 +25,7 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <LangVersion Condition="$(TargetFramework.StartsWith('net4'))">10</LangVersion>
 
     <RevisionControl>git</RevisionControl>
     <RevisionControlLabel>release/v$(Version)</RevisionControlLabel>
@@ -60,6 +61,7 @@
 
   <ItemGroup>
     <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.4" PrivateAssets="all" />
+    <PackageReference Include="CSharpIsNullAnalyzer" Version="0.1.495" PrivateAssets="all" />
     <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
     <ProjectReference Include="..\..\..\commandline\code\RJCP.Core.CommandLine.csproj" />
   </ItemGroup>

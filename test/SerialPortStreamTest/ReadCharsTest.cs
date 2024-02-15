@@ -12,8 +12,8 @@
         [Test]
         public void NewLine()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 serial.PortName = "COM";
 
                 Assert.That(() => {
@@ -29,8 +29,8 @@
         [Test]
         public void ReadChars()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -50,8 +50,8 @@
         [Test]
         public void ReadCharsWithTimeout()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 100;
                 stream.Open();
@@ -74,8 +74,8 @@
         [Test]
         public void ReadSingleChar()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -91,8 +91,8 @@
         [Test]
         public void ReadSingleCharWithTimeout()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 100;
                 stream.Open();
@@ -110,8 +110,8 @@
         [Test]
         public void ReadSingleCharEuroSymbol()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -125,8 +125,8 @@
         [Test]
         public void ReadSingleCharEuroSymbolBytes()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -144,8 +144,8 @@
         [Test]
         public void ReadSingleCharUtf32()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -162,8 +162,8 @@
         [Test]
         public void ReadSingleCharUtf32Bytes()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -185,8 +185,8 @@
         [Test]
         public void ReadLine()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -200,8 +200,8 @@
         [Test]
         public void ReadLineBytes()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -223,8 +223,8 @@
         [Test]
         public void ReadLineMultipleLines()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -241,8 +241,8 @@
         [Test]
         public void ReadLineMultipleLinesBytes()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -270,8 +270,8 @@
         [Test]
         public void ReadToCached()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -291,8 +291,8 @@
         [Test]
         public void ReadToCachedWithData()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -311,8 +311,8 @@
         [Test]
         public void ReadToWithData()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -328,13 +328,13 @@
         [Test]
         public void ReadToOverflow()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
                 // Send 2048 ASCII characters
-                Random r = new Random();
+                Random r = new();
                 byte[] sdata = new byte[2048];
                 for (int i = 0; i < sdata.Length; i++) {
                     sdata[i] = (byte)r.Next(65, 65 + 26);
@@ -357,14 +357,14 @@
         [Test]
         public void ReadToOverflowBytes1()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
 
                 // Send 2048 ASCII characters
-                Random r = new Random();
+                Random r = new();
                 byte[] sdata = new byte[2048];
                 for (int i = 0; i < sdata.Length; i++) {
                     sdata[i] = (byte)r.Next(65, 65 + 26);
@@ -393,14 +393,14 @@
         [Test]
         public void ReadToOverflowBytes2()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
 
                 // Send 2048 ASCII characters
-                Random r = new Random();
+                Random r = new();
                 byte[] sdata = new byte[2048];
                 for (int i = 0; i < sdata.Length; i++) {
                     sdata[i] = (byte)r.Next(65, 65 + 26);
@@ -435,14 +435,14 @@
         [Test]
         public void ReadToOverflowTwice()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
 
                 // Send 2048 ASCII characters
-                Random r = new Random();
+                Random r = new();
                 byte[] sdata = new byte[2048];
                 for (int i = 0; i < sdata.Length; i++) {
                     sdata[i] = (byte)r.Next(65, 65 + 26);
@@ -474,8 +474,8 @@
         [Test]
         public void ReadToWithMbcs()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -494,8 +494,8 @@
         [Test]
         public void ReadToWithMbcs1()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -514,8 +514,8 @@
         [Test]
         public void ReadToWithMbcs2()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -534,8 +534,8 @@
         [Test]
         public void ReadToWithMbcs3()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -555,8 +555,8 @@
         [Test]
         public void ReadToResetWithOverflow1()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -581,8 +581,8 @@
         [Test]
         public void ReadToResetWithOverflow2()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.ReadTimeout = 0;
                 stream.Open();
@@ -609,8 +609,8 @@
         [Test]
         public void WriteLine()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -628,7 +628,7 @@
                 Assert.That(bu, Is.EqualTo(r));
                 Assert.That(cu, Is.EqualTo(10 + stream.NewLine.Length));
                 Assert.That(completed, Is.True);
-                string decodedString = new string(decoded, 0, cu);
+                string decodedString = new(decoded, 0, cu);
                 Assert.That(decodedString, Is.EqualTo("TestString" + stream.NewLine));
             }
         }
@@ -636,8 +636,8 @@
         [Test]
         public void WriteText()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -655,7 +655,7 @@
                 Assert.That(bu, Is.EqualTo(r));
                 Assert.That(cu, Is.EqualTo(10));
                 Assert.That(completed, Is.True);
-                string decodedString = new string(decoded, 0, cu);
+                string decodedString = new(decoded, 0, cu);
                 Assert.That(decodedString, Is.EqualTo("TestString"));
             }
         }
@@ -663,8 +663,8 @@
         [Test]
         public void WriteChars()
         {
-            using (VirtualNativeSerial serial = new VirtualNativeSerial())
-            using (SerialPortStream stream = new SerialPortStream(serial)) {
+            using (VirtualNativeSerial serial = new())
+            using (SerialPortStream stream = new(serial)) {
                 stream.PortName = "COM";
                 stream.Open();
 
@@ -683,7 +683,7 @@
                 Assert.That(bu, Is.EqualTo(r));
                 Assert.That(cu, Is.EqualTo(10));
                 Assert.That(completed, Is.True);
-                string decodedString = new string(decoded, 0, cu);
+                string decodedString = new(decoded, 0, cu);
                 Assert.That(decodedString, Is.EqualTo("TestString"));
             }
         }

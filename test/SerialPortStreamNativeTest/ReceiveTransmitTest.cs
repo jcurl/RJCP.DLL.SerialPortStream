@@ -37,8 +37,8 @@
         [Timeout(20000)]
         public void SendReceive()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -46,7 +46,7 @@
 
                 // Send Maximum data in one go
                 byte[] sendbuf = new byte[src.WriteBufferSize];
-                Random r = new Random();
+                Random r = new();
                 r.NextBytes(sendbuf);
                 src.Write(sendbuf, 0, sendbuf.Length);
 
@@ -98,7 +98,7 @@
 
         private class SendReceiveAsyncState
         {
-            public ManualResetEvent finished = new ManualResetEvent(false);
+            public ManualResetEvent finished = new(false);
             public SerialPortStream src;
             public SerialPortStream dst;
             public byte[] sendBuf;
@@ -110,20 +110,20 @@
         [Timeout(20000)]
         public void SendReceiveWithBeginEnd()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
-                SendReceiveAsyncState state = new SendReceiveAsyncState {
+                SendReceiveAsyncState state = new() {
                     src = src,
                     dst = dst,
                     sendBuf = new byte[src.WriteBufferSize],
                     recvBuf = new byte[src.WriteBufferSize + 10]
                 };
-                Random r = new Random();
+                Random r = new();
                 r.NextBytes(state.sendBuf);
 
                 // Here we start the read and write in parallel. The read will wait up to c_Timeout for the first byte.
@@ -167,8 +167,8 @@
         [Test]
         public void SendAndFlush1()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 // Required for com0com to send the data (the remote side must receive it)
                 dst.Open();
 
@@ -181,8 +181,8 @@
         [Test]
         public void SendAndFlush2()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 // Required for com0com to send the data (the remote side must receive it)
                 dst.Open();
 
@@ -203,8 +203,8 @@
         [Test]
         public void Flush()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -237,9 +237,9 @@
         [Test]
         public void WaitForRxCharEventOn1Byte()
         {
-            using (ManualResetEvent rxChar = new ManualResetEvent(false))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent rxChar = new(false))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
 
@@ -253,9 +253,9 @@
         [Test]
         public void WaitForRxCharEventOn2Bytes()
         {
-            using (ManualResetEvent rxChar = new ManualResetEvent(false))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent rxChar = new(false))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
 
@@ -271,10 +271,10 @@
         [Test]
         public void WaitForRxCharEventOnEofChar()
         {
-            using (ManualResetEvent rxChar = new ManualResetEvent(false))
-            using (ManualResetEvent eofChar = new ManualResetEvent(false))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent rxChar = new(false))
+            using (ManualResetEvent eofChar = new(false))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
 
@@ -305,9 +305,9 @@
         [Test]
         public void WaitForCtsChangedEvent()
         {
-            using (ManualResetEvent cts = new ManualResetEvent(false))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent cts = new(false))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
 
@@ -327,9 +327,9 @@
         [Test]
         public void WaitForDsrChangedEvent()
         {
-            using (ManualResetEvent dsr = new ManualResetEvent(false))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent dsr = new(false))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.Open(); src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.Open(); dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
 
@@ -351,7 +351,7 @@
         {
             byte[] buffer = new byte[256];
 
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 Assert.That(() => {
                     src.Write(buffer, 0, buffer.Length);
                 }, Throws.TypeOf<InvalidOperationException>());
@@ -367,9 +367,9 @@
 
             int startTick = Environment.TickCount;
 
-            using (ManualResetEvent finished = new ManualResetEvent(false))
-            using (SerialPortStream serialSource = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream serialDest = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (ManualResetEvent finished = new(false))
+            using (SerialPortStream serialSource = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream serialDest = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 serialSource.ReadBufferSize = blockSize;
                 serialSource.WriteBufferSize = blockSize;
                 serialDest.ReadBufferSize = blockSize;
@@ -422,7 +422,7 @@
                 sp.Open();
                 spReceive.Open();
 
-                List<int> positions = new List<int>();
+                List<int> positions = new();
                 while (size - position > bufferSize) {
                     positions.Add(position);
                     if (position >= sp.WriteBufferSize - bufferSize) {
@@ -451,7 +451,7 @@
         [Timeout(10000)]
         public async Task ReadAndWriteAsyncInDifferentThreadsAtSameTime()
         {
-            using (SerialPortStream serial = new SerialPortStream(SourcePort) {
+            using (SerialPortStream serial = new(SourcePort) {
                 BaudRate = 115200,
                 DataBits = 8,
                 Parity = Parity.None,
@@ -548,7 +548,7 @@
             bool equal = data.SequenceEqual(receivedData);
             Console.WriteLine($"Are data the same: {equal}");
 
-            List<Difference> differences = new List<Difference>();
+            List<Difference> differences = new();
             for (int i = 0; i < data.Length; i++) {
                 var sent = data[i];
                 var received = receivedData[i];

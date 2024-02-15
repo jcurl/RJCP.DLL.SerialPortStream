@@ -23,7 +23,7 @@
 
             // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
             // invalid port name.
-            using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One)) {
+            using (SerialPort serialSource = new(SourcePort, 115200, Parity.None, 8, StopBits.One)) {
                 Assume.That(() => { serialSource.Write(buffer, 0, buffer.Length); }, Throws.TypeOf<InvalidOperationException>());
             }
         }
@@ -37,8 +37,8 @@
 
             // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
             // invalid port name.
-            using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One))
-            using (SerialPort serialDest = new SerialPort(DestPort, 115200, Parity.None, 8, StopBits.One)) {
+            using (SerialPort serialSource = new(SourcePort, 115200, Parity.None, 8, StopBits.One))
+            using (SerialPort serialDest = new(DestPort, 115200, Parity.None, 8, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 
@@ -74,8 +74,8 @@
 
             // Be sure to set up the COM port properly in the app.config file, els you'll get an exception with an
             // invalid port name.
-            using (SerialPort serialSource = new SerialPort(SourcePort, 115200, Parity.None, 8, StopBits.One))
-            using (SerialPort serialDest = new SerialPort(DestPort, 115200, Parity.None, 8, StopBits.One)) {
+            using (SerialPort serialSource = new(SourcePort, 115200, Parity.None, 8, StopBits.One))
+            using (SerialPort serialDest = new(DestPort, 115200, Parity.None, 8, StopBits.One)) {
                 serialSource.Open();
                 serialDest.Open();
 

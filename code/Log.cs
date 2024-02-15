@@ -6,6 +6,6 @@
     {
         public const string SerialPortStream = "RJCP.IO.Ports.SerialPortStream";
 
-        public static readonly LogSource Serial = new LogSource(SerialPortStream);
+        public static readonly LogSource Serial = new(SerialPortStream);
     }
 }

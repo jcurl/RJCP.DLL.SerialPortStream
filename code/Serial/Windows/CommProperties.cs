@@ -13,7 +13,7 @@
     internal sealed class CommProperties
     {
         private readonly SafeFileHandle m_ComPortHandle;
-        private Kernel32.CommProp m_CommProp = new Kernel32.CommProp();
+        private Kernel32.CommProp m_CommProp = new();
 
         internal CommProperties(SafeFileHandle handle)
         {
@@ -69,7 +69,7 @@
         /// <returns><see langword="true"/> if the number of data bits is indicated as supported.</returns>
         public bool IsValidDataBits(int databits)
         {
-            if ((databits < 5 || databits > 8) && databits != 16) return false;
+            if (databits is (< 5 or > 8) and not 16) return false;
             switch (databits) {
             case 5: return m_CommProp.dwSettableDataStopParity[(int)Kernel32.SettableData.DATABITS_5];
             case 6: return m_CommProp.dwSettableDataStopParity[(int)Kernel32.SettableData.DATABITS_6];

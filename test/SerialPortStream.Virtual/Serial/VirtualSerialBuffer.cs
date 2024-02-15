@@ -9,7 +9,7 @@
         private void OnWriteEvent(object sender, SerialBufferEventArgs args)
         {
             EventHandler<SerialBufferEventArgs> handler = WriteEvent;
-            if (handler != null) handler(sender, args);
+            if (handler is not null) handler(sender, args);
         }
 
         public event EventHandler<SerialBufferEventArgs> ReadEvent;
@@ -17,7 +17,7 @@
         private void OnReadEvent(object sender, SerialBufferEventArgs args)
         {
             EventHandler<SerialBufferEventArgs> handler = ReadEvent;
-            if (handler != null) handler(sender, args);
+            if (handler is not null) handler(sender, args);
         }
 
         public event EventHandler<SerialDataReceivedEventArgs> DataReceived;
@@ -25,7 +25,7 @@
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs args)
         {
             EventHandler<SerialDataReceivedEventArgs> handler = DataReceived;
-            if (handler != null) handler(sender, args);
+            if (handler is not null) handler(sender, args);
         }
 
         private bool m_ReadRegistered;
@@ -33,7 +33,7 @@
 
         protected override SerialReadBuffer GetSerialReadBuffer(bool pinned)
         {
-            VirtualSerialReadBuffer buffer = new VirtualSerialReadBuffer(ReadBufferSize) {
+            VirtualSerialReadBuffer buffer = new(ReadBufferSize) {
                 Encoding = Encoding
             };
             buffer.ReadEvent += OnReadEvent;
@@ -44,7 +44,7 @@
 
         protected override SerialWriteBuffer GetSerialWriteBuffer(bool pinned)
         {
-            VirtualSerialWriteBuffer buffer = new VirtualSerialWriteBuffer(WriteBufferSize);
+            VirtualSerialWriteBuffer buffer = new(WriteBufferSize);
             buffer.WriteEvent += OnWriteEvent;
             m_WriteRegistered = true;
             return buffer;

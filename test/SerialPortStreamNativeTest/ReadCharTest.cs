@@ -32,8 +32,8 @@
         [Test]
         public void ReadChars()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = 2 * TimeOut + 500; src.ReadTimeout = 2 * TimeOut + 500;
                 dst.WriteTimeout = 2 * TimeOut + 500; dst.ReadTimeout = 2 * TimeOut + 500;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -55,8 +55,8 @@
         [Test]
         public void ReadCharsWithTimeout()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = 2 * TimeOut + 500; src.ReadTimeout = 2 * TimeOut + 500;
                 dst.WriteTimeout = 2 * TimeOut + 500; dst.ReadTimeout = 2 * TimeOut + 500;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -92,8 +92,8 @@
         [Test]
         public void ReadSingleChar()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = 2 * TimeOut + 500; src.ReadTimeout = 2 * TimeOut + 500;
                 dst.WriteTimeout = 2 * TimeOut + 500; dst.ReadTimeout = 2 * TimeOut + 500;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -112,8 +112,8 @@
         [Test]
         public void ReadSingleCharWithTimeout()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = 2 * TimeOut + 500; src.ReadTimeout = 2 * TimeOut + 500;
                 dst.WriteTimeout = 2 * TimeOut + 500; dst.ReadTimeout = 2 * TimeOut + 500;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -136,8 +136,8 @@
         [Test]
         public void ReadSingleCharEuro()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -152,8 +152,8 @@
         [Test]
         public void ReadSingleCharUtf32()
         {
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -171,8 +171,8 @@
         [Test]
         public void WriteLineReadLine()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -186,8 +186,8 @@
         [Test]
         public void WriteLineReadLineTimeout1()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -206,8 +206,8 @@
         [Test]
         public void WriteLineReadLineTimeout2()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -226,8 +226,8 @@
         [Test]
         public void WriteLineReadLineMultilines()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -246,8 +246,8 @@
         [Test]
         public void WriteLineReadLineCharForChar()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -276,8 +276,8 @@
         [Test]
         public void WriteLineReadLineMbcsByteForByte()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -309,8 +309,8 @@
         [Test]
         public void ReadToCached()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -333,8 +333,8 @@
         [Test]
         public void ReadToNormal()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -353,15 +353,15 @@
         [Test]
         public void ReadToOverflow()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
                 dst.Open(); Assert.That(dst.IsOpen, Is.True);
 
                 // Send 2048 ASCII characters
-                Random r = new Random();
+                Random r = new();
                 byte[] sdata = new byte[2048];
                 for (int i = 0; i < sdata.Length; i++) {
                     sdata[i] = (byte)r.Next(65, 65 + 26);
@@ -387,8 +387,8 @@
         [Test]
         public void ReadToWithMbcs()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -407,8 +407,8 @@
         [Test]
         public void ReadToResetWithMbcs1()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -426,8 +426,8 @@
         [Test]
         public void ReadToResetWithMbcs2()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -445,8 +445,8 @@
         [Test]
         public void ReadToResetWithMbcs3()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -464,8 +464,8 @@
         [Test]
         public void ReadToResetWithOverflow()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = TimeOut; src.ReadTimeout = TimeOut;
                 dst.WriteTimeout = TimeOut; dst.ReadTimeout = TimeOut;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
@@ -488,8 +488,8 @@
         [Test]
         public void ReadToWithOverflow2()
         {
-            using (SerialPortStream src = new SerialPortStream(SourcePort, 115200, 8, Parity.None, StopBits.One))
-            using (SerialPortStream dst = new SerialPortStream(DestPort, 115200, 8, Parity.None, StopBits.One)) {
+            using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
+            using (SerialPortStream dst = new(DestPort, 115200, 8, Parity.None, StopBits.One)) {
                 src.WriteTimeout = -1; src.ReadTimeout = -1;
                 dst.WriteTimeout = -1; dst.ReadTimeout = -1;
                 src.Open(); Assert.That(src.IsOpen, Is.True);
