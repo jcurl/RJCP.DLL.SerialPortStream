@@ -2,6 +2,7 @@ namespace RJCP.IO.Ports.Serial
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Runtime.Versioning;
     using System.Threading;
@@ -56,6 +57,7 @@ namespace RJCP.IO.Ports.Serial
 #endif
         }
 
+        [DoesNotReturn]
         private void ThrowException()
         {
             if (m_IsDisposed) return;
@@ -72,6 +74,7 @@ namespace RJCP.IO.Ports.Serial
 #else
                 ThrowExceptionMono();
 #endif
+                // [DoesNotReturn] doesn't have an effect as we haven't opted in for nullable.
                 throw;
             }
             string libDescription = LibNSerial.serial_error(m_Handle);
@@ -107,6 +110,7 @@ namespace RJCP.IO.Ports.Serial
 
 #if !NET6_0_OR_GREATER
         // For compatibility with libnserial 1.0 only.
+        [DoesNotReturn]
         private void ThrowExceptionMono()
         {
             Mono.Unix.Native.Errno errno = Mono.Unix.Native.NativeConvert.ToErrno(LibNSerial.errno);
@@ -124,6 +128,7 @@ namespace RJCP.IO.Ports.Serial
 
 #if NET6_0_OR_GREATER
         // For compatibility with libnserial 1.0 only.
+        [DoesNotReturn]
         private void ThrowExceptionNetStandard()
         {
             string description = LibNSerial.serial_error(m_Handle);
