@@ -237,8 +237,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                ThrowHelper.ThrowIfNull(value);
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Must provide a valid name for a COM port", nameof(PortName));
+                ThrowHelper.ThrowIfNullOrWhiteSpaceMsg("Must provide a valid name for a COM port", value);
                 if (m_NativeSerial.IsOpen && value != m_NativeSerial.PortName) throw new InvalidOperationException("Serial Port already opened");
 
                 m_NativeSerial.PortName = value;
@@ -448,8 +447,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                ThrowHelper.ThrowIfNull(value);
-                if (string.IsNullOrEmpty(value)) throw new ArgumentException("Newline may not be empty", nameof(NewLine));
+                ThrowHelper.ThrowIfNullOrEmpty(value);
                 m_NewLine = value;
             }
         }
@@ -1189,8 +1187,7 @@
         public string ReadTo(string text)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            ThrowHelper.ThrowIfNull(text);
-            if (string.IsNullOrEmpty(text)) throw new ArgumentException("Parameter text shall not be null or empty", nameof(text));
+            ThrowHelper.ThrowIfNullOrEmpty(text);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
             if (ReadCheckDeviceError()) return null;
