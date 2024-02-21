@@ -105,10 +105,10 @@ The `SerialPortStream` tries to solve the following issues observed:
 Software has been tested and developed using:
 
 * .NET Standard 1.5 on Windows 10 Pro x64
-* .NET 4.8 on Windows 10 Pro x64
-* .NET 4.5 on Windows 8 Pro x64 and Windows 8.1 Pro x64.
-* .NET 4.5 on Windows 7 x86 and x64.
-* Mono 6.x from Xamarin on Ubuntu 18.04 (64-bit)
+* .NET 4.8.1 on Windows 10 Pro x64
+* .NET 4.5 on Windows 8 Pro x64 and Windows 8.1 Pro x64 (previous versions).
+* .NET 4.5 on Windows 7 x86 and x64 (previous versions).
+* Mono 6.x from Xamarin on Ubuntu 18.04 (64-bit, previous versions).
 
 I use this software for automation in another system (Windows) that runs for
 multiple days and it appears stable.
@@ -278,7 +278,7 @@ The following issues are known:
 * This is not an issue, but when using the `Com0Com` for running unit tests,
   some specific test cases for Parity will fail. That is because Com0Com doesn't
   emulate data at a bit level.
-* .NET 4.0 to the currently tested .NET 4.6 has a minor bug in
+* .NET 4.0 to the currently tested .NET 4.8.1 and .NET Core has a minor bug in
   System.Text.Decoder that in a special circumstance it will consume too many
   bytes. The `PeekChar()` method is therefore a slower implementation than what
   it could be. Please refer to the Xamarin bug

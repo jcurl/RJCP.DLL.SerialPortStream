@@ -134,4 +134,9 @@
   <ItemGroup>
     <None Include="rjcp_serialportstream.snk" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>
