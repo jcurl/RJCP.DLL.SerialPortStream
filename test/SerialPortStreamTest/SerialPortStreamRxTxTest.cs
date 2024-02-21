@@ -523,7 +523,7 @@ namespace RJCP.IO.Ports
         }
 #endif
 
-        private byte[] ReceiveData(SerialPortStream sp, int size)
+        private static byte[] ReceiveData(SerialPortStream sp, int size)
         {
             var buffer = new byte[size];
             var dataReceived = 0;
@@ -549,7 +549,7 @@ namespace RJCP.IO.Ports
             public string Received { get; set; }
         }
 
-        private bool Compare(byte[] data, byte[] receivedData)
+        private static bool Compare(byte[] data, byte[] receivedData)
         {
             bool equal = data.SequenceEqual(receivedData);
             Console.WriteLine("Are data the same: {0}", equal);

@@ -20,9 +20,15 @@ dotnet test -c Release -f net45 --logger "trx"
 
 echo.
 echo ======================================================================
-echo == Testing SerialPortStream on .NET Core App 3.1
+echo == Testing SerialPortStream on .NET 6.0
 echo ======================================================================
-dotnet test -c Release -f netcoreapp3.1 --logger "trx"
+dotnet test -c Release -f net6.0 --logger "trx"
+
+echo.
+echo ======================================================================
+echo == Testing SerialPortStream on .NET 8.0
+echo ======================================================================
+dotnet test -c Release -f net8.0 --logger "trx"
 
 echo.
 echo ======================================================================
