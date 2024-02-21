@@ -171,7 +171,14 @@ namespace RJCP.IO.Ports.Native
                 // libnserial is version < 1.1.0
                 ports = null;
             }
-            if (ports == null) return System.IO.Ports.SerialPort.GetPortNames();
+            if (ports == null)
+#if NETFRAMEWORK
+                // The implementation, most likely from Mono.
+                return System.IO.Ports.SerialPort.GetPortNames();
+#else
+                // There is no alternative implementation for Linux.
+                return Array.Empty<string>();
+#endif
 
             string[] portNames = new string[ports.Length];
             for (int i = 0; i < ports.Length; i++) {
@@ -199,20 +206,21 @@ namespace RJCP.IO.Ports.Native
             } catch (EntryPointNotFoundException) {
                 ports = null;
             }
-            if (ports == null) return GetRuntimePortDescriptions();
+            if (ports != null)
+                return ports;
 
-            return ports;
-        }
+#if NETFRAMEWORK
+            string[] portNamess =
+                System.IO.Ports.SerialPort.GetPortNames();
+            PortDescription[] portdescs = new PortDescription[portNamess.Length];
 
-        private PortDescription[] GetRuntimePortDescriptions()
-        {
-            string[] ports = System.IO.Ports.SerialPort.GetPortNames();
-            PortDescription[] portdescs = new PortDescription[ports.Length];
-
-            for (int i = 0; i < ports.Length; i++) {
-                portdescs[i] = new PortDescription(ports[i], "");
+            for (int i = 0; i < portNamess.Length; i++) {
+                portdescs[i] = new PortDescription(portNamess[i], "");
             }
             return portdescs;
+#else
+            return Array.Empty<PortDescription>();
+#endif
         }
 
         /// <summary>

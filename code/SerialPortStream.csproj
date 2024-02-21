@@ -115,7 +115,6 @@
     <Compile Include="SerialPortStream.cs" />
     <Compile Include="StopBits.cs" />
     <None Include="System\EntryPointNotFoundException.cs" />
-    <None Include="System\IO\Ports\SerialPort.cs" />
     <None Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\Log.cs" />
     <None Include="Trace\LoggerTraceListener.cs" />
@@ -125,7 +124,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <Compile Include="System\EntryPointNotFoundException.cs" />
-    <Compile Include="System\IO\Ports\SerialPort.cs" />
     <Compile Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\LoggerTraceListener.cs" />
     <Compile Include="Trace\LogSourceFactory.cs" />
