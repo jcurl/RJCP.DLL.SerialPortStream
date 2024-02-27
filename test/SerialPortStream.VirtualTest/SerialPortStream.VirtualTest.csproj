@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net462;net60</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <Configurations>Debug;Release</Configurations>
