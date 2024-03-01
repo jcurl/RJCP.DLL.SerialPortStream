@@ -45,8 +45,7 @@
             }
             set
             {
-                ThrowHelper.ThrowIfNull(value);
-
+                ThrowHelper.ThrowIfNull(value, nameof(Factory));
                 lock (s_FactoryLock) {
                     s_Factory = value;
                 }

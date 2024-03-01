@@ -20,9 +20,9 @@
 
         public ReusableList(int minCapacity, int maxCapacity)
         {
-            if (minCapacity < 1) throw new ArgumentOutOfRangeException(nameof(minCapacity), "Minimum capacity must be 1 or greater");
-            if (maxCapacity < 1) throw new ArgumentOutOfRangeException(nameof(maxCapacity), "Maximum capacity must be 1 or greater");
-            if (maxCapacity < minCapacity) throw new ArgumentException("Maximum capacity must be greater/equal than Minimum capacity");
+            ThrowHelper.ThrowIfLessThan(minCapacity, 1);
+            ThrowHelper.ThrowIfLessThan(maxCapacity, 1);
+            ThrowHelper.ThrowIfLessThan(maxCapacity, minCapacity);
 
             m_ReusableList = new T[maxCapacity];
             m_ReusableListCache = new T[maxCapacity - minCapacity + 1][];
@@ -33,16 +33,12 @@
         {
             get
             {
-                if (index < 0) throw new ArgumentOutOfRangeException(nameof(index), "Index is less than zero");
-                if (index >= Count) throw new ArgumentOutOfRangeException(nameof(index), "Index is more than Count");
-
+                ThrowHelper.ThrowIfNotBetween(index, 0, Count - 1);
                 return m_ReusableList[index];
             }
             set
             {
-                if (index < 0) throw new ArgumentOutOfRangeException(nameof(index), "Index is less than zero");
-                if (index >= Count) throw new ArgumentOutOfRangeException(nameof(index), "Index is more than Count");
-
+                ThrowHelper.ThrowIfNotBetween(index, 0, Count - 1);
                 m_ReusableList[index] = value;
             }
         }
@@ -76,11 +72,7 @@
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            ThrowHelper.ThrowIfNull(array);
-            if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex), "arrayIndex is less than lower bound of array");
-            if (array.Rank != 1) throw new ArgumentException("array is multidimensional", nameof(array));
-            if (m_Count + arrayIndex > array.Length) throw new ArgumentException("The number of elements in source array is greater than available elements from index to the end of the destination array");
-
+            ThrowHelper.ThrowIfArrayOutOfBounds(array, arrayIndex, m_Count);
             for (int i = 0; i < m_Count; i++) {
                 array[i + arrayIndex] = m_ReusableList[i];
             }
@@ -141,7 +133,7 @@
         public void Insert(int index, T item)
         {
             if (m_Count == m_ReusableList.Length) throw new InvalidOperationException("List is full");
-            if (index > m_Count) throw new ArgumentOutOfRangeException(nameof(index), "Index greater than Count");
+            ThrowHelper.ThrowIfGreaterThan(index, m_Count);
             for (int i = m_Count; i > index; i--) {
                 m_ReusableList[i] = m_ReusableList[i - 1];
             }
@@ -159,7 +151,7 @@
 
         public void RemoveAt(int index)
         {
-            if (index >= Count) throw new ArgumentOutOfRangeException(nameof(index), "Index is more than Count");
+            ThrowHelper.ThrowIfGreaterThan(index, Count);
             for (int i = index; i < m_Count; i++) {
                 m_ReusableList[i] = m_ReusableList[i + 1];
             }

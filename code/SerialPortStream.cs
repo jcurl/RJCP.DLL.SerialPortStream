@@ -426,7 +426,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                ThrowHelper.ThrowIfNull(value);
+                ThrowHelper.ThrowIfNull(value, nameof(Encoding));
                 m_NativeSerial.Buffer.Encoding = value;
             }
         }
@@ -447,7 +447,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                ThrowHelper.ThrowIfNullOrEmpty(value);
+                ThrowHelper.ThrowIfNullOrEmpty(value, nameof(NewLine));
                 m_NewLine = value;
             }
         }
@@ -597,7 +597,7 @@
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(ReadBufferSize), "ReadBufferSize must be greater than zero");
+                ThrowHelper.ThrowIfNegativeOrZero(value, nameof(ReadBufferSize));
 
                 m_NativeSerial.Buffer.ReadBufferSize = value;
                 if (m_RxThreshold > value) m_RxThreshold = value;
@@ -628,9 +628,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(ReceivedBytesThreshold), "Must be a positive value (1 or greater)");
-                if (value > ReadBufferSize)
-                    throw new ArgumentOutOfRangeException(nameof(ReceivedBytesThreshold), "Must be less or equal to the ReadBufferSize");
+                ThrowHelper.ThrowIfNotBetween(value, 1, ReadBufferSize, nameof(ReceivedBytesThreshold));
 
                 // Only raise an event if we think that we wouldn't have received an event otherwise
                 int btr = m_NativeSerial.BytesToRead;
@@ -669,20 +667,14 @@
         private void ReadCheck(byte[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            ThrowHelper.ThrowIfNull(buffer);
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
-            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
-            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 
         private void ReadCheck(char[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            ThrowHelper.ThrowIfNull(buffer);
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
-            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
-            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 
@@ -1329,7 +1321,7 @@
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(WriteBufferSize), "WriteBufferSize must be greater than zero");
+                ThrowHelper.ThrowIfNegativeOrZero(value, nameof(WriteBufferSize));
 
                 m_NativeSerial.Buffer.WriteBufferSize = value;
             }
@@ -1383,10 +1375,7 @@
         private bool WriteCheck(byte[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            ThrowHelper.ThrowIfNull(buffer);
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
-            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
-            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (count == 0) return false;
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port is closed");
             WriteCheckDeviceError();
@@ -1756,10 +1745,7 @@
         public void Write(char[] buffer, int offset, int count)
         {
             if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-            ThrowHelper.ThrowIfNull(buffer);
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Negative offset provided");
-            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Negative count provided");
-            if (buffer.Length - offset < count) throw new ArgumentException("offset and count exceed buffer boundaries");
+            ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (count == 0) return;
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial port is not open");
             WriteCheckDeviceError();
@@ -1994,9 +1980,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (!Enum.IsDefined(typeof(StopBits), value))
-                    throw new ArgumentOutOfRangeException(nameof(StopBits), "Unknown setting for StopBits");
-
+                ThrowHelper.ThrowIfEnumUndefined(value, nameof(StopBits));
                 m_NativeSerial.StopBits = value;
             }
         }
@@ -2022,9 +2006,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (!Enum.IsDefined(typeof(Parity), value))
-                    throw new ArgumentOutOfRangeException(nameof(Parity), "Unknown setting for Parity");
-
+                ThrowHelper.ThrowIfEnumUndefined(value, nameof(Parity));
                 m_NativeSerial.Parity = value;
             }
         }
@@ -2157,8 +2139,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (!Enum.IsDefined(typeof(Handshake), value))
-                    throw new ArgumentOutOfRangeException(nameof(Handshake), "Unknown setting for Handshake");
+                ThrowHelper.ThrowIfEnumUndefined(value, nameof(Handshake));
                 m_NativeSerial.Handshake = value;
             }
         }
@@ -2182,8 +2163,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOffLimit must be positive");
+                ThrowHelper.ThrowIfNegative(value, nameof(XOnLimit));
                 m_NativeSerial.XOnLimit = value;
             }
         }
@@ -2207,8 +2187,7 @@
             set
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
-                if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(XOffLimit), "XOffLimit must be positive");
+                ThrowHelper.ThrowIfNegative(value, nameof(XOffLimit));
                 m_NativeSerial.XOffLimit = value;
             }
         }

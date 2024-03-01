@@ -5,9 +5,8 @@
         /// <summary>
         /// Mapped C-Library errors to constants for Managed Code
         /// </summary>
-        /// <remarks>>
-        /// This table must be identical to the enumeration values defined in the C-Sources
-        /// netfx.h and netfx.c.
+        /// <remarks>
+        /// &gt; This table must be identical to the enumeration values defined in the C-Sources netfx.h and netfx.c.
         /// </remarks>
         public enum SysErrNo
         {
@@ -17,32 +16,32 @@
             NETFX_OK = 0,
 
             /// <summary>
-            /// ArgumentException
+            /// ArgumentException.
             /// </summary>
             NETFX_EINVAL = 1,
 
             /// <summary>
-            /// UnauthorizedAccessException
+            /// UnauthorizedAccessException.
             /// </summary>
             NETFX_EACCES = 2,
 
             /// <summary>
-            /// OutOfMemoryException
+            /// OutOfMemoryException.
             /// </summary>
             NETFX_ENOMEM = 3,
 
             /// <summary>
-            /// InvalidOperationException
+            /// InvalidOperationException.
             /// </summary>
             NETFX_EBADF = 4,
 
             /// <summary>
-            /// PlatformNotSupportedException
+            /// PlatformNotSupportedException.
             /// </summary>
             NETFX_ENOSYS = 5,
 
             /// <summary>
-            /// IOException
+            /// IOException.
             /// </summary>
             NETFX_EIO = 6,
 
@@ -62,7 +61,7 @@
             NETFX_EINTR = 9,
 
             /// <summary>
-            /// Unmapped error. InvalidOperationException
+            /// Unmapped error. InvalidOperationException.
             /// </summary>
             NETFX_UNKNOWN = -1
         }

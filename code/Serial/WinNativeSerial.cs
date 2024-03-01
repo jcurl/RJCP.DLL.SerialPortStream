@@ -194,7 +194,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(BaudRate), "Baud rate must be positive");
+                ThrowHelper.ThrowIfNegative(value, nameof(BaudRate));
 
                 m_Baud = value;
                 if (IsOpen) SetPortSettings();
@@ -241,9 +241,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (!Enum.IsDefined(typeof(Parity), value)) {
-                    throw new ArgumentOutOfRangeException(nameof(Parity), "Unknown value for Parity");
-                }
+                ThrowHelper.ThrowIfEnumUndefined(value, nameof(Parity));
                 m_Parity = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -264,9 +262,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (!Enum.IsDefined(typeof(StopBits), value)) {
-                    throw new ArgumentOutOfRangeException(nameof(StopBits), "Unknown value for Stop Bits");
-                }
+                ThrowHelper.ThrowIfEnumUndefined(value, nameof(StopBits));
                 m_StopBits = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -356,9 +352,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) {
-                    throw new ArgumentOutOfRangeException(nameof(XOffLimit), "XOffLimit must be positive");
-                }
+                ThrowHelper.ThrowIfNegative(value, nameof(XOffLimit));
                 m_XOffLimit = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -379,8 +373,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0)
-                    throw new ArgumentOutOfRangeException(nameof(XOnLimit), "XOnLimit must be positive");
+                ThrowHelper.ThrowIfNegative(value, nameof(XOnLimit));
                 m_XOnLimit = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -436,7 +429,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(DriverInQueue), "value must be a positive integer");
+                ThrowHelper.ThrowIfNegative(value, nameof(DriverInQueue));
                 m_DriverInQueue = value;
 
                 if (IsOpen) {
@@ -464,7 +457,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(DriverOutQueue), "value must be a positive integer");
+                ThrowHelper.ThrowIfNegative(value, nameof(DriverOutQueue));
                 m_DriverOutQueue = value;
 
                 if (IsOpen) {
@@ -643,9 +636,7 @@
             set
             {
                 if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
-                if (!Enum.IsDefined(typeof(Handshake), value)) {
-                    throw new ArgumentOutOfRangeException(nameof(Handshake), "Unknown value for Handshake");
-                }
+                ThrowHelper.ThrowIfEnumUndefined(value, nameof(Handshake));
                 m_Handshake = value;
                 if (IsOpen) SetPortSettings();
             }

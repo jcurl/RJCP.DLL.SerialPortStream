@@ -13,7 +13,7 @@
             get { return m_ReadIntervalTimeout; }
             set
             {
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(ReadIntervalTimeout));
+                ThrowHelper.ThrowIfNegative(value, nameof(ReadIntervalTimeout));
                 m_ReadIntervalTimeout = value;
             }
         }
@@ -25,7 +25,7 @@
             get { return m_ReadTotalTimeoutConstant; }
             set
             {
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(ReadTotalTimeoutConstant));
+                ThrowHelper.ThrowIfNegative(value, nameof(ReadTotalTimeoutConstant));
                 m_ReadTotalTimeoutConstant = value;
             }
         }
@@ -37,7 +37,7 @@
             get { return m_ReadTotalTimeoutMultiplier; }
             set
             {
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(ReadTotalTimeoutMultiplier));
+                ThrowHelper.ThrowIfNegative(value, nameof(ReadTotalTimeoutMultiplier));
                 m_ReadTotalTimeoutMultiplier = value;
             }
         }
@@ -49,7 +49,7 @@
             get { return m_WriteTotalTimeoutConstant; }
             set
             {
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(WriteTotalTimeoutConstant));
+                ThrowHelper.ThrowIfNegative(value, nameof(WriteTotalTimeoutConstant));
                 m_WriteTotalTimeoutConstant = value;
             }
         }
@@ -61,7 +61,7 @@
             get { return m_WriteTotalTimeoutMultiplier; }
             set
             {
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(WriteTotalTimeoutMultiplier));
+                ThrowHelper.ThrowIfNegative(value, nameof(WriteTotalTimeoutMultiplier));
                 m_WriteTotalTimeoutMultiplier = value;
             }
         }

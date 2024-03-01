@@ -83,7 +83,7 @@
             }
             set
             {
-                ThrowHelper.ThrowIfNull(value);
+                ThrowHelper.ThrowIfNull(value, nameof(Encoding));
                 if (ReadChars is not null) ReadChars.Encoding = value;
                 m_Encoding = value;
             }
@@ -107,7 +107,7 @@
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
                 if (m_ReadBuffer is not null) throw new InvalidOperationException("Buffer already allocated");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(ReadBufferSize), "Must be a positive integer");
+                ThrowHelper.ThrowIfNegativeOrZero(value, nameof(ReadBufferSize));
 
                 m_ReadBufferSize = (value < 1024) ? 1024 : value;
             }
@@ -131,7 +131,7 @@
             {
                 if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
                 if (m_WriteBuffer is not null) throw new InvalidOperationException("Buffer already allocated");
-                if (value <= 0) throw new ArgumentOutOfRangeException(nameof(WriteBufferSize), "Must be a positive integer");
+                ThrowHelper.ThrowIfNegativeOrZero(value, nameof(WriteBufferSize));
 
                 m_WriteBufferSize = (value < 1024) ? 1024 : value;
             }

@@ -66,7 +66,7 @@
             get { return m_Encoding; }
             set
             {
-                ThrowHelper.ThrowIfNull(value);
+                ThrowHelper.ThrowIfNull(value, nameof(Encoding));
                 m_Encoding = value;
                 Decoder = m_Encoding.GetDecoder();
             }
