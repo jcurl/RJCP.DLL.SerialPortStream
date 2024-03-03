@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Style", "IDE0074:Use compound assignment", Justification = ".NET Framework 4.0 compatibility")]
+[assembly: SuppressMessage("Style", "IDE0230:Use UTF-8 string literal", Justification = "Testing byte streams, not UTF8 strings")]
