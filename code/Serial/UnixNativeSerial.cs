@@ -695,7 +695,7 @@ namespace RJCP.IO.Ports.Serial
         /// </summary>
         public void StartMonitor()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(UnixNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Serial Port not open");
 
             m_Buffer.Reset();

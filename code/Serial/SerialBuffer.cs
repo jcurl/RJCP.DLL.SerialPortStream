@@ -105,7 +105,7 @@
             get { return m_ReadBufferSize; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (m_ReadBuffer is not null) throw new InvalidOperationException("Buffer already allocated");
                 ThrowHelper.ThrowIfNegativeOrZero(value, nameof(ReadBufferSize));
 
@@ -129,7 +129,7 @@
             get { return m_WriteBufferSize; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (m_WriteBuffer is not null) throw new InvalidOperationException("Buffer already allocated");
                 ThrowHelper.ThrowIfNegativeOrZero(value, nameof(WriteBufferSize));
 
@@ -212,7 +212,7 @@
         /// </remarks>
         public void Reset()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialBuffer));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
 
             if (m_ReadBuffer is not null && m_ReadBuffer.Buffer.Length == ReadBufferSize) {
                 m_ReadBuffer.Reset();

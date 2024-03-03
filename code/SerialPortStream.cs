@@ -231,12 +231,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.PortName;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNullOrWhiteSpaceMsg("Must provide a valid name for a COM port", value);
                 if (m_NativeSerial.IsOpen && value != m_NativeSerial.PortName) throw new InvalidOperationException("Serial Port already opened");
 
@@ -256,7 +256,7 @@
         /// </remarks>
         public void GetPortSettings()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
             m_NativeSerial.Open();
             m_NativeSerial.GetPortSettings();
@@ -319,7 +319,7 @@
 
         private void Open(bool setCommState)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
 
             m_ReadCheckDeviceErrorNotified = false;
@@ -356,7 +356,7 @@
             get
             {
                 lock (m_CloseLock) {
-                    if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                    ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                     return m_NativeSerial.IsOpen && m_NativeSerial.IsRunning;
                 }
             }
@@ -425,7 +425,7 @@
             get { return m_NativeSerial.Buffer.Encoding; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNull(value, nameof(Encoding));
                 m_NativeSerial.Buffer.Encoding = value;
             }
@@ -446,7 +446,7 @@
             get { return m_NewLine; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNullOrEmpty(value, nameof(NewLine));
                 m_NewLine = value;
             }
@@ -466,12 +466,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.DriverInQueue;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
                 m_NativeSerial.DriverInQueue = value;
             }
@@ -489,12 +489,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.DriverOutQueue;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
                 m_NativeSerial.DriverOutQueue = value;
             }
@@ -547,7 +547,7 @@
             get { return m_ReadTimeout; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (value < 0) {
                     m_ReadTimeout = Timeout.Infinite;
                 } else {
@@ -595,7 +595,7 @@
             get { return m_NativeSerial.Buffer.ReadBufferSize; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
                 ThrowHelper.ThrowIfNegativeOrZero(value, nameof(ReadBufferSize));
 
@@ -627,7 +627,7 @@
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNotBetween(value, 1, ReadBufferSize, nameof(ReceivedBytesThreshold));
 
                 // Only raise an event if we think that we wouldn't have received an event otherwise
@@ -658,7 +658,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
                 return m_NativeSerial.Buffer.ReadStream.BytesToRead;
             }
@@ -666,14 +666,14 @@
 
         private void ReadCheck(byte[] buffer, int offset, int count)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 
         private void ReadCheck(char[] buffer, int offset, int count)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
@@ -681,7 +681,7 @@
 #if NET6_0_OR_GREATER
         private void ReadCheck()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
         }
 #endif
@@ -804,7 +804,7 @@
         {
             if (m_NativeSerial.IsRunning) {
                 bool ready = m_NativeSerial.Buffer.ReadStream.WaitForRead(m_ReadTimeout);
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!ready) {
                     ReadCheckDeviceError();
                     if (m_NativeSerial.IsRunning && ThrowOnReadError)
@@ -887,7 +887,7 @@
                 bool ready = await m_NativeSerial.Buffer.ReadStream.WaitForReadAsync(m_ReadTimeout, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!ready) {
                     ReadCheckDeviceError();
                     if (m_NativeSerial.IsRunning && ThrowOnReadError)
@@ -1023,7 +1023,7 @@
         /// </exception>
         public override int ReadByte()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return -1;
             if (ReadCheckDeviceError()) return -1;
@@ -1104,7 +1104,7 @@
         /// </exception>
         public int ReadChar()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return -1;
             if (ReadCheckDeviceError()) return -1;
@@ -1138,7 +1138,7 @@
         /// </exception>
         public string ReadLine()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             return ReadTo(m_NewLine);
         }
 
@@ -1178,7 +1178,7 @@
         /// </remarks>
         public string ReadTo(string text)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             ThrowHelper.ThrowIfNullOrEmpty(text);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
@@ -1221,7 +1221,7 @@
         /// </remarks>
         public string ReadExisting()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (ThrowOnReadError && !IsOpen) throw new InvalidOperationException("Port is not open");
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return null;
             if (ReadCheckDeviceError()) return null;
@@ -1238,7 +1238,7 @@
         /// </remarks>
         public void DiscardInBuffer()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return;
 
             m_NativeSerial.Buffer.ReadStream.Clear();
@@ -1285,7 +1285,7 @@
             get { return m_WriteTimeout; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (value < 0) {
                     m_WriteTimeout = Timeout.Infinite;
                 } else {
@@ -1319,7 +1319,7 @@
             get { return m_NativeSerial.Buffer.WriteBufferSize; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port already opened");
                 ThrowHelper.ThrowIfNegativeOrZero(value, nameof(WriteBufferSize));
 
@@ -1339,7 +1339,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
 
                 int bytesToWrite = m_NativeSerial.Buffer.WriteStream.BytesToWrite;
@@ -1360,11 +1360,11 @@
         /// or there was a device error.</exception>
         public override void Flush()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port not opened");
 
             bool flushed = m_NativeSerial.Buffer.WriteStream.WaitForEmpty(m_WriteTimeout);
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.IsOpen) throw new IOException("SerialPortStream was closed during write operation");
             WriteCheckDeviceError();
             if (!flushed) {
@@ -1374,7 +1374,7 @@
 
         private bool WriteCheck(byte[] buffer, int offset, int count)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (count == 0) return false;
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port is closed");
@@ -1391,7 +1391,7 @@
 #if NET6_0_OR_GREATER
         private bool WriteCheck(ReadOnlySpan<byte> buffer)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port is closed");
             WriteCheckDeviceError();
 
@@ -1405,7 +1405,7 @@
 
         private bool WriteCheck(ReadOnlyMemory<byte> buffer)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port is closed");
             WriteCheckDeviceError();
 
@@ -1525,7 +1525,7 @@
         private void WaitForWrite(int count)
         {
             bool ready = m_NativeSerial.Buffer.WriteStream.WaitForWrite(count, m_WriteTimeout);
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.IsOpen) throw new IOException("SerialPortStream was closed during write operation");
 
             if (!ready) {
@@ -1612,7 +1612,7 @@
             bool ready = await m_NativeSerial.Buffer.WriteStream.WaitForWriteAsync(count, m_WriteTimeout, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.IsOpen) throw new IOException("SerialPortStream was closed during write operation");
 
             if (!ready) {
@@ -1744,7 +1744,7 @@
         /// </exception>
         public void Write(char[] buffer, int offset, int count)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             ThrowHelper.ThrowIfArrayOutOfBounds(buffer, offset, count);
             if (count == 0) return;
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial port is not open");
@@ -1777,7 +1777,7 @@
         /// or there was a device error.</exception>
         public void Write(string text)
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             ThrowHelper.ThrowIfNull(text);
             if (text.Length == 0) return;
             if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial port is not open");
@@ -1819,7 +1819,7 @@
         /// </remarks>
         public void DiscardOutBuffer()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return;
 
             // Only valid if the serial port is open. If not, then there's nothing
@@ -1844,7 +1844,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.CDHolding;
             }
         }
@@ -1862,7 +1862,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.CtsHolding;
             }
         }
@@ -1880,7 +1880,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.DsrHolding;
             }
         }
@@ -1897,7 +1897,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.RingHolding;
             }
         }
@@ -1920,12 +1920,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.BaudRate;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_NativeSerial.BaudRate = value;
             }
         }
@@ -1950,12 +1950,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.DataBits;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_NativeSerial.DataBits = value;
             }
         }
@@ -1974,12 +1974,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.StopBits;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(StopBits));
                 m_NativeSerial.StopBits = value;
             }
@@ -2000,12 +2000,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.Parity;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(Parity));
                 m_NativeSerial.Parity = value;
             }
@@ -2023,12 +2023,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.ParityReplace;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_NativeSerial.ParityReplace = value;
             }
         }
@@ -2046,12 +2046,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.DiscardNull;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_NativeSerial.DiscardNull = value;
             }
         }
@@ -2069,12 +2069,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.DtrEnable;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_NativeSerial.DtrEnable = value;
             }
         }
@@ -2093,12 +2093,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.RtsEnable;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_NativeSerial.RtsEnable = value;
             }
         }
@@ -2133,12 +2133,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.Handshake;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(Handshake));
                 m_NativeSerial.Handshake = value;
             }
@@ -2157,12 +2157,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.XOnLimit;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(XOnLimit));
                 m_NativeSerial.XOnLimit = value;
             }
@@ -2181,12 +2181,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.XOffLimit;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(XOffLimit));
                 m_NativeSerial.XOffLimit = value;
             }
@@ -2217,12 +2217,12 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return m_NativeSerial.TxContinueOnXOff;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_NativeSerial.TxContinueOnXOff = value;
             }
         }
@@ -2243,13 +2243,13 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port not opened");
                 return m_NativeSerial.BreakState;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(SerialPortStream));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!m_NativeSerial.IsOpen) throw new InvalidOperationException("Serial Port not opened");
                 m_NativeSerial.BreakState = value;
             }

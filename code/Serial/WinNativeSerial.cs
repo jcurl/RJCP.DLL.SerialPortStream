@@ -90,7 +90,7 @@
             get { return m_PortName; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (IsOpen) throw new InvalidOperationException("Port already open");
                 m_PortName = value;
             }
@@ -193,7 +193,7 @@
             get { return m_Baud; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(BaudRate));
 
                 m_Baud = value;
@@ -216,7 +216,7 @@
             get { return m_DataBits; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (value is (< 5 or > 8) and not 16) {
                     throw new ArgumentOutOfRangeException(nameof(DataBits), "May only be 5, 6, 7, 8 or 16");
                 }
@@ -240,7 +240,7 @@
             get { return m_Parity; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(Parity));
                 m_Parity = value;
                 if (IsOpen) SetPortSettings();
@@ -261,7 +261,7 @@
             get { return m_StopBits; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(StopBits));
                 m_StopBits = value;
                 if (IsOpen) SetPortSettings();
@@ -287,7 +287,7 @@
             get { return m_DiscardNull; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 m_DiscardNull = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -307,7 +307,7 @@
             get { return m_ParityReplace; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 m_ParityReplace = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -331,7 +331,7 @@
             get { return m_TxContinueOnXOff; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 m_TxContinueOnXOff = value;
                 if (IsOpen) SetPortSettings();
             }
@@ -351,7 +351,7 @@
             get { return m_XOffLimit; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(XOffLimit));
                 m_XOffLimit = value;
                 if (IsOpen) SetPortSettings();
@@ -372,7 +372,7 @@
             get { return m_XOnLimit; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(XOnLimit));
                 m_XOnLimit = value;
                 if (IsOpen) SetPortSettings();
@@ -393,13 +393,13 @@
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) return false;
                 return m_BreakState;
             }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) throw new InvalidOperationException("Port not open");
                 if (value) {
                     m_CommModemStatus.SetCommBreak();
@@ -428,7 +428,7 @@
             get { return m_DriverInQueue; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(DriverInQueue));
                 m_DriverInQueue = value;
 
@@ -456,7 +456,7 @@
             get { return m_DriverOutQueue; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(DriverOutQueue));
                 m_DriverOutQueue = value;
 
@@ -476,7 +476,7 @@
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) return 0;
                 return m_CommOverlappedIo.BytesToRead;
             }
@@ -493,7 +493,7 @@
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) return 0;
                 return m_CommOverlappedIo.BytesToWrite;
             }
@@ -510,7 +510,7 @@
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Rlsd;
@@ -528,7 +528,7 @@
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Cts;
@@ -546,7 +546,7 @@
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Dsr;
@@ -564,7 +564,7 @@
         {
             get
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 if (!IsOpen) return false;
                 m_CommModemStatus.GetCommModemStatus();
                 return m_CommModemStatus.Ring;
@@ -590,7 +590,7 @@
             get { return m_DtrEnable; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 m_DtrEnable = value;
                 if (IsOpen && (m_Handshake & Handshake.Dtr) == 0) SetDtrPortSettings(true);
             }
@@ -615,7 +615,7 @@
             get { return m_RtsEnable; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 m_RtsEnable = value;
                 if (IsOpen && (m_Handshake & Handshake.Rts) == 0) SetRtsPortSettings(true);
             }
@@ -635,7 +635,7 @@
             get { return m_Handshake; }
             set
             {
-                if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(Handshake));
                 m_Handshake = value;
                 if (IsOpen) SetPortSettings();
@@ -665,7 +665,7 @@
         /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void DiscardInBuffer()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             Kernel32.PurgeComm(m_ComPortHandle,
@@ -680,7 +680,7 @@
         /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void DiscardOutBuffer()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             m_CommOverlappedIo.DiscardOutBuffer();
@@ -693,7 +693,7 @@
         /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void GetPortSettings()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             m_CommState.GetCommState();
@@ -741,7 +741,7 @@
         /// <exception cref="InvalidOperationException">Port not open.</exception>
         public void SetPortSettings()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             // Binary mode must always be set per MSDN
@@ -848,7 +848,7 @@
         /// </remarks>
         public void Open()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             if (string.IsNullOrWhiteSpace(PortName)) throw new InvalidOperationException("Port must first be set");
             if (IsOpen) throw new InvalidOperationException("Serial Port currently open");
 
@@ -905,7 +905,7 @@
         /// </remarks>
         public void Close()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             m_Buffer.Close();
             if (IsOpen) {
                 SafeFileHandle handle = m_ComPortHandle;
@@ -932,7 +932,7 @@
         /// </summary>
         public void StartMonitor()
         {
-            if (m_IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(m_IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Serial Port not open");
 
             m_Buffer.Reset();

@@ -57,7 +57,7 @@
             get { return m_PortName; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(VirtualNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (IsOpen) throw new InvalidOperationException("Port already open");
                 m_PortName = value;
             }
@@ -108,7 +108,7 @@
             get { return m_Baud; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(VirtualNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(BaudRate));
                 m_Baud = value;
             }
@@ -128,7 +128,7 @@
             get { return m_DataBits; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(VirtualNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (value is (< 5 or > 8) and not 16) {
                     throw new ArgumentOutOfRangeException(nameof(DataBits), "May only be 5, 6, 7, 8 or 16");
                 }
@@ -150,7 +150,7 @@
             get { return m_Parity; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(VirtualNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(Parity));
                 m_Parity = value;
             }
@@ -169,7 +169,7 @@
             get { return m_StopBits; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(VirtualNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(StopBits));
                 m_StopBits = value;
             }
@@ -187,7 +187,7 @@
             get { return m_DiscardNull; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(VirtualNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_DiscardNull = value;
             }
         }
@@ -205,7 +205,7 @@
             get { return m_ParityReplace; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_ParityReplace = value;
             }
         }
@@ -228,7 +228,7 @@
             get { return m_TxContinueOnXOff; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_TxContinueOnXOff = value;
             }
         }
@@ -246,7 +246,7 @@
             get { return m_XOffLimit; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(XOffLimit));
                 m_XOffLimit = value;
             }
@@ -265,7 +265,7 @@
             get { return m_XOnLimit; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(XOnLimit));
                 m_XOnLimit = value;
             }
@@ -284,13 +284,13 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!IsOpen) return false;
                 return m_BreakState;
             }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!IsOpen) throw new InvalidOperationException("Port not open");
                 m_BreakState = value;
             }
@@ -310,7 +310,7 @@
             get { return m_DriverInQueue; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(DriverInQueue));
                 m_DriverInQueue = value;
             }
@@ -330,7 +330,7 @@
             get { return m_DriverOutQueue; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfNegative(value, nameof(DriverOutQueue));
                 m_DriverOutQueue = value;
             }
@@ -345,7 +345,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return 0;
             }
         }
@@ -362,7 +362,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 return 0;
             }
         }
@@ -379,7 +379,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!IsOpen) return false;
                 return m_CDHolding;
             }
@@ -403,7 +403,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!IsOpen) return false;
                 return m_CtsHolding;
             }
@@ -427,7 +427,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!IsOpen) return false;
                 return m_DsrHolding;
             }
@@ -451,7 +451,7 @@
         {
             get
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 if (!IsOpen) return false;
                 return m_RingHolding;
             }
@@ -476,7 +476,7 @@
             get { return m_DtrEnable; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_DtrEnable = value;
             }
         }
@@ -494,7 +494,7 @@
             get { return m_RtsEnable; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 m_RtsEnable = value;
             }
         }
@@ -512,7 +512,7 @@
             get { return m_Handshake; }
             set
             {
-                if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+                ThrowHelper.ThrowIfDisposed(IsDisposed, this);
                 ThrowHelper.ThrowIfEnumUndefined(value, nameof(Handshake));
                 m_Handshake = value;
             }
@@ -532,7 +532,7 @@
         /// <remarks>This method has no effect for <see cref="VirtualNativeSerial"/>.</remarks>
         public virtual void DiscardInBuffer()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
         }
 
@@ -543,7 +543,7 @@
         /// <exception cref="InvalidOperationException">Port not open.</exception>
         public virtual void DiscardOutBuffer()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             lock (m_Buffer.SerialWrite.Lock) {
@@ -567,7 +567,7 @@
         /// <remarks>This method has no effect for <see cref="VirtualNativeSerial"/>.</remarks>
         public virtual void GetPortSettings()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             BaudRate = m_ShadowBaudRate;
@@ -587,7 +587,7 @@
         /// <remarks>This method has no effect for <see cref="VirtualNativeSerial"/>.</remarks>
         public virtual void SetPortSettings()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Port not open");
 
             m_ShadowBaudRate = BaudRate;
@@ -610,7 +610,7 @@
         /// </exception>
         public virtual void Open()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (string.IsNullOrWhiteSpace(PortName)) throw new InvalidOperationException("Port must first be set");
             if (IsOpen) throw new InvalidOperationException("Serial Port currently open");
             IsOpen = true;
@@ -626,7 +626,7 @@
         /// </remarks>
         public virtual void Close()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             m_Buffer.Close();
             IsRunning = false;
             IsOpen = false;
@@ -646,7 +646,7 @@
         /// </summary>
         public virtual void StartMonitor()
         {
-            if (IsDisposed) throw new ObjectDisposedException(nameof(WinNativeSerial));
+            ThrowHelper.ThrowIfDisposed(IsDisposed, this);
             if (!IsOpen) throw new InvalidOperationException("Serial Port not open");
 
             m_Buffer.Reset();
