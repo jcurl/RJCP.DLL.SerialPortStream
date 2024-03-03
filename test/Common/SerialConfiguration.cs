@@ -36,9 +36,7 @@
             {
                 if (s_SourcePort is null) {
                     lock (m_SyncLock) {
-                        if (s_SourcePort is null) {
-                            s_SourcePort = AppSettings.Settings[OSPrefix + "SourcePort"].Value;
-                        }
+                        s_SourcePort ??= AppSettings.Settings[OSPrefix + "SourcePort"].Value;
                     }
                 }
                 return s_SourcePort;
@@ -51,9 +49,7 @@
             {
                 if (s_DestPort is null) {
                     lock (m_SyncLock) {
-                        if (s_DestPort is null) {
-                            s_DestPort = AppSettings.Settings[OSPrefix + "DestPort"].Value;
-                        }
+                        s_DestPort ??= AppSettings.Settings[OSPrefix + "DestPort"].Value;
                     }
                 }
                 return s_DestPort;
