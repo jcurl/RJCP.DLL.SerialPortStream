@@ -436,20 +436,7 @@
                     } else if (whandles[ev] == m_ReadEvent) {
                         result = Kernel32.GetOverlappedResult(m_ComPortHandle, ref readOverlapped, out bytes, true);
                         if (!result) {
-                            int win32Error = Marshal.GetLastWin32Error();
-                            int hr = Marshal.GetHRForLastWin32Error();
-                            // Should never get ERROR_IO_PENDING, as this method is only called when the event is triggered.
-                            if (win32Error != WinError.ERROR_OPERATION_ABORTED || bytes > 0) {
-                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
-                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
-                                        $"{m_Name}: SerialThread: Overlapped ReadFile() error {win32Error} bytes {bytes}");
-                                Marshal.ThrowExceptionForHR(hr);
-                            } else {
-                                // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
-                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
-                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
-                                        $"{m_Name}: SerialThread: Overlapped ReadFile() error {win32Error} bytes {bytes}");
-                            }
+                            ProcessReadEventError(bytes);
                         } else {
                             ProcessReadEvent(bytes);
                         }
@@ -460,20 +447,7 @@
                     } else if (whandles[ev] == m_WriteEvent) {
                         result = Kernel32.GetOverlappedResult(m_ComPortHandle, ref writeOverlapped, out bytes, true);
                         if (!result) {
-                            int win32Error = Marshal.GetLastWin32Error();
-                            int hr = Marshal.GetHRForLastWin32Error();
-                            // Should never get ERROR_IO_PENDING, as this method is only called when the event is triggered.
-                            if (win32Error != WinError.ERROR_OPERATION_ABORTED || bytes > 0) {
-                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
-                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
-                                        $"{m_Name}: SerialThread: Overlapped WriteFile() error {win32Error} bytes {bytes}");
-                                Marshal.ThrowExceptionForHR(hr);
-                            } else {
-                                // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
-                                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
-                                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
-                                        $"{m_Name}: SerialThread: Overlapped WriteFile() error {win32Error} bytes {bytes}");
-                            }
+                            ProcessWriteEventError(bytes);
                         } else {
                             ProcessWriteEvent(bytes);
                         }
@@ -488,20 +462,7 @@
                             m_PurgePending = true;
                             result = Kernel32.PurgeComm(m_ComPortHandle,
                                 Kernel32.PurgeFlags.PURGE_TXABORT | Kernel32.PurgeFlags.PURGE_TXCLEAR);
-                            if (!result) {
-                                int win32Error = Marshal.GetLastWin32Error();
-                                int hr = Marshal.GetHRForLastWin32Error();
-                                if (win32Error != WinError.ERROR_OPERATION_ABORTED) {
-                                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
-                                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
-                                            $"{m_Name}: SerialThread: PurgeComm() error {win32Error}");
-                                    Marshal.ThrowExceptionForHR(hr);
-                                } else {
-                                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
-                                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
-                                            $"{m_Name}: SerialThread: PurgeComm() error {win32Error}");
-                                }
-                            }
+                            if (!result) ProcessPurgeCommError();
                         } else {
                             if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
                                 m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose, $"{m_Name}: SerialThread: Purged");
@@ -698,6 +659,33 @@
             }
         }
 
+        private void ProcessReadEventError(uint bytes)
+        {
+            int win32Error = Marshal.GetLastWin32Error();
+            int hr = Marshal.GetHRForLastWin32Error();
+
+            // Should never get ERROR_IO_PENDING, as this method is only called when the event is triggered.
+            if (bytes == 0) {
+                switch (win32Error) {
+                case WinError.ERROR_OPERATION_ABORTED:
+                    // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        "{0}: SerialThread: Overlapped ReadFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+                    return;
+                case WinError.ERROR_HANDLE_EOF:
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Information))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Information,
+                        "{0}: SerialThread: Overlapped ReadFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+                    return;
+                }
+            }
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                "{0}: SerialThread: Overlapped ReadFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+            Marshal.ThrowExceptionForHR(hr);
+        }
+
         /// <summary>
         /// Check if we should WriteFile() and update buffers if serial data is immediately cached by driver.
         /// </summary>
@@ -776,6 +764,47 @@
                         }
                     }
                 }
+            }
+        }
+
+        private void ProcessWriteEventError(uint bytes)
+        {
+            int win32Error = Marshal.GetLastWin32Error();
+            int hr = Marshal.GetHRForLastWin32Error();
+
+            if (bytes == 0) {
+                switch (win32Error) {
+                case WinError.ERROR_OPERATION_ABORTED:
+                    // ERROR_OPERATION_ABORTED may be caused by CancelIo or PurgeComm
+                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                        "{0}: SerialThread: Overlapped WriteFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+                    return;
+                }
+            }
+            if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                "{0}: SerialThread: Overlapped WriteFile() error {1} bytes {2}", m_Name, win32Error, bytes);
+            Marshal.ThrowExceptionForHR(hr);
+        }
+
+        private void ProcessPurgeCommError()
+        {
+            int win32Error = Marshal.GetLastWin32Error();
+            int hr = Marshal.GetHRForLastWin32Error();
+
+            switch (win32Error) {
+            case WinError.ERROR_OPERATION_ABORTED:
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
+                    "{0}: SerialThread: PurgeComm() error {1}", m_Name, win32Error);
+                return;
+            default:
+                if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Error))
+                    m_Log.TraceEvent(System.Diagnostics.TraceEventType.Error,
+                    "{0}: SerialThread: PurgeComm() error {1}", m_Name, win32Error);
+                Marshal.ThrowExceptionForHR(hr);
+                break;
             }
         }
 
