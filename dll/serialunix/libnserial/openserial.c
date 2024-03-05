@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -194,18 +195,31 @@ NSERIAL_EXPORT int WINAPI serial_getproperties(struct serialhandle *handle)
   }
 
   // Get the baud rate
-  handle->cbaud = cfgetispeed(&tio);
-  handle->baudrate = 0;
-  int i = 0;
-  while (baudrates[i].baud && handle->baudrate == 0) {
-    if (baudrates[i].cbaud == handle->cbaud) {
-      handle->baudrate = baudrates[i].baud;
+  if(handle->custombaud == 0) {
+    handle->cbaud = cfgetispeed(&tio);
+    handle->baudrate = 0;
+    int i = 0;
+    while (baudrates[i].baud && handle->baudrate == 0) {
+      if (baudrates[i].cbaud == handle->cbaud) {
+        handle->baudrate = baudrates[i].baud;
+      }
+      i++;
     }
-    i++;
-  }
-  if (handle->baudrate == 0) {
-    // This baudrate is not known, so we set the default
-    serial_setdefaultbaud(handle);
+    if (handle->baudrate == 0) {
+      // This baudrate is not known, so we set the default
+      serial_setdefaultbaud(handle);
+    }
+  } else {
+	struct serial_struct serstruct;
+	
+	handle->cbaud = cfgetispeed(&tio);
+	//TODO: Should be B38400
+	if (ioctl(handle->fd, TIOCGSERIAL, &serstruct) != 0) {
+      serial_seterror(handle, ERRMSG_SERIALTCGETATTR);
+      return -1;
+    }
+	
+	handle->baudrate = serstruct.baud_base / serstruct.custom_divisor;
   }
 
   return 0;
@@ -374,15 +388,43 @@ NSERIAL_EXPORT int WINAPI serial_setproperties(struct serialhandle *handle)
     return -1;
   }
 
-  // Set baudrate. Here we assume first no custom baudrate
-  if (cfsetospeed(&newtio, handle->cbaud) < 0 ||
-      cfsetispeed(&newtio, handle->cbaud) < 0) {
-    serial_seterror(handle, ERRMSG_INVALIDBAUD);
-    errno = EINVAL;
-    return -1;
-  }
+  if(handle->custombaud == 0) {
+    // Set baudrate. Here we assume first no custom baudrate
+    if (cfsetospeed(&newtio, handle->cbaud) < 0 ||
+        cfsetispeed(&newtio, handle->cbaud) < 0) {
+      serial_seterror(handle, ERRMSG_INVALIDBAUD);
+      errno = EINVAL;
+      return -1;
+    }
+  } else {
+	struct serial_struct serstruct;
 
-  // TODO: Custom baudrates are not currently supported
+	//Set speed to B38400
+	if (cfsetospeed(&newtio, B38400) < 0 ||
+        cfsetispeed(&newtio, B38400) < 0) {
+      serial_seterror(handle, ERRMSG_INVALIDBAUD);
+      errno = EINVAL;
+      return -1;
+    }
+	
+	//Extract serial_struct
+	if (ioctl(handle->fd, TIOCGSERIAL, &serstruct) != 0) {
+      serial_seterror(handle, ERRMSG_SERIALTCGETATTR);
+      return -1;
+    }
+	
+	//Calculate divisor and set custom flags
+	serstruct.custom_divisor = serstruct.baud_base / handle->baudrate;
+    if (serstruct.custom_divisor == 0)
+      serstruct.custom_divisor = 1;
+    serstruct.flags &= ~ASYNC_SPD_MASK;
+    serstruct.flags |= ASYNC_SPD_CUST;
+	
+	if (ioctl(handle->fd, TIOCSSERIAL, &serstruct) != 0) {
+      serial_seterror(handle, ERRMSG_SERIALTCSETATTR);
+      return -1;
+    }
+  }
 
   // Turn off delays in the system. Read only the data in the serial port.
   newtio.c_cc[VMIN] = 0;
@@ -402,8 +444,9 @@ NSERIAL_EXPORT int WINAPI serial_setproperties(struct serialhandle *handle)
 
   // Get the baudrate and compare with what we set
   tcgetattr(handle->fd, &newtio);
-  if (cfgetispeed(&newtio) != handle->cbaud ||
-      cfgetospeed(&newtio) != handle->cbaud) {
+  if (handle->custombaud == 0 &&
+       (cfgetispeed(&newtio) != handle->cbaud ||
+        cfgetospeed(&newtio) != handle->cbaud)) {
     nslog(handle, NSLOG_WARNING, "setproperties: baudrate mismatch. "
 	  "ispeed ret=%d set=%d; ospeed ret=%d set=%d",
 	  cfgetispeed(&newtio), handle->cbaud,

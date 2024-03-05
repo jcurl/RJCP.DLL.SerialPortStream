@@ -51,6 +51,7 @@ struct serialhandle {
   int                fd;                // File descriptor for the serial port
   int                baudrate;          // Integer value of the baudrate
   int                cbaud;             // Converted cbaud value
+  int                custombaud;        // Flag to indicate that there is no supported cbaud value and a custom trick has to be performed
   int                databits;          // Databits: 5..8
   serialparity_t     parity;            // Parity: N, E, O, S, M
   serialstopbits_t   stopbits;          // Stopbits: 1, 1.5, 2
