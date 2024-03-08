@@ -28,7 +28,6 @@
     <LangVersion Condition="$(TargetFramework.StartsWith('net4'))">10</LangVersion>
 
     <RevisionControl>git</RevisionControl>
-    <RevisionControlLabel>release/v$(Version)</RevisionControlLabel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
