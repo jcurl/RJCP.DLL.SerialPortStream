@@ -9,7 +9,7 @@
     using Serial;
 
     [TestFixture]
-    [Timeout(20000)]
+    [CancelAfter(20000)]
     public class ReadWriteBytesTest
     {
         [Test]
@@ -665,7 +665,7 @@
         }
 
         [Test]
-        [Timeout(30000)]
+        [CancelAfter(30000)]
         public void CopyTo()
         {
             Random r = new();
@@ -715,7 +715,7 @@
 
 #if !NET40_LEGACY
         [Test]
-        [Timeout(30000)]
+        [CancelAfter(30000)]
         public async Task CopyToAsync()
         {
             Random r = new();

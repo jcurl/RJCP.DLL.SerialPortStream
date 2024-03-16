@@ -9,7 +9,7 @@ namespace RJCP.IO.Ports
 #endif
 
     [TestFixture]
-    [Timeout(10000)]
+    [CancelAfter(10000)]
     public class ReadWithThrowOnError
     {
         [Test]

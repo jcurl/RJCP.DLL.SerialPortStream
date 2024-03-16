@@ -201,7 +201,7 @@
 
         [Test]
         [Repeat(20)]
-        [Timeout(2000)]
+        [CancelAfter(2000)]
         public void VirtualNativeClosed()
         {
             using (VirtualNativeSerial serial = new())

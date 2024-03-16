@@ -6,7 +6,7 @@
     using Serial;
 
     [TestFixture]
-    [Timeout(10000)]
+    [CancelAfter(10000)]
     public class ReadCharsTest
     {
         [Test]

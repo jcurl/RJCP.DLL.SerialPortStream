@@ -9,7 +9,7 @@
         private readonly string SourcePort = SerialConfiguration.SourcePort;
 
         [Test]
-        [Platform(Include = "Win")]
+        [Platform(Include = "Win32NT")]
         [SupportedOSPlatform("windows")]
         public void InstantiateWinSerialPortStream()
         {
@@ -19,8 +19,8 @@
         }
 
         [Test]
-        [Platform(Exclude = "Win")]
-        [SupportedOSPlatform("windows")]
+        [Platform(Include = "Linux")]
+        [SupportedOSPlatform("linux")]
         public void InstantiateSerialPortStream()
         {
             using (SerialPortStream stream = SerialPortStreamFactory.Factory.Create(SourcePort)) {

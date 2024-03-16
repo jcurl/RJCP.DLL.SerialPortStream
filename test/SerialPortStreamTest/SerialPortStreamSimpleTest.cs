@@ -231,7 +231,7 @@
         }
 
         [Test]
-        [Timeout(30000)]
+        [CancelAfter(30000)]
         public void ListPorts()
         {
             bool result = true;
@@ -269,7 +269,7 @@
         }
 
         [Test]
-        [Platform(Include = "Win")]
+        [Platform(Include = "Win32NT")]
         [SupportedOSPlatform("windows")]
         public void SerialPortStreamNativeSerialWindows()
         {

@@ -4,7 +4,7 @@
     using NUnit.Framework;
 
     [TestFixture]
-    [Platform(Include = "Win")]
+    [Platform(Include = "Win32NT")]
     [SupportedOSPlatform("windows")]
     public class WinSerialPortStreamTest
     {
