@@ -1,0 +1,4 @@
+[*.cs]
+# CA2007
+dotnet_diagnostic.CA2007.severity = warning
+exclude_async_void_methods = false

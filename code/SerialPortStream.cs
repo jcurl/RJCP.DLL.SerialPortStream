@@ -846,7 +846,7 @@
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
             if (ReadCheckDeviceError()) return 0;
 
-            if (!await WaitForReadAsync(cancellationToken)) return 0;
+            if (!await WaitForReadAsync(cancellationToken).ConfigureAwait(false)) return 0;
             return m_NativeSerial.Buffer.ReadStream.Read(buffer, offset, count);
         }
 
@@ -876,7 +876,7 @@
             if (!m_NativeSerial.Buffer.IsBufferAllocated) return 0;
             if (ReadCheckDeviceError()) return 0;
 
-            if (!await WaitForReadAsync(cancellationToken)) return 0;
+            if (!await WaitForReadAsync(cancellationToken).ConfigureAwait(false)) return 0;
             return m_NativeSerial.Buffer.ReadStream.Read(buffer.Span);
         }
 #endif
@@ -884,7 +884,7 @@
         private async Task<bool> WaitForReadAsync(CancellationToken cancellationToken)
         {
             if (m_NativeSerial.IsRunning) {
-                bool ready = await m_NativeSerial.Buffer.ReadStream.WaitForReadAsync(m_ReadTimeout, cancellationToken);
+                bool ready = await m_NativeSerial.Buffer.ReadStream.WaitForReadAsync(m_ReadTimeout, cancellationToken).ConfigureAwait(false);
                 cancellationToken.ThrowIfCancellationRequested();
 
                 ThrowHelper.ThrowIfDisposed(IsDisposed, this);
@@ -1568,7 +1568,7 @@
                 return;
             if (count == 0) return;
 
-            await WaitForWriteAsync(count, cancellationToken);
+            await WaitForWriteAsync(count, cancellationToken).ConfigureAwait(false);
             m_NativeSerial.Buffer.WriteStream.Write(buffer, offset, count);
             WriteCheckDeviceError();
         }
@@ -1601,7 +1601,7 @@
             if (!WriteCheck(buffer)) return;
             if (buffer.Length == 0) return;
 
-            await WaitForWriteAsync(buffer.Length, cancellationToken);
+            await WaitForWriteAsync(buffer.Length, cancellationToken).ConfigureAwait(false);
             m_NativeSerial.Buffer.WriteStream.Write(buffer.Span);
             WriteCheckDeviceError();
         }
@@ -1609,7 +1609,7 @@
 
         private async Task WaitForWriteAsync(int count, CancellationToken cancellationToken)
         {
-            bool ready = await m_NativeSerial.Buffer.WriteStream.WaitForWriteAsync(count, m_WriteTimeout, cancellationToken);
+            bool ready = await m_NativeSerial.Buffer.WriteStream.WaitForWriteAsync(count, m_WriteTimeout, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
 
             ThrowHelper.ThrowIfDisposed(IsDisposed, this);
