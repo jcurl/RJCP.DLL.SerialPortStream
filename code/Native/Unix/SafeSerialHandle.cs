@@ -2,6 +2,9 @@
 {
     using System;
     using System.Runtime.InteropServices;
+#if NETFRAMEWORK
+    using System.Runtime.ConstrainedExecution;
+#endif
 
     internal class SafeSerialHandle : SafeHandle
     {
@@ -15,6 +18,9 @@
             }
         }
 
+#if NETFRAMEWORK
+        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
         protected override bool ReleaseHandle()
         {
             UnsafeNativeMethods.serial_terminate(handle);

@@ -3,8 +3,11 @@
     using System;
     using System.Runtime.InteropServices;
     using System.Security;
+#if NETFRAMEWORK
+    using System.Runtime.ConstrainedExecution;
+#endif
 
-#if !NETSTANDARD1_5
+#if NETFRAMEWORK
     [SuppressUnmanagedCodeSecurity]
 #endif
     internal static class UnsafeNativeMethods
@@ -12,6 +15,9 @@
         [DllImport("libnserial.so.1", SetLastError = true)]
         internal static extern SafeSerialHandle serial_init();
 
+#if NETFRAMEWORK
+        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+#endif
         [DllImport("libnserial.so.1")]
         internal static extern void serial_terminate(IntPtr handle);
 

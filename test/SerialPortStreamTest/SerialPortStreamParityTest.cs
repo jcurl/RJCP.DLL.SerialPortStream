@@ -43,7 +43,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-        private void TestOddParity(SerialPortStream src, SerialPortStream dst)
+        private static void TestOddParity(SerialPortStream src, SerialPortStream dst)
         {
             src.Write(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F }, 0, 16);
             src.Flush();
@@ -70,7 +70,7 @@ namespace RJCP.IO.Ports
             }
         }
 
-        private void TestEvenParity(SerialPortStream src, SerialPortStream dst)
+        private static void TestEvenParity(SerialPortStream src, SerialPortStream dst)
         {
             src.Write(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F }, 0, 16);
             src.Flush();

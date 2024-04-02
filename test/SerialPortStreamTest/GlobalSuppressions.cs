@@ -5,8 +5,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0031:Use null propagation", Justification = ".NET Framework / Core compatibility")]
-[assembly: SuppressMessage("Style", "IDE0056:Use index operator", Justification = ".NET Framework / Core compatibility")]
-[assembly: SuppressMessage("Style", "IDE0074:Use compound assignment", Justification = ".NET Framework / Core compatibility")]
+[assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "C# 7.3 compatibility")]
+[assembly: SuppressMessage("Style", "IDE0031:Use null propagation", Justification = "C# 7.3 compatibility")]
+[assembly: SuppressMessage("Style", "IDE0056:Use index operator", Justification = "C# 7.3 compatibility")]
+[assembly: SuppressMessage("Style", "IDE0074:Use compound assignment", Justification = "C# 7.3 compatibility")]
+[assembly: SuppressMessage("Style", "IDE0090:Use 'new(...)'", Justification = "C# 7.3 compatibility")]
+[assembly: SuppressMessage("Style", "IDE0230:Use UTF-8 string literal", Justification = "Byte based testing")]
+[assembly: SuppressMessage("Style", "IDE0300:Simplify collection initialization", Justification = "C# 7.3 compatibility")]
 [assembly: SuppressMessage("Blocker Code Smell", "S2699:Tests should include assertions", Justification = "Not required")]
-

@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net48;netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>net40;net45;netstandard1.5</TargetFrameworks>
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -10,18 +10,18 @@
     <Product>RJCP.SerialPortStream</Product>
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
     <Configurations>Debug;Release;Signed_Release</Configurations>
-  </PropertyGroup>
 
-  <PropertyGroup>
     <AssemblyTitle>SerialPortStream</AssemblyTitle>
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) Jason Curl, 2012-2021</Copyright>
+    <Copyright>(C) Jason Curl, 2012-2024</Copyright>
     <PackageId>SerialPortStream</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/jcurl/serialportstream</PackageProjectUrl>
     <Description>An independent implementation of System.IO.Ports.SerialPort and SerialStream for better reliability and maintainability. Version 3.x and later will be under the package name RJCP.SerialPortStream.</Description>
-    <Version>2.4.1</Version>
+    <Version>2.4.2</Version>
+
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
@@ -126,7 +126,6 @@
     <Compile Include="SerialPortStream.cs" />
     <Compile Include="StopBits.cs" />
     <None Include="System\EntryPointNotFoundException.cs" />
-    <None Include="System\IO\Ports\SerialPort.cs" />
     <None Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\Log.cs" />
     <None Include="Trace\LoggerTraceListener.cs" />
@@ -136,10 +135,17 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <Compile Include="System\EntryPointNotFoundException.cs" />
-    <Compile Include="System\IO\Ports\SerialPort.cs" />
     <Compile Include="Trace\LineSplitter.cs" />
     <Compile Include="Trace\LoggerTraceListener.cs" />
     <Compile Include="Trace\LogSourceFactory.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="rjcp_serialportstream.snk" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>

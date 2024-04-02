@@ -1,6 +1,9 @@
 ﻿namespace RJCP.IO.Ports
 {
     using System;
+#if NETFRAMEWORK
+    using System.Runtime.Serialization;
+#endif
 
     /// <summary>
     /// Indicates an unexpected internal error occurred in the application.
@@ -9,8 +12,9 @@
     /// The InternalApplicationError indicates a programming error in the application. Such an
     /// error should never occur and always indicates a bug in the application itself.
     /// </remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S3871:Exception types should be \"public\"",
-        Justification = "Exception should never occur, so should be internal")]
+#if NETFRAMEWORK
+    [Serializable]
+#endif
     internal class InternalApplicationException : Exception
     {
         /// <summary>
@@ -33,5 +37,19 @@
         /// Visual Basic) if no inner exception is specified.
         /// </param>
         public InternalApplicationException(string message, Exception innerException) : base(message, innerException) { }
+
+#if NETFRAMEWORK
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InternalApplicationException"/> class.
+        /// </summary>
+        /// <param name="info">
+        /// The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown.
+        /// </param>
+        /// <param name="context">
+        /// The <see cref="StreamingContext"/> that contains contextual information about the source or destination.
+        /// </param>
+        protected InternalApplicationException(SerializationInfo info, StreamingContext context)
+            : base(info, context) { }
+#endif
     }
 }
