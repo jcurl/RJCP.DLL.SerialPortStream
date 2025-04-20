@@ -64,7 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.4" PrivateAssets="all" />
+    <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.5" PrivateAssets="all" />
     <PackageReference Include="CSharpIsNullAnalyzer" Version="0.1.495" PrivateAssets="all" />
     <ProjectReference Include="..\..\environment\SysCompat\RJCP.Core.SysCompat.csproj" />
     <ProjectReference Include="..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
