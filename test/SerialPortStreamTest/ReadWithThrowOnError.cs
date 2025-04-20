@@ -45,7 +45,7 @@ namespace RJCP.IO.Ports
                 byte[] buffer = new byte[256];
                 if (throwOnError) {
                     Assert.That(() => {
-                        stream.Read(buffer, 0, buffer.Length);
+                        _ = stream.Read(buffer, 0, buffer.Length);
                     }, Throws.TypeOf<InvalidOperationException>());
                 } else {
                     Assert.That(stream.Read(buffer, 0, buffer.Length), Is.EqualTo(0));
@@ -174,7 +174,7 @@ namespace RJCP.IO.Ports
                 byte[] buffer = new byte[256];
                 if (throwOnError) {
                     Assert.That(async () => {
-                        await stream.ReadAsync(buffer, 0, buffer.Length);
+                        _ = await stream.ReadAsync(buffer, 0, buffer.Length);
                     }, Throws.TypeOf<InvalidOperationException>());
                 } else {
                     Assert.That(await stream.ReadAsync(buffer, 0, buffer.Length), Is.EqualTo(0));
@@ -355,7 +355,7 @@ namespace RJCP.IO.Ports
                 byte[] buffer = new byte[256];
                 if (throwOnError) {
                     Assert.That(async () => {
-                        await stream.ReadAsync(buffer, 0, buffer.Length);
+                        _ = await stream.ReadAsync(buffer, 0, buffer.Length);
                     }, Throws.TypeOf<TimeoutException>());
                 } else {
                     Assert.That(await stream.ReadAsync(buffer, 0, buffer.Length), Is.EqualTo(0));

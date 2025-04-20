@@ -49,7 +49,7 @@
 
                 // Now that we've read all data, we should get an exception
                 Assert.That(() => {
-                    stream.Read(inbuff, 0, inbuff.Length);
+                    _ = stream.Read(inbuff, 0, inbuff.Length);
                 }, Throws.TypeOf<IOException>());
             }
         }
