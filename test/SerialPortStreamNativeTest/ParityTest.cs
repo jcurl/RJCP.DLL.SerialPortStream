@@ -57,7 +57,7 @@
 
             // NOTE: This test case will likely fail on software loopback devices, as they handle bytes and not
             // bits as a real UART does
-            Assert.That(offset, Is.EqualTo(16), "Expected 16 bytes received, but only got {0} bytes", offset);
+            Assert.That(offset, Is.EqualTo(16), $"Expected 16 bytes received, but only got {offset} bytes");
             byte[] expectedrecv = new byte[] { 0x80, 0x01, 0x02, 0x83, 0x04, 0x85, 0x86, 0x07, 0x08, 0x89, 0x8A, 0x0B, 0x8C, 0x0D, 0x0E, 0x8F };
             for (int i = 0; i < offset; i++) {
                 Assert.That(recv[i], Is.EqualTo(expectedrecv[i]), $"Offset {i} got {recv[i]}; expected {expectedrecv[i]}");

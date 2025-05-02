@@ -52,7 +52,7 @@
 
   <ItemGroup>
     <PackageReference Include="RJCP.MSBuildTasks" Version="0.2.5" PrivateAssets="all" />
-    <PackageReference Include="CSharpIsNullAnalyzer" Version="0.1.495" PrivateAssets="all" />
+    <PackageReference Include="CSharpIsNullAnalyzer" Version="0.1.593" PrivateAssets="all" />
     <ProjectReference Include="..\..\code\SerialPortStream.csproj" />
     <ProjectReference Include="..\..\..\bufferio\BufferIO\RJCP.IO.Buffer.csproj" />
   </ItemGroup>
