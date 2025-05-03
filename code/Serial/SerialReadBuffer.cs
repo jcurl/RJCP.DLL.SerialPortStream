@@ -202,7 +202,7 @@
                     }
 
                     Decoder.Convert(ReadBuffer, buffer, offset + chars, count - chars,
-                        false, out int bu, out int cu, out bool complete);
+                        false, out int _, out int cu, out bool _);
                     return chars + cu;
                 } finally {
                     CheckBufferState(false);
@@ -331,7 +331,7 @@
                 lock (Lock) {
                     do {
                         char[] c = new char[2048];
-                        Decoder.Convert(ReadBuffer, c, 0, c.Length, false, out int bu, out int cu, out bool complete);
+                        Decoder.Convert(ReadBuffer, c, 0, c.Length, false, out int _, out int cu, out bool _);
                         sb.Append(c, 0, cu);
                     } while (ReadBuffer.Length > 0);
                 }

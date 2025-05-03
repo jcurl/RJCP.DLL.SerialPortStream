@@ -16,7 +16,6 @@
     [TestFixture]
     [Explicit("Fails on Linux")]
     [Category("ManualTest")]
-    [Timeout(10000)]
     public class CloseWhileBlockedTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;

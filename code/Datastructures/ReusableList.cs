@@ -1,4 +1,4 @@
-﻿namespace RJCP.Datastructures
+﻿namespace RJCP.IO.Ports.Datastructures
 {
     using System;
     using System.Collections;

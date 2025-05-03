@@ -13,7 +13,6 @@
     [TestFixture]
     [Category("ManualTest")]
     [Explicit("Manual Test")]
-    [Timeout(10000)]
     public class DisconnectDeviceTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;

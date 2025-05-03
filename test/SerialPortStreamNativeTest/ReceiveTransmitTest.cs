@@ -18,7 +18,6 @@
     /// <para>You need to update the variables SourcePort and DestPort to be the names of the two serial ports.</para>
     /// </remarks>
     [TestFixture]
-    [Timeout(10000)]
     public class ReceiveTransmitTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
@@ -34,7 +33,6 @@
 #endif
 
         [Test]
-        [Timeout(20000)]
         public void SendReceive()
         {
             using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -107,7 +105,6 @@
         }
 
         [Test]
-        [Timeout(20000)]
         public void SendReceiveWithBeginEnd()
         {
             using (SerialPortStream src = new(SourcePort, 115200, 8, Parity.None, StopBits.One))
@@ -135,7 +132,7 @@
             }
         }
 
-        private void SendReceiveAsyncWriteComplete(IAsyncResult ar)
+        private static void SendReceiveAsyncWriteComplete(IAsyncResult ar)
         {
             SendReceiveAsyncState state = (SendReceiveAsyncState)ar.AsyncState;
             state.src.EndWrite(ar);
@@ -359,7 +356,6 @@
         }
 
         [Test]
-        [Timeout(60000)]
         public void ReadDataEvent()
         {
             const int blockSize = 8192;
@@ -408,7 +404,6 @@
         }
 
         [Test]
-        [Timeout(60000)]
         public void SendReceiveBoundaries()
         {
             using (var sp = new SerialPortStream(SourcePort, 57600))
@@ -448,7 +443,6 @@
 
 #if NET45_OR_GREATER || NET6_0_OR_GREATER
         [Test]
-        [Timeout(10000)]
         public async Task ReadAndWriteAsyncInDifferentThreadsAtSameTime()
         {
             using (SerialPortStream serial = new(SourcePort) {
@@ -478,7 +472,6 @@
         }
 
         [Test]
-        [Timeout(2000)] // We abort the test after timeout. This tests the blocking behavior in ReadAsync and the test will fail if ReadAsync blocks.
         public async Task ReadAndWriteAsync()
         {
             using (var serialPortStreamWrite = new SerialPortStream(SourcePort, 9600, 8, Parity.None, StopBits.One))

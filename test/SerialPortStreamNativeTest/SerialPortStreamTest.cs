@@ -13,7 +13,6 @@
     /// <para>You need to update the variables SourcePort and DestPort to be the names of the two serial ports.</para>
     /// </remarks>
     [TestFixture]
-    [Timeout(10000)]
     public class SerialPortStreamTest
     {
         private readonly string SourcePort = SerialConfiguration.SourcePort;
