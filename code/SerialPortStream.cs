@@ -13,7 +13,6 @@
 
 #if NET6_0_OR_GREATER
     using Microsoft.Extensions.Logging;
-    using static System.Net.Mime.MediaTypeNames;
 #endif
 
     /// <summary>

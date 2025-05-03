@@ -3,7 +3,6 @@
     using System;
     using RJCP.Core.Environment;
     using Serial;
-    using static System.Net.Mime.MediaTypeNames;
 
     /// <summary>
     /// A Factory for <see cref="SerialPortStream"/> objects, based on the runtime environment.
