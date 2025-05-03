@@ -17,7 +17,7 @@
                 Assert.That(stream.Settings.ReadIntervalTimeout, Is.EqualTo(10));
                 Assert.That(stream.Settings.ReadTotalTimeoutConstant, Is.EqualTo(100));
                 Assert.That(stream.Settings.ReadTotalTimeoutMultiplier, Is.EqualTo(0));
-                Assert.That(stream.Settings.WriteTotalTimeoutConstant, Is.EqualTo(500));
+                Assert.That(stream.Settings.WriteTotalTimeoutConstant, Is.EqualTo(0));
                 Assert.That(stream.Settings.WriteTotalTimeoutMultiplier, Is.EqualTo(0));
             }
         }

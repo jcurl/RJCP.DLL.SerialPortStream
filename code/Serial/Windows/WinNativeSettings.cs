@@ -42,7 +42,7 @@
             }
         }
 
-        private int m_WriteTotalTimeoutConstant = 500;
+        private int m_WriteTotalTimeoutConstant = 0;
 
         public int WriteTotalTimeoutConstant
         {

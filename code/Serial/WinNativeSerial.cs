@@ -852,7 +852,7 @@
             if (string.IsNullOrWhiteSpace(PortName)) throw new InvalidOperationException("Port must first be set");
             if (IsOpen) throw new InvalidOperationException("Serial Port currently open");
 
-            m_ComPortHandle = Kernel32.CreateFile(@"\\.\" + PortName,
+            m_ComPortHandle = Kernel32.CreateFile(@"\\?\" + PortName,
                 Kernel32.FileAccess.GENERIC_READ | Kernel32.FileAccess.GENERIC_WRITE,
                 Kernel32.FileShare.FILE_SHARE_NONE,
                 IntPtr.Zero,

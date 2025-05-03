@@ -13,6 +13,8 @@
     [SupportedOSPlatform("windows")]
     internal class CommOverlappedIo : IDisposable
     {
+        private const uint MaxWriteBytes = 8192;
+
         #region Local variables
         /// <summary>
         /// Handle to the already opened COM Port.
@@ -189,7 +191,7 @@
         /// Discards data from the serial driver's transmit buffer.
         /// </summary>
         /// <remarks>
-        /// This function will discard the receive buffer of the SerialPortStream.
+        /// This function will discard the transmit buffer of the SerialPortStream.
         /// </remarks>
         public void DiscardOutBuffer()
         {
@@ -265,7 +267,6 @@
             Kernel32.SerialEventMask.EV_RING |
             Kernel32.SerialEventMask.EV_RLSD |
             Kernel32.SerialEventMask.EV_RXCHAR |
-            Kernel32.SerialEventMask.EV_TXEMPTY |
             Kernel32.SerialEventMask.EV_RXFLAG;
 
         private const Kernel32.SerialEventMask maskReadPending =
@@ -274,8 +275,7 @@
             Kernel32.SerialEventMask.EV_DSR |
             Kernel32.SerialEventMask.EV_ERR |
             Kernel32.SerialEventMask.EV_RING |
-            Kernel32.SerialEventMask.EV_RLSD |
-            Kernel32.SerialEventMask.EV_TXEMPTY;
+            Kernel32.SerialEventMask.EV_RLSD;
 
         private void OverlappedIoThread()
         {
@@ -533,17 +533,6 @@
             // is complete.
             OnCommEvent(new CommEventArgs(mask & ~(Kernel32.SerialEventMask.EV_RXCHAR | Kernel32.SerialEventMask.EV_RXFLAG)));
 
-            if ((mask & Kernel32.SerialEventMask.EV_TXEMPTY) != 0) {
-                // Some devices don't support EV_TXEMPTY, so this implementation doesn't use this information. It is
-                // logged for information only.
-                if (m_Buffer.SerialWrite.BufferReadLength == 0) {
-                    if (m_Log.ShouldTrace(System.Diagnostics.TraceEventType.Verbose)) {
-                        m_Log.TraceEvent(System.Diagnostics.TraceEventType.Verbose,
-                            $"{m_Name}: SerialThread: ProcessWaitCommEvent: TX-BUFFER empty");
-                    }
-                }
-            }
-
             if ((mask & (Kernel32.SerialEventMask.EV_RXCHAR | Kernel32.SerialEventMask.EV_ERR)) != 0) {
                 bool result = Kernel32.ClearCommError(m_ComPortHandle, out Kernel32.ComStatErrors comErr, IntPtr.Zero);
                 if (!result) {
@@ -705,7 +694,7 @@
             uint bufLen;
             lock (m_Buffer.SerialWrite.Lock) {
                 bufPtr = m_Buffer.SerialWrite.BufferPtr;
-                bufLen = (uint)m_Buffer.SerialWrite.BufferReadLength;
+                bufLen = Math.Min(MaxWriteBytes, (uint)m_Buffer.SerialWrite.BufferReadLength);
             }
 
             bool result = Kernel32.WriteFile(m_ComPortHandle, bufPtr, bufLen, out uint bufWrite, ref overlap);
