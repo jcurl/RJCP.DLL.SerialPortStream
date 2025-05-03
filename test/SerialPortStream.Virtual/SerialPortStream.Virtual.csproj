@@ -12,7 +12,7 @@
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
 
     <Authors>Jason Curl</Authors>
-    <Copyright>(C) 2021-2024, Jason Curl</Copyright>
+    <Copyright>(C) 2021-2025, Jason Curl</Copyright>
     <Company></Company>
     <PackageId>RJCP.SerialPortStream.Virtual</PackageId>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>

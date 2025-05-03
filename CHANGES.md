@@ -1,6 +1,7 @@
 # List of Changes with Releases <!-- omit in toc -->
 
-- [Version 3.0.2 (libnserial 1.1.4)](#version-302-libnserial-114)
+- [Version 3.0.3 (libnserial 1.1.4) - 3/May/2025](#version-303-libnserial-114---3may2025)
+- [Version 3.0.2 (libnserial 1.1.4) - 20/Apr/2025](#version-302-libnserial-114---20apr2025)
 - [Version 3.0.1 (libnserial 1.1.4) - 29/Feb/2024](#version-301-libnserial-114---29feb2024)
 - [Version 3.0.0 (libnserial 1.1.4) - 25/Oct/2021](#version-300-libnserial-114---25oct2021)
 - [Version 2.4.2 (libnserial 1.1.4) - 29/Feb/2024](#version-242-libnserial-114---29feb2024)
@@ -22,7 +23,15 @@
 - [Version 2.0.1 (libnserial 1.0.0) - 7/Sep/2016](#version-201-libnserial-100---7sep2016)
 - [Version 2.0.0 - 25/May/2016](#version-200---25may2016)
 
-## Version 3.0.2 (libnserial 1.1.4)
+## Version 3.0.3 (libnserial 1.1.4) - 3/May/2025
+
+Bugfix:
+
+- [Issue #154](https://github.com/jcurl/RJCP.DLL.SerialPortStream/issues/154),
+  DOTNET-1030: Set default write constant to zero on Windows so that PL2303
+  chipsets properly flush.
+
+## Version 3.0.2 (libnserial 1.1.4) - 20/Apr/2025
 
 Quality:
 
