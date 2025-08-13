@@ -11,7 +11,7 @@
 // DESCRIPTION : Methods for setting modem flags in serial hardware.
 //
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef NSERIAL_MODEML_H
+#ifndef NSERIAL_MODEM_H
 #define NSERIAL_MODEM_H
 
 #include "nserial.h"
