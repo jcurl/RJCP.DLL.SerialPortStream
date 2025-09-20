@@ -10,6 +10,15 @@
     public class WinSerialPortStream : SerialPortStream<IWinNativeSettings>
     {
         /// <summary>
+        /// Constructor. Create a stream that doesn't connect to any port.
+        /// </summary>
+        /// <remarks>
+        /// This constructor initialises a stream object, but doesn't assign it to any COM port. The properties then
+        /// assume default settings. No COM port is opened and queried.
+        /// </remarks>
+        public WinSerialPortStream() : base(new WinNativeSerial()) { }
+
+        /// <summary>
         /// Constructor. Create a stream that connects to the specified port.
         /// </summary>
         /// <param name="port">The name of the COM port, such as "COM1" or "COM33".</param>

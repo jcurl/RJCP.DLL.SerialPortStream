@@ -13,7 +13,9 @@
             get { return m_ReadIntervalTimeout; }
             set
             {
-                ThrowHelper.ThrowIfNegative(value, nameof(ReadIntervalTimeout));
+                if (value != System.Threading.Timeout.Infinite)
+                    ThrowHelper.ThrowIfNegative(value, nameof(ReadIntervalTimeout));
+
                 m_ReadIntervalTimeout = value;
             }
         }
