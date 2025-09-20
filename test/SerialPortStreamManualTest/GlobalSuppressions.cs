@@ -5,4 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+[assembly: SuppressMessage("Style", "IDE0130:Namespace does not match folder structure", Justification = "Testing system libraries", Scope = "namespace", Target = "~N:System.IO.Ports")]
+[assembly: SuppressMessage("Style", "IDE0130:Namespace does not match folder structure", Justification = "Testing system libraries", Scope = "namespace", Target = "~N:System.Text")]
 [assembly: SuppressMessage("Style", "IDE0230:Use UTF-8 string literal", Justification = "Testing byte streams, not UTF8 strings")]
