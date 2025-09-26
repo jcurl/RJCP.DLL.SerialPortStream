@@ -21,9 +21,6 @@ better integration with .NET Core projects, and to allow better unit testing.
     - [2.4.2. Executing Unit Tests on Linux](#242-executing-unit-tests-on-linux)
     - [2.4.3. Failing Tests for Linux](#243-failing-tests-for-linux)
 - [3. Developer](#3-developer)
-  - [3.1. .NET Framework SDK Project](#31-net-framework-sdk-project)
-  - [3.2. .NET Standard 2.1](#32-net-standard-21)
-    - [3.2.1. Logging in Unit Tests](#321-logging-in-unit-tests)
 
 ## 1. Windows
 
@@ -40,6 +37,8 @@ The following other projects are needed in parallel
 | serialportstream | RJCP.DLL.SerialPortStream.git |
 | bufferio         | RJCP.DLL.BufferIO.git         |
 | trace            | RJCP.DLL.Trace.git            |
+| devicemgr        | RJCP.DLL.DeviceMgr.git        |
+| environment      | RJCP.DLL.Environment.git      |
 
 ### 1.2. Building
 
@@ -156,22 +155,6 @@ To build on Linux, install the .NET SDK. For example, on Ubuntu the instructions
 are given at [Install the .NET SDK or the .NET Runtime on
 Ubuntu](https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu)
 
-1. Preconditions
-
-   ```cmd
-   $ wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-   $ sudo dpkg -i packages-microsoft-prod.deb
-   ```
-
-2. Install the SDK
-
-   ```cmd
-   $ sudo apt-get update; \
-    sudo apt-get install -y apt-transport-https && \
-    sudo apt-get update && \
-    sudo apt-get install -y dotnet-sdk-3.1
-   ```
-
 ### 2.2. Building the libnserial Library
 
 You should install the latest version of `libnserial`. The package for Ubuntu is
@@ -270,31 +253,13 @@ but provided on Windows. Linux doesn't provide this functionality natively.
 
 ## 3. Developer
 
-### 3.1. .NET Framework SDK Project
-
 This project uses the newest Microsoft SDK Project format, which is simpler and
 easier to write. It has been modified from the original to require explicit
 inclusion of files (this is for safety reasons to ensure that unexpected files
 do not get included).
 
-The library targets .NET 4.0, .NET 4.5, .NET Standard 1.5; where as the unit
-tests are using NUnit 3.x and target .NET 4.0, .NET 4.5 and .NET Core App 3.1
-(LTS).
+The library targets .NET 4.0, .NET 4.5, .NET Core 6.0, 8.0.
 
 When adding files, you'll need to look and modify the `.csproj` files directly,
-Visual Studio 2019 will likely not be able to put the files in the correct
+Visual Studio 2022 will likely not be able to put the files in the correct
 `<ItemGroup/>`.
-
-### 3.2. .NET Standard 2.1
-
-This project also targets .NET Standard 2,1. There are some features that are
-available in .NET 4.x that are not available in .NET Standard 2.1, and so there
-are replacement libraries in the `System` folder, which are not otherwise
-needed.
-
-#### 3.2.1. Logging in Unit Tests
-
-The Unit Tests for .NET Standard 2.1 is run by compiling for .NET Core App 3.1.
-In .NET Framework, logging is done using the `TraceSource` which doesn't work
-well in .NET Core, and so the unit test cases obtain a solution from the project
-`RJCP.DLL.Trace` with its own implementation and can log using the NUnit Logger.
