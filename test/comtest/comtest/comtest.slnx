@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../../../code/SerialPortStream.csproj" />
+  <Project Path="WinFormsApp1/WinFormsApp1.csproj" />
+</Solution>
