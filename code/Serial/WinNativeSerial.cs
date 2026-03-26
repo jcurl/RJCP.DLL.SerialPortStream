@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
     using Microsoft.Win32;
@@ -102,30 +103,39 @@
         /// <returns>An array of serial port names.</returns>
         public string[] GetPortNames()
         {
-            using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
-                if (local is null) {
-#if NET40
-                    return new string[0];
-#else
-                    return Array.Empty<string>();
-#endif
-                }
+//            using (RegistryKey local = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DEVICEMAP\SERIALCOMM", false)) {
+//                if (local is null) {
+//#if NET40
+//                    return new string[0];
+//#else
+//                    return Array.Empty<string>();
+//#endif
+//                }
 
-                string[] k = local.GetValueNames();
-                if (k.Length > 0) {
-                    string[] ports = new string[local.ValueCount];
-                    for (int i = 0; i < k.Length; i++) {
-                        ports[i] = local.GetValue(k[i]) as string;
-                    }
-                    return ports;
-                }
+//                string[] k = local.GetValueNames();
+//                if (k.Length > 0) {
+//                    string[] ports = new string[local.ValueCount];
+//                    for (int i = 0; i < k.Length; i++) {
+//                        ports[i] = local.GetValue(k[i]) as string;
+//                    }
+//                    return ports;
+//                }
 
-#if NET40
-                return new string[0];
-#else
-                return Array.Empty<string>();
-#endif
+//#if NET40
+//                return new string[0];
+//#else
+//                return Array.Empty<string>();
+//#endif
+//        }
+            IList<DeviceInstance> devices = DeviceInstance.GetList(LocateMode.Normal);
+            HashSet<string> ports = new();
+            foreach (DeviceInstance device in devices) {
+                if (!device.HasProblem &&
+                    device.GetDeviceProperty("PortName") is string portName) {
+                    ports.Add(portName);
+                }
             }
+            return ports.ToArray();
         }
 
         /// <summary>
