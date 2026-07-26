@@ -29,6 +29,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion Condition="$(TargetFramework.StartsWith('net4'))">10</LangVersion>
 
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
+
     <RevisionControl>git</RevisionControl>
     <RevisionControlLabel>release/v$(Version)</RevisionControlLabel>
   </PropertyGroup>

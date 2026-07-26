@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
+    using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Runtime.Versioning;
     using Microsoft.Win32;
@@ -14,7 +14,6 @@
     using Windows;
 
 #if NET6_0_OR_GREATER
-    using System.Reflection;
     using System.Collections;
 #endif
 
@@ -65,13 +64,10 @@
             {
                 if (m_Version is not null) return m_Version;
 
-#if NET6_0_OR_GREATER
-                System.Reflection.Assembly assembly = typeof(WinNativeSerial).GetTypeInfo().Assembly;
-#else
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-#endif
-                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-                m_Version = fvi.FileVersion;
+                Assembly assembly = typeof(WinNativeSerial).Assembly;
+                Attribute attribute = Attribute.GetCustomAttribute(assembly, typeof(AssemblyFileVersionAttribute), false);
+                m_Version = (attribute as AssemblyFileVersionAttribute)?.Version ??
+                    assembly.GetName().Version?.ToString() ?? string.Empty;
                 return m_Version;
             }
         }
