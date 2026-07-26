@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Runtime.Versioning;
     using NUnit.Framework;
     using Serial;
@@ -33,6 +34,27 @@
             using (SerialPortStream src = new()) {
                 Assert.That(src.Version, Is.Not.Null.Or.Empty);
                 Console.WriteLine($"Version: {src.Version}");
+            }
+        }
+
+        [Test]
+        [Platform(Include = "Win32NT")]
+        [SupportedOSPlatform("windows")]
+        public void WinNativeSerialVersion()
+        {
+            using (WinNativeSerial serial = new()) {
+                Assert.That(serial.Version, Is.EqualTo("3.0.5.0"));
+            }
+        }
+
+        [Test]
+        [Platform(Include = "Linux")]
+        [SupportedOSPlatform("linux")]
+        public void UnixNativeSerialVersion()
+        {
+            using (UnixNativeSerial serial = new()) {
+                Assert.That(Version.TryParse(serial.Version, out Version version), Is.True);
+                Assert.That(version, Is.GreaterThanOrEqualTo(new Version(1, 1, 0)));
             }
         }
 
