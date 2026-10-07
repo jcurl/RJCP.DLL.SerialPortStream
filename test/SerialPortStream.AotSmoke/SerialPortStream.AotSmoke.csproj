@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <PublishAot>true</PublishAot>
     <IsPackable>false</IsPackable>
+	<PublishAot>true</PublishAot>
 
     <AssemblyName>SerialPortStream.AotSmoke</AssemblyName>
     <RootNamespace>RJCP.IO.Ports</RootNamespace>
